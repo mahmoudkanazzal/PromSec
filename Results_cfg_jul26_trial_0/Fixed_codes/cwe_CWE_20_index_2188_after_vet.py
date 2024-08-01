@@ -1,0 +1,32 @@
+import os
+from twisted.internet import reactor
+from twisted.internet.ssl import CertificateOptions
+from twisted.web.client import Agent
+from sydent.http.httpcommon import FakeChannel, FakeSite, make_request
+from sydent.http.imsy import ToTwistedHandler
+from sydent.util import setup_logging
+from twisted.internet.testing import ResolvingMemoryReactorClock
+from twisted.names import client, dns, error, server
+
+os.environ["SECRET_KEY"] = "your_secret_key_here"
+os.environ["PASSWORD"] = "your_password_here"
+
+class Sydent:
+    pass
+
+tls_certificate = """
+-----BEGIN CERTIFICATE-----
+MIIDozCCAougAwIBAgIJALB4z1Zz1Zz1MA0GCSqGSIb3DQEBCwUAMIGZMQswCQYD
+VQQGEwJVUzELMAkGA1UECAwCTUExEDAOBgNVBAcMB0NoaWNhZ28xETAPBgNVBAoM
+CFN5ZGVudDEUMBIGA1UECwwLU3lkZW50IFNlcnZlcjEUMBIGA1UEAwwLU3lkZW50
+IFNlcnZlcjEgMB4GCSqGSIb3DQEJARYRc3lkZW50QHN5ZGVudC5jb20wHhcNMTkw
+NjI4MTQ0MzQwWhcNMjkwNjI2MTQ0MzQwWjCBmTELMAkGA1UEBhMCVVMxCzAJBgNV
+BAgMAk1BMRAwDgYDVQQHDAdDaGljYWdvMREwDwYDVQQKDAhTeWRlbnQxFDASBgNVBAsM
+C1N5ZGVudCBTZXJ2ZXIxFDASBgNVBAMMC1N5ZGVudCBTZXJ2ZXIgMB4GCSqGSIb3DQ
+EJARYRc3lkZW50QHN5ZGVudC5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggE
+KAoIBAQDQ6Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5
+Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz
+5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Z
+z5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5
+Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz5Zz
+5Zz5Zz5Z

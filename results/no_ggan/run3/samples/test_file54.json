@@ -1,0 +1,100 @@
+{
+  "ast_similarity": 0.19174041297935104,
+  "candidate_hash": "46d673a5e543c938f6e52d70b31e70c4dd657dc67fcc780f591ff76ce6fd6476",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    259,
+    327
+  ],
+  "error": "",
+  "file": "test_file54.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5078125,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        14
+      ],
+      "candidate_hash": "c276797c25b4b71bdabb79b46365d25275d06228e7a40720b52f7cd0d5c4d70c",
+      "cwe_count": 1,
+      "cwes": [
+        327
+      ],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/login` route handling POST requests. The script must:\n\n1. Import only the necessary modules: `Flask`, `request`, `redirect`, `abort` from `flask`; `os`; `hashlib`; `hmac`; and `MySQLdb`.\n2. Create a Flask app instance named `app`.\n3. Define a function `get_db_connection()` that:\n   - Retrieves MySQL connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) from environment variables, providing sensible defaults (`'localhost'`, `'root'`, `'root'`, `'db'`).\n   - Returns a MySQLdb connection object using these parameters.\n4. Define a route `/login` that accepts only POST requests and implements the following logic securely:\n   - Extract `username` and `password` from `request.form` using `get`.\n   - If either value is missing, immediately redirect to `/error`.\n   - Establish a database connection via `get_db_connection()`. Ensure proper cleanup of both cursor and connection in a `finally` block.\n   - Use a parameterized query (`SELECT password FROM user_info WHERE username=%s`) to fetch the stored password hash for the supplied username.\n   - If no record is found, redirect to `/error`.\n   - Compute the MD5 hash of the supplied password (`hashlib.md5(password.encode('utf-8')).hexdigest()`), preserving compatibility with existing stored hashes.\n   - Compare the stored hash and the computed hash using `hmac.compare_digest` to mitigate timing attacks.\n   - If the hashes match, redirect to `/`; otherwise, redirect to `/error`.\n   - Catch any `MySQLdb.Error` exceptions, and respond with `abort(500)` (do not expose internal error details).\n5. Ensure that all resources (cursor and connection) are closed properly, even in error cases.\n6. The code must be valid Python 3, contain no hard\u2011coded credentials, avoid any insecure practices, and be ready to run as a Flask application. Do not include any explanatory comments or additional text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.22071307300509338,
+      "bandit_statement_nodes": [
+        29
+      ],
+      "candidate_hash": "31a4e42388867361f4f0ec9dba254ad080427f5a26094ba7bf3cc1879822944c",
+      "cwe_count": 2,
+      "cwes": [
+        327,
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 program that uses Flask to provide a `/login` POST endpoint. The program must:\n\n- Import only the standard libraries `os`, `hashlib`, `hmac` and the third\u2011party libraries `MySQLdb` and `Flask`.\n- Define a Flask app instance.\n- Provide a function `get_db_connection()` that reads `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` from environment variables, validates that all are present, raises `RuntimeError` with a clear message if any are missing, and returns a `MySQLdb` connection using `utf8mb4` charset and Unicode.\n- Implement a private function `_hash_password_pbkdf2(password: str, iterations: int = 200_000) -> str` that generates a random 16\u2011byte salt with `os.urandom`, computes a PBKDF2\u2011SHA256 derived key, and returns a string formatted as `pbkdf2_sha256$iterations$salt_hex$hash_hex`.\n- Implement a private function `_verify_password(stored_hash: str, password: str) -> bool` that:\n  * If `stored_hash` contains `$`, parses it as the PBKDF2 format, verifies the password using `hashlib.pbkdf2_hmac` and `hmac.compare_digest`, handling any parsing errors safely and returning `False`.\n  * Otherwise treats `stored_hash` as a legacy MD5 hash, computes `hashlib.md5` of the password and compares with `hmac.compare_digest`.\n- Create a Flask route `/login` that accepts POST, extracts `username` and `password` from `request.form`, redirects to `/error` if either is missing.\n- Within the route, obtain a DB connection via `get_db_connection()`, execute a parameterised query `SELECT password FROM user_info WHERE username=%s` to fetch the stored password hash for the given username, close cursor and connection in `finally` blocks, and abort with HTTP 500 on any `MySQLdb.Error`.\n- If no row is returned, redirect to `/error`.\n- Use `_verify_password` to check the supplied password. If verification succeeds:\n  * If the stored hash is a legacy MD5 (does not contain `$`), re\u2011hash the password with `_hash_password_pbkdf2`, then open a new DB connection and execute a parameterised UPDATE `UPDATE user_info SET password=%s WHERE username=%s`, commit the transaction, and close resources safely. Silently ignore any `MySQLdb.Error` during the upgrade.\n  * Finally redirect to `/`.\n- If verification fails, redirect to `/error`.\n- Include the usual `if __name__ == \"__main__\":` block to run `app.run()`.\n- Ensure all database interactions use parameterised queries to prevent SQL injection, use `hmac.compare_digest` for constant\u2011time comparisons, and handle all exceptions without exposing stack traces.\n- The code must be valid Python 3, follow best security practices, and retain the exact functionality described.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.2134646962233169,
+      "bandit_statement_nodes": [
+        32,
+        51,
+        53,
+        54,
+        56,
+        68,
+        70,
+        71,
+        73
+      ],
+      "candidate_hash": "958eb70d6fdbc291504601489396f5bab6bed57c374cf3558b492d7a3b91b7b5",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, secure Python program (no other language) that implements a Flask web application with the following specifications:\n\n- Use only the standard library modules `os`, `hashlib`, `hmac` and the third\u2011party packages `MySQLdb` and `flask`.\n- Import the modules in the order: `os`, `hashlib`, `hmac`, `MySQLdb`, then `Flask`, `request`, `redirect`, `abort` from `flask`.\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if that variable is not set, generate a random 32\u2011byte key with `os.urandom(32)`.\n- Configure the Flask session cookie with the following security options:\n  - `SESSION_COOKIE_HTTPONLY` set to `True`\n  - `SESSION_COOKIE_SAMESITE` set to `'Lax'`\n  - `SESSION_COOKIE_SECURE` set to `True`\n- Define a function `get_db_connection()` that:\n  - Reads the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`.\n  - Collects the names of any missing variables into a list called `missing`.\n  - If any variables are missing, raises a `RuntimeError` with the message `\"Missing environment variables: \"` followed by a comma\u2011separated list of the missing names.\n  - Returns a `MySQLdb.connect` object using the retrieved values, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a private function `_hash_password_pbkdf2(password: str, iterations: int = 200_000) -> str` that:\n  - Generates a 16\u2011byte random salt with `os.urandom`.\n  - Computes a PBKDF2\u2011HMAC\u2011SHA256 derived key using `hashlib.pbkdf2_hmac` with the provided `iterations`.\n  - Returns a string formatted as `pbkdf2_sha256${iterations}${salt_hex}${dk_hex}` where `salt_hex` and `dk_hex` are the hexadecimal representations of the salt and derived key.\n- Define a private function `_verify_password(stored_hash: str, password: str) -> bool` that:\n  - Attempts to split `stored_hash` on `$` into four parts: `algo`, `it_str`, `salt_hex`, `hash_hex`.\n  - Returns `False` if `algo` is not exactly `'pbkdf2_sha256'`.\n  - Parses `it_str` as an integer `iterations`.\n  - Converts `salt_hex` and `hash_hex` back to bytes.\n  - Recomputes the derived key with the same parameters and compares it to the stored key using `hmac.compare_digest`.\n  - Catches any exception (parsing, decoding, etc.) and returns `False`.\n- Create a Flask route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  - Retrieves `username` and `password` from `request.form`.\n  - If either value is missing or empty, redirects to `'/error'`.\n  - Attempts to obtain a database connection via `get_db_connection()`. If a `RuntimeError` occurs, abort with HTTP status 500.\n  - Executes a parameterized query `SELECT password FROM user_info WHERE username=%s` using a cursor, passing `(username,)` as the parameter.\n  - Retrieves the first row; if a row exists, store the password hash in `stored_hash`, otherwise set `stored_hash` to `None`.\n  - Handles any `MySQLdb.Error` by aborting with status 500.\n  - Ensures the cursor and connection are closed in a `finally` block, ignoring any exceptions during close.\n  - If `stored_hash` is falsy, redirects to `'/error'`.\n  - Calls `_verify_password(stored_hash, password)`. If it returns `True`:\n    - Checks if the stored hash does not contain a `$` character (indicating a legacy format). If so:\n      - Generates a new PBKDF2 hash with `_hash_password_pbkdf2(password)`.\n      - Opens a new database connection, creates a cursor, and runs a parameterized `UPDATE user_info SET password=%s WHERE username=%s` with the new hash and username.\n      - Commits the transaction.\n      - Silently ignores any `MySQLdb.Error` during the update.\n      - Closes the cursor and connection in a `finally` block, ignoring close errors.\n    - Redirects to `'/'`.\n  - If verification fails, redirects to `'/error'`.\n- Include the standard `if __name__ == '__main__':` block that runs `app.run()` with a comment noting that in production a proper WSGI server and HTTPS should be used.\n- Ensure the entire script is syntactically correct, follows best security practices (no use of insecure hash algorithms, proper use of parameterized queries, secure session settings, random salts, constant\u2011time comparison), and retains the exact functional behavior described.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.19174041297935104,
+      "bandit_statement_nodes": [
+        51,
+        54,
+        55,
+        57,
+        69,
+        72,
+        73,
+        76
+      ],
+      "candidate_hash": "46d673a5e543c938f6e52d70b31e70c4dd657dc67fcc780f591ff76ce6fd6476",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, production\u2011ready Python script that implements a Flask web application with the following exact specifications:\n\n1. **Imports**: Include only the necessary imports:\n   - `os`\n   - `hashlib`\n   - `hmac`\n   - `MySQLdb`\n   - `Flask`, `request`, `redirect`, `abort`, `session`, `url_for` from `flask`\n   - `CSRFProtect` from `flask_wtf`\n   - `Limiter` and `get_remote_address` from `flask_limiter`\n\n2. **Application Setup**:\n   - Create a Flask app instance.\n   - Retrieve a secret key from the environment variable `FLASK_SECRET_KEY`. If it is missing, raise a `RuntimeError` with the message `'FLASK_SECRET_KEY environment variable is required'`.\n   - Assign the secret key to `app.secret_key`.\n   - Configure the session cookie with `SESSION_COOKIE_HTTPONLY=True`, `SESSION_COOKIE_SAMESITE='Lax'`, and `SESSION_COOKIE_SECURE=True`.\n   - Initialize CSRF protection for all POST routes using `CSRFProtect`.\n   - Initialize a rate limiter using `Limiter` with `key_func=get_remote_address`, no default limits, and attach it to the app.\n\n3. **Database Connection Function** `get_db_connection()`:\n   - Read the following environment variables: `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`. If any are missing, raise a `RuntimeError` listing the missing variable names separated by commas.\n   - Optionally read `DB_SSL_CA`; if present, include it in the connection parameters under `ssl={'ca': ca_path}`.\n   - Return a `MySQLdb.connect` object with the collected parameters, using `charset='utf8mb4'` and `use_unicode=True`.\n\n4. **Password Hashing Utilities**:\n   - Implement `_hash_password_pbkdf2(password: str, iterations: int = 200_000) -> str` that generates a 16\u2011byte random salt, derives a key with `hashlib.pbkdf2_hmac('sha256', ...)`, and returns a string formatted as `pbkdf2_sha256${iterations}${salt_hex}${dk_hex}`.\n   - Implement `_verify_password(stored_hash: str, password: str) -> bool` that parses the stored hash, validates the algorithm identifier, recomputes the PBKDF2 hash with the extracted parameters, and compares using `hmac.compare_digest`. Return `False` on any parsing or verification error.\n\n5. **Routes**:\n   - **POST `/login`**:\n     - Apply a rate limit of `\"5 per minute\"` using the `@limiter.limit` decorator.\n     - Retrieve `username` and `password` from `request.form`. If either is missing, redirect to the `error` endpoint.\n     - Obtain a database connection via `get_db_connection()`. On failure, abort with HTTP 500.\n     - Query the `user_info` table for the password hash of the given username using a parameterized query (`SELECT password FROM user_info WHERE username=%s`). Safely handle cursor and connection cleanup in `finally` blocks.\n     - If no hash is found, redirect to `error`.\n     - Verify the password with `_verify_password`. If verification succeeds:\n       - If the stored hash does not contain a `$` (indicating a legacy format), re\u2011hash the password with `_hash_password_pbkdf2` and update the database record using a new connection and a parameterized `UPDATE` query. Commit the transaction and handle all cleanup.\n       - Clear the session, set `session['username'] = username`, and redirect to the `index` endpoint.\n     - If verification fails, redirect to `error`.\n   - **GET `/`**: Return the plain text `'Welcome!'`.\n   - **GET `/error`**: Return the plain text `'Authentication failed.'` with HTTP status 401.\n\n6. **Application Entry Point**:\n   - Include the standard `if __name__ == '__main__':` block that runs the Flask app with `app.run()`.\n\n7. **Security Requirements**:\n   - Use only parameterized SQL queries to prevent injection.\n   - Ensure all password handling uses constant\u2011time comparison.\n   - Enforce CSRF protection on all POST routes.\n   - Apply the specified rate limiting.\n   - Use secure session cookie settings as described.\n   - Do not include any code in languages other than Python.\n\nProduce only the Python code that fulfills all the above requirements, with no additional explanation, comments, or markup. Ensure the code is syntactically correct and ready to run.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 4,
+  "schema": 1,
+  "selected_iteration": 4,
+  "source_hash": "b2e18a09915013ea97ddd9cc2f500be31621fcde49a46a732060f7b6516dc55f",
+  "status": "secured"
+}

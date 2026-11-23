@@ -1,0 +1,72 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "46d673a5e543c938f6e52d70b31e70c4dd657dc67fcc780f591ff76ce6fd6476",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError.",
+      "If the username does not exist, row is None and accessing row[0] raises an exception.",
+      "Database connection failures raise an exception and result in a 500 response.",
+      "Empty password strings are still hashed and compared, potentially allowing login if stored hash matches.",
+      "Very large input values may trigger request size limits or performance degradation.",
+      "MD5 collisions are possible, though unlikely in normal use."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via POST /login and redirect to the appropriate page based on credential validity.",
+    "invariants": [
+      "Only the POST method is accepted for the /login endpoint.",
+      "Password comparison always uses MD5 of the UTF\u20118 encoded password.",
+      "Redirect destinations are fixed strings '/' and '/error'.",
+      "Database credentials (host, user, password, db) are hard\u2011coded.",
+      "The SQL query uses a parameter placeholder to avoid injection.",
+      "No data is written or modified in the database."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /login with form fields 'username' and 'password'.",
+      "Queries the MySQL 'user_info' table for the stored password hash of the supplied username.",
+      "Computes the MD5 hash of the supplied password (UTF\u20118 encoded) and compares it to the stored hash.",
+      "On a match, returns an HTTP 302 redirect to '/'.",
+      "On a mismatch, returns an HTTP 302 redirect to '/error'.",
+      "If required fields are missing or a database error occurs, the server may return an HTTP 500 error."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a new MySQL connection for each request.",
+      "Performs a SELECT query against the database.",
+      "Sends an HTTP redirect response to the client.",
+      "May emit log entries via Flask's default logger.",
+      "Consumes network I/O to the MySQL server."
+    ],
+    "source_hash": "b2e18a09915013ea97ddd9cc2f500be31621fcde49a46a732060f7b6516dc55f"
+  },
+  "dimensions": {
+    "behavior": 0.1,
+    "edge_cases": 0.1,
+    "invariants": 0.1,
+    "io_semantics": 0.1,
+    "side_effects": 0.3
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file54.py",
+  "gated_score": 0.1225,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.1225,
+  "original_hash": "b2e18a09915013ea97ddd9cc2f500be31621fcde49a46a732060f7b6516dc55f",
+  "rationale": "The program deviates from the contract: it uses PBKDF2 instead of MD5, reads DB credentials from env instead of hard\u2011coding, performs an UPDATE (writes data), handles missing fields with redirects rather than KeyError, and adds extra side\u2011effects (session, CSRF, rate limiting). Most edge\u2011case behaviors and invariants are not preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.0975,
+  "stability_dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.4,
+    "side_effects": 0.2
+  },
+  "stability_score": 0.22,
+  "weighted_mean": 0.13,
+  "worst_dimension": 0.1
+}

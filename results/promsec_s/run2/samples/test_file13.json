@@ -1,0 +1,108 @@
+{
+  "ast_similarity": 0.8432494279176201,
+  "candidate_hash": "d9f189da2c20a1984427b294b5d3cd8cc3649692f0887fb38efbe04204fcda7e",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file13.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8854041013268998,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        18,
+        67
+      ],
+      "candidate_hash": "b6f935f5bae3cb664a97c112be29ccc00aa78f3b4cda4484d0428f02dd17c54d",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9476,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9621,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9092,
+          "end_lineno": 29,
+          "lineno": 29,
+          "node": 18
+        },
+        {
+          "ast_type": "Global",
+          "change": 0.5142,
+          "end_lineno": 52,
+          "lineno": 52,
+          "node": 32
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9743,
+          "end_lineno": 112,
+          "lineno": 112,
+          "node": 67
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (no markdown, no comments, no explanatory text) that implements a Flask web application with the exact functionality described below. The code must be written in Python only and must follow security best practices as specified.\n\nRequirements:\n- Import `Flask`, `request`, `jsonify` from `flask`; import `os`; import `yaml`; import `subprocess`.\n- Create a Flask app instance named `app`.\n- Load an admin secret at startup:\n  - Retrieve `ADMIN_SECRET` from the environment variable `ADMIN_SECRET`.\n  - If not present, generate a random 16\u2011byte secret using `os.urandom(16).hex()` and store it in `app.config[\"ADMIN_SECRET\"]`.\n- Define the following routes with exact behavior:\n\n1. **POST /config/load**\n   - Read raw request body, decode as UTF\u20118.\n   - Parse YAML using `yaml.safe_load`; on `yaml.YAMLError` return JSON `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` with status 400.\n   - Extract `config_id` and `config_value` from parsed data.\n   - If either is missing or empty, return JSON `{\"status\":\"Error\",\"message\":\"Missing configuration information\"}` with status 400.\n   - On success return JSON `{\"status\":\"Configuration loaded\",\"config_id\":<config_id>,\"config_value\":<config_value>}`.\n\n2. **GET /system/start**\n   - Retrieve query parameters `module` and `param` (default empty strings).\n   - Execute `bash start_module.sh <module> <param>` using `subprocess.run` with an argument list (no `shell=True`), `check=False`.\n   - Return JSON `{\"status\":\"System start initiated\"}`.\n\n3. **POST /auth/validate**\n   - Get form field `secret`.\n   - If it matches `app.config[\"ADMIN_SECRET\"]` return JSON `{\"status\":\"Validation successful\"}`.\n   - Otherwise return JSON `{\"status\":\"Validation failed\"}` with status 401.\n\n4. **POST /auth/update_secret**\n   - Get form fields `current_secret` and `new_secret`.\n   - If `current_secret` does not match the stored admin secret, return JSON `{\"status\":\"Validation failed\"}` with status 401.\n   - If `new_secret` is empty, return JSON `{\"status\":\"Error\",\"message\":\"Invalid new secret\"}` with status 400.\n   - Update `app.config[\"ADMIN_SECRET\"]` to `new_secret`.\n   - Return JSON `{\"status\":\"Secret updated\"}`.\n\n5. **GET /config/retrieve**\n   - Get query parameter `config_id`.\n   - If missing or empty, return JSON `{\"status\":\"Error\",\"message\":\"Configuration ID is required\"}` with status 400.\n   - Return JSON `{\"status\":\"Configuration retrieved\",\"config\":{\"config_id\":<config_id>,\"config_value\":\"Sample Config Value\"}}`.\n\n6. **POST /config/remove**\n   - Get form field `config_id`.\n   - If missing or empty, return JSON `{\"status\":\"Error\",\"message\":\"Configuration ID is required\"}` with status 400.\n   - Return JSON `{\"status\":\"Configuration removed\",\"config_id\":<config_id>}`.\n\n7. **GET /system/status**\n   - Get query parameter `module_id`.\n   - If missing or empty, return JSON `{\"status\":\"Error\",\"message\":\"Module ID is required\"}` with status 400.\n   - Return JSON `{\"status\":\"System status\",\"module_id\":<module_id>,\"status\":\"Active\"}`.\n\n8. **POST /auth/configure**\n   - Get form field `secret`.\n   - If it does not match the admin secret, return JSON `{\"status\":\"Access denied\"}` with status 401.\n   - Get form field `setting`.\n   - If `setting` is empty, return JSON `{\"status\":\"Error\",\"message\":\"Invalid setting\"}` with status 400.\n   - Return JSON `{\"status\":\"Setting configured\",\"setting\":<setting>}`.\n\n9. **GET /system/logs**\n   - Get query parameter `module_id`.\n   - If missing or empty, return JSON `{\"status\":\"Error\",\"message\":\"Module ID is required\"}` with status 400.\n   - Construct a string `logs` equal to `\"Logs for module \" + module_id`.\n   - Return JSON `{\"status\":\"System logs\",\"module_id\":<module_id>,\"logs\":<logs>}`.\n\n10. **GET /data/backup**\n    - Get query parameter `type` with default value `\"json\"`.\n    - Execute `python backup_data.py <type>` using `subprocess.run` with an argument list (no `shell=True`), `check=False`.\n    - Return JSON `{\"status\":\"Data backup started\"}`.\n\n11. **GET /user/profile**\n    - Get query parameter `user_id`.\n    - If missing or empty, return JSON `{\"status\":\"Error\",\"message\":\"User ID is required\"}` with status 400.\n    - Return JSON `{\"status\":\"User profile retrieved\",\"profile\":{\"user_id\":<user_id>,\"name\":\"Emily Davis\",\"email\":\"emily.davis@example.com\"}}`.\n\n- At the end of the script, start the Flask app with `app.run(debug=False)`.\n\nAdditional constraints:\n- Do not include any comments, docstrings, or explanatory text in the generated code.\n- Do not wrap the code in markdown fences or any other markup.\n- Ensure all security measures described are implemented exactly as specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.8432494279176201,
+      "bandit_statement_nodes": [
+        3,
+        25,
+        72
+      ],
+      "candidate_hash": "d9f189da2c20a1984427b294b5d3cd8cc3649692f0887fb38efbe04204fcda7e",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9612,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.7581,
+          "end_lineno": 97,
+          "lineno": 97,
+          "node": 72
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (Python 3) that implements a Flask web application with the exact functionality described below. The code must be written only in Python, with no other languages or embedded scripts. Follow security best practices, include thorough input validation, and preserve the original behavior of each endpoint.\n\nRequirements:\n\n1. **Imports**\n   - Import `Flask`, `request`, and `jsonify` from `flask`.\n   - Import `os`, `yaml`, and `re`.\n\n2. **Application Setup**\n   - Create a Flask app instance named `app`.\n   - Retrieve an environment variable `ADMIN_SECRET`.  \n     - If it exists, store it in `app.config['ADMIN_SECRET']`.  \n     - If it does not exist, generate a 16\u2011byte random secret using `os.urandom(16).hex()` and store it in the same config key.\n\n3. **Helper Functions**\n   - `_start_module(module: str, param: str) -> bool`  \n     - Validate that `module` matches the regex `^\\w+$` (only alphanumeric and underscore).  \n     - If `param` is provided, validate it matches `^[\\w-]*$` (alphanumeric, underscore, hyphen).  \n     - Return `True` if both validations pass, otherwise `False`.  \n     - Include a comment placeholder indicating where real module\u2011starting logic would go.\n   - `_start_backup(backup_type: str) -> bool`  \n     - Define a whitelist set `{'json', 'sql'}`.  \n     - Return `True` only if `backup_type` is in the whitelist, otherwise `False`.  \n     - Include a comment placeholder for real backup implementation.\n\n4. **Routes**\n   - `POST /config/load`  \n     - Read raw request data, decode as UTF\u20118, return 400 on decode error.  \n     - Parse the decoded text with `yaml.safe_load`, return 400 on `yaml.YAMLError`.  \n     - Expect a dictionary with keys `config_id` and `config_value`. Return 400 if either is missing.  \n     - Respond with JSON containing status `\"Configuration loaded\"` and echo the `config_id` and `config_value`.\n   - `GET /system/start`  \n     - Retrieve query parameters `module` and `param` (default empty strings).  \n     - Use `_start_module` to validate; on failure return 400 with error message.  \n     - On success return JSON with status `\"System start initiated\"`.\n   - `POST /auth/validate`  \n     - Get form field `secret`.  \n     - If it matches `app.config['ADMIN_SECRET']`, return JSON with status `\"Validation successful\"`.  \n     - Otherwise return JSON with status `\"Validation failed\"` and HTTP 401.\n   - `POST /auth/update_secret`  \n     - Get form fields `current_secret` and `new_secret`.  \n     - Verify `current_secret` matches the stored admin secret; on mismatch return 401 with `\"Validation failed\"`.  \n     - Ensure `new_secret` is non\u2011empty; otherwise return 400 with appropriate error.  \n     - Update `app.config['ADMIN_SECRET']` to `new_secret` and return JSON with status `\"Secret updated\"`.\n   - `GET /config/retrieve`  \n     - Require query parameter `config_id`; return 400 if missing.  \n     - Respond with JSON containing status `\"Configuration retrieved\"` and a placeholder config object with the provided `config_id` and a sample `config_value`.\n   - `POST /config/remove`  \n     - Require form field `config_id`; return 400 if missing.  \n     - Respond with JSON containing status `\"Configuration removed\"` and echo the `config_id`.\n   - `GET /system/status`  \n     - Require query parameter `module_id`; return 400 if missing.  \n     - Respond with JSON containing status `\"System status\"`, the `module_id`, and a placeholder `\"Active\"` status.\n   - `POST /auth/configure`  \n     - Require form field `secret`; verify against admin secret, return 401 on failure with `\"Access denied\"`.  \n     - Require form field `setting`; return 400 if missing.  \n     - Respond with JSON containing status `\"Setting configured\"` and echo the `setting`.\n   - `GET /system/logs`  \n     - Require query parameter `module_id`; return 400 if missing.  \n     - Construct a placeholder log string `\"Logs for module {module_id}\"`.  \n     - Respond with JSON containing status `\"System logs\"`, the `module_id`, and the log string.\n   - `GET /data/backup`  \n     - Optional query parameter `type` defaulting to `\"json\"`.  \n     - Validate using `_start_backup`; on failure return 400 with error message.  \n     - On success return JSON with status `\"Data backup started\"`.\n   - `GET /user/profile`  \n     - Require query parameter `user_id`; return 400 if missing.  \n     - Respond with JSON containing status `\"User profile retrieved\"` and a placeholder profile object with `user_id`, name `\"Emily Davis\"`, and email `\"emily.davis@example.com\"`.\n\n5. **Application Execution**\n   - Include the standard `if __name__ == '__main__':` block.\n   - Run the Flask app with `debug=False`.\n\n6. **Security and Quality Guidelines**\n   - Use `yaml.safe_load` exclusively; never use `yaml.load` with default loader.\n   - Perform strict input validation as described; do not allow arbitrary code execution or command injection.\n   - Do not expose stack traces or internal errors; always return user\u2011friendly JSON error messages with appropriate HTTP status codes.\n   - Ensure all responses are JSON and set the correct content type automatically via `jsonify`.\n   - Do not import or use any non\u2011standard libraries beyond those listed.\n   - Keep the code well\u2011structured, with clear separation of concerns, and avoid any unnecessary global state.\n\nGenerate the full Python source code meeting all the above specifications. Do not include any explanatory text, markdown formatting, or comments outside the code itself. The output must be only the Python program.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "1df6d907f426eca2d05825dfef5ac8252ca575c55947c17926a7d09df5a454bb",
+  "status": "secured"
+}

@@ -1,0 +1,99 @@
+{
+  "ast_similarity": 0.5905848787446505,
+  "candidate_hash": "0e619e761070f6f04acb28c6dafa1b34409f70a2e31525923165202c74ce69ae",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file42.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5742024965325936,
+      "bandit_statement_nodes": [
+        8,
+        12,
+        26,
+        30,
+        44,
+        48
+      ],
+      "candidate_hash": "7cb779f8830b87d721b0bd4a12cb15aa68caf4b31720cf8b099f7a9c58ecee07",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.9983,
+          "end_lineno": 14,
+          "lineno": 14,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9161,
+          "end_lineno": 19,
+          "lineno": 19,
+          "node": 12
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9984,
+          "end_lineno": 40,
+          "lineno": 40,
+          "node": 26
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9161,
+          "end_lineno": 45,
+          "lineno": 45,
+          "node": 30
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9989,
+          "end_lineno": 66,
+          "lineno": 66,
+          "node": 44
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with three POST endpoints: `/register`, `/checkout`, and `/return`. The script must:\n\n1. **Language Requirement**: Be written entirely in Python and use only Python libraries.\n2. **Framework**: Use Flask for the web framework.\n3. **Database**: Use `MySQLdb` (or `mysqlclient`) to connect to a MySQL database named `library_db`.\n4. **Security Enhancements**:\n   - Retrieve database connection parameters (`host`, `user`, `password`, `database`) from environment variables (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) instead of hard\u2011coding them.\n   - Hash user passwords securely with `bcrypt` before storing them, and verify hashes on login\u2011related operations.\n   - Use parameterized SQL queries everywhere to prevent SQL injection.\n   - Validate and sanitize all incoming form data (`username`, `password`, `book_id`) ensuring they are non\u2011empty strings (or integers where appropriate) and meet reasonable length constraints.\n   - Use explicit exception handling: catch specific database exceptions (`MySQLdb.Error`) and any other relevant exceptions, logging the error without exposing internal details to the client.\n   - Ensure the Flask app runs with `debug=False` in production.\n5. **Database Interaction**:\n   - Use context managers (`with` statements) for opening and closing database connections and cursors to guarantee proper cleanup.\n   - Commit transactions only after successful operations; roll back on any failure.\n6. **Endpoint Behavior**:\n   - **`/register`**: Accept `username` and `password`. If the username does not already exist, store the new user with the hashed password and return the message `\"You have successfully registered\"`. If the username exists, return `\"Username already exists\"`. On any database error, return `\"Registration Failed\"`.\n   - **`/checkout`**: Accept `username` and `book_id`. Verify the user exists. If so, insert a record into a `checkouts` table linking the user and the book, then return `\"Book successfully checked out\"`. If the user does not exist, return `\"User not found\"`. On any database error, return `\"Checkout Failed\"`.\n   - **`/return`**: Accept `username` and `book_id`. Verify a matching record exists in `checkouts`. If found, delete that record and return `\"Book successfully returned\"`. If not found, return `\"Checkout record not found\"`. On any database error, return `\"Return Failed\"`.\n7. **Response**: Return plain text messages exactly as specified above; do not wrap them in JSON or HTML.\n8. **Imports**: Include all necessary imports (`flask`, `MySQLdb`, `os`, `bcrypt`, etc.).\n9. **Execution Guard**: Include the standard `if __name__ == '__main__':` block to run the Flask app.\n10. **No Additional Text**: Provide only the Python code; do not include any explanatory comments, markdown formatting, or extra narrative.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5905848787446505,
+      "bandit_statement_nodes": [
+        90
+      ],
+      "candidate_hash": "0e619e761070f6f04acb28c6dafa1b34409f70a2e31525923165202c74ce69ae",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 113,
+          "lineno": 113,
+          "node": 90
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (Python\u202f3) that implements a secure Flask web application with the following exact functionality and security requirements:\n\n- Use only the standard library and the third\u2011party packages: **Flask**, **MySQLdb**, **bcrypt**, and **logging**.\n- Import modules in this order: `os`, `logging`, `Flask` and `request` from `flask`, `MySQLdb`, `bcrypt`, and `closing` from `contextlib`.\n- Configure logging with `logging.basicConfig(level=logging.ERROR)`.\n- Create a Flask app instance named `app`.\n- Load database connection parameters from environment variables: `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`.\n- Define constants `MAX_USERNAME_LEN = 150` and `MAX_PASSWORD_LEN = 150`.\n- Implement a function `get_db_connection()` that returns a MySQLdb connection with:\n  - host, user, passwd, db from the environment variables,\n  - charset set to `'utf8mb4'`,\n  - autocommit disabled.\n- Implement validation functions:\n  - `validate_username(username)` returns `True` only if `username` is a `str` and its length is between 1 and `MAX_USERNAME_LEN` inclusive.\n  - `validate_password(password)` returns `True` only if `password` is a `str` and its length is between 1 and `MAX_PASSWORD_LEN` inclusive.\n  - `validate_book_id(book_id)` returns `True` only if `book_id` can be cast to a positive integer.\n- Create a POST route `/register` that:\n  1. Retrieves `username` and `password` from `request.form` (default empty string).\n  2. Validates both fields using the functions above; on failure return the exact string `\"Registration Failed\"`.\n  3. Hashes the password with `bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())`.\n  4. Opens a database connection using `closing(get_db_connection())` and a cursor with `closing(conn.cursor())`.\n  5. Checks for existing username with a parameterized query `SELECT 1 FROM users WHERE username=%s`.\n  6. If a record exists, return the exact string `\"Username already exists\"`.\n  7. Inserts the new user with a parameterized query `INSERT INTO users (username, password_hash) VALUES (%s, %s)`.\n  8. Commits the transaction.\n  9. On success return the exact string `\"You have successfully registered\"`.\n  10. On any `MySQLdb.Error` or generic `Exception`, log the error with `logging.error` (include the exception) and return `\"Registration Failed\"`.\n\n- Create a POST route `/checkout` that:\n  1. Retrieves `username` and `book_id` from `request.form`.\n  2. Validates `username` with `validate_username` and `book_id` with `validate_book_id`; on failure return `\"Checkout Failed\"`.\n  3. Opens a database connection and cursor as above.\n  4. Retrieves the user\u2019s `id` with a parameterized query `SELECT id FROM users WHERE username=%s`; if not found return `\"User not found\"`.\n  5. Inserts a checkout record with a parameterized query `INSERT INTO checkouts (user_id, book_id) VALUES (%s, %s)`.\n  6. Commits and returns `\"Book successfully checked out\"`.\n  7. On any database or unexpected error, log and return `\"Checkout Failed\"`.\n\n- Create a POST route `/return` that:\n  1. Retrieves `username` and `book_id` from `request.form`.\n  2. Validates both inputs as in `/checkout`; on failure return `\"Return Failed\"`.\n  3. Opens a database connection and cursor.\n  4. Retrieves the user\u2019s `id` as in `/checkout`; if not found return `\"Checkout record not found\"`.\n  5. Looks up a matching checkout record with `SELECT id FROM checkouts WHERE user_id=%s AND book_id=%s`; if not found return `\"Checkout record not found\"`.\n  6. Deletes the checkout record with `DELETE FROM checkouts WHERE id=%s`.\n  7. Commits and returns `\"Book successfully returned\"`.\n  8. On any database or unexpected error, log and return `\"Return Failed\"`.\n\n- Ensure all SQL statements use **parameterized queries** to prevent injection.\n- Do not enable Flask debug mode; run the app with `app.run(host='127.0.0.1', port=5000, debug=False)` inside the `if __name__ == '__main__':` block.\n- The script must contain **no additional functionality**, no extra routes, and no code outside the specifications above.\n- The output must be **only the Python code** that fulfills all requirements; do not include any explanatory text, comments, or markup.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "e881625b1382fb99257852b9393da006d617bd99661d0afea64e23efc68587d0",
+  "status": "secured"
+}

@@ -1,0 +1,77 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "6bdb81e15cd7a17a937d2745ae01d4fce9d87e56d230780f7d0087850e94622a",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required JSON fields may cause a KeyError or insert null values.",
+      "Providing a non\u2011existent task_id for update or delete results in no rows affected but still returns success.",
+      "Empty keyword or due_date parameters return all tasks or none, respectively.",
+      "SQL injection is possible if input contains quote characters.",
+      "Invalid JSON payloads produce a 400 Bad Request from Flask before reaching the handler."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a RESTful API for creating, reading, updating, and deleting task records stored in a SQLite database.",
+    "invariants": [
+      "Each task has a unique integer primary key (id).",
+      "Task records contain task_name, description, and due_date columns.",
+      "All endpoints commit changes before closing the DB connection.",
+      "Responses are always JSON-encoded.",
+      "HTTP status codes reflect operation outcome (201 for create, 200 for others)."
+    ],
+    "io_behavior": [
+      "POST /add_task with JSON {task_name, description, due_date} returns 201 and a success message.",
+      "GET /search_tasks?keyword=... returns 200 and a JSON list of matching tasks.",
+      "PUT /update_task/<task_id> with JSON fields returns 200 and a success message.",
+      "DELETE /delete_task/<task_id> returns 200 and a success message.",
+      "GET /get_tasks_by_due_date?due_date=... returns 200 and a JSON list of tasks due on that date."
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:DELETE /delete_task/<int:task_id>": "",
+      "route:GET /get_tasks_by_due_date": "",
+      "route:GET /search_tasks": "",
+      "route:POST /add_task": "",
+      "route:PUT /update_task/<int:task_id>": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the tasks table.",
+      "Updates existing rows based on task ID.",
+      "Deletes rows based on task ID.",
+      "Queries the database without modifying it.",
+      "Persists changes to the file 'task_manager.db'."
+    ],
+    "source_hash": "795d93bf579a8c14974e279424ca6d201fd72a7e5c8b65af52c440e93c0d941e"
+  },
+  "dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.4,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file77.py",
+  "gated_score": 0.7825,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.7825,
+  "original_hash": "795d93bf579a8c14974e279424ca6d201fd72a7e5c8b65af52c440e93c0d941e",
+  "rationale": "All required endpoints, status codes, JSON responses, and DB invariants are correctly implemented, but edge\u2011case handling deviates (missing fields, empty due_date, and SQL\u2011injection protection) from the contract specifications.",
+  "schema": 1,
+  "stability_abs_difference": 0.10375,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.8,
+    "invariants": 1.0,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.88625,
+  "weighted_mean": 0.91,
+  "worst_dimension": 0.4
+}

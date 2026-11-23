@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "3b7cb47acc5f4a77c483762d7341753ab02fb9ab1f7e400d1c9a5b780523f7ac",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Providing malformed YAML to /system/add_record triggers a 400 error.",
+      "Omitting required parameters (e.g., id, key, new_config) yields a 400 or 401 response depending on endpoint.",
+      "Using an outdated or incorrect secret key causes 401 authentication failure.",
+      "Calling /admin/change_key with an empty new_key will replace the secret with an empty string, effectively disabling future auth.",
+      "Running /system/start_process or /data/export with empty arguments still invokes the underlying shell commands."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple HTTP API for managing records, processes, configuration, and user data, with basic authentication for admin actions.",
+    "invariants": [
+      "All admin\u2011only endpoints require the current SECRET_KEY supplied as a form field.",
+      "Endpoints return JSON with a \"status\" field and appropriate HTTP status codes (200 for success, 400 for client errors, 401 for auth failures).",
+      "Record\u2011related endpoints require a non\u2011empty id (and value for add_record).",
+      "YAML payload must be parseable; otherwise a 400 error is returned.",
+      "Missing required query or form parameters result in a 400 error with a descriptive message."
+    ],
+    "io_behavior": [
+      "POST /system/add_record \u2013 accepts raw YAML, returns JSON with status and echoed id/value or error on bad format/missing fields.",
+      "GET /system/start_process \u2013 reads query parameters process and argument, triggers a shell script, returns JSON status.",
+      "POST /admin/authenticate \u2013 checks form key against secret, returns success JSON or 401 failure.",
+      "POST /admin/update_config \u2013 requires valid secret key and new_config field, returns JSON confirmation or error.",
+      "GET /records/fetch \u2013 requires id query, returns JSON with a sample record or error.",
+      "POST /records/delete \u2013 requires id form field, returns JSON confirming deletion or error."
+    ],
+    "public_api": {
+      "route:GET /data/export": "",
+      "route:GET /logs/view": "",
+      "route:GET /process/status": "",
+      "route:GET /records/fetch": "",
+      "route:GET /system/start_process": "",
+      "route:GET /user/details": "",
+      "route:POST /admin/authenticate": "",
+      "route:POST /admin/change_key": "",
+      "route:POST /admin/set_preference": "",
+      "route:POST /admin/update_config": "",
+      "route:POST /records/delete": "",
+      "route:POST /system/add_record": ""
+    },
+    "side_effects": [
+      "os.system call to execute \"bash start_process.sh <process> <argument>\" in /system/start_process.",
+      "os.system call to run \"python3 export_data.py <type>\" in /data/export.",
+      "Modification of the in\u2011memory SECRET_KEY variable via /admin/change_key."
+    ],
+    "source_hash": "ce4864d7f7c339a53aefaecc047fa140985c7e50c8066fcb5f9ed10108269376"
+  },
+  "dimensions": {
+    "behavior": 0.45,
+    "edge_cases": 0.5,
+    "invariants": 0.6,
+    "io_semantics": 0.55,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file7.py",
+  "gated_score": 0.32437,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.32437,
+  "original_hash": "ce4864d7f7c339a53aefaecc047fa140985c7e50c8066fcb5f9ed10108269376",
+  "rationale": "The program implements most endpoints and basic auth, but omits required os.system side\u2011effects, mishandles empty new_key, lacks a status field on fetch, and does not enforce all invariant checks, leading to partial preservation of the contract.",
+  "schema": 1,
+  "stability_abs_difference": 0.264,
+  "stability_dimensions": {
+    "behavior": 0.65,
+    "edge_cases": 0.6,
+    "invariants": 0.85,
+    "io_semantics": 0.9,
+    "side_effects": 0.33
+  },
+  "stability_score": 0.58837,
+  "weighted_mean": 0.4325,
+  "worst_dimension": 0.0
+}

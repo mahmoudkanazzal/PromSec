@@ -1,0 +1,79 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "7c54ba705d1d0a713266e9e0bc530c880ae619818e5318b7b0a31cf4f4eb273d",
+  "compile_ok": true,
+  "confidence": 0.3,
+  "contract": {
+    "edge_cases": [
+      "Passing a non\u2011bytes method or path causes automatic UTF\u20118 encoding; malformed Unicode may raise UnicodeEncodeError.",
+      "Providing content as a dict triggers JSON serialization; non\u2011serializable objects raise a TypeError.",
+      "Calling FakeChannel.json_body before any response has been written raises an Exception.",
+      "ResolvingMemoryReactorClock.getHostByName for a name not in lookups returns a failed Deferred with DNSLookupError.",
+      "If access_token is None, no Authorization header is added; malformed tokens are not validated by this harness.",
+      "When federation_auth_origin is supplied, an Authorization header with a placeholder signature is added, which may be rejected by downstream logic."
+    ],
+    "entrypoints": [],
+    "intent": "Provide a lightweight test harness for the Sydent identity server, enabling creation of an in\u2011memory Sydent instance, construction of synthetic HTTP requests, and a fake Twisted reactor with deterministic DNS resolution for unit tests.",
+    "invariants": [
+      "If test_config does not specify a DB file, make_sydent always uses ':memory:' as the SQLite database.",
+      "FakeChannel.result always contains keys 'code', 'reason', 'headers' after writeHeaders is called.",
+      "ResolvingMemoryReactorClock.nameResolver always resolves names only from its own lookups dict; unknown names always raise DNSLookupError.",
+      "FakeChannel.write only accepts bytes and concatenates them to the 'body' field.",
+      "The request path is always prefixed with '/_matrix/identity/v2/' when shorthand=True and the path does not already start with '/_matrix'.",
+      "FakeChannel.getPeer always returns a non\u2011null IPv4 address, ensuring request.getClientIP() is defined."
+    ],
+    "io_behavior": [
+      "make_sydent(test_config) \u2192 returns a Sydent object configured with an in\u2011memory SQLite DB and a ResolvingMemoryReactorClock.",
+      "make_request(reactor, method, path, content, access_token, ...) \u2192 returns a (Request, FakeChannel) pair; the Request is pre\u2011populated with the given HTTP method, URL, headers and body.",
+      "FakeChannel.json_body, .code, .headers \u2192 expose the HTTP response body (decoded as JSON), status code and response headers after the request has been processed.",
+      "ResolvingMemoryReactorClock.nameResolver.getHostByName(name) \u2192 returns a Deferred that succeeds with a preset IP address or fails with DNSLookupError if the name is unknown.",
+      "setup_logging() \u2192 installs a logging handler that forwards Python log records to Twisted's logger.",
+      "ToTwistedHandler.emit(record) \u2192 formats a log record and emits it via twisted.logger.Logger."
+    ],
+    "public_api": {
+      "class:FakeChannel": "code(self);getHost(self);getPeer(self);getPeerCertificate(self);headers(self);json_body(self);registerProducer(self, producer, streaming);requestDone(self, _self);transport(self);unregisterProducer(self);write(self, content);writeHeaders(self, version, code, reason, headers)",
+      "class:FakeSite": "",
+      "class:ResolvingMemoryReactorClock": "installNameResolver(self, resolver: IHostnameResolver)",
+      "class:ToTwistedHandler": "emit(self, record)",
+      "func:make_request": "(reactor, method, path, content=b'', access_token=None, request=Request, shorthand=True, federation_auth_origin=None)",
+      "func:make_sydent": "(test_config={})",
+      "func:setup_logging": "()"
+    },
+    "side_effects": [
+      "Registers ToTwistedHandler on the root Python logger, affecting all subsequent logging.",
+      "Modifies the global logging level based on the SYDENT_TEST_LOG_LEVEL environment variable.",
+      "Creates a fake TLS certificate object when FakeChannel.getPeerCertificate() is called.",
+      "Mutates the FakeChannel.result dictionary as the simulated response is written.",
+      "Updates the internal lookups dictionary of ResolvingMemoryReactorClock when tests add entries.",
+      "Potentially writes to the in\u2011memory SQLite database used by the Sydent instance."
+    ],
+    "source_hash": "1a39a4177928ac3d32e74a2ff0d447c7f6ce1c7a9a28105b4f5d40c44d317349"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.4,
+    "invariants": 0.2,
+    "io_semantics": 0.3,
+    "side_effects": 0.4
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file31.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.26,
+  "original_hash": "1a39a4177928ac3d32e74a2ff0d447c7f6ce1c7a9a28105b4f5d40c44d317349",
+  "rationale": "Key contract requirements are missing or incorrect: DB defaults, writeHeaders omits reason, DNS resolver accesses wrong lookup dict, federation_auth_origin handling differs, setup_logging does not forward to Twisted logger, and ToTwistedHandler is absent. Some edge cases (encoding, dict content) are handled, but many invariants and side\u2011effects are not fully preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.15625,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.5,
+    "invariants": 0.4,
+    "io_semantics": 0.3,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.41625,
+  "weighted_mean": 0.28,
+  "worst_dimension": 0.2
+}

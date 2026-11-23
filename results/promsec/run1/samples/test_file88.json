@@ -1,0 +1,69 @@
+{
+  "ast_similarity": 0.7734627831715211,
+  "candidate_hash": "1033ef29470f5a4236df07d852dfbebb3251f7e277b35f9399b9402be5ff8c10",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file88.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7734627831715211,
+      "bandit_statement_nodes": [
+        8,
+        12,
+        26,
+        38,
+        47,
+        56
+      ],
+      "candidate_hash": "1033ef29470f5a4236df07d852dfbebb3251f7e277b35f9399b9402be5ff8c10",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1209,
+          "end_lineno": 19,
+          "lineno": 19,
+          "node": 12
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1361,
+          "end_lineno": 40,
+          "lineno": 40,
+          "node": 26
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1252,
+          "end_lineno": 59,
+          "lineno": 59,
+          "node": 38
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1289,
+          "end_lineno": 89,
+          "lineno": 89,
+          "node": 56
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the exact functionality described below. The script must be pure Python (no other languages) and must use the `MySQLdb` library to connect to a MySQL server at `127.0.0.1` with username `root`, password `password`, and database `community_db`. Follow these precise requirements:\n\n1. **General Setup**\n   - Import `Flask`, `request`, and `redirect` from `flask`.\n   - Import `MySQLdb`.\n   - Create a Flask app instance named `app`.\n   - At the end of the file, include the standard `if __name__ == '__main__':` block that runs the app with `debug=False`.\n\n2. **Route `/add_member` (POST)**\n   - Retrieve `name` and `email` from `request.form`.\n   - Open a MySQL connection and create a cursor.\n   - Execute a **parameterized** SELECT query to check if a member with the given name already exists:  \n     `SELECT * FROM members WHERE name=%s`\n   - If no rows are returned, attempt to INSERT the new member using a **parameterized** query:  \n     `INSERT INTO members(name, email) VALUES(%s, %s)`\n   - Commit the transaction on success; on any exception, roll back and set the response message to `\"Failed to add member\"`.\n   - If the member already exists, set the response message to `\"Member already exists\"`.\n   - Close the cursor and connection, then return the response message as plain text.\n\n3. **Route `/login_member` (POST)**\n   - Retrieve `name` and `email` from `request.form`.\n   - Open a MySQL connection and create a cursor.\n   - Execute a **parameterized** SELECT query:  \n     `SELECT * FROM members WHERE name=%s AND email=%s`\n   - Fetch one row.\n   - Close the cursor and connection.\n   - If a row is found, return `\"Login successful\"`; otherwise return `\"Invalid credentials\"`.\n\n4. **Route `/update_member_profile` (POST)**\n   - Retrieve `name` and `new_email` from `request.form`.\n   - Open a MySQL connection and create a cursor.\n   - Execute a **parameterized** UPDATE query:  \n     `UPDATE members SET email=%s WHERE name=%s`\n   - Commit the transaction.\n   - Close the cursor and connection.\n   - Return `\"Profile updated successfully\"`.\n\n5. **Route `/search_members` (GET)**\n   - Retrieve the query parameter `term` from `request.args` (default to empty string if missing).\n   - Open a MySQL connection and create a cursor.\n   - Execute a **parameterized** SELECT query that searches for names containing the term using the SQL `LIKE` operator. Use the pattern `%term%` safely with parameters:  \n     `SELECT name FROM members WHERE name LIKE %s`  \n     Pass the pattern as `f\"%{search_term}%\"`.\n   - Fetch all matching rows.\n   - Close the cursor and connection.\n   - Return the fetched rows converted to a string (e.g., `str(members)`).\n\n6. **Route `/remove_member` (POST)**\n   - Retrieve `name` from `request.form`.\n   - Open a MySQL connection and create a cursor.\n   - Execute a **parameterized** DELETE query:  \n     `DELETE FROM members WHERE name=%s`\n   - Commit the transaction.\n   - Close the cursor and connection.\n   - Return `\"Member removed successfully\"`.\n\n7. **Security and Best Practices**\n   - All SQL statements must be **parameterized** to prevent SQL injection; never concatenate user input directly into query strings.\n   - Ensure every database connection and cursor is closed in all code paths, even when exceptions occur.\n   - Use explicit `try/except` blocks around INSERT operations to handle errors and perform rollbacks.\n   - Do not include any additional routes, functions, or external dependencies beyond those specified.\n   - Do not add any comments, explanatory text, or non\u2011Python code in the output. The final output must be a single, runnable Python file that meets all the above criteria.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "2f00a8a0eeaa9a8317ae9d6ebfc23b6a24b31f8a7b3914bd4807a398fd0ad8ff",
+  "status": "secured"
+}

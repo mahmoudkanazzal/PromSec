@@ -1,0 +1,84 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "eab7bcdba32eb5196bb65744c4e8437c82690184e8fb10adeebfe4a11676fa5c",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML in /config/add results in a 400 response with an \"Invalid YAML format\" message.",
+      "Missing required fields (e.g., config_id, password, new_password) cause 400 or 401 errors depending on the endpoint.",
+      "Providing an incorrect admin password to any protected endpoint returns a 401 \"Login failed\" or \"Access denied\" response.",
+      "Empty job_name or parameter still triggers the shell script, potentially with missing arguments.",
+      "Requesting /job/status or /job/logs without a job_id yields a 400 error.",
+      "Changing the admin password affects all subsequent privileged calls within the same process only; the change is lost on restart."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a REST\u2011like HTTP API that allows adding, retrieving, and removing configuration entries, authenticating an admin user, updating the admin password, executing and monitoring jobs, exporting data, and fetching user information.",
+    "invariants": [
+      "ADMIN_PASSWORD must match the stored value for any privileged endpoint (login, password update, settings update).",
+      "Both \"config_id\" and \"config_value\" must be present in the YAML payload for /config/add to succeed.",
+      "Required query or form parameters (e.g., config_id, job_id, user_id) must be non\u2011empty; otherwise a 400 error is returned.",
+      "The /auth/login endpoint never changes state; it only validates the password.",
+      "The default export format for /data/export is \"json\" when the \"format\" query parameter is omitted.",
+      "All successful responses are JSON objects with a \"status\" field describing the outcome."
+    ],
+    "io_behavior": [
+      "Accepts POST /config/add with raw YAML body and returns JSON indicating success or YAML\u2011format error.",
+      "GET /job/execute?job_name=\u2026&parameter=\u2026 triggers a shell script and returns a JSON acknowledgement.",
+      "POST /auth/login with form field \"password\" returns JSON success or 401 failure.",
+      "POST /auth/update_password with current and new passwords updates the in\u2011memory admin password and returns JSON status.",
+      "GET /config/get?config_id=\u2026 returns a JSON object containing the requested config_id and a placeholder value.",
+      "GET /user/info?user_id=\u2026 returns static JSON user details."
+    ],
+    "public_api": {
+      "route:GET /config/get": "",
+      "route:GET /data/export": "",
+      "route:GET /job/execute": "",
+      "route:GET /job/logs": "",
+      "route:GET /job/status": "",
+      "route:GET /user/info": "",
+      "route:POST /auth/login": "",
+      "route:POST /auth/settings": "",
+      "route:POST /auth/update_password": "",
+      "route:POST /config/add": "",
+      "route:POST /config/remove": ""
+    },
+    "side_effects": [
+      "Calls os.system to run \"sh execute_job.sh <job_name> <parameter>\" for each job execution request.",
+      "Calls os.system to run \"python export_data.py <format>\" when /data/export is invoked.",
+      "Mutates the global ADMIN_PASSWORD variable when the password is successfully updated.",
+      "Potentially spawns a subprocess that may write to stdout/stderr of the Flask process.",
+      "No persistent file or database writes; all state is kept in memory for the process lifetime."
+    ],
+    "source_hash": "0525122ed53928fa8d282c5f392bfd0ac67a247d4fac9a62a54c08b0630bd854"
+  },
+  "dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.85,
+    "invariants": 1.0,
+    "io_semantics": 0.85,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file9.py",
+  "gated_score": 0.8725,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.8725,
+  "original_hash": "0525122ed53928fa8d282c5f392bfd0ac67a247d4fac9a62a54c08b0630bd854",
+  "rationale": "Endpoints, responses, and state handling follow the contract, but job execution rejects empty job_name/parameter contrary to the specified edge case; subprocess.run replaces os.system yet still produces the required side effects.",
+  "schema": 1,
+  "stability_abs_difference": 0.1485,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.83,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 0.4
+  },
+  "stability_score": 0.724,
+  "weighted_mean": 0.88,
+  "worst_dimension": 0.85
+}

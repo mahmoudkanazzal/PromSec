@@ -1,0 +1,37 @@
+{
+  "ast_similarity": 0.3991130820399113,
+  "candidate_hash": "28b331c3c4d8fcd080abf6080a2cb08b02181a399e9129588c3b432e1e01545e",
+  "complete": true,
+  "config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "cwe_count_after": 0,
+  "cwe_count_before": 2,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file60.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.3991130820399113,
+      "bandit_statement_nodes": [
+        2,
+        20
+      ],
+      "candidate_hash": "28b331c3c4d8fcd080abf6080a2cb08b02181a399e9129588c3b432e1e01545e",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 script that implements a Flask web service with a single GET endpoint `/api/temperature_for_location`. The script must:\n\n- Begin with the shebang line `#!/usr/bin/env python3`.\n- Import only the following modules: `os`, `sys`, `yaml`, `MySQLdb`, and from `flask` import `Flask`, `request`, `jsonify`, `abort`.\n- Create a Flask app instance named `app`.\n- Define a private function `_get_db_connection()` that:\n  - Reads the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`, defaulting to `'localhost'`, `'root'`, `''`, and `'cwe_db'` respectively.\n  - Attempts to create and return a `MySQLdb` connection using these credentials.\n  - Catches `MySQLdb.Error`, logs the error with `app.logger.error`, and re\u2011raises the exception.\n- Implement the route `/api/temperature_for_location` that:\n  - Accepts only GET requests.\n  - Retrieves a query\u2011string parameter named `payload`. If missing, abort with status\u202f400 and description `\"Missing 'payload' parameter.\"`.\n  - Parses the `payload` as YAML using `yaml.safe_load`. If parsing fails or the result is not a dictionary, abort with status\u202f400 and description `\"Invalid YAML payload.\"`.\n  - Extracts the keys `latitude`, `longitude`, and `date` from the parsed data. If any key is missing, abort with status\u202f400 and description `\"Missing required field: <field_name>\"`.\n  - Validates that `latitude` and `longitude` are numbers (`int` or `float`) and that `date` is a string. If validation fails, abort with status\u202f400 and an appropriate description.\n  - Calls `_get_db_connection()` to obtain a database connection.\n  - Uses a cursor as a context manager to execute a parameterized SQL query:\n    ```\n    SELECT temperature\n    FROM temperature_data\n    WHERE latitude = %s AND longitude = %s AND date = %s\n    LIMIT 1\n    ```\n    passing `(latitude, longitude, date)` as parameters.\n  - If the query returns no rows, abort with status\u202f404 and description `\"Temperature data not found for the given location and date.\"`.\n  - If a `MySQLdb.Error` occurs during the query, log the error with `app.logger.error` and abort with status\u202f500 and description `\"Database query failed.\"`.\n  - Ensures the database connection is closed in a `finally` block.\n  - Returns a JSON response `{\"temperature\": temperature}` where `temperature` is the value retrieved from the database.\n- Include an `if __name__ == '__main__':` block that:\n  - Reads environment variables `FLASK_HOST` and `FLASK_PORT`, defaulting to `'127.0.0.1'` and `5000` respectively.\n  - Starts the Flask app with `app.run(host=host, port=port)`.\n- Follow security best practices:\n  - Use `yaml.safe_load` (never `yaml.load`).\n  - Use parameterized queries (no string interpolation).\n  - Do not expose raw exception messages to clients.\n  - Properly close all database resources.\n- Ensure the entire code is valid Python 3, contains no code in any other language, and is ready to run as provided.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "ec4dd14bd2fbe472ac338770df0bdf848373148e37c52bb097b1b9aa92b55517",
+  "status": "secured"
+}

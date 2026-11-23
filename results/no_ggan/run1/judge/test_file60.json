@@ -1,0 +1,69 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "17d75af4c80bce396eca3ae930f0a3f88825cc7b9cb772d93bff093dc00540e2",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'payload' parameter leads to a parsing error and a 500 response.",
+      "Malformed YAML causes yaml.safe_load to raise an exception, resulting in a 500 response.",
+      "Payload lacking latitude, longitude, or date triggers a KeyError when accessing the YAML string.",
+      "Database connection failure or query error returns a 500 response.",
+      "No matching temperature record yields an empty list string \"[]\" in the response.",
+      "Multiple matching rows are returned as a list of tuples in the response string."
+    ],
+    "entrypoints": [],
+    "intent": "Return the temperature(s) stored in a MySQL database for a supplied latitude, longitude, and date supplied via an HTTP GET request.",
+    "invariants": [
+      "The endpoint only processes GET requests; other HTTP methods are not handled.",
+      "The MySQL credentials (host, user, password, database) are hard\u2011coded and unchanged.",
+      "The response body is always a string, even when the query returns no rows.",
+      "The service does not modify any database records; it only reads.",
+      "If the payload is valid, the three required keys (latitude, longitude, date) must be present."
+    ],
+    "io_behavior": [
+      "Accepts a GET request to /api/temperature_for_location with a query parameter named 'payload' containing a YAML document.",
+      "Parses the YAML and extracts the fields latitude, longitude, and date.",
+      "Executes a SELECT query against the local MySQL database using those three values.",
+      "Returns an HTTP response whose body is the string representation of the query result (e.g., \"[(23.5,)]\" or \"[]\").",
+      "Writes the raw payload and the re\u2011dumped YAML string to the server's standard output (log)."
+    ],
+    "public_api": {
+      "route:GET /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to the MySQL server on localhost.",
+      "Performs a read\u2011only SELECT query on the temperature_data table.",
+      "Closes the database cursor and connection after the query.",
+      "Emits log lines to stdout for debugging purposes."
+    ],
+    "source_hash": "ec4dd14bd2fbe472ac338770df0bdf848373148e37c52bb097b1b9aa92b55517"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.4,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file60.py",
+  "gated_score": 0.2975,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.2975,
+  "original_hash": "ec4dd14bd2fbe472ac338770df0bdf848373148e37c52bb097b1b9aa92b55517",
+  "rationale": "The program follows the GET endpoint and parses YAML, but diverges on error handling (uses 400/404 instead of 500), returns JSON instead of a string, lacks required stdout logging, and does not use hard\u2011coded DB credentials, violating several contract invariants and edge\u2011case expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.04063,
+  "stability_dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.0,
+    "invariants": 0.4,
+    "io_semantics": 0.5,
+    "side_effects": 0.75
+  },
+  "stability_score": 0.25687,
+  "weighted_mean": 0.33,
+  "worst_dimension": 0.2
+}

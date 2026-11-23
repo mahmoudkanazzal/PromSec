@@ -1,0 +1,57 @@
+{
+  "ast_similarity": 0.5828571428571429,
+  "candidate_hash": "d74f53895276453318fa5dfb097e8841f1a8954c06a03622dca8c3d166b5af59",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    78
+  ],
+  "error": "",
+  "file": "test_file63.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5828571428571429,
+      "bandit_statement_nodes": [
+        2
+      ],
+      "candidate_hash": "d74f53895276453318fa5dfb097e8841f1a8954c06a03622dca8c3d166b5af59",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2448,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.2184,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 3
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.177,
+          "end_lineno": 8,
+          "lineno": 8,
+          "node": 4
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program that implements a Flask web service with the following exact specifications and security requirements. The program must be written **only in Python** and must not contain any explanatory text, comments, or markup outside of the code itself.\n\n**Functional requirements**\n1. Import only the necessary modules: `Flask`, `request`, `redirect` from `flask`; `os`; `MySQLdb`; and `safe_load` from `yaml`.\n2. Create a Flask app instance named `app`.\n3. Define a route at `/api/temperature_for_location` that handles **GET** requests.\n4. Retrieve a query\u2011string parameter named `payload`. If it is missing, return the plain string `ERROR: No payload`.\n5. Safely parse the `payload` as YAML using `yaml.safe_load`. If parsing fails, return the exception message as a plain string.\n6. Expect the parsed YAML to be a dictionary containing the keys `latitude`, `longitude`, and `datetime`. Extract these values into variables `lat`, `lon`, and `datetime`. If any key is missing, return a plain string indicating the missing key.\n7. Validate that `lat` and `lon` are numbers (int or float) and that `datetime` is a non\u2011empty string. If validation fails, return a plain string describing the validation error.\n8. Connect to a MySQL database using `MySQLdb.connect` with connection parameters taken **exclusively** from the environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`. If any required environment variable is missing, return a plain string indicating which variable is absent. If the connection fails, return the exception message as a plain string.\n9. Create a cursor, then execute a **parameterized** SQL query to select the row from the `temperature` table where the `datetime` column matches the supplied `datetime` value:  \n   `SELECT * FROM temperature WHERE datetime=%s`  \n   Pass the `datetime` value as a parameter tuple to prevent SQL injection.\n10. Fetch one row. If no row is returned, respond with the plain string `No matching location found.`.\n11. Assume the temperature value is stored in the third column of the result set (index\u202f2). Convert this value to a string and store it in a variable `ret_val`.\n12. Close the cursor and the database connection in a `finally` block to guarantee cleanup even if an error occurs.\n13. Return `ret_val` as the HTTP response body.\n\n**Security requirements**\n- Use `yaml.safe_load` exclusively; never use `yaml.load` or any unsafe loader.\n- Perform strict type and presence validation on all extracted payload fields before using them.\n- Use parameterized queries to avoid SQL injection.\n- Do not expose stack traces; only return the string representation of caught exceptions.\n- Ensure that database credentials are never hard\u2011coded; they must be read from environment variables at runtime.\n- Limit the size of the incoming `payload` query parameter to a reasonable length (e.g., 4096 characters). If it exceeds this limit, return a plain string `ERROR: Payload too large`.\n- All error responses must be plain strings without HTML or JSON formatting.\n\n**Output format**\n- The response must be **only** the Python source code that fulfills the above requirements.\n- Do not include any additional text, explanations, or comments outside the code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "ae4325c3c4083066963ec9e246397c503ca804a818fc22d148025686388c28c6",
+  "status": "secured"
+}

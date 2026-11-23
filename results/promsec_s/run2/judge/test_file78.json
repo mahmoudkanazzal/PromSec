@@ -1,0 +1,66 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "b01fa12b428b04f366a437ac7b83b58f61129e3fbd151124c36ec50b5bdb3ea8",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty stock_name or stock_quantity leads to a server error.",
+      "Absent username in the session causes a failure.",
+      "Database connection failures raise an exception and result in an error response.",
+      "Unsanitized inputs allow SQL injection, potentially altering database behavior.",
+      "Extremely long input values may exceed column size limits and cause errors.",
+      "Requests using methods other than POST receive a 405 Method Not Allowed response."
+    ],
+    "entrypoints": [],
+    "intent": "Record a buy order submitted via HTTP POST and redirect the client to the home page.",
+    "invariants": [
+      "The route only responds to POST requests.",
+      "Database connection parameters are fixed: host=localhost, user=root, password=root, db=db.",
+      "The buy_orders table must exist with columns stock_name, stock_quantity, and username.",
+      "The response is always a redirect to '/' on successful processing."
+    ],
+    "io_behavior": [
+      "Accepts a POST request to /buy_order with form fields stock_name and stock_quantity.",
+      "Reads the current username from the session.",
+      "Returns an HTTP 302 redirect response pointing to '/'.",
+      "Returns an error status (e.g., 500) if required data is missing or a database error occurs."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the buy_orders table of the MySQL database.",
+      "Commits the transaction to make the insert permanent.",
+      "Closes the MySQL database connection after the operation."
+    ],
+    "source_hash": "3933d8b93e3f0a1254b4141d36360163ba275575ddf489cb0f8834937cda68fd"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.4,
+    "invariants": 0.4,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file78.py",
+  "gated_score": 0.64375,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.64375,
+  "original_hash": "3933d8b93e3f0a1254b4141d36360163ba275575ddf489cb0f8834937cda68fd",
+  "rationale": "Core functionality and DB side\u2011effects are preserved, but error handling, fixed DB parameters, and intentional lack of input sanitization deviate from the contract.",
+  "schema": 1,
+  "stability_abs_difference": 0.13188,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.5,
+    "invariants": 0.75,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.77563,
+  "weighted_mean": 0.725,
+  "worst_dimension": 0.4
+}

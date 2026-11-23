@@ -1,0 +1,76 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "3a38d72f6c0988c8d81bc577486ab66e5890811e58cf77e5cfc69b571a8478f3",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields cause a server error (KeyError).",
+      "Providing a duplicate title to /add_event results in a redirect back to the add page.",
+      "An empty 'term' parameter in /search_events matches every event (LIKE '%%').",
+      "Very long or malformed input strings are passed directly to SQL, potentially causing errors.",
+      "If the database is unreachable, each endpoint returns a 500 error."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple web API for creating, reading, updating, and deleting event records stored in a MySQL database.",
+    "invariants": [
+      "Each request closes its database cursor and connection before responding.",
+      "The Title field is treated as a unique identifier for duplicate checks.",
+      "Responses are either plain\u2011text messages or HTTP redirects; no JSON is returned.",
+      "All database operations are committed immediately.",
+      "The server runs with Flask's default routing and does not expose additional endpoints."
+    ],
+    "io_behavior": [
+      "POST /add_event with form fields 'title' and 'date' redirects to './add_event' if the title already exists, otherwise redirects to './view_events'.",
+      "POST /update_event_date with form fields 'title' and 'new_date' returns the plain text \"Event date updated successfully\".",
+      "POST /delete_event with form field 'title' returns the plain text \"Event deleted successfully\".",
+      "GET /search_events?term=XYZ returns a string representation of all rows whose Title contains the term.",
+      "GET /view_events returns a string representation of all rows in the Events table."
+    ],
+    "public_api": {
+      "route:GET /search_events": "",
+      "route:GET /view_events": "",
+      "route:POST /add_event": "",
+      "route:POST /delete_event": "",
+      "route:POST /update_event_date": ""
+    },
+    "side_effects": [
+      "Inserts a new row into Events on successful /add_event.",
+      "Updates the Date column of an existing row on /update_event_date.",
+      "Deletes a row from Events on /delete_event.",
+      "Opens and closes a MySQL connection for each request.",
+      "Issues HTTP redirects for /add_event outcomes."
+    ],
+    "source_hash": "d84a9609bbb8f855b34f74858f98b2d52127ee7a0edd954cac0ab277af3ac497"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.4,
+    "invariants": 0.8,
+    "io_semantics": 0.5,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file92.py",
+  "gated_score": 0.56875,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.56875,
+  "original_hash": "d84a9609bbb8f855b34f74858f98b2d52127ee7a0edd954cac0ab277af3ac497",
+  "rationale": "CRUD routes and redirects work as specified, but missing\u2011field errors are handled with redirects instead of KeyError, view/search endpoints return JSON rather than plain\u2011text, and parameterized queries avoid the intended SQL\u2011injection edge case.",
+  "schema": 1,
+  "stability_abs_difference": 0.125,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.6,
+    "invariants": 0.8,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.69375,
+  "weighted_mean": 0.625,
+  "worst_dimension": 0.4
+}

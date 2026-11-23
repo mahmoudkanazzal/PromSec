@@ -1,0 +1,67 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "8befac7f6a315ef22638814bb54837ed171f105d26290016c45e965d463a5cd9",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields raise a KeyError and result in a server error.",
+      "SQL statements are built with string interpolation, so special characters can cause syntax errors or injection.",
+      "Database connection failures raise exceptions and abort the request.",
+      "Extremely long usernames may exceed database column limits or cause regex performance issues.",
+      "If the generated salt contains non\u2011printable bytes, insertion may fail depending on column type."
+    ],
+    "entrypoints": [],
+    "intent": "Create a new user account when a client sends a POST request to /register with a username and password.",
+    "invariants": [
+      "Usernames are unique; duplicate usernames never get inserted.",
+      "Passwords are stored as SHA\u2011256(salt + password) rather than plain text.",
+      "A random 16\u2011byte salt is generated for each registration and stored alongside the hash.",
+      "The 'account_created' column is always set to 1 for new rows."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST to /register with form fields 'username' and 'password'.",
+      "If the username already exists, responds with HTTP 307 redirect to /login.",
+      "If the username is new, responds with a default 200 OK (empty body).",
+      "Returns an error response if required form fields are missing or a database error occurs."
+    ],
+    "public_api": {
+      "func:register": "()",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Queries the MySQL 'users' table for the supplied username.",
+      "Inserts a new row into 'users' with the username, hashed password, salt, and account_created flag.",
+      "Commits the transaction and closes the database connection.",
+      "May cause a client redirect (HTTP 307) when the username is already taken."
+    ],
+    "source_hash": "91acf2a5aef5bcd370c6a3200ba7ebb3820f83aa24caea6ae6604f49f50bfecf"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.4,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file1.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.34625,
+  "original_hash": "91acf2a5aef5bcd370c6a3200ba7ebb3820f83aa24caea6ae6604f49f50bfecf",
+  "rationale": "The program deviates from the contract: it uses PBKDF2 instead of SHA\u2011256(salt+password), returns 201 with a body instead of 200 empty, and handles missing fields with None rather than raising KeyError. It does preserve the redirect on duplicate and performs the required DB queries/inserts, but stores the salt as hex and uses parameterized queries, altering edge\u2011case behavior.",
+  "schema": 1,
+  "stability_abs_difference": 0.0375,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.3,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.38375,
+  "weighted_mean": 0.395,
+  "worst_dimension": 0.2
+}

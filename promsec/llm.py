@@ -8,9 +8,9 @@ import os
 import sqlite3
 import threading
 import time
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Callable
 
 from .io import append_jsonl
 
@@ -110,6 +110,7 @@ class LLMClient:
         if system:
             messages.append({"role": "system", "content": system})
         messages.append({"role": "user", "content": prompt})
+        assert self._client is not None
         response = self._client.chat.completions.create(
             model=self.model,
             messages=messages,
@@ -140,7 +141,7 @@ class LLMClient:
                     raise ValueError("Empty cached response")
                 if validate:
                     validate(cached["text"])
-            except (Exception,):
+            except Exception:
                 cached = None
         if cached is not None:
             result = LLMResponse(
@@ -164,6 +165,7 @@ class LLMClient:
                         continue
                     raise LLMError(f"{purpose}: {type(exc).__name__}: {exc}") from exc
 
+                validation_exc: Exception | None
                 if not isinstance(text, str) or not text.strip():
                     validation_exc = ValueError("The LLM returned an empty response")
                 else:

@@ -1,0 +1,113 @@
+{
+  "ast_similarity": 0.5363881401617251,
+  "candidate_hash": "2c8cadb76b18b2558abd8062548fb3d3a8495998814a7d0f8bb859211bb4a71d",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file16.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5685714285714286,
+      "bandit_statement_nodes": [
+        5,
+        10,
+        22
+      ],
+      "candidate_hash": "a24585aa745a30100acd0fa055d32a13585cbc317da7ea73fbfa5f1bd6842fe4",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1545,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 1
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2862,
+          "end_lineno": 10,
+          "lineno": 10,
+          "node": 5
+        },
+        {
+          "ast_type": "Return",
+          "change": 0.1801,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 7
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1315,
+          "end_lineno": 21,
+          "lineno": 21,
+          "node": 10
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2521,
+          "end_lineno": 40,
+          "lineno": 40,
+          "node": 22
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program that implements a Flask web application with the following exact functionality and security requirements:\n\n1. **Environment Configuration**\n   - Retrieve the MySQL database password from an environment variable named `DB_PASSWORD`.\n   - If the variable is missing, raise a `RuntimeError` with the message `\"Database password not set in environment variable DB_PASSWORD\"`.\n\n2. **Database Connection**\n   - Define a function `get_db_connection()` that returns a `MySQLdb` connection to a MySQL server on `localhost` using user `root`, the password from `DB_PASSWORD`, and database `weather_database`.\n\n3. **Endpoint `/api/temperature_for_location`**\n   - Accept a GET request with a query parameter `payload` containing a YAML string.\n   - Safely parse the YAML using `yaml.safe_load`. If parsing fails, abort with HTTP 400 and description `\"Invalid YAML payload\"`.\n   - Verify that the parsed object is a mapping containing the keys `\"latitude\"`, `\"longitude\"`, and `\"date\"`. If any are missing, abort with HTTP 400 and description `\"Missing required fields\"`.\n   - Extract `latitude`, `longitude`, and `date` from the payload.\n   - Use a parameterized SQL query to select `temp` from the table `temperatures` where `date`, `latitude`, and `longitude` match the supplied values.\n   - Close the database connection after the query.\n   - If a result is found, return the temperature as a plain string; otherwise return `\"Temperature not found\"`.\n\n4. **Endpoint `/api/update_weather_data`**\n   - Accept a GET request with a query parameter `location`.\n   - Validate `location` against the regular expression `^[A-Za-z0-9_\\-]+$`. If it does not match, abort with HTTP 400 and description `\"Invalid location parameter\"`.\n   - Execute an external script `weather_update_script.py` using `subprocess.run` with the arguments `[\"python3\", \"weather_update_script.py\", \"--location\", location]`.\n   - Set `check=True`, `capture_output=True`, and `text=True` in the `subprocess.run` call.\n   - If the subprocess raises `CalledProcessError`, abort with HTTP 500 and description `\"Weather update failed: {stderr}\"` where `{stderr}` is the captured standard error.\n   - On success, return the string `\"Weather data updated for {location}\"`.\n\n5. **Application Execution**\n   - Include the standard `if __name__ == '__main__':` block to run the Flask app with `debug=False`.\n\n6. **Security and Style**\n   - Use only the standard library and the following third\u2011party packages: `flask`, `PyYAML`, `MySQLdb`.\n   - Ensure all inputs are validated and all database interactions use parameterized queries to prevent SQL injection.\n   - Prevent command injection by passing the subprocess arguments as a list and validating the `location` parameter.\n   - Do not include any explanatory comments, docstrings, or non\u2011code text in the output.\n   - The output must be pure Python code, nothing else.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5363881401617251,
+      "bandit_statement_nodes": [
+        2,
+        39
+      ],
+      "candidate_hash": "2c8cadb76b18b2558abd8062548fb3d3a8495998814a7d0f8bb859211bb4a71d",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.3324,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1047,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.3379,
+          "end_lineno": 54,
+          "lineno": 49,
+          "node": 39
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service with the exact functionality described below. The code must be written in Python only, contain no explanatory text, comments, or non\u2011code output, and must follow security best practices.\n\n**Requirements:**\n1. **Imports** \u2013 Only import the following modules: `os`, `re`, `importlib`, `flask` (specifically `Flask`, `request`, `abort`), `yaml` (specifically `safe_load`), and `MySQLdb`.\n2. **Environment Variable** \u2013 Retrieve the database password from the environment variable `DB_PASSWORD`. If it is not set, raise a `RuntimeError` with the message `\"Database password not set in environment variable DB_PASSWORD\"`.\n3. **Database Connection** \u2013 Define a function `get_db_connection()` that returns a MySQLdb connection to a database named `weather_database` on `localhost` using user `root` and the retrieved password.\n4. **Flask App** \u2013 Create a Flask app instance named `app`.\n5. **Endpoint `/api/temperature_for_location`** (GET):\n   - Retrieve the query parameter `payload`. If missing, abort with status 400 and description `\"Invalid YAML payload\"`.\n   - Safely parse `payload` using `yaml.safe_load`. If parsing fails, abort with status 400 and description `\"Invalid YAML payload\"`.\n   - Verify that the parsed data is a dictionary containing the keys `\"latitude\"`, `\"longitude\"`, and `\"date\"`. If not, abort with status 400 and description `\"Missing required fields\"`.\n   - Extract `latitude`, `longitude`, and `date` from the parsed data.\n   - Use `get_db_connection()` to obtain a database connection. Ensure the connection is closed after use.\n   - Execute a parameterized SQL query: `SELECT temp FROM temperatures WHERE date=%s AND latitude=%s AND longitude=%s` with the extracted values.\n   - If a row is returned, respond with the temperature as a string; otherwise respond with `\"Temperature not found\"`.\n6. **Endpoint `/api/update_weather_data`** (GET):\n   - Retrieve the query parameter `location`. If missing or if it does not match the regular expression `^[A-Za-z0-9_\\-]+$`, abort with status 400 and description `\"Invalid location parameter\"`.\n   - Dynamically import a module named `weather_update_script` using `importlib.import_module`.\n   - If the imported module has an attribute `update`, call it with `location` as the argument.\n   - Else if the module has an attribute `main`, call it with a list `['--location', location]`.\n   - If neither attribute exists, raise an `AttributeError` with the message `\"No suitable entry point in weather_update_script\"`.\n   - If any exception occurs during import or execution, abort with status 500 and description `\"Weather update failed: <exception message>\"`.\n   - On success, return the string `\"Weather data updated for <location>\"`.\n7. **Application Entry Point** \u2013 Include the standard `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n8. **Security Considerations** \u2013 Ensure all inputs are validated, use parameterized queries to prevent SQL injection, do not enable Flask debug mode, and close all resources properly. Use only the specified imports and no additional third\u2011party libraries. \n\nGenerate only the Python code that satisfies all of the above requirements.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "00ef446e4ffe7380744100a7e572276e4748c3bf5fdc961d646efa176ce770fa",
+  "status": "secured"
+}

@@ -1,0 +1,72 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "11e3b41181d8e910974532466298e5d133676da5ed4f591d9ae17687ed9043bb",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'payload' query parameter.",
+      "Payload is not valid YAML or lacks required keys.",
+      "Environment variables for DB connection are unset or incorrect.",
+      "Database server is unreachable or authentication fails.",
+      "The SELECT query returns no rows for the given datetime.",
+      "Unexpected exceptions during query execution (e.g., malformed datetime format)."
+    ],
+    "entrypoints": [],
+    "intent": "Provide the temperature value for a given datetime (and location) via an HTTP GET request to /api/temperature_for_location.",
+    "invariants": [
+      "The endpoint always returns a string response body.",
+      "Database connections are always closed before the function returns.",
+      "The function never modifies any database rows.",
+      "The response does not depend on the latitude or longitude values supplied.",
+      "If a payload is provided, it must be valid YAML; otherwise an exception is raised.",
+      "The function runs synchronously within the Flask request thread."
+    ],
+    "io_behavior": [
+      "Accepts a query parameter named 'payload' containing a YAML document with keys latitude, longitude, and datetime.",
+      "Returns a plain\u2011text response containing the temperature as a string when a matching record exists.",
+      "Returns the literal string 'ERROR: No payload' if the payload parameter is missing.",
+      "Returns the literal string 'No matching location found.' if the database query yields no row.",
+      "Returns the exception message as plain text if a database connection or query error occurs.",
+      "All responses are sent with HTTP status 200 (default Flask behavior)."
+    ],
+    "public_api": {
+      "route:GET /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to a MySQL server using credentials from environment variables.",
+      "Executes a SELECT query against the 'temperature' table.",
+      "Closes the database cursor and connection after the query.",
+      "Potentially logs errors via Flask's default error handling.",
+      "Consumes CPU and network resources for request handling."
+    ],
+    "source_hash": "ae4325c3c4083066963ec9e246397c503ca804a818fc22d148025686388c28c6"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.4,
+    "invariants": 0.9,
+    "io_semantics": 0.3,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file62.py",
+  "gated_score": 0.395,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.395,
+  "original_hash": "ae4325c3c4083066963ec9e246397c503ca804a818fc22d148025686388c28c6",
+  "rationale": "The program performs the required DB query and closes connections, but deviates from the contract on response texts and HTTP status codes (e.g., returns 400/404/500 instead of always 200, and uses different error messages). It also adds extra error handling not specified and mishandles missing/invalid payload cases, leading to partial edge\u2011case coverage.",
+  "schema": 1,
+  "stability_abs_difference": 0.055,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.4,
+    "invariants": 0.6,
+    "io_semantics": 0.3,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.45,
+  "weighted_mean": 0.46,
+  "worst_dimension": 0.2
+}

@@ -1,0 +1,595 @@
+{
+  "ast_similarity": 0.5483870967741935,
+  "candidate_hash": "f0d73a52b7d8e87790817c2bcbc96a344935dee9b4264dd932a78385cea7b239",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 1,
+  "cwe_count_before": 1,
+  "cwes_after": [
+    89
+  ],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file97.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5483870967741935,
+      "bandit_statement_nodes": [
+        11,
+        20,
+        31,
+        39,
+        48
+      ],
+      "candidate_hash": "f0d73a52b7d8e87790817c2bcbc96a344935dee9b4264dd932a78385cea7b239",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1752,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1346,
+          "end_lineno": 63,
+          "lineno": 63,
+          "node": 39
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web API with the same routes, request/response formats, and database schema as the insecure example below, but refactor the code to follow security best practices and maintain identical functionality.\n\nRequirements:\n- The script must be pure Python and runnable with `python script_name.py`.\n- Use `sqlite3` for the database connection to a file named `library.db`.\n- Define a Flask app (`app = Flask(__name__)`) and **do not** enable debug mode.\n- Implement the following endpoints with the exact same URLs, HTTP methods, and JSON response structures:\n  1. `POST /add_book` \u2013 expects JSON body with `title`, `author`, `genre`; inserts a new row into `books`.\n  2. `GET /search_books` \u2013 accepts query parameter `keyword`; returns all rows where `title` or `author` contains the keyword (case\u2011insensitive).\n  3. `PUT /update_book/<int:book_id>` \u2013 expects optional JSON fields `title`, `author`, `genre`; updates the specified book.\n  4. `DELETE /delete_book/<int:book_id>` \u2013 deletes the specified book.\n  5. `GET /get_books_by_genre` \u2013 accepts query parameter `genre`; returns all rows with that genre.\n- Use **parameterized SQL statements** (`?` placeholders) for every query to prevent SQL injection.\n- Validate and sanitize all incoming data:\n  * Ensure required fields are present and are non\u2011empty strings.\n  * Trim whitespace and reject excessively long inputs (e.g., >255 characters).\n  * For `keyword` and `genre` parameters, treat missing values as empty strings.\n- Manage database connections and cursors with context managers (`with sqlite3.connect(...) as conn:`) so that resources are automatically closed and transactions are committed or rolled back appropriately.\n- Implement comprehensive error handling:\n  * Return `400 Bad Request` with a JSON error message for validation failures.\n  * Return `404 Not Found` if an update or delete targets a non\u2011existent `book_id`.\n  * Return `500 Internal Server Error` with a generic JSON error message for unexpected exceptions.\n- Set appropriate Flask configuration for production (e.g., `app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False`).\n- Ensure all responses are JSON\u2011encoded using `jsonify` and include the correct HTTP status codes: `201` for successful creation, `200` for successful reads/updates/deletes, and appropriate error codes as described.\n- Include a `if __name__ == '__main__':` block that runs the app on the default host and port without debug mode.\n\nProvide only the Python code; do not include any explanatory text, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5522041763341067,
+      "bandit_statement_nodes": [
+        71
+      ],
+      "candidate_hash": "7c2be784946832f860e5d6daa5c321af012d708146caccbbad2be188f7c2559e",
+      "cwe_count": 2,
+      "cwes": [
+        89,
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1323,
+          "end_lineno": 93,
+          "lineno": 93,
+          "node": 68
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1453,
+          "end_lineno": 94,
+          "lineno": 94,
+          "node": 69
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1104,
+          "end_lineno": 121,
+          "lineno": 121,
+          "node": 90
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service for managing a library of books using SQLite. The script must:\n\n- Import only the standard library modules and Flask (and sqlite3) as shown.\n- Define a Flask app with JSON pretty\u2011print disabled and a secret key taken from the environment variable `FLASK_SECRET_KEY` or generated securely with `os.urandom` if not set.\n- Use a constant `DB_PATH = 'library.db'` and `MAX_LENGTH = 255`.\n- Include a function `init_db()` that creates a `books` table with `id` (auto increment primary key), `title`, `author`, `genre` (all TEXT NOT NULL).\n- Provide a helper `validate_string(value, field_name)` that checks the value is a string, non\u2011empty after stripping, and does not exceed `MAX_LENGTH`; on failure abort with 400 and an appropriate description.\n- Provide a helper `get_book_by_id(book_id)` that returns the row if it exists.\n- Register error handlers for 400, 404, 500 that return JSON with an `\"error\"` field.\n- Implement the following routes with exact behavior:\n  * `POST /add_book` \u2013 expects JSON with `title`, `author`, `genre`; validates each; inserts into the database using a parameterized query; returns JSON with a message and the new `book_id`, status 201.\n  * `GET /search_books` \u2013 optional query parameter `keyword`; performs a case\u2011insensitive LIKE search on `title` and `author`; returns a list of matching rows as JSON, status 200.\n  * `PUT /update_book/<int:book_id>` \u2013 expects JSON; validates provided fields; only allows updating `title`, `author`, `genre`; uses a whitelist of columns; builds the SET clause safely; returns a JSON message, status 200; abort 404 if the book is not found, abort 400 if no valid fields are provided.\n  * `DELETE /delete_book/<int:book_id>` \u2013 deletes the book if it exists; abort 404 if not; returns a JSON message, status 200.\n  * `GET /get_books_by_genre` \u2013 optional query parameter `genre`; if provided, returns books with an exact genre match; otherwise returns all books; status 200.\n- Ensure all database interactions use context managers (`with sqlite3.connect`) and parameterized queries to prevent SQL injection.\n- Set `row_factory` to `sqlite3.Row` where needed to convert rows to dictionaries.\n- At the bottom, under `if __name__ == '__main__':`, call `init_db()`, read `host` and `port` from environment variables `FLASK_RUN_HOST` (default `0.0.0.0`) and `FLASK_RUN_PORT` (default `5000`), and run the app with `debug=False` and `use_reloader=False`.\n- The code must be syntactically correct, follow best security practices, and contain no extraneous output or comments.\n- Output only the Python code, nothing else.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4827586206896552,
+      "bandit_statement_nodes": [
+        68,
+        91
+      ],
+      "candidate_hash": "14ed6d57f3a77b1b411b04ed30682d22d14dde455c297e88f7cb44c72e447882",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1576,
+          "end_lineno": 93,
+          "lineno": 93,
+          "node": 65
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.148,
+          "end_lineno": 94,
+          "lineno": 94,
+          "node": 66
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1719,
+          "end_lineno": 124,
+          "lineno": 124,
+          "node": 91
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1154,
+          "end_lineno": 126,
+          "lineno": 126,
+          "node": 93
+        }
+      ],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web API for a simple library database using SQLite. The script must:\n\n- Import only the standard library modules `os`, `ipaddress`, `sqlite3` and the Flask components `Flask`, `request`, `jsonify`, `abort`.\n- Define a Flask app with `JSONIFY_PRETTYPRINT_REGULAR` set to `False` and a secret key taken from the environment variable `FLASK_SECRET_KEY` or generated securely with `os.urandom(24)`.\n- Use constants `DB_PATH = 'library.db'` and `MAX_LENGTH = 255`.\n- Include a function `init_db()` that creates a table `books` with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `title` TEXT NOT NULL, `author` TEXT NOT NULL, `genre` TEXT NOT NULL, if it does not already exist.\n- Include a helper `validate_string(value, field_name)` that:\n  * Checks `value` is a string, aborts with HTTP\u202f400 and a descriptive message if not.\n  * Strips whitespace, aborts with HTTP\u202f400 if the result is empty.\n  * Enforces a maximum length of `MAX_LENGTH`, aborting with HTTP\u202f400 if exceeded.\n  * Returns the stripped string on success.\n- Include a helper `get_book_by_id(book_id)` that returns a `sqlite3.Row` for the given `id` or `None` if not found.\n- Register error handlers for status codes 400, 404, and 500 that return JSON objects with an `\"error\"` field containing the appropriate message and the matching status code.\n- Implement the following routes with exact behavior:\n\n  1. `POST /add_book`  \n     - Expects JSON with keys `title`, `author`, `genre`.  \n     - Validates each field using `validate_string`.  \n     - Inserts a new row into `books` using a parameterized query.  \n     - Returns JSON `{\"message\":\"Book added\",\"book_id\":<id>}` with status\u202f201.\n\n  2. `GET /search_books`  \n     - Optional query parameter `keyword`.  \n     - If provided, performs a case\u2011insensitive `LIKE` search on `title` and `author` using a parameterized query with pattern `%keyword%`.  \n     - Returns a list of matching rows as JSON with status\u202f200.\n\n  3. `PUT /update_book/<int:book_id>`  \n     - Checks the book exists; aborts with 404 if not.  \n     - Accepts JSON containing any subset of `title`, `author`, `genre`.  \n     - Validates provided fields with `validate_string`.  \n     - If no valid fields are supplied, aborts with 400 and a descriptive message.  \n     - Updates only the allowed columns using a dynamically built `SET` clause, but ensures column names are limited to the allowed set and uses a parameterized query.  \n     - Returns JSON `{\"message\":\"Book updated\"}` with status\u202f200.\n\n  4. `DELETE /delete_book/<int:book_id>`  \n     - Checks the book exists; aborts with 404 if not.  \n     - Deletes the row using a parameterized query.  \n     - Returns JSON `{\"message\":\"Book deleted\"}` with status\u202f200.\n\n  5. `GET /get_books_by_genre`  \n     - Optional query parameter `genre`.  \n     - If provided, filters rows where `genre` equals the parameter using a parameterized query.  \n     - Returns the resulting rows as JSON with status\u202f200.\n\n- Ensure all database interactions use parameterized queries to prevent SQL injection.\n- In the `if __name__ == '__main__':` block:\n  * Call `init_db()` before starting the server.\n  * Determine the host from the environment variable `FLASK_RUN_HOST`. If set, validate it with `ipaddress.ip_address`; reject unspecified addresses and fall back to `'127.0.0.1'` on any validation error. If not set, default to `'127.0.0.1'`.\n  * Determine the port from the environment variable `FLASK_RUN_PORT`, defaulting to `5000`, and convert it to an integer.\n  * Run the Flask app with `debug=False`, `use_reloader=False`, and the resolved host and port.\n- The script must be secure: no use of `eval`/`exec`, no insecure defaults, proper input validation, safe secret\u2011key handling, and safe host configuration.\n- Do not include any additional functionality, comments, or explanatory text. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4847250509164969,
+      "bandit_statement_nodes": [
+        76
+      ],
+      "candidate_hash": "81f65f74f85d78b78efe8a6c0c497bb5f8bc224413ed0b6c02af46d3811d45f0",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1236,
+          "end_lineno": 97,
+          "lineno": 97,
+          "node": 73
+        }
+      ],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a SQLite database for a simple library. The script must:\n\n- Import only `os`, `ipaddress`, `sqlite3`, and Flask components (`Flask`, `request`, `jsonify`, `abort`).\n- Define constants `DB_PATH = 'library.db'` and `MAX_LENGTH = 255`.\n- Create a Flask app, set `JSONIFY_PRETTYPRINT_REGULAR` to `False`, and set a secret key from the environment variable `FLASK_SECRET_KEY` or a random 24\u2011byte value.\n- Include a function `init_db()` that creates a table `books(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, author TEXT NOT NULL, genre TEXT NOT NULL)` if it does not exist.\n- Include a function `validate_string(value, field_name)` that checks the value is a non\u2011empty string, strips whitespace, enforces length \u2264 `MAX_LENGTH`, and aborts with status\u202f400 and a descriptive message on failure.\n- Include a helper `get_book_by_id(book_id)` that returns a `sqlite3.Row` or `None`.\n- Register error handlers for 400, 404, and 500 that return JSON with appropriate messages.\n- Implement the following routes with exact behavior and security measures:\n  * `POST /add_book` \u2013 expects JSON with `title`, `author`, `genre`; validates each field; inserts a new row using a parameterized query; returns JSON with a message and the new `book_id`, status\u202f201.\n  * `GET /search_books` \u2013 optional query parameter `keyword`; if provided, performs a case\u2011insensitive `LIKE` search on `title` and `author` using a parameterized query; otherwise returns all books; returns a list of rows as JSON, status\u202f200.\n  * `PUT /update_book/<int:book_id>` \u2013 checks existence; expects JSON; only allows `title`, `author`, `genre`; validates provided fields; builds a deterministic `SET` clause preserving the order `title`, `author`, `genre`; updates using a parameterized query; returns JSON message, status\u202f200; aborts 400 if no valid fields are provided.\n  * `DELETE /delete_book/<int:book_id>` \u2013 checks existence; deletes the row using a parameterized query; returns JSON message, status\u202f200.\n  * `GET /get_books_by_genre` \u2013 optional query parameter `genre`; if provided, selects rows where `genre = ?`; otherwise returns all rows; returns a JSON list, status\u202f200.\n- In the `if __name__ == '__main__':` block, call `init_db()`, read the environment variable `FLASK_RUN_HOST`, validate it as a non\u2011unspecified IP address using `ipaddress.ip_address`; fallback to `'127.0.0.1'` on error or if not set. Read `FLASK_RUN_PORT` from the environment, defaulting to `5000`. Run the app with the determined host and port, `debug=False`, and `use_reloader=False`.\n- Ensure all database interactions use parameterized queries to prevent SQL injection.\n- Ensure all user\u2011provided data is validated and sanitized.\n- Do not include any comments, explanatory text, or non\u2011code output. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.49583333333333335,
+      "bandit_statement_nodes": [
+        79
+      ],
+      "candidate_hash": "430a9b2db26dbc5e1915a263c247c9e9a828674027de60724a18e8747154d92e",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2776,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1484,
+          "end_lineno": 111,
+          "lineno": 111,
+          "node": 76
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1305,
+          "end_lineno": 112,
+          "lineno": 112,
+          "node": 77
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2675,
+          "end_lineno": 147,
+          "lineno": 147,
+          "node": 104
+        }
+      ],
+      "iteration": 5,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web API for a simple library database using SQLite. The script must:\n\n- Import only the standard library modules `os`, `re`, `sqlite3`, `socket` and the Flask components `Flask`, `request`, `jsonify`, `abort`.\n- Define constants `DB_PATH = 'library.db'` and `MAX_LENGTH = 255`.\n- Create a Flask app with JSON pretty\u2011print disabled and a secret key taken from the environment variable `FLASK_SECRET_KEY` or generated securely with `os.urandom(24)`.\n- Include a function `init_db()` that creates a table `books(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, author TEXT NOT NULL, genre TEXT NOT NULL)` if it does not exist.\n- Include a helper `validate_string(value, field_name)` that checks the value is a non\u2011empty string, strips whitespace, enforces `MAX_LENGTH`, and aborts with status\u202f400 and a clear description on failure.\n- Include a helper `get_book_by_id(book_id)` that returns a `sqlite3.Row` or `None`.\n- Register error handlers for 400, 404, and 500 that return JSON with an `'error'` field and the appropriate status code.\n- Implement the following routes with exact behavior:\n  * `POST /add_book` \u2013 expects JSON with `title`, `author`, `genre`; validates each field; inserts into `books`; returns JSON `{'message': 'Book added', 'book_id': <id>}` with status\u202f201.\n  * `GET /search_books` \u2013 optional query parameter `keyword`; if provided, performs a case\u2011insensitive `LIKE` search on `title` and `author`; returns a list of matching rows as JSON with status\u202f200.\n  * `PUT /update_book/<int:book_id>` \u2013 checks the book exists, expects JSON, allows updating any of `title`, `author`, `genre` after validation; builds a dynamic `SET` clause safely using parameterized queries; returns JSON `{'message': 'Book updated'}` with status\u202f200.\n  * `DELETE /delete_book/<int:book_id>` \u2013 checks the book exists, deletes it, returns JSON `{'message': 'Book deleted'}` with status\u202f200.\n  * `GET /get_books_by_genre` \u2013 optional query parameter `genre`; if provided, filters by exact `genre`; returns matching rows as JSON with status\u202f200.\n- In the `if __name__ == '__main__':` block, call `init_db()`, read `host` from the environment variable `FLASK_RUN_HOST` only if it matches a valid IPv4 address regex using `re.fullmatch`, otherwise default to `'127.0.0.1'`. Read `port` from `FLASK_RUN_PORT` defaulting to `5000`. Run the Flask app with `debug=False` and `use_reloader=False`.\n- Ensure all database connections use context managers, set `row_factory` to `sqlite3.Row` where needed, and use parameterized queries to prevent SQL injection.\n- Do not include any additional functionality, external dependencies, or comments. The code must be valid Python\u202f3 and ready to run.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5157096424702059,
+      "bandit_statement_nodes": [
+        76
+      ],
+      "candidate_hash": "33855c6cca691b0bbd1c879d07f5b1405d8c4ec8058ced78d1b97af35c057950",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1323,
+          "end_lineno": 108,
+          "lineno": 108,
+          "node": 73
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1455,
+          "end_lineno": 109,
+          "lineno": 109,
+          "node": 74
+        }
+      ],
+      "iteration": 6,
+      "optimized_prompt": "You are an expert Python developer. Write a complete, self\u2011contained Flask application in **Python** that provides a secure REST API for managing a library of books using SQLite. The code must:\n\n- Use only the standard library and the Flask package (no additional third\u2011party libraries).\n- Define constants `DB_PATH = 'library.db'` and `MAX_LENGTH = 255`.\n- Create a Flask app with `app = Flask(__name__)`, set `app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False`, and set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` or a securely generated 24\u2011byte random key if the variable is missing.\n- Include a function `init_db()` that creates a table `books` with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `title` (TEXT NOT NULL), `author` (TEXT NOT NULL), and `genre` (TEXT NOT NULL) if it does not already exist.\n- Implement a helper `validate_string(value, field_name)` that:\n  * Ensures `value` is a string, otherwise aborts with HTTP\u202f400 and a clear message.\n  * Strips whitespace, aborts with HTTP\u202f400 if the result is empty.\n  * Checks the length does not exceed `MAX_LENGTH`, aborting with HTTP\u202f400 if it does.\n  * Returns the cleaned string.\n- Implement a helper `get_book_by_id(book_id)` that returns a single row as a `sqlite3.Row` object or `None` if not found, using a parameterized query.\n- Register error handlers for HTTP\u202f400, 404, and 500 that return JSON objects with an `\"error\"` field and the appropriate status code.\n- Provide the following routes with exact functionality and security measures:\n  1. `POST /add_book` \u2013 Accept JSON with `title`, `author`, and `genre`. Validate each field with `validate_string`. Insert the new book using a parameterized query, return JSON `{'message': 'Book added', 'book_id': <id>}` with status 201.\n  2. `GET /search_books` \u2013 Optional query parameter `keyword`. If present, perform a case\u2011insensitive search on `title` and `author` using `LIKE` with wildcards, safely parameterized. Return a JSON list of matching books (each as a dict) with status 200.\n  3. `PUT /update_book/<int:book_id>` \u2013 Validate that the book exists, abort 404 if not. Accept JSON with any subset of `title`, `author`, `genre`. Validate provided fields. Build the `SET` clause only from allowed columns (`title`, `author`, `genre`) using parameterized placeholders, abort 400 for any other fields or if no valid fields are supplied. Execute the update securely and return JSON `{'message': 'Book updated'}` with status 200.\n  4. `DELETE /delete_book/<int:book_id>` \u2013 Validate that the book exists, abort 404 if not. Delete the book using a parameterized query and return JSON `{'message': 'Book deleted'}` with status 200.\n  5. `GET /get_books_by_genre` \u2013 Optional query parameter `genre`. If provided, filter books where `genre = ?` using a parameterized query. Return a JSON list of matching books with status 200.\n- In the `if __name__ == '__main__':` block:\n  * Call `init_db()`.\n  * Read environment variable `FLASK_RUN_HOST`; if it matches the IPv4 regex `(?:\\d{1,3}\\.){3}\\d{1,3}` use it as the host, otherwise default to `'127.0.0.1'`.\n  * Read environment variable `FLASK_RUN_PORT` (default `'5000'`), convert to int, and run the app with `debug=False` and `use_reloader=False`.\n- Ensure **all** database interactions use parameterized queries to prevent SQL injection.\n- Ensure **all** input validation aborts with clear HTTP\u202f400 messages.\n- Do not include any comments, explanatory text, or markdown formatting in the output. Output **only** the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.536036036036036,
+      "bandit_statement_nodes": [
+        77
+      ],
+      "candidate_hash": "318e6bf71fb000d6a09dcdd4ba0b8f455fafe16164dee108f4449a73dca25c26",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1428,
+          "end_lineno": 104,
+          "lineno": 104,
+          "node": 77
+        }
+      ],
+      "iteration": 7,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.9+) that implements a secure Flask web application for managing a library of books using SQLite. The script must:\n\n- Import only the following standard libraries: `os`, `re`, `sqlite3`, `secrets`.\n- Import from Flask: `Flask`, `request`, `jsonify`, `abort`, `g`.\n- Define a constant `DB_PATH` set to `'library.db'` and `MAX_LENGTH` set to `255`.\n- Create a Flask app instance, set `app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False`, and set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` or, if not present, a securely generated token using `secrets.token_urlsafe(24)`.\n- Implement a `get_db()` function that lazily creates a SQLite connection stored in Flask\u2019s `g` object, sets `row_factory` to `sqlite3.Row`, and returns the connection.\n- Implement a `close_db(exception)` function registered with `@app.teardown_appcontext` that closes and removes the database connection from `g` if it exists.\n- Implement an `init_db()` function that creates a table `books` with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `title` (TEXT NOT NULL), `author` (TEXT NOT NULL), and `genre` (TEXT NOT NULL) if it does not already exist, and commits the change.\n- Implement a `validate_string(value, field_name)` helper that:\n  * aborts with HTTP\u202f400 if `value` is not a string,\n  * strips whitespace, aborts with HTTP\u202f400 if the result is empty,\n  * aborts with HTTP\u202f400 if the length exceeds `MAX_LENGTH`,\n  * returns the cleaned string.\n- Implement a `get_book_by_id(book_id)` helper that returns a single row from `books` where `id` matches the given integer, using a parameterized query.\n- Register error handlers for HTTP\u202f400, 404, and 500 that return JSON objects with an `error` field and the appropriate status code.\n- Define the following routes with exact functionality and security measures:\n  * `POST /add_book`:\n    - Parse JSON payload (force parsing).\n    - Validate `title`, `author`, and `genre` using `validate_string`.\n    - Insert a new record with a parameterized query.\n    - Commit and return JSON `{ \"message\": \"Book added\", \"book_id\": <new_id> }` with status 201.\n  * `GET /search_books`:\n    - Accept optional query parameter `keyword`.\n    - If provided, perform a case\u2011insensitive LIKE search on `title` and `author` using `%keyword%` pattern and a parameterized query.\n    - If not provided, return all books.\n    - Return a JSON list of book objects (convert rows to dicts) with status 200.\n  * `PUT /update_book/<int:book_id>`:\n    - Verify the book exists; abort 404 if not.\n    - Parse JSON payload (force parsing).\n    - Allow only the fields `title`, `author`, `genre`; abort 400 for any other keys.\n    - Validate each provided field with `validate_string`.\n    - If no valid fields are supplied, abort 400.\n    - Build the SQL `SET` clause using only whitelisted column names, create a parameter list, and execute a parameterized `UPDATE` query.\n    - Commit and return JSON `{ \"message\": \"Book updated\" }` with status 200.\n  * `DELETE /delete_book/<int:book_id>`:\n    - Verify the book exists; abort 404 if not.\n    - Delete the record with a parameterized query, commit, and return JSON `{ \"message\": \"Book deleted\" }` with status 200.\n  * `GET /get_books_by_genre`:\n    - Accept optional query parameter `genre`.\n    - If provided, validate it with `validate_string` and return books where `genre` matches exactly using a parameterized query.\n    - If not provided, return all books.\n    - Return a JSON list of book objects with status 200.\n- In the `if __name__ == '__main__':` block:\n  * Call `init_db()`.\n  * Read environment variable `FLASK_RUN_HOST`; if it matches a valid IPv4 address pattern (`(?:\\d{1,3}\\.){3}\\d{1,3}`) use it, otherwise default to `'127.0.0.1'`.\n  * Read environment variable `FLASK_RUN_PORT`, default to `'5000'`, convert to integer.\n  * Run the Flask app with `debug=False`, `use_reloader=False`, using the resolved host and port.\n\nThe generated code must be pure Python, contain no comments, no explanatory text, and must not include any code in languages other than Python. Ensure all database interactions use parameterized queries to prevent SQL injection, all input validation follows the described rules, and the application behavior matches the specification exactly.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5112781954887218,
+      "bandit_statement_nodes": [
+        78
+      ],
+      "candidate_hash": "3f1612fb12b32c9e21db307d4acace37958a8f1a648fa3f6960e750c08f61203",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1428,
+          "end_lineno": 105,
+          "lineno": 105,
+          "node": 78
+        }
+      ],
+      "iteration": 8,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that implements a secure Flask web application with the following exact functionality and constraints:\n\n- Use only Python standard library modules and the Flask package; do not import or rely on any non\u2011standard third\u2011party libraries.\n- The application must manage a SQLite database stored in a file named `library.db`.\n- Define a constant `MAX_LENGTH = 255` and enforce this limit on all user\u2011provided string inputs.\n- Configure the Flask app with `JSONIFY_PRETTYPRINT_REGULAR = False` and set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` or, if that variable is not set, to a securely generated random URL\u2011safe token of at least 24 bytes.\n- Implement a `get_db()` function that lazily creates a SQLite connection stored in Flask\u2019s `g` context, sets `row_factory` to `sqlite3.Row`, and returns the connection.\n- Implement a `close_db(exception)` function registered with `@app.teardown_appcontext` that closes the database connection if it exists.\n- Implement an `init_db()` function that creates a table `books` with columns:\n  - `id` \u2013 integer primary key autoincrement\n  - `title` \u2013 non\u2011null text\n  - `author` \u2013 non\u2011null text\n  - `genre` \u2013 non\u2011null text\n- Implement a `validate_string(value, field_name)` helper that:\n  - aborts with HTTP 400 if `value` is not a string\n  - strips leading/trailing whitespace, aborts with HTTP 400 if the result is empty\n  - aborts with HTTP 400 if the stripped string length exceeds `MAX_LENGTH`\n  - returns the cleaned string\n- Implement a `get_book_by_id(book_id)` helper that returns a single row from `books` where `id` equals `book_id`, or `None` if not found.\n- Register error handlers for HTTP 400, 404, and 500 that return JSON responses with an `error` field and the appropriate status code.\n- Define the following routes with exact behavior:\n\n  1. `POST /add_book`\n     - Parse JSON payload (force parsing).\n     - Validate `title`, `author`, and `genre` using `validate_string`.\n     - Insert a new record into `books` using a parameterized query.\n     - Commit the transaction.\n     - Return JSON `{ \"message\": \"Book added\", \"book_id\": <new_id> }` with status 201.\n\n  2. `GET /search_books`\n     - Accept optional query parameter `keyword`.\n     - If `keyword` is provided, perform a case\u2011insensitive search on `title` and `author` using `LIKE` with wildcards, safely parameterized.\n     - If `keyword` is omitted, return all books.\n     - Return a JSON list of book objects (each as a dict) with status 200.\n\n  3. `PUT /update_book/<int:book_id>`\n     - Verify the book exists; abort with 404 if not.\n     - Parse JSON payload (force parsing).\n     - Allow only the keys `title`, `author`, `genre`; abort with 400 if any other keys are present.\n     - Validate each provided field with `validate_string`.\n     - If no allowed fields are provided, abort with 400.\n     - Construct the `SET` clause dynamically but safely using only whitelisted column names.\n     - Execute a parameterized `UPDATE` query, commit, and return JSON `{ \"message\": \"Book updated\" }` with status 200.\n\n  4. `DELETE /delete_book/<int:book_id>`\n     - Verify the book exists; abort with 404 if not.\n     - Delete the record using a parameterized query, commit, and return JSON `{ \"message\": \"Book deleted\" }` with status 200.\n\n  5. `GET /get_books_by_genre`\n     - Accept optional query parameter `genre`.\n     - If `genre` is provided, validate it with `validate_string` and return books where `genre` matches exactly using a parameterized query.\n     - If omitted, return all books.\n     - Return a JSON list of book objects with status 200.\n\n- In the `if __name__ == '__main__':` block:\n  - Call `init_db()` to ensure the database schema exists.\n  - Determine the host to bind:\n    - Read environment variable `FLASK_RUN_HOST`; if it matches a valid IPv4 address pattern (`(?:\\d{1,3}\\.){3}\\d{1,3}`) use it, otherwise default to `127.0.0.1`.\n  - Determine the port to bind:\n    - Read environment variable `FLASK_RUN_PORT`; default to `5000` if not set; convert to integer.\n  - Run the Flask app with `debug=False`, `use_reloader=False`, and the resolved host and port.\n\nAdditional security and quality requirements:\n- Use only parameterized SQL statements; never concatenate user input into SQL strings.\n- Perform strict input validation as described; do not allow empty or overly long strings.\n- Ensure all aborts use the appropriate HTTP status codes.\n- Do not include any explanatory comments, markdown formatting, or non\u2011code text in the generated output.\n- The entire output must be valid Python code ready to run.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5053418803418803,
+      "bandit_statement_nodes": [
+        76
+      ],
+      "candidate_hash": "dca9647f990aef02408c083c2c9fde303d93501c29317100eea65171f10e8c8c",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1446,
+          "end_lineno": 122,
+          "lineno": 122,
+          "node": 76
+        }
+      ],
+      "iteration": 9,
+      "optimized_prompt": "Write a complete, secure Python Flask application that implements a simple library API with SQLite. The code must:\n\n- Import only `os`, `re`, `secrets`, `sqlite3`, and Flask components (`Flask`, `request`, `jsonify`, `abort`, `g`).\n- Define `MAX_LENGTH = 255` and create a Flask app with `JSONIFY_PRETTYPRINT_REGULAR` set to `False`.\n- Set `app.secret_key` from the environment variable `FLASK_SECRET_KEY` or generate a URL\u2011safe token using `secrets.token_urlsafe(24)`.\n- Provide a `get_db()` function that stores a SQLite connection in Flask\u2019s `g`, using `row_factory = sqlite3.Row`, connecting to a file named `library.db`.\n- Include a teardown function to close the DB connection.\n- Include an `init_db()` function that creates a table `books` (`id INTEGER PRIMARY KEY AUTOINCREMENT`, `title TEXT NOT NULL`, `author TEXT NOT NULL`, `genre TEXT NOT NULL`) if it does not exist, and commits.\n- Implement a `validate_string(value, field_name)` helper that aborts with 400 if the value is not a string, is empty after stripping, or exceeds `MAX_LENGTH`; otherwise returns the stripped string.\n- Implement `get_book_by_id(book_id)` that returns a row from `books` where `id = ?`.\n- Register error handlers for 400, 404, and 500 that return JSON with an `\"error\"` field and appropriate status codes.\n- Provide the following routes with exact behavior:\n  * `POST /add_book`: expects JSON with `title`, `author`, `genre`; validates each with `validate_string`; inserts into `books` using a parameterized query; returns JSON `{\"message\": \"Book added\", \"book_id\": <id>}` with status 201.\n  * `GET /search_books`: optional query parameter `keyword`; if provided, search `title` or `author` with `LIKE %keyword%`; otherwise return all books; return a list of book dicts as JSON with status 200.\n  * `PUT /update_book/<int:book_id>`: fetch the book, abort 404 if missing; accept JSON with any of `title`, `author`, `genre`; reject any other fields with 400; validate provided fields; build a dynamic `SET` clause using parameterized queries; update the row; return JSON `{\"message\": \"Book updated\"}` with status 200.\n  * `DELETE /delete_book/<int:book_id>`: fetch the book, abort 404 if missing; delete the row; return JSON `{\"message\": \"Book deleted\"}` with status 200.\n  * `GET /get_books_by_genre`: optional query parameter `genre`; if provided, validate it and return books where `genre = ?`; otherwise return all books; return a list of book dicts as JSON with status 200.\n- In the `if __name__ == '__main__':` block, call `init_db()`, read `host` from the environment variable `FLASK_RUN_HOST`, validate it matches an IPv4 address using a fullmatch regex `r'(?:\\d{1,3}\\.){3}\\d{1,3}'`, default to `'127.0.0.1'` if invalid, read `port` from `FLASK_RUN_PORT` defaulting to `5000`, and run the app with `debug=False` and `use_reloader=False`.\n- Ensure all SQL statements use parameterized queries to prevent injection.\n- Ensure all user\u2011provided data is validated and stripped.\n- Do not include any additional functionality, comments, or non\u2011Python code. The output must be a single Python script that can be run directly.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4927536231884058,
+      "bandit_statement_nodes": [
+        74
+      ],
+      "candidate_hash": "09dea75f538cb1aa37c37bdc2dd3e3ba9f87c6e574424e7fccec612804077d24",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.2224,
+          "end_lineno": 106,
+          "lineno": 106,
+          "node": 74
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1264,
+          "end_lineno": 107,
+          "lineno": 107,
+          "node": 75
+        }
+      ],
+      "iteration": 10,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no markdown, no comments, no explanatory text) that implements a Flask web application with the following exact requirements:\n\n- Use only the standard library modules `os`, `re`, `secrets`, `sqlite3` and the Flask package (`flask.Flask`, `flask.request`, `flask.jsonify`, `flask.abort`, `flask.g`).\n- Define a constant `MAX_LENGTH = 255`.\n- Create a Flask app instance named `app` and set `app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if that variable is not set, generate a secure random URL\u2011safe token of 24 bytes using `secrets.token_urlsafe`.\n- Implement a function `get_db()` that lazily creates a SQLite connection to a file named `library.db`, stores it in `flask.g` under the key `'db'`, and sets the connection\u2019s `row_factory` to `sqlite3.Row`. Return the connection.\n- Implement a `@app.teardown_appcontext` function `close_db(exception)` that closes and removes the database connection from `flask.g` if it exists.\n- Implement a function `init_db()` that creates a table `books` with columns:\n  - `id` \u2013 integer primary key autoincrement\n  - `title` \u2013 non\u2011null text\n  - `author` \u2013 non\u2011null text\n  - `genre` \u2013 non\u2011null text\n  Use `IF NOT EXISTS` and commit the transaction.\n- Implement a helper `validate_string(value, field_name)` that:\n  - aborts with HTTP 400 if `value` is not a string,\n  - strips whitespace, aborts with HTTP 400 if the result is empty,\n  - aborts with HTTP 400 if the stripped length exceeds `MAX_LENGTH`,\n  - returns the stripped string.\n- Implement `get_book_by_id(book_id)` that returns a single row from `books` where `id = ?`.\n- Register error handlers for HTTP 400, 404, and 500 that return JSON `{\"error\": <message>}` with the appropriate status code. Use the exception\u2019s `description` attribute if present, otherwise the string representation.\n- Define the following routes with exact behavior:\n\n  1. `POST /add_book`\n     - Parse JSON body (force parsing).\n     - Validate `title`, `author`, and `genre` using `validate_string`.\n     - Insert a new row into `books` using a parameterized query.\n     - Commit and return JSON `{\"message\": \"Book added\", \"book_id\": <lastrowid>}` with status 201.\n\n  2. `GET /search_books`\n     - Optional query parameter `keyword`.\n     - If provided, search `title` OR `author` with `LIKE` using `%keyword%`.\n     - If not provided, return all rows.\n     - Return a JSON list of dictionaries for each row with status 200.\n\n  3. `PUT /update_book/<int:book_id>`\n     - Retrieve the book; abort 404 with \u201cBook not found\u201d if missing.\n     - Parse JSON body (force parsing).\n     - Allow only the fields `title`, `author`, `genre`; abort 400 with \u201cInvalid field\u201d for any others.\n     - For each provided field, validate with `validate_string` and build a dynamic `SET` clause using named parameters.\n     - Abort 400 with \u201cNo fields to update\u201d if no allowed fields are present.\n     - Execute the update with a parameterized query, commit, and return JSON `{\"message\": \"Book updated\"}` with status 200.\n\n  4. `DELETE /delete_book/<int:book_id>`\n     - Retrieve the book; abort 404 with \u201cBook not found\u201d if missing.\n     - Delete the row using a parameterized query, commit, and return JSON `{\"message\": \"Book deleted\"}` with status 200.\n\n  5. `GET /get_books_by_genre`\n     - Optional query parameter `genre`.\n     - If provided, validate it with `validate_string` and return rows where `genre = ?`.\n     - If not provided, return all rows.\n     - Return a JSON list of dictionaries for each row with status 200.\n\n- In the `if __name__ == '__main__':` block:\n  - Call `init_db()`.\n  - Determine the host from environment variable `FLASK_RUN_HOST`; default to `'127.0.0.1'`.\n  - Validate the host string against the regex `r'(?:\\d{1,3}\\.){3}\\d{1,3}'`; if it does not match, fall back to `'127.0.0.1'`.\n  - Determine the port from environment variable `FLASK_RUN_PORT`; default to `5000`. If conversion to int fails, use `5000`.\n  - Run the Flask app with `host`, `port`, `debug=False`, and `use_reloader=False`.\n\nThe generated code must be syntactically correct, secure (use only parameterized SQL statements, proper input validation, and safe handling of environment variables), and must exactly implement the described functionality. Output only the Python source code, with no surrounding text, markdown fences, or comments.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5015806111696522,
+      "bandit_statement_nodes": [
+        81
+      ],
+      "candidate_hash": "783c2e5b2ff90b10f2de278aa6f6027c3abfedb784af3c7b0c3756f6cfbca5d4",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1569,
+          "end_lineno": 107,
+          "lineno": 107,
+          "node": 81
+        }
+      ],
+      "iteration": 11,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.9+) that implements a secure Flask web application with the exact functionality described below. The code must be pure Python (no other languages) and must not include any explanatory comments or markup.\n\n**General requirements**\n- Use only the standard library modules `os`, `re`, `secrets`, `sqlite3` and the Flask package (`flask`).\n- The application must create a SQLite database file named `library.db` in the current working directory.\n- All database connections must be obtained through a `get_db()` function that stores the connection in Flask\u2019s `g` context and sets `row_factory` to `sqlite3.Row`.\n- Implement a `close_db` function registered with `@app.teardown_appcontext` to close the connection.\n- Provide an `init_db()` function that creates a table `books` with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `title` (TEXT NOT NULL), `author` (TEXT NOT NULL), and `genre` (TEXT NOT NULL). Call this function once at startup inside an application context.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if not set, generate a secure random key using `secrets.token_urlsafe(24)`.\n- Configure Flask to disable pretty\u2011print JSON (`app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False`).\n\n**Input validation**\n- Define a constant `MAX_LENGTH = 255`.\n- Implement a `validate_string(value, field_name)` function that:\n  * aborts with HTTP\u202f400 if `value` is not a string,\n  * strips whitespace and aborts with HTTP\u202f400 if the result is empty,\n  * aborts with HTTP\u202f400 if the stripped length exceeds `MAX_LENGTH`,\n  * returns the stripped string otherwise.\n\n**Error handling**\n- Register error handlers for HTTP\u202f400,\u202f404, and\u202f500 that return JSON objects `{'error': <message>}` with the appropriate status code. Use `getattr(error, 'description', str(error))` to obtain the message.\n\n**Routes**\n1. `POST /add_book`\n   - Accept JSON payload (force parsing) with keys `title`, `author`, `genre`.\n   - Validate each field with `validate_string`.\n   - Insert a new row using a parameterized query.\n   - Return JSON `{'message': 'Book added', 'book_id': <lastrowid>}` with status\u202f201.\n\n2. `GET /search_books`\n   - Optional query parameter `keyword`.\n   - If provided, perform a case\u2011insensitive search on `title` and `author` using `LIKE` with `%keyword%`.\n   - If not provided, return all rows.\n   - Return a JSON list of dictionaries representing each row with status\u202f200.\n\n3. `PUT /update_book/<int:book_id>`\n   - Verify the book exists; abort with 404 if not.\n   - Accept JSON payload (force parsing). Allowed keys are `title`, `author`, `genre`; abort with 400 for any other key.\n   - Validate provided fields with `validate_string`.\n   - If no valid fields are supplied, abort with 400.\n   - Build a safe `SET` clause using only the allowed column names and parameterized placeholders.\n   - Execute an `UPDATE` query with the constructed clause and the `book_id`.\n   - Return JSON `{'message': 'Book updated'}` with status\u202f200.\n\n4. `DELETE /delete_book/<int:book_id>`\n   - Verify the book exists; abort with 404 if not.\n   - Delete the row using a parameterized query.\n   - Return JSON `{'message': 'Book deleted'}` with status\u202f200.\n\n5. `GET /get_books_by_genre`\n   - Optional query parameter `genre`.\n   - If provided, validate it with `validate_string` and return rows where `genre` matches exactly using a parameterized query.\n   - If not provided, return all rows.\n   - Return a JSON list of dictionaries with status\u202f200.\n\n**Server startup**\n- In the `if __name__ == '__main__':` block, create an application context and call `init_db()`.\n- Determine the host from the environment variable `FLASK_RUN_HOST`; if it does not match the IPv4 regex `(?:\\d{1,3}\\.){3}\\d{1,3}`, default to `127.0.0.1`.\n- Determine the port from `FLASK_RUN_PORT`; if conversion to int fails, default to `5000`.\n- Run the Flask app with `debug=False` and `use_reloader=False`.\n\n**Security constraints**\n- All SQL statements must use parameterized placeholders (`?`) to prevent injection.\n- Input strings must be validated and trimmed as specified.\n- The secret key must never be hard\u2011coded.\n- Host and port values must be validated as described before passing to `app.run`.\n\nGenerate the Python code that fulfills all the above requirements exactly, preserving the described functionality and security measures. Do not include any explanatory text, comments, or non\u2011code output. The response must consist solely of the requested Python script.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5130151843817787,
+      "bandit_statement_nodes": [
+        71
+      ],
+      "candidate_hash": "987e5b011a7521020b219c463778c72b6950282f713c0843d3a3f56802b12a3a",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1291,
+          "end_lineno": 92,
+          "lineno": 92,
+          "node": 71
+        }
+      ],
+      "iteration": 12,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service for managing a simple library. The script must:\n\n- Use only Python standard library modules and the following third\u2011party packages: Flask, sqlite3.\n- Import `os`, `re`, `secrets`, `sqlite3`, and from `flask` import `Flask`, `g`, `request`, `jsonify`, `abort`.\n- Create a Flask app with a secret key taken from the environment variable `FLASK_SECRET_KEY` or generated with `secrets.token_urlsafe(24)` if not set.\n- Disable pretty\u2011print JSON by setting `app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False`.\n- Define a constant `MAX_LENGTH = 255`.\n- Implement a `get_db()` function that stores a sqlite3 connection in Flask's `g` object, uses a `Row` factory, and connects to a file named `library.db`.\n- Implement a teardown function that closes the DB connection.\n- Implement `init_db()` that creates a table `books` with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `title` TEXT NOT NULL, `author` TEXT NOT NULL, `genre` TEXT NOT NULL.\n- Implement a `validate_string(value, field_name)` helper that aborts with 400 if the value is not a string, is empty after stripping, or exceeds `MAX_LENGTH`; otherwise returns the stripped string.\n- Register error handlers for 400, 404, and 500 that return JSON with an `'error'` field and the appropriate status code.\n- Provide the following routes with exact behavior:\n  * `POST /add_book`: expects JSON with `title`, `author`, `genre`; validates each with `validate_string`; inserts a new row using a parameterized query; returns JSON with message `'Book added'` and the new `book_id`, status 201.\n  * `GET /search_books`: optional query parameter `keyword`; if provided, perform a case\u2011insensitive LIKE search on `title` and `author` using a parameterized query with pattern `%keyword%`; otherwise return all books; return list of rows as JSON, status 200.\n  * `PUT /update_book/<int:book_id>`: checks existence of the book, aborts 404 if not found; expects JSON with any subset of `title`, `author`, `genre`; rejects any other fields with 400; validates provided fields; builds a dynamic SET clause using only allowed columns and a parameterized query; updates the row; returns JSON message `'Book updated'`, status 200.\n  * `DELETE /delete_book/<int:book_id>`: checks existence, aborts 404 if missing; deletes the row with a parameterized query; returns JSON message `'Book deleted'`, status 200.\n  * `GET /get_books_by_genre`: optional query parameter `genre`; if provided, validates it and returns rows where `genre` equals the value using a parameterized query; otherwise returns all books; returns JSON list, status 200.\n- In the `if __name__ == '__main__':` block, within `app.app_context()`, call `init_db()`.\n- Determine the host to run on by reading the `FLASK_RUN_HOST` environment variable; accept only IPv4 dotted\u2011decimal strings matching the regex `^(?:\\d{1,3}\\.){3}\\d{1,3}$`; default to `127.0.0.1` if invalid or missing.\n- Determine the port by reading the `FLASK_RUN_PORT` environment variable; convert to int, default to `5000` on any error.\n- Run the Flask app with `debug=False`, `use_reloader=False`, using the computed host and port.\n\nThe code must be secure: use parameterized SQL statements, never concatenate user input into SQL, validate all external input, handle errors gracefully, and avoid exposing stack traces. Do not include any additional functionality, comments, or non\u2011Python code. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5102481121898598,
+      "bandit_statement_nodes": [
+        76
+      ],
+      "candidate_hash": "e16e82a7f5d474cb347f5b01963baf1b4f7b3136b2936fa4e96a6b75b6a334ee",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.3507,
+          "end_lineno": 96,
+          "lineno": 96,
+          "node": 76
+        }
+      ],
+      "iteration": 13,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other language) that implements a secure Flask web application with the exact functionality described below. The code must:\n\n- Import only the following modules: `os`, `re`, `secrets`, `sqlite3`, and from `flask` import `Flask`, `g`, `request`, `jsonify`, `abort`.\n- Create a Flask app instance, set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` or, if not set, to a securely generated token using `secrets.token_urlsafe(24)`.\n- Disable pretty\u2011print JSON by setting `app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False`.\n- Define a constant `MAX_LENGTH = 255` for input length limits.\n- Implement a `get_db()` function that lazily creates a SQLite connection to a file named `library.db`, stores it in Flask\u2019s `g` object, and sets `row_factory` to `sqlite3.Row`.\n- Implement a `close_db(exception)` function registered with `@app.teardown_appcontext` that closes and removes the database connection from `g` if it exists.\n- Implement an `init_db()` function that creates a table `books` with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `title` (TEXT NOT NULL), `author` (TEXT NOT NULL), and `genre` (TEXT NOT NULL) if it does not already exist, then commits.\n- Implement a `validate_string(value, field_name)` helper that:\n  * aborts with HTTP 400 if `value` is not a string,\n  * strips whitespace, aborts with HTTP 400 if the result is empty,\n  * aborts with HTTP 400 if the stripped length exceeds `MAX_LENGTH`,\n  * returns the stripped string otherwise.\n- Register error handlers for HTTP 400, 404, and 500 that return JSON objects with an `error` field and the appropriate status code.\n- Provide the following routes with exact behavior and security measures:\n  * `POST /add_book`:\n    - Parse JSON body (force parsing).\n    - Validate `title`, `author`, and `genre` using `validate_string`.\n    - Insert a new row into `books` using a parameterized query.\n    - Commit and return JSON `{ \"message\": \"Book added\", \"book_id\": <lastrowid> }` with status 201.\n  * `GET /search_books`:\n    - Accept optional query parameter `keyword`.\n    - If `keyword` is provided, search `title` and `author` case\u2011insensitively using `LIKE` with `%keyword%` pattern, parameterized safely.\n    - If not provided, return all books.\n    - Return a JSON list of objects (convert each row to a dict) with status 200.\n  * `PUT /update_book/<int:book_id>`:\n    - Verify the book exists; abort 404 if not.\n    - Parse JSON body (force parsing); abort 400 if body is missing.\n    - Allow only fields `title`, `author`, `genre`; abort 400 for any other keys.\n    - Validate each provided field with `validate_string`.\n    - Build a safe `SET` clause using only the validated column names and parameter placeholders.\n    - Execute a parameterized `UPDATE` query, commit, and return JSON `{ \"message\": \"Book updated\" }` with status 200.\n    - Abort 400 if no valid fields are supplied.\n  * `DELETE /delete_book/<int:book_id>`:\n    - Verify the book exists; abort 404 if not.\n    - Delete the row using a parameterized query, commit, and return JSON `{ \"message\": \"Book deleted\" }` with status 200.\n  * `GET /get_books_by_genre`:\n    - Accept optional query parameter `genre`.\n    - If provided, validate it with `validate_string` and return books where `genre` matches exactly using a parameterized query.\n    - If not provided, return all books.\n    - Return a JSON list of objects with status 200.\n- In the `if __name__ == '__main__':` block:\n  * Use `app.app_context()` to call `init_db()`.\n  * Retrieve `FLASK_RUN_HOST` from the environment; if it matches a valid IPv4 address (use a full\u2011match regex `r'^(?:\\d{1,3}\\.){3}\\d{1,3}$'`), use it, otherwise default to `'127.0.0.1'`.\n  * Retrieve `FLASK_RUN_PORT` from the environment; if it can be converted to an integer, use it, otherwise default to `5000`.\n  * Run the Flask app with `debug=False`, `use_reloader=False`, and the resolved `host` and `port`.\n\nAll database interactions must use parameterized queries to prevent SQL injection. All input handling must enforce the validation rules described. The script must be ready to run as a standalone Python file. Do not include any additional text, comments, or explanations.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5042643923240938,
+      "bandit_statement_nodes": [
+        76
+      ],
+      "candidate_hash": "ed44744d1646272f39ecfefc2938b45493c207091e78cbf404e53978feae908c",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.3509,
+          "end_lineno": 101,
+          "lineno": 101,
+          "node": 76
+        }
+      ],
+      "iteration": 14,
+      "optimized_prompt": "Write a complete, secure Python program (no other language) that implements a Flask web API for managing a simple library database using SQLite. The program must:\n\n- Import only the following modules: `os`, `re`, `secrets`, `sqlite3`, and from `flask` import `Flask`, `g`, `request`, `jsonify`, `abort`.\n- Create a Flask app instance, set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` or, if not set, to a securely generated URL\u2011safe token of 24 bytes using `secrets.token_urlsafe`.\n- Disable pretty\u2011print JSON responses by setting `app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False`.\n- Define a constant `MAX_LENGTH = 255` for input length validation.\n- Implement a `get_db()` function that lazily creates a SQLite connection to a file named `library.db`, stores it in Flask\u2019s `g` object, and sets `row_factory` to `sqlite3.Row`.\n- Implement a `close_db(exception)` function registered with `@app.teardown_appcontext` that closes and removes the database connection from `g` if it exists.\n- Implement an `init_db()` function that creates a table `books` with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `title` (TEXT NOT NULL), `author` (TEXT NOT NULL), and `genre` (TEXT NOT NULL) if it does not already exist, then commits the transaction.\n- Implement a `validate_string(value, field_name)` helper that:\n  * aborts with HTTP 400 if `value` is not a string,\n  * strips whitespace, aborts with HTTP 400 if the result is empty,\n  * aborts with HTTP 400 if the stripped length exceeds `MAX_LENGTH`,\n  * returns the stripped string otherwise.\n- Register error handlers for HTTP 400, 404, and 500 that return JSON objects with an `error` field containing the appropriate message and the correct status code.\n- Provide the following routes with exact behavior:\n\n  1. `POST /add_book`:\n     - Parse JSON body (force parsing).\n     - Validate `title`, `author`, and `genre` using `validate_string`.\n     - Insert a new row into `books` using a parameterized query.\n     - Commit and return JSON `{ \"message\": \"Book added\", \"book_id\": <new_id> }` with status 201.\n\n  2. `GET /search_books`:\n     - Accept optional query parameter `keyword`.\n     - If `keyword` is provided, search `title` and `author` with a `LIKE` pattern `%keyword%` using a parameterized query.\n     - If not provided, return all books.\n     - Return a JSON list of objects (convert each row to a dict) with status 200.\n\n  3. `PUT /update_book/<int:book_id>`:\n     - Verify the book exists; abort 404 if not.\n     - Parse JSON body (force parsing); abort 400 if body is empty.\n     - Allow only the fields `title`, `author`, `genre`; abort 400 for any other fields.\n     - For each allowed field present, validate it with `validate_string`.\n     - Build a dynamic `SET` clause using only the provided fields, execute a parameterized `UPDATE` query, commit, and return JSON `{ \"message\": \"Book updated\" }` with status 200.\n     - Abort 400 if no valid fields are supplied.\n\n  4. `DELETE /delete_book/<int:book_id>`:\n     - Verify the book exists; abort 404 if not.\n     - Delete the row using a parameterized query, commit, and return JSON `{ \"message\": \"Book deleted\" }` with status 200.\n\n  5. `GET /get_books_by_genre`:\n     - Accept optional query parameter `genre`.\n     - If `genre` is provided, validate it with `validate_string` and return books where `genre` matches exactly using a parameterized query.\n     - If not provided, return all books.\n     - Return a JSON list of objects with status 200.\n\n- In the `if __name__ == '__main__':` block:\n  * Initialize the database by calling `init_db()` within the app context.\n  * Determine the host:\n    - Read environment variable `FLASK_RUN_HOST`.\n    - If it matches a valid IPv4 address pattern (`^(?:\\d{1,3}\\.){3}\\d{1,3}$`), use it; otherwise default to `127.0.0.1`.\n  * Determine the port:\n    - Read environment variable `FLASK_RUN_PORT`.\n    - Convert to integer if possible; on failure or if not set, default to `5000`.\n  * Run the Flask app with `debug=False` and `use_reloader=False` using the resolved host and port.\n\nThe code must be fully functional, follow best security practices (use parameterized SQL queries, proper input validation, secure secret handling), and contain no comments or explanatory text. Ensure the script is ready to be executed as a standalone Python file.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.490216271884655,
+      "bandit_statement_nodes": [
+        76
+      ],
+      "candidate_hash": "9a74389ff5b99553f33e8a54ba9ca23c38f0a2c3eaba19c0ca547a420b4acb23",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1187,
+          "end_lineno": 101,
+          "lineno": 101,
+          "node": 76
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1331,
+          "end_lineno": 102,
+          "lineno": 102,
+          "node": 77
+        }
+      ],
+      "iteration": 15,
+      "optimized_prompt": "Write a complete, secure Python 3 Flask application that implements a simple library API with the following exact specifications:\n\n- **Imports**: `os`, `re`, `secrets`, `sqlite3`, and from `flask` import `Flask`, `g`, `request`, `jsonify`, `abort`.\n- **App setup**:\n  - Create a Flask app instance.\n  - Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` or, if not set, to a securely generated token using `secrets.token_urlsafe(24)`.\n  - Disable pretty\u2011print JSON responses by setting `app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False`.\n- **Constants**: Define `MAX_LENGTH = 255`.\n- **Database handling**:\n  - Implement `get_db()` that opens a SQLite connection to a file named `library.db`, stores it in `g.db`, and sets `row_factory` to `sqlite3.Row`. Return the connection.\n  - Implement a `@app.teardown_appcontext` function `close_db(exception)` that closes and removes `g.db` if it exists.\n  - Implement `init_db()` that creates a table `books` with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `title` (TEXT NOT NULL), `author` (TEXT NOT NULL), and `genre` (TEXT NOT NULL). Commit the changes.\n- **Input validation**:\n  - Write a function `validate_string(value, field_name)` that:\n    - Aborts with HTTP 400 if `value` is not a string.\n    - Strips whitespace, aborts with HTTP 400 if the result is empty.\n    - Aborts with HTTP 400 if the stripped string length exceeds `MAX_LENGTH`.\n    - Returns the stripped string.\n- **Error handlers**:\n  - Register handlers for HTTP 400, 404, and 500 that return JSON objects with an `error` field containing the appropriate message and the correct status code.\n- **Routes**:\n  1. `POST /add_book`:\n     - Parse JSON body (force parsing).\n     - Validate `title`, `author`, and `genre` using `validate_string`.\n     - Insert a new row into `books` using a parameterized query.\n     - Commit and return JSON `{ \"message\": \"Book added\", \"book_id\": <new_id> }` with status 201.\n  2. `GET /search_books`:\n     - Accept optional query parameter `keyword`.\n     - If provided, search `title` and `author` with a `LIKE` pattern `%keyword%`; otherwise return all books.\n     - Return a JSON list of book objects (convert each row to a dict) with status 200.\n  3. `PUT /update_book/<int:book_id>`:\n     - Verify the book exists; abort 404 if not.\n     - Parse JSON body (force parsing); abort 400 if empty.\n     - Allow only the fields `title`, `author`, `genre`; abort 400 for any others.\n     - For each provided field, validate with `validate_string` and build a dynamic `UPDATE` statement using named parameters.\n     - Abort 400 if no valid fields are supplied.\n     - Execute the update, commit, and return JSON `{ \"message\": \"Book updated\" }` with status 200.\n  4. `DELETE /delete_book/<int:book_id>`:\n     - Verify the book exists; abort 404 if not.\n     - Delete the row, commit, and return JSON `{ \"message\": \"Book deleted\" }` with status 200.\n  5. `GET /get_books_by_genre`:\n     - Accept optional query parameter `genre`.\n     - If provided, validate it with `validate_string` and return books where `genre` matches exactly; otherwise return all books.\n     - Return a JSON list of book objects with status 200.\n- **Application entry point**:\n  - When the script is run directly, create an application context and call `init_db()`.\n  - Determine the host:\n    - Read environment variable `FLASK_RUN_HOST`.\n    - If it matches a valid IPv4 address pattern (`^(?:\\d{1,3}\\.){3}\\d{1,3}$`), use it; otherwise default to `127.0.0.1`.\n  - Determine the port:\n    - Read environment variable `FLASK_RUN_PORT`.\n    - Convert to integer if possible; on any error or if not set, default to `5000`.\n  - Run the Flask app with the computed `host` and `port`, with `debug=False` and `use_reloader=False`.\n\nAdditional security and quality requirements:\n- Use only parameterized SQL queries to prevent injection.\n- Do not import or use any modules outside those listed.\n- Ensure all abort calls include a clear description.\n- Do not include any code comments, explanatory text, or non\u2011Python output.\n- The entire output must be valid, runnable Python code that fulfills the specifications exactly.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5085470085470085,
+      "bandit_statement_nodes": [
+        76
+      ],
+      "candidate_hash": "25f450787252e3e969f67150cc8e1d1f5b1fbb6a951dc853ffc9521250aabaa1",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1151,
+          "end_lineno": 97,
+          "lineno": 97,
+          "node": 76
+        }
+      ],
+      "iteration": 16,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.9+) that implements a secure Flask web application with the exact functionality described below. The generated code must be pure Python (no other languages) and must not contain any explanatory comments or extra text\u2014only the functional code.\n\n**General requirements**\n- Use only the standard library modules `os`, `re`, `secrets`, `sqlite3` and the third\u2011party package `flask`.\n- The application must create a Flask instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if that variable is not set, generate a secure random URL\u2011safe token of 24 bytes using `secrets.token_urlsafe`.\n- Disable Flask\u2019s pretty\u2011print JSON formatting by setting `app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False`.\n- Define a constant `MAX_LENGTH = 255` that limits the length of all user\u2011provided string fields.\n\n**Database handling**\n- Implement a function `get_db()` that lazily creates a SQLite connection to a file named `library.db`, stores it on Flask\u2019s `g` object, and sets `row_factory` to `sqlite3.Row`.\n- Implement a teardown function `close_db(exception)` that closes and removes the database connection from `g` if it exists, and register it with `@app.teardown_appcontext`.\n- Implement `init_db()` that creates a table `books` with columns:\n  - `id` \u2013 integer primary key, autoincrement\n  - `title` \u2013 non\u2011null text\n  - `author` \u2013 non\u2011null text\n  - `genre` \u2013 non\u2011null text\n  The function must commit the change.\n\n**Input validation**\n- Implement `validate_string(value, field_name)` that:\n  - aborts with HTTP\u202f400 if `value` is not a string.\n  - strips whitespace; aborts with HTTP\u202f400 if the result is empty.\n  - aborts with HTTP\u202f400 if the stripped length exceeds `MAX_LENGTH`.\n  - returns the stripped string.\n\n**Error handlers**\n- Register handlers for HTTP\u202f400, 404, and 500 that return JSON objects with an `error` key containing the description (or a generic message for 500) and the appropriate status code.\n\n**Routes**\n1. `POST /add_book`\n   - Parse JSON body (force parsing).\n   - Validate `title`, `author`, and `genre` using `validate_string`.\n   - Insert a new row into `books` using a parameterized query.\n   - Commit and return JSON `{ \"message\": \"Book added\", \"book_id\": <new_id> }` with status\u202f201.\n\n2. `GET /search_books`\n   - Optional query parameter `keyword`.\n   - If provided, search `title` and `author` with a `LIKE` pattern `%keyword%` using a parameterized query.\n   - If not provided, return all rows.\n   - Return a JSON list of book objects (convert each row to a dict) with status\u202f200.\n\n3. `PUT /update_book/<int:book_id>`\n   - Verify the book exists; abort 404 if not.\n   - Parse JSON body (force parsing); abort 400 if empty.\n   - Allow only the fields `title`, `author`, `genre`; abort 400 for any other keys.\n   - Validate each provided field with `validate_string`.\n   - If no valid fields are supplied, abort 400.\n   - Build a dynamic `SET` clause using only the validated fields and execute a parameterized `UPDATE` query.\n   - Commit and return JSON `{ \"message\": \"Book updated\" }` with status\u202f200.\n\n4. `DELETE /delete_book/<int:book_id>`\n   - Verify the book exists; abort 404 if not.\n   - Delete the row using a parameterized query.\n   - Commit and return JSON `{ \"message\": \"Book deleted\" }` with status\u202f200.\n\n5. `GET /get_books_by_genre`\n   - Optional query parameter `genre`.\n   - If provided, validate it with `validate_string` and return rows where `genre` matches exactly using a parameterized query.\n   - If not provided, return all rows.\n   - Return a JSON list of book objects with status\u202f200.\n\n**Application entry point**\n- Under `if __name__ == '__main__':`:\n  - Create an application context and call `init_db()`.\n  - Determine the host:\n    - Read `FLASK_RUN_HOST` environment variable.\n    - If it matches the regex `^(?:\\d{1,3}\\.){3}\\d{1,3}$`, use it; otherwise default to `'127.0.0.1'`.\n  - Determine the port:\n    - Read `FLASK_RUN_PORT` environment variable.\n    - If it can be converted to an integer, use that value; otherwise default to `5000`.\n  - Run the Flask app with `debug=False`, `use_reloader=False`, and the resolved host and port.\n\n**Security constraints**\n- Use only parameterized SQL statements to prevent injection.\n- Do not use `eval`, `exec`, or any dynamic code execution.\n- Ensure all user input passes through `validate_string` before being used in SQL.\n- Do not expose stack traces; the 500 error handler must return a generic message.\n- Do not enable Flask debug mode.\n\nGenerate only the Python code that satisfies all the above specifications. Do not include any explanatory text, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.49737118822292326,
+      "bandit_statement_nodes": [
+        71
+      ],
+      "candidate_hash": "eb1416c87e1510ac2e6d6edf9b2bd74b3f5d848e85dfa586ceb54eb287360022",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1114,
+          "end_lineno": 91,
+          "lineno": 91,
+          "node": 71
+        }
+      ],
+      "iteration": 17,
+      "optimized_prompt": "Write a complete, secure Python program (no other language) that implements a Flask web API for managing a simple library database using SQLite. The code must:\n\n- Import only `os`, `re`, `secrets`, `sqlite3`, and the necessary objects from `flask`.\n- Create a Flask app, set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` or, if not set, generate a URL\u2011safe token with `secrets.token_urlsafe(24)`.\n- Disable pretty\u2011print JSON formatting (`app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False`).\n- Define a constant `MAX_LENGTH = 255` for string length validation.\n- Implement a `get_db()` function that lazily creates a SQLite connection to a file named `library.db`, stores it in Flask\u2019s `g` object, and sets `row_factory` to `sqlite3.Row`.\n- Implement a `close_db(exception)` function registered with `@app.teardown_appcontext` that closes and removes the database connection from `g`.\n- Implement an `init_db()` function that creates a table `books` with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `title` (TEXT NOT NULL), `author` (TEXT NOT NULL), and `genre` (TEXT NOT NULL), then commits.\n- Implement a `validate_string(value, field_name)` helper that:\n  * aborts with HTTP 400 if `value` is not a string,\n  * strips whitespace and aborts with HTTP 400 if the result is empty,\n  * aborts with HTTP 400 if the stripped length exceeds `MAX_LENGTH`,\n  * returns the stripped string otherwise.\n- Register error handlers for HTTP 400, 404, and 500 that return JSON objects with an `error` field and the appropriate status code.\n- Provide the following routes with exact behavior:\n  * `POST /add_book` \u2013 expects JSON with `title`, `author`, `genre`; validates each field with `validate_string`; inserts a new row into `books` using parameterized SQL; commits; returns JSON `{ \"message\": \"Book added\", \"book_id\": <new_id> }` with status 201.\n  * `GET /search_books` \u2013 optional query parameter `keyword`; if present, performs a case\u2011insensitive LIKE search on `title` and `author` using `%keyword%`; otherwise returns all books; returns a JSON list of book objects with status 200.\n  * `PUT /update_book/<int:book_id>` \u2013 checks that a book with the given `book_id` exists, aborts 404 if not; expects JSON; only allows keys `title`, `author`, `genre`; aborts 400 for any other keys or if no data; validates provided fields with `validate_string`; builds a dynamic SET clause using only the provided fields, executes a parameterized UPDATE, commits, and returns JSON `{ \"message\": \"Book updated\" }` with status 200.\n  * `DELETE /delete_book/<int:book_id>` \u2013 checks existence, aborts 404 if missing; deletes the row with a parameterized DELETE, commits, and returns JSON `{ \"message\": \"Book deleted\" }` with status 200.\n  * `GET /get_books_by_genre` \u2013 optional query parameter `genre`; if provided, validates it with `validate_string` and returns books where `genre` matches exactly using a parameterized SELECT; otherwise returns all books; returns a JSON list of book objects with status 200.\n- In the `if __name__ == '__main__':` block:\n  * Use `app.app_context()` to call `init_db()`.\n  * Read `FLASK_RUN_HOST` from the environment; if it matches a valid IPv4 address (`r'^(?:\\d{1,3}\\.){3}\\d{1,3}$'`) use it, otherwise default to `'127.0.0.1'`.\n  * Read `FLASK_RUN_PORT` from the environment; if it can be converted to an integer use it, otherwise default to `5000`.\n  * Run the Flask app with `debug=False` and `use_reloader=False` using the resolved host and port.\n\nEnsure all SQL statements use parameterized queries to prevent injection, all user inputs are validated, and the application does not contain any extraneous comments or code unrelated to the specifications. Output only the Python code fulfilling these requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5152505446623094,
+      "bandit_statement_nodes": [
+        75
+      ],
+      "candidate_hash": "02dcdb125e48b5cc3e4ea3cf4b03061dffd0dfc49d1cf225ed72ee4c816682ab",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.2067,
+          "end_lineno": 101,
+          "lineno": 101,
+          "node": 75
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.178,
+          "end_lineno": 102,
+          "lineno": 102,
+          "node": 76
+        }
+      ],
+      "iteration": 18,
+      "optimized_prompt": "Create a complete, production\u2011ready Python Flask application that implements a simple library management API with the following exact specifications and security requirements. The code must be pure Python (no other languages) and must not contain any explanatory comments or additional text beyond the required implementation.\n\n**General requirements**\n- Use only the standard library modules `os`, `re`, `secrets`, `sqlite3` and the Flask package (`flask`).\n- The Flask app must be instantiated as `app = Flask(__name__)`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if that variable is not set, generate a secure random URL\u2011safe token of 24 bytes using `secrets.token_urlsafe`.\n- Disable pretty\u2011printing of JSON responses by setting `app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False`.\n- Define a constant `MAX_LENGTH = 255` that limits the maximum length of all string inputs.\n\n**Database handling**\n- Implement a function `get_db()` that lazily creates a SQLite connection to a file named `library.db`, stores it in Flask\u2019s `g` object under the key `'db'`, and sets `row_factory` to `sqlite3.Row`. Return the connection.\n- Implement a teardown function `close_db(exception)` that removes the connection from `g` and closes it if it exists. Register it with `@app.teardown_appcontext`.\n- Implement `init_db()` that creates a table `books` with columns:\n  - `id` \u2013 integer primary key autoincrement\n  - `title` \u2013 non\u2011null text\n  - `author` \u2013 non\u2011null text\n  - `genre` \u2013 non\u2011null text\n  Use `IF NOT EXISTS` and commit the transaction.\n\n**Input validation**\n- Implement `validate_string(value, field_name)` that:\n  - aborts with HTTP 400 if `value` is not a `str`.\n  - strips whitespace; aborts with HTTP 400 if the result is empty.\n  - aborts with HTTP 400 if the stripped length exceeds `MAX_LENGTH`.\n  - returns the stripped string.\n\n**Error handling**\n- Register error handlers for HTTP 400, 404, and 500 that return JSON objects with an `\"error\"` key containing the description (or a generic message for 500) and the appropriate status code.\n\n**API endpoints**\n1. `POST /add_book`\n   - Parse JSON body (force parsing).\n   - Validate `title`, `author`, and `genre` using `validate_string`.\n   - Insert a new row into `books` using a parameterized query.\n   - Commit and return JSON `{\"message\":\"Book added\",\"book_id\":<lastrowid>}` with status 201.\n\n2. `GET /search_books`\n   - Optional query parameter `keyword`.\n   - If `keyword` is provided, search case\u2011insensitively for the keyword in `title` or `author` using `LIKE` with `%` wildcards and `COLLATE NOCASE`.\n   - If not provided, return all rows.\n   - Return a JSON list of dictionaries (convert each `sqlite3.Row` to `dict`) with status 200.\n\n3. `PUT /update_book/<int:book_id>`\n   - Verify the book exists; abort 404 if not.\n   - Parse JSON body (force parsing); abort 400 if body is empty.\n   - Allow only the fields `title`, `author`, `genre`; abort 400 for any other keys.\n   - For each allowed field present, validate with `validate_string`, build a dynamic `SET` clause, and execute a single parameterized `UPDATE` statement.\n   - Abort 400 if no valid fields are provided.\n   - Commit and return JSON `{\"message\":\"Book updated\"}` with status 200.\n\n4. `DELETE /delete_book/<int:book_id>`\n   - Verify the book exists; abort 404 if not.\n   - Delete the row using a parameterized query, commit, and return JSON `{\"message\":\"Book deleted\"}` with status 200.\n\n5. `GET /get_books_by_genre`\n   - Optional query parameter `genre`.\n   - If `genre` is provided, validate it with `validate_string` and return rows where `genre` matches exactly using a parameterized query.\n   - If not provided, return all rows.\n   - Return a JSON list of dictionaries with status 200.\n\n**Application startup**\n- In the `if __name__ == '__main__':` block, create an application context and call `init_db()`.\n- Determine the host:\n  - Read `FLASK_RUN_HOST` environment variable.\n  - If it matches the IPv4 regex `^(?:\\d{1,3}\\.){3}\\d{1,3}$`, use it; otherwise default to `'127.0.0.1'`.\n- Determine the port:\n  - Read `FLASK_RUN_PORT` environment variable.\n  - Convert to `int`; if conversion fails, default to `5000`.\n- Run the Flask app with `debug=False`, `use_reloader=False`, and the resolved host and port.\n\n**Security constraints**\n- Use only parameterized SQL statements to prevent injection.\n- Validate and sanitize all external input (JSON bodies, query parameters, path parameters) using the `validate_string` function and type checks.\n- Do not expose stack traces; ensure the 500 error handler returns a generic message.\n- Do not include any debugging or development features such as `debug=True` or automatic reloading.\n\nGenerate only the Python code that fulfills all the above requirements. Do not include any additional text, explanations, or comments.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.48762886597938143,
+      "bandit_statement_nodes": [
+        75
+      ],
+      "candidate_hash": "5ca1de376ec3bdb79d03a422a4846ee8daee5e04c80b034d078173e417377260",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.3507,
+          "end_lineno": 100,
+          "lineno": 100,
+          "node": 75
+        }
+      ],
+      "iteration": 19,
+      "optimized_prompt": "Write a secure Python Flask application that provides a simple library API with the following exact specifications:\n\n- Use only Python standard library modules and the third\u2011party packages **flask** and **sqlite3**.\n- Import `os`, `re`, `secrets`, `sqlite3`, and from `flask` import `Flask`, `request`, `jsonify`, `abort`, `g`.\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if it is not set, generate a URL\u2011safe token with `secrets.token_urlsafe(24)`.\n- Disable pretty\u2011print JSON by setting `app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False`.\n- Define a constant `MAX_LENGTH = 255`.\n\nDatabase handling:\n- Implement a function `get_db()` that opens a SQLite connection to a file named `library.db`, stores it in Flask\u2019s `g` object under the key `'db'`, and sets `row_factory` to `sqlite3.Row`. Return the connection.\n- Implement a `@app.teardown_appcontext` function `close_db(exception)` that closes and removes the database connection from `g` if it exists.\n- Implement `init_db()` that creates a table `books` with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `title` (TEXT NOT NULL), `author` (TEXT NOT NULL), and `genre` (TEXT NOT NULL) if it does not already exist, then commits.\n\nInput validation:\n- Implement `validate_string(value, field_name)` that aborts with HTTP 400 if `value` is not a string, is empty after stripping whitespace, or exceeds `MAX_LENGTH`. Return the stripped string.\n\nError handling:\n- Register error handlers for HTTP 400, 404, and 500 that return JSON objects with an `\"error\"` key. For 400 and 404, include the exception description if available; for 500 return a generic `\"Internal server error\"` message.\n\nAPI endpoints:\n1. `POST /add_book`\n   - Parse JSON body (force parsing).\n   - Validate `title`, `author`, and `genre` using `validate_string`.\n   - Insert a new row into `books` using a parameterized query.\n   - Commit and return JSON `{\"message\":\"Book added\",\"book_id\":<lastrowid>}` with status 201.\n\n2. `GET /search_books`\n   - Accept optional query parameter `keyword`.\n   - If `keyword` is provided, search `title` and `author` case\u2011insensitively using `LIKE` with wildcards, otherwise return all rows.\n   - Return a JSON list of dictionaries representing each row with status 200.\n\n3. `PUT /update_book/<int:book_id>`\n   - Verify the book exists; if not, abort 404.\n   - Parse JSON body (force parsing) and ensure it is not empty.\n   - Allow only the fields `title`, `author`, and `genre`; abort 400 if any other keys are present.\n   - For each provided field, validate the value with `validate_string`.\n   - Build a dynamic parameterized `UPDATE` statement using only the supplied fields.\n   - Execute, commit, and return JSON `{\"message\":\"Book updated\"}` with status 200.\n\n4. `DELETE /delete_book/<int:book_id>`\n   - Verify the book exists; if not, abort 404.\n   - Delete the row using a parameterized query, commit, and return JSON `{\"message\":\"Book deleted\"}` with status 200.\n\n5. `GET /get_books_by_genre`\n   - Accept optional query parameter `genre`.\n   - If `genre` is provided, validate it with `validate_string` and return rows where `genre` matches exactly; otherwise return all rows.\n   - Return a JSON list of dictionaries with status 200.\n\nApplication entry point:\n- In the `if __name__ == '__main__':` block, call `init_db()` within an application context.\n- Determine the host:\n  - Read environment variable `FLASK_RUN_HOST`.\n  - If it matches the regex `^(?:\\d{1,3}\\.){3}\\d{1,3}$` (valid IPv4), use it; otherwise default to `127.0.0.1`.\n- Determine the port:\n  - Read environment variable `FLASK_RUN_PORT`.\n  - Convert to integer; if conversion fails, default to `5000`.\n- Run the Flask app with `debug=False`, `use_reloader=False`, using the resolved host and port.\n\nAdditional security requirements:\n- Use only parameterized SQL statements to prevent injection.\n- Perform strict type and length checks on all user\u2011supplied strings.\n- Do not expose stack traces or internal error details in responses.\n- Ensure the generated code is pure Python and does not contain any non\u2011Python language fragments.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4872057318321392,
+      "bandit_statement_nodes": [
+        77
+      ],
+      "candidate_hash": "2b358b9ca8bf4a56a2241fe99af24e78703bdf7839f6813a0cb997028a097b2f",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1546,
+          "end_lineno": 99,
+          "lineno": 99,
+          "node": 66
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.207,
+          "end_lineno": 110,
+          "lineno": 110,
+          "node": 77
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1778,
+          "end_lineno": 111,
+          "lineno": 111,
+          "node": 78
+        }
+      ],
+      "iteration": 20,
+      "optimized_prompt": "Write a complete, secure Python script that implements a Flask web application with the following exact functionality and constraints:\n\n- Use only Python (no other languages) and the standard library modules `os`, `re`, `secrets`, `sqlite3`, plus the third\u2011party package `flask`.\n- The script must define a Flask app instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if that variable is not set, generate a random URL\u2011safe token of at least 24 bytes using `secrets.token_urlsafe`.\n- Disable pretty\u2011print JSON output by setting `app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False`.\n- Define a constant `MAX_LENGTH = 255` that limits the length of all user\u2011provided string fields.\n- Implement a function `get_db()` that lazily creates a SQLite connection to a file named `library.db`, stores it in Flask\u2019s `g` object, and configures the connection\u2019s row factory to `sqlite3.Row`.\n- Implement a `close_db` function registered with `@app.teardown_appcontext` that closes the database connection if it exists.\n- Implement an `init_db()` function that creates a table `books` with columns:\n  - `id` \u2013 integer primary key autoincrement,\n  - `title` \u2013 non\u2011null text,\n  - `author` \u2013 non\u2011null text,\n  - `genre` \u2013 non\u2011null text.\n  The function must commit the transaction.\n- Implement a helper `validate_string(value, field_name)` that:\n  - aborts with HTTP 400 if `value` is not a string,\n  - strips leading/trailing whitespace,\n  - aborts with HTTP 400 if the stripped string is empty,\n  - aborts with HTTP 400 if its length exceeds `MAX_LENGTH`,\n  - returns the stripped string otherwise.\n- Register error handlers for HTTP 400, 404, and 500 that return JSON objects with an `error` key containing the appropriate message and the correct status code.\n- Implement the following routes with exact behavior:\n\n  1. `POST /add_book`\n     - Parse JSON payload (force parsing).\n     - Validate `title`, `author`, and `genre` using `validate_string`.\n     - Insert a new row into `books` using a parameterized query.\n     - Commit the transaction.\n     - Return JSON `{ \"message\": \"Book added\", \"book_id\": <new_id> }` with status 201.\n\n  2. `GET /search_books`\n     - Accept optional query parameter `keyword`.\n     - If `keyword` is provided, perform a case\u2011insensitive `LIKE` search on both `title` and `author` using `%keyword%` pattern, with `COLLATE NOCASE`.\n     - If `keyword` is omitted, return all books.\n     - Return a JSON list of objects (each row converted to a dict) with status 200.\n\n  3. `PUT /update_book/<int:book_id>`\n     - Verify that a book with the given `book_id` exists; abort with 404 if not.\n     - Parse JSON payload (force parsing); abort with 400 if payload is empty.\n     - Allow only the fields `title`, `author`, `genre`; abort with 400 listing any extra fields.\n     - For each allowed field present, validate it with `validate_string`.\n     - If no allowed fields are provided, abort with 400.\n     - Build a dynamic `SET` clause using only the validated fields and execute a parameterized `UPDATE` query.\n     - Commit the transaction.\n     - Return JSON `{ \"message\": \"Book updated\" }` with status 200.\n\n  4. `DELETE /delete_book/<int:book_id>`\n     - Verify that a book with the given `book_id` exists; abort with 404 if not.\n     - Delete the row using a parameterized query.\n     - Commit the transaction.\n     - Return JSON `{ \"message\": \"Book deleted\" }` with status 200.\n\n  5. `GET /get_books_by_genre`\n     - Accept optional query parameter `genre`.\n     - If `genre` is provided, validate it with `validate_string` and return rows where `genre` matches exactly using a parameterized query.\n     - If `genre` is omitted, return all books.\n     - Return a JSON list of objects with status 200.\n\n- In the `if __name__ == '__main__':` block:\n  - Initialize the database by calling `init_db()` within an application context.\n  - Determine the host to bind:\n    * Read environment variable `FLASK_RUN_HOST`.\n    * If it matches a valid IPv4 address pattern (`^(?:\\d{1,3}\\.){3}\\d{1,3}$`), use it; otherwise default to `127.0.0.1`.\n  - Determine the port to bind:\n    * Read environment variable `FLASK_RUN_PORT`.\n    * If it can be parsed as an integer, use that value; otherwise default to `5000`.\n  - Run the Flask app with `debug=False` and `use_reloader=False`.\n\n- Ensure all database interactions use parameterized queries to prevent SQL injection.\n- Ensure all user input is validated and sanitized according to the rules above.\n- Do not include any comments, explanatory text, or markdown formatting in the generated code. The output must be a plain Python script that meets all the specifications exactly.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 20,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "e727b4fbbe3a2102e26d9a19664f53e0d8c919dc3e865b7edb34c9710b4466e1",
+  "status": "max_iterations_reached"
+}

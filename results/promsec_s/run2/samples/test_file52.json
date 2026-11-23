@@ -1,0 +1,79 @@
+{
+  "ast_similarity": 0.5303514376996805,
+  "candidate_hash": "a5877103a973421feff68bbed8646bc6358ea02a4b2e38f90b240b8e4b863b85",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 4,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    89,
+    259,
+    327
+  ],
+  "error": "",
+  "file": "test_file52.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7685185185185185,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        12,
+        17,
+        19
+      ],
+      "candidate_hash": "a09bacf0f1b8b087a01f731d304948ba18cffdce1f1062b6847342d614987578",
+      "cwe_count": 1,
+      "cwes": [
+        327
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9993,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9996,
+          "end_lineno": 26,
+          "lineno": 26,
+          "node": 12
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9743,
+          "end_lineno": 31,
+          "lineno": 31,
+          "node": 17
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a Python script (no other language) that implements a Flask web application with a `/login` route accepting only POST requests. The script must:\n\n- Import `Flask`, `request`, and `redirect` from `flask`; import `os`, `sys`, `hashlib`; import `MySQLdb`.\n- Create a Flask app instance.\n- Define the `/login` view function that:\n  1. Retrieves `username` and `password` from `request.form`.\n  2. Connects to a MySQL database on `localhost` with user `root`, password `root`, database `db` using `MySQLdb.connect`.\n  3. Uses a cursor to safely query the `usr` table for the given `username` with a parameterized query (`%s` placeholder) to prevent SQL injection.\n  4. If the user does not exist, close the database connection and redirect to `/wrong`.\n  5. If the user exists, query the stored password hash for that `username` using another parameterized query.\n  6. Compute the MD5 hash of the supplied `password` (`hashlib.md5(password.encode()).hexdigest()`), matching the original functionality.\n  7. Compare the computed hash with the stored hash; if they match, close the database connection and redirect to `/success`; otherwise, close the connection and redirect to `/wrong`.\n- Ensure all database connections and cursors are properly closed in every execution path.\n- Preserve the exact logical flow and behavior of the original code while maintaining security best practices such as using parameterized queries and avoiding string interpolation for SQL statements.\n- Do not include any additional functionality, comments, or explanatory text. The output must be pure Python code that fulfills the above requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5303514376996805,
+      "bandit_statement_nodes": [
+        19
+      ],
+      "candidate_hash": "a5877103a973421feff68bbed8646bc6358ea02a4b2e38f90b240b8e4b863b85",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a POST `/login` endpoint. The script must:\n\n- Import only Python standard library modules and the third\u2011party packages `Flask`, `MySQLdb` (or `mysqlclient`), and a secure password\u2011hashing library such as `bcrypt` or `argon2-cffi`.\n- Read database connection parameters from environment variables `DB_USER`, `DB_PASS`, and `DB_NAME`, providing sensible defaults if they are not set.\n- Create a Flask app instance.\n- Define a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  - Retrieves `username` and `password` from `request.form` using `request.form.get`.\n  - Validates that `username` is a non\u2011empty string; if not, immediately redirect to `/wrong`.\n  - Establishes a MySQL connection using the parameters from the environment.\n  - Uses a context manager or explicit try/finally blocks to ensure the connection and cursor are closed properly.\n  - Executes a parameterized query to check whether a user with the supplied `username` exists in the `usr` table. If no such user exists, redirect to `/wrong`.\n  - Executes a second parameterized query to fetch the stored password hash for that `username`. If the query returns no row, redirect to `/wrong`.\n  - Uses the chosen secure hashing library to verify the supplied password against the stored hash (e.g., `bcrypt.checkpw` or `argon2.PasswordHasher.verify`). Do **not** use MD5 or any insecure hash.\n  - If the password verification succeeds, redirect to `/success`; otherwise, redirect to `/wrong`.\n- End the script with the standard `if __name__ == '__main__':` block that runs the Flask app.\n- Do not include any explanatory text, comments, or code in languages other than Python. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "8c96e5cf69da3fbe6e443e3be1ae77760b89a8ba49a54a5c0f8a5c0c0d9d3d82",
+  "status": "secured"
+}

@@ -1,0 +1,87 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "6c25823a267722e696f354da3e1e0141c4b001f48962a8c6f593ef9ab00a53d7",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payload causes a 400 error on add_book or submit_review",
+      "Non\u2011integer year_published leads to a 400 error on add_book",
+      "Providing an empty or missing isbn triggers 400 errors on many endpoints",
+      "Incorrect admin password or secret_key returns 401 Access denied",
+      "Changing the password affects subsequent admin calls but not already issued tokens",
+      "Running /api/start_inventory with empty section/location still launches the script"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple library management HTTP API for adding, removing, querying, and updating books, handling admin authentication, and submitting reviews.",
+    "invariants": [
+      "title, author, and isbn must be present for a book to be added",
+      "year_published must be an integer when adding a book",
+      "rating in a review must be between 1 and 5 inclusive",
+      "admin actions require the correct LIBRARIAN_PASSWORD and, for login, the fixed secret_key",
+      "All endpoints return JSON with a \"status\" field",
+      "Missing required parameters result in a 400 (or 401 for auth) response"
+    ],
+    "io_behavior": [
+      "POST /api/add_book with YAML body \u2192 JSON response with book details or 400 error",
+      "POST /api/remove_book with form field isbn \u2192 JSON confirmation or 400 error",
+      "GET /api/start_inventory?section=&location= \u2192 launches inventory_checker script and returns JSON status",
+      "POST /admin/login with form fields password and secret_key \u2192 JSON admin access granted or 401 error",
+      "POST /admin/change_password with form fields old_password and new_password \u2192 updates password and returns JSON or 401 error",
+      "GET /api/book_info?isbn= \u2192 JSON with static sample book data or 400 error"
+    ],
+    "public_api": {
+      "route:GET /api/book_info": "",
+      "route:GET /api/check_book_availability": "",
+      "route:GET /api/list_books": "",
+      "route:GET /api/start_inventory": "",
+      "route:POST /admin/adjust_settings": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/login": "",
+      "route:POST /api/add_book": "",
+      "route:POST /api/remove_book": "",
+      "route:POST /api/request_book": "",
+      "route:POST /api/return_book": "",
+      "route:POST /api/submit_review": "",
+      "route:POST /api/update_book": ""
+    },
+    "side_effects": [
+      "Executes an external Python script via os.system when /api/start_inventory is called",
+      "Mutates the in\u2011process LIBRARIAN_PASSWORD variable on successful password change",
+      "Potentially logs request data via Flask's default logging (implicit side effect)",
+      "Returns HTTP status codes and JSON payloads observable by clients",
+      "No persistent storage; state exists only for the running process"
+    ],
+    "source_hash": "4c83867f20dee938bab2830444ab8449dd3b9d42f7abb916aa3f793ef44631a6"
+  },
+  "dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.85,
+    "invariants": 0.6,
+    "io_semantics": 0.6,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file29.py",
+  "gated_score": 0.66563,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.66563,
+  "original_hash": "4c83867f20dee938bab2830444ab8449dd3b9d42f7abb916aa3f793ef44631a6",
+  "rationale": "The program implements most required routes and validates inputs per contract, handling YAML errors, type checks, and auth correctly. However it omits the mandated 'status' field in many JSON responses and does not execute the external inventory script, breaking key side\u2011effects and I/O expectations. Edge\u2011case handling is largely present, but the missing script launch reduces full compliance.",
+  "schema": 1,
+  "stability_abs_difference": 0.17187,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.83,
+    "invariants": 0.83,
+    "io_semantics": 0.83,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.8375,
+  "weighted_mean": 0.6875,
+  "worst_dimension": 0.6
+}

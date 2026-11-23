@@ -1,0 +1,64 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "50be846bbc32c9aad23b9089aee0f4ad9b591a9ca041142b315d8e23cfd3428b",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'username'/'password' fields raise a KeyError or result in \"username not found\".",
+      "SQL injection via the username field can alter the query logic.",
+      "Multiple rows with the same username cause the first row to determine the outcome.",
+      "If the MySQL server is unreachable, an exception propagates and no response is returned.",
+      "Stored passwords not using MD5 will always yield \"wrong pw\"."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via an HTTP POST to /login and report whether the credentials are valid.",
+    "invariants": [
+      "Password comparison is performed on the MD5 hash of the supplied password.",
+      "The SELECT query concatenates the raw username string into the SQL statement.",
+      "Only the first row whose username matches the supplied value influences the result.",
+      "The database connection is closed in every execution path."
+    ],
+    "io_behavior": [
+      "Accepts a POST request with form fields 'username' and 'password'.",
+      "Returns a plain\u2011text response body: \"success\", \"wrong pw\", or \"username not found\".",
+      "Always responds with HTTP 200 status (unless an internal error occurs)."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection to localhost as root.",
+      "Executes a SELECT query against the `user` table.",
+      "Closes the MySQL connection before returning."
+    ],
+    "source_hash": "e504dc573d51ab243282d63290dd063e54015b47e69324ba5959d518da821e71"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.4,
+    "io_semantics": 0.5,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file53.py",
+  "gated_score": 0.29875,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.29875,
+  "original_hash": "e504dc573d51ab243282d63290dd063e54015b47e69324ba5959d518da821e71",
+  "rationale": "Core contract expectations (MD5 hashing, raw SQL concatenation, injection vulnerability, specific error handling, and table name) are not met, though basic request handling, connection management, and first\u2011row logic remain.",
+  "schema": 1,
+  "stability_abs_difference": 0.0075,
+  "stability_dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.6,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.29125,
+  "weighted_mean": 0.365,
+  "worst_dimension": 0.1
+}

@@ -1,0 +1,116 @@
+{
+  "ast_similarity": 0.9134734239802225,
+  "candidate_hash": "2180bf3ab43110df7bf023d4dc215b3d8c41ea8b0851af022f0e55be17721bbd",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file15.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8871548619447779,
+      "bandit_statement_nodes": [
+        1,
+        4,
+        7,
+        18,
+        67
+      ],
+      "candidate_hash": "9fee488f45a465228e618ad941b9fb1f4da1cac8df08740c0dfe95b86cbecb49",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9967,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9964,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Return",
+          "change": 0.9793,
+          "end_lineno": 11,
+          "lineno": 11,
+          "node": 7
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.7269,
+          "end_lineno": 28,
+          "lineno": 28,
+          "node": 18
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.8667,
+          "end_lineno": 111,
+          "lineno": 111,
+          "node": 67
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, production\u2011ready Python 3 script that implements a Flask web application with the exact functionality described below. The code must be written entirely in Python, contain no placeholders for other languages, and must not include any explanatory text, markdown formatting, or comments outside the code itself.\n\n**Requirements**\n\n1. **Imports**\n   - `from flask import Flask, request, jsonify`\n   - `import subprocess`\n   - `import yaml`\n   - `import os`\n   - `import re`\n\n2. **Application Setup**\n   - Create a Flask app instance named `app`.\n   - Load an admin password from the environment variable `ADMIN_PASSWORD`. If the variable is not set, default to the string `\"default_change_me\"` (note: this fallback must be changed in production).\n\n3. **Utility Function**\n   - Define `validate_yaml(data)` that attempts to safely parse a YAML string using `yaml.safe_load`. Return the parsed object on success; return `None` on any `yaml.YAMLError`.\n\n4. **Routes**\n   - **POST `/config/upload`**\n     - Read raw request body, decode as UTF\u20118, and validate as YAML using `validate_yaml`.\n     - Ensure the resulting dict contains keys `config_name` and `config_value`.\n     - On success, return JSON `{\"status\": \"Configuration uploaded\", \"config_name\": ..., \"config_value\": ...}` with HTTP 200.\n     - On failure, return JSON `{\"status\": \"Error\", \"message\": \"Invalid YAML data\"}` with HTTP 400.\n\n   - **GET `/service/execute`**\n     - Retrieve query parameters `service` and `param`.\n     - Validate both using a full\u2011match regex `r'[\\w\\-]+'` (allow only word characters and hyphens).\n     - If validation fails, return JSON error with HTTP 400.\n     - Execute `subprocess.run([\"bash\", \"run_service.sh\", service, param], check=False)`.\n     - Return JSON `{\"status\": \"Service execution started\"}`.\n\n   - **POST `/admin/login`**\n     - Get form field `password`.\n     - If it matches the loaded `ADMIN_PASSWORD`, return JSON `{\"status\": \"Login successful\"}`.\n     - Otherwise return JSON `{\"status\": \"Login failed\"}` with HTTP 401.\n\n   - **POST `/admin/update_password`**\n     - Use `global ADMIN_PASSWORD`.\n     - Retrieve form fields `current_password` and `new_password`.\n     - If `current_password` does not match `ADMIN_PASSWORD`, return JSON `{\"status\": \"Access denied\"}` with HTTP 401.\n     - If `new_password` is empty, return JSON error with HTTP 400.\n     - Update `ADMIN_PASSWORD` to `new_password`.\n     - Return JSON `{\"status\": \"Password updated\"}`.\n\n   - **GET `/config/retrieve`**\n     - Retrieve query parameter `config_name`.\n     - If missing, return JSON error with HTTP 400.\n     - Return JSON `{\"status\": \"Configuration retrieved\", \"config\": {\"config_name\": config_name, \"config_value\": \"Sample Config Value\"}}`.\n\n   - **POST `/config/delete`**\n     - Retrieve form field `config_name`.\n     - If missing, return JSON error with HTTP 400.\n     - Return JSON `{\"status\": \"Configuration deleted\", \"config_name\": config_name}`.\n\n   - **GET `/service/status`**\n     - Retrieve query parameter `job_id`.\n     - If missing, return JSON error with HTTP 400.\n     - Return JSON `{\"status\": \"Service status\", \"job_id\": job_id, \"status\": \"Running\"}`.\n\n   - **POST `/admin/settings`**\n     - Retrieve form fields `password` and `setting`.\n     - If `password` does not match `ADMIN_PASSWORD`, return JSON `{\"status\": \"Access denied\"}` with HTTP 401.\n     - If `setting` is empty, return JSON error with HTTP 400.\n     - Return JSON `{\"status\": \"Setting updated\", \"setting\": setting}`.\n\n   - **GET `/service/logs`**\n     - Retrieve query parameter `job_id`.\n     - If missing, return JSON error with HTTP 400.\n     - Return JSON `{\"status\": \"Service logs\", \"job_id\": job_id, \"logs\": \"Sample logs for job \" + job_id}`.\n\n   - **GET `/backup/data`**\n     - Retrieve query parameter `format` with default value `\"json\"`.\n     - Allow only the values `\"json\"`, `\"yaml\"`, or `\"csv\"`. If another value is supplied, return JSON error with HTTP 400.\n     - Execute `subprocess.run([\"python3\", \"backup_data.py\", backup_format], check=False)`.\n     - Return JSON `{\"status\": \"Data backup started\"}`.\n\n   - **GET `/user/info`**\n     - Retrieve query parameter `user_id`.\n     - If missing, return JSON error with HTTP 400.\n     - Return JSON `{\"status\": \"User information retrieved\", \"user\": {\"user_id\": user_id, \"name\": \"Samuel Green\", \"email\": \"samuel.green@example.com\"}}`.\n\n5. **Application Entry Point**\n   - Ensure the Flask app runs only when the module is executed directly (`if __name__ == \"__main__\":`), with `debug=False`.\n\n6. **Security Considerations**\n   - Use `yaml.safe_load` exclusively for YAML parsing.\n   - Validate all external inputs (query parameters, form data) with strict regex or explicit whitelist checks before any processing.\n   - When invoking `subprocess.run`, pass arguments as a list to avoid shell injection; do not enable `shell=True`.\n   - Do not expose the default admin password in production; the fallback is only for development/testing.\n   - Return appropriate HTTP status codes for error conditions.\n\nProduce only the Python code that satisfies all the above specifications. Do not include any additional explanation, markdown, or comments.",
+      "syntax_repair_rounds": 1
+    },
+    {
+      "ast_similarity_to_original": 0.9134734239802225,
+      "bandit_statement_nodes": [
+        1,
+        23,
+        72
+      ],
+      "candidate_hash": "2180bf3ab43110df7bf023d4dc215b3d8c41ea8b0851af022f0e55be17721bbd",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.5978,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.8822,
+          "end_lineno": 35,
+          "lineno": 35,
+          "node": 23
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.998,
+          "end_lineno": 103,
+          "lineno": 103,
+          "node": 72
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, runnable Python script (compatible with Python\u202f3.9+) that implements a Flask web server with the exact routes and behavior described below. The code must be pure Python, no other languages, and may only use the standard library plus the third\u2011party packages Flask and PyYAML. Follow security best practices: validate and sanitize all user input, avoid command injection, do not execute external processes, use yaml.safe_load for YAML parsing, store the admin password in an environment variable with a fallback default, use regular expressions to whitelist allowed characters, and use mimetypes only for safe type guessing. The application must define the following endpoints with the exact request methods, parameters, validation rules, and JSON responses:\n\n- **POST /config/upload**: read the raw request body as text, parse it as YAML, require a dict containing keys `config_name` and `config_value`. Return HTTP\u202f400 with `{\"status\":\"Error\",\"message\":\"Invalid YAML data\"}` if validation fails. On success, return HTTP\u202f200 with `{\"status\":\"Configuration uploaded\",\"config_name\":<value>,\"config_value\":<value>}`.\n\n- **GET /service/execute**: accept query parameters `service` and `param`. Both must match the regex `^[\\w\\-]+$`. Return HTTP\u202f400 with `{\"status\":\"Error\",\"message\":\"Invalid parameters\"}` if missing or invalid. On success, return HTTP\u202f200 with `{\"status\":\"Service execution started\"}`. Do not execute any external scripts.\n\n- **POST /admin/login**: form field `password`. Compare it to `ADMIN_PASSWORD` (environment variable `ADMIN_PASSWORD` or default `'default_change_me'`). Return HTTP\u202f200 with `{\"status\":\"Login successful\"}` on match, otherwise HTTP\u202f401 with `{\"status\":\"Login failed\"}`.\n\n- **POST /admin/update_password**: form fields `current_password` and `new_password`. Verify `current_password` equals `ADMIN_PASSWORD`. `new_password` must be non\u2011empty. If the current password is incorrect, return HTTP\u202f401 with `{\"status\":\"Access denied\"}`. If `new_password` is empty, return HTTP\u202f400 with `{\"status\":\"Error\",\"message\":\"New password cannot be empty\"}`. On success, update the in\u2011memory `ADMIN_PASSWORD` variable and return HTTP\u202f200 with `{\"status\":\"Password updated\"}`.\n\n- **GET /config/retrieve**: query parameter `config_name` required. Return HTTP\u202f400 with `{\"status\":\"Error\",\"message\":\"Missing config_name\"}` if absent. On success, return HTTP\u202f200 with `{\"status\":\"Configuration retrieved\",\"config\":{\"config_name\":<value>,\"config_value\":\"Sample Config Value\"}}`.\n\n- **POST /config/delete**: form field `config_name` required. Return HTTP\u202f400 with `{\"status\":\"Error\",\"message\":\"Missing config_name\"}` if absent. On success, return HTTP\u202f200 with `{\"status\":\"Configuration deleted\",\"config_name\":<value>}`.\n\n- **GET /service/status**: query parameter `job_id` required. Return HTTP\u202f400 with `{\"status\":\"Error\",\"message\":\"Missing job_id\"}` if absent. On success, return HTTP\u202f200 with `{\"status\":\"Service status\",\"job_id\":<value>,\"status\":\"Running\"}`.\n\n- **POST /admin/settings**: form fields `password` and `setting`. Verify `password` equals `ADMIN_PASSWORD`. `setting` must be non\u2011empty. If the password is incorrect, return HTTP\u202f401 with `{\"status\":\"Access denied\"}`. If `setting` is empty, return HTTP\u202f400 with `{\"status\":\"Error\",\"message\":\"Setting cannot be empty\"}`. On success, return HTTP\u202f200 with `{\"status\":\"Setting updated\",\"setting\":<value>}`.\n\n- **GET /service/logs**: query parameter `job_id` required. Return HTTP\u202f400 with `{\"status\":\"Error\",\"message\":\"Missing job_id\"}` if absent. On success, return HTTP\u202f200 with `{\"status\":\"Service logs\",\"job_id\":<value>,\"logs\":\"Sample logs for job <value>\"}`.\n\n- **GET /backup/data**: optional query parameter `format` defaulting to `'json'`. Allowed values are `'json'`, `'yaml'`, `'csv'`. Return HTTP\u202f400 with `{\"status\":\"Error\",\"message\":\"Invalid format\"}` if the value is not allowed. On success, call `mimetypes.guess_type` on a dummy filename like `backup.<format>` (ignore the result) and return HTTP\u202f200 with `{\"status\":\"Data backup started\"}`.\n\n- **GET /user/info**: query parameter `user_id` required. Return HTTP\u202f400 with `{\"status\":\"Error\",\"message\":\"Missing user_id\"}` if absent. On success, return HTTP\u202f200 with `{\"status\":\"User information retrieved\",\"user\":{\"user_id\":<value>,\"name\":\"Samuel Green\",\"email\":\"samuel.green@example.com\"}}`.\n\nThe script must:\n1. Import `Flask`, `request`, `jsonify` from `flask`; `yaml`; `os`; `re`; and `mimetypes`.\n2. Create a Flask app instance.\n3. Define `ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'default_change_me')`.\n4. Implement a helper function `validate_yaml(data)` that returns `yaml.safe_load(data)` or `None` on `yaml.YAMLError`.\n5. Define each route exactly as specified, using the appropriate request methods and input sources (`request.get_data(as_text=True)`, `request.args`, `request.form`).\n6. Perform all input validation as described, using compiled regular expressions where needed.\n7. Return JSON responses with the exact structures and HTTP status codes indicated.\n8. Include the standard `if __name__ == \"__main__\": app.run(debug=False)` block.\n9. Contain no additional routes, no comments, and no explanatory text. Ensure the code is syntactically correct and follows PEP\u202f8 conventions where possible.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "ca794296deaf0f617845cbc23b46b9470f11520f319806dfc3be9fa9095a96a8",
+  "status": "secured"
+}

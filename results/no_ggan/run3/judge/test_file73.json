@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "8543dddd4afbd8d0d1f98c64720fe73d2af8ec38e1f6dbcf342db477d1a9c420",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields cause a Bad Request error before any database action",
+      "Attempting to register a username that already exists may raise a database error",
+      "Login with an incorrect password returns \"Invalid credentials\" without revealing which part failed",
+      "Database connection failures result in redirects (register/login) or plain\u2011text error messages for other endpoints",
+      "Providing special characters in form values can lead to SQL syntax errors or injection vulnerabilities",
+      "Checking out a book for a non\u2011existent user returns \"User not found\""
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for a library system that lets users register, log in, add books, view the catalog, check out books, and return them.",
+    "invariants": [
+      "Each stored password consists of a SHA\u2011256 hash followed by the 16\u2011byte salt used at registration",
+      "A checkout record is created only if the username exists in the users table",
+      "A return operation removes a checkout record only if a matching record exists",
+      "The view_books endpoint always returns the current contents of the books table",
+      "Database connections are opened and closed for every request",
+      "Responses are always plain\u2011text strings (or JSON for view_books) and never expose raw SQL"
+    ],
+    "io_behavior": [
+      "POST /register with 'username' and 'password' \u2192 redirects to /home on success or failure",
+      "POST /login with 'username' and 'password' \u2192 redirects to /dashboard on valid credentials, otherwise returns a plain\u2011text error message",
+      "POST /add_book with 'book_id', 'title', 'author' \u2192 returns a plain\u2011text success or failure message",
+      "POST /checkout with 'username' and 'book_id' \u2192 returns a plain\u2011text message indicating success, user not found, or failure",
+      "POST /return with 'username' and 'book_id' \u2192 returns a plain\u2011text message indicating success, record not found, or failure",
+      "GET /view_books \u2192 returns a JSON array of all rows in the books table or a plain\u2011text error"
+    ],
+    "public_api": {
+      "route:GET /view_books": "",
+      "route:POST /add_book": "",
+      "route:POST /checkout": "",
+      "route:POST /login": "",
+      "route:POST /register": "",
+      "route:POST /return": ""
+    },
+    "side_effects": [
+      "Inserts new rows into the users, books, and checkouts tables in the MySQL database",
+      "Updates existing rows (e.g., inserts checkout records, deletes them on return)",
+      "Commits transactions to persist changes",
+      "Prints exception tracebacks to the server console",
+      "Issues HTTP redirects to /home or /dashboard",
+      "Closes database connections after each request"
+    ],
+    "source_hash": "a4a023812d8d87d69ca6b7c153a086fae31bb10841e6483047d43e29bb8d72c9"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 1.0,
+    "invariants": 0.8,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file73.py",
+  "gated_score": 0.90125,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.90125,
+  "original_hash": "a4a023812d8d87d69ca6b7c153a086fae31bb10841e6483047d43e29bb8d72c9",
+  "rationale": "The program implements all required endpoints, handles missing fields, duplicate users, invalid credentials, DB failures, and non\u2011existent users as specified, and performs the expected side\u2011effects. However, it stores passwords using Werkzeug's PBKDF2 hash rather than a raw SHA\u2011256+16\u2011byte\u2011salt format, violating the password\u2011hash invariant.",
+  "schema": 1,
+  "stability_abs_difference": 0.00725,
+  "stability_dimensions": {
+    "behavior": 0.88,
+    "edge_cases": 0.95,
+    "invariants": 0.85,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.9085,
+  "weighted_mean": 0.935,
+  "worst_dimension": 0.8
+}

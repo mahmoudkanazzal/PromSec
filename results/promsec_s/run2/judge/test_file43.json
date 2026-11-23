@@ -1,0 +1,75 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "d64dbbd438b30a0058748488a69b09028230e23760540f46743cfa95e28a9506",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields trigger the generic failure message.",
+      "Attempting to register an already\u2011taken username returns \"Username already exists\".",
+      "Database connection failures or query errors cause the generic failure messages.",
+      "Empty strings for username or password are accepted and processed like any other input.",
+      "SQL injection payloads may alter database state, but the observable effect is still a redirect or error message.",
+      "Unexpected exceptions (e.g., malformed request data) are caught and result in the generic failure response."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide HTTP endpoints for user registration and login, storing and verifying credentials in a MySQL database.",
+    "invariants": [
+      "Both endpoints accept only HTTP POST requests.",
+      "The request must contain 'username' and 'password' form fields; otherwise an exception is caught.",
+      "Database connections are always closed before the response is sent.",
+      "Responses are limited to a redirect or a short plain\u2011text message.",
+      "Successful registration always results in a redirect, never in a success message body.",
+      "Successful login always results in a redirect, never in a success message body."
+    ],
+    "io_behavior": [
+      "POST /register with form fields 'username' and 'password' returns a redirect to /home on success.",
+      "POST /register returns the plain text \"Username already exists\" if the username is found.",
+      "POST /register returns the plain text \"Registration failed\" on any exception.",
+      "POST /login with form fields 'username' and 'password' returns a redirect to /dashboard on successful authentication.",
+      "POST /login returns the plain text \"Invalid credentials\" when the credentials do not match any record.",
+      "POST /login returns the plain text \"Login failed\" on any exception."
+    ],
+    "public_api": {
+      "route:POST /login": "",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Creates a new row in the 'user' table for a successful registration.",
+      "Queries the 'user' table to check for existing usernames and to validate login credentials.",
+      "Opens and closes a MySQL database connection for each request.",
+      "Issues HTTP 302 redirects to /home or /dashboard on successful operations."
+    ],
+    "source_hash": "961a470c675273769ee3c7a270f64fbb8430961a14be43b8a5919a306f1f5f86"
+  },
+  "dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.8,
+    "invariants": 0.9,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file43.py",
+  "gated_score": 0.86187,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.86187,
+  "original_hash": "961a470c675273769ee3c7a270f64fbb8430961a14be43b8a5919a306f1f5f86",
+  "rationale": "All main functionalities and side effects match the contract except empty strings are rejected instead of being processed, slightly lowering behavior and edge\u2011case scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.03113,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.83,
+    "invariants": 0.83,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.893,
+  "weighted_mean": 0.8825,
+  "worst_dimension": 0.8
+}

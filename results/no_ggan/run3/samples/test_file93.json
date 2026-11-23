@@ -1,0 +1,37 @@
+{
+  "ast_similarity": 0.5388349514563107,
+  "candidate_hash": "93d9812fad9463bb899825be2e69021e9f0ec1a067bd2f2b9062197c1f9f4b12",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file93.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5388349514563107,
+      "bandit_statement_nodes": [
+        10,
+        19,
+        29
+      ],
+      "candidate_hash": "93d9812fad9463bb899825be2e69021e9f0ec1a067bd2f2b9062197c1f9f4b12",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with the exact functionality described below. The code must be secure, follow best practices, and preserve the original behavior.\n\n**General requirements**\n- Use only Python standard library modules and the publicly available packages `flask` and `sqlite3`.\n- The script must be executable as `python script_name.py` and start the Flask server with `debug=False`.\n- All database connections must be created with a helper function `get_db_connection()` that returns a `sqlite3.Connection` with `row_factory = sqlite3.Row`.\n- Ensure every database cursor is closed properly and connections are closed after each request.\n- Use parameterized SQL statements (`?` placeholders) for all queries to prevent SQL injection.\n- Validate all incoming request data rigorously; return appropriate HTTP error codes and messages using `abort`.\n- Do not include any debugging statements, print calls, or insecure constructs such as `eval`, `exec`, or raw string interpolation in SQL.\n- Follow PEP\u202f8 style guidelines for naming and formatting.\n\n**Endpoints**\n\n1. **POST /register_candidate**\n   - Accept JSON body with required fields `name` (string) and `party` (string).\n   - If the JSON is missing or required fields are absent, respond with `400 Bad Request` and a clear description.\n   - Insert a new row into the `candidates` table (`name`, `party`) using a parameterized `INSERT` statement.\n   - Commit the transaction, close the connection, and respond with JSON `{\"message\": \"Candidate registered successfully\"}` and status `201 Created`.\n\n2. **GET /get_candidate**\n   - Accept query parameter `id` representing the candidate\u2019s integer ID.\n   - Validate that `id` is present and consists only of digits; otherwise return `400 Bad Request`.\n   - Retrieve the candidate row with `SELECT * FROM candidates WHERE id = ?`.\n   - If no row is found, return `404 Not Found` with a descriptive message.\n   - Return the candidate data as JSON (convert the row to a dict) with status `200 OK`.\n\n3. **POST /update_votes**\n   - Accept JSON body with required fields `candidate_id` and `votes`.\n   - Validate that both fields exist and can be cast to integers; otherwise return `400 Bad Request`.\n   - Update the candidate\u2019s vote count with `UPDATE candidates SET votes = votes + ? WHERE id = ?`.\n   - If the `UPDATE` affects zero rows, return `404 Not Found`.\n   - Commit the transaction, close the connection, and respond with JSON `{\"message\": \"Votes updated successfully\"}` and status `200 OK`.\n\n4. **GET /get_results**\n   - Retrieve all candidates ordered by `votes` descending using `SELECT name, party, votes FROM candidates ORDER BY votes DESC`.\n   - Return a JSON array of objects (each row converted to a dict) with status `200 OK`.\n\n**Security and robustness**\n- All inputs must be sanitized and type\u2011checked before use.\n- Use `abort` with explicit `description` messages for all error responses.\n- Do not enable Flask\u2019s debug mode.\n- Ensure the SQLite database file is named `election.db` and resides in the same directory as the script.\n- Include a `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\nGenerate only the Python code fulfilling these specifications. Do not include any explanatory text, comments, or markup outside the code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "47679752c6580ec721a4e649dd63089f102ea9f5858a6f578e464ff2959c276d",
+  "status": "secured"
+}

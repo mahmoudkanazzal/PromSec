@@ -1,0 +1,65 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "6412f7402b5ab3fae59d19f71d3dd6c8749ae616fceb375b6467e24c25cc62d4",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Submitting an empty or whitespace\u2011only username or password may still be accepted unless validated elsewhere.",
+      "Providing a username that contains SQL special characters can lead to injection because the query is built via string concatenation.",
+      "Very long usernames or passwords may exceed database column limits and cause an error.",
+      "If the MySQL server is unreachable or credentials are wrong, the request will fail with a server error.",
+      "Missing form fields cause a KeyError in the request handling code."
+    ],
+    "entrypoints": [],
+    "intent": "Provide a web endpoint that allows a client to create a new user account by submitting a username and password.",
+    "invariants": [
+      "Each username can appear at most once in the `user` table.",
+      "Passwords are never stored in clear text; they are stored as a SHA\u20111 hexadecimal digest.",
+      "The endpoint does not modify any existing rows; it only inserts when the username is absent."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST requests at the path /register with form fields 'username' and 'password'.",
+      "Returns the plain\u2011text response \"register success\" when a new account is created.",
+      "Returns the plain\u2011text response \"user already exists\" when the supplied username is already present.",
+      "If required form fields are missing, the request will raise an error from the framework.",
+      "All responses are sent with the default HTTP status code 200 on success paths."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Creates a new row in the MySQL table `user` containing the supplied username and a SHA\u20111 hash of the password.",
+      "Commits the transaction to persist the new user record.",
+      "May open a network connection to the MySQL server at mysql.eecs.oregonstate.edu."
+    ],
+    "source_hash": "b6e3cdbb96decf7cd13844e5210a27a2089060571717bc243e0a1303df33bc57"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file68.py",
+  "gated_score": 0.41,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.41,
+  "original_hash": "b6e3cdbb96decf7cd13844e5210a27a2089060571717bc243e0a1303df33bc57",
+  "rationale": "The program routes POST /register and returns correct success/exist messages, but mishandles missing or empty fields (returns 'user already exists' instead of raising an error) and stores passwords with PBKDF2\u2011SHA256 rather than SHA\u20111, violating key invariants and edge\u2011case expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.19225,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.3,
+    "invariants": 0.66,
+    "io_semantics": 0.9,
+    "side_effects": 0.66
+  },
+  "stability_score": 0.60225,
+  "weighted_mean": 0.48,
+  "worst_dimension": 0.2
+}

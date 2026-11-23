@@ -1,0 +1,71 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "1e86ae1774baedc7136a2ec1a9e0392ab98b17d2406896a23492ce953d998896",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and result in a 500 error.",
+      "Empty strings for username or password are treated as valid inputs and may return \"Bad Login\".",
+      "Very long input values may exceed MySQL field limits, potentially causing query errors.",
+      "Special characters (e.g., quotes) in inputs can alter the SQL query semantics (SQL injection).",
+      "Database connection failures (wrong credentials, server down) raise exceptions and produce a 500 response.",
+      "Multiple matching rows (if the table allows duplicates) still result in \"Good Login\"."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by checking the supplied username and password against records in a MySQL database.",
+    "invariants": [
+      "The endpoint only processes POST requests; other methods are not handled.",
+      "Both 'username' and 'password' form fields must be present for the function to run.",
+      "The response is always one of the two exact strings: \"Good Login\" or \"Bad Login\" (or an error status).",
+      "Database connections are always closed before the function returns.",
+      "The SQL query string is built using the raw input values without sanitization.",
+      "The function does not modify any server\u2011side files or external state beyond reading the database."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to the /login path with form fields 'username' and 'password'.",
+      "Returns the plain\u2011text response \"Good Login\" when a matching record is found.",
+      "Returns the plain\u2011text response \"Bad Login\" when no matching record exists.",
+      "Responds with an HTTP 500 error if the database connection fails or an unexpected exception occurs.",
+      "Requires the request content\u2011type to be application/x\u2011form\u2011urlencoded.",
+      "Closes the database connection before sending the response."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to a local MySQL server.",
+      "Executes a SELECT query that reads data from the 'user' table.",
+      "Creates a cursor object for the query execution.",
+      "Closes the cursor and the database connection after the query."
+    ],
+    "source_hash": "c342ac763cd38f3e4cf27c5d04160741be7feb9eb24def7a7b7d8a73ecb749f8"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.3,
+    "invariants": 0.2,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file46.py",
+  "gated_score": 0.36125,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.36125,
+  "original_hash": "c342ac763cd38f3e4cf27c5d04160741be7feb9eb24def7a7b7d8a73ecb749f8",
+  "rationale": "Key contract aspects are broken: missing fields no longer raise KeyError/500, query is parameterized (no raw injection), password is hashed instead of plain compare, and required raw SQL building is absent; other aspects like POST handling, response strings, connection cleanup, and side\u2011effects are preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.1675,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.3,
+    "invariants": 0.6,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.52875,
+  "weighted_mean": 0.415,
+  "worst_dimension": 0.2
+}

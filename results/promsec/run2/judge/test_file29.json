@@ -1,0 +1,86 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "c030d774e0ee3af20754de33db0736af61f6cfa33b54fd46ca5b7777128b986c",
+  "compile_ok": true,
+  "confidence": 0.94,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payload causes a 400 error",
+      "Non\u2011integer year_published or out\u2011of\u2011range rating triggers validation errors",
+      "Providing an empty or missing isbn leads to 400 errors on many endpoints",
+      "Wrong admin password or secret_key returns 401 Unauthorized",
+      "Changing the password affects subsequent admin calls but not already running processes",
+      "Calling start_inventory with empty section/location still runs the script"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a RESTful library management service with endpoints for adding, removing, querying, and updating books, handling admin authentication, and processing reviews.",
+    "invariants": [
+      "A book must include non\u2011empty title, author, and isbn to be accepted",
+      "year_published must be an integer for add_book",
+      "rating in submit_review must be between 1 and 5 inclusive",
+      "Admin actions require correct LIBRARIAN_PASSWORD (and secret_key for login)",
+      "All endpoints return JSON with a \"status\" field",
+      "Missing required parameters result in HTTP 400 (or 401 for auth failures)"
+    ],
+    "io_behavior": [
+      "POST /api/add_book with YAML body \u2192 JSON response with book details or 400 error",
+      "POST /api/remove_book with form field isbn \u2192 JSON confirmation or 400 error",
+      "GET /api/start_inventory?section=&location= \u2192 launches inventory_checker script and returns JSON status",
+      "POST /admin/login with form fields password and secret_key \u2192 JSON admin access granted or 401 error",
+      "POST /admin/change_password with form fields old_password and new_password \u2192 updates password and returns JSON or 401 error",
+      "GET /api/book_info?isbn= \u2192 JSON with static sample book data or 400 error"
+    ],
+    "public_api": {
+      "route:GET /api/book_info": "",
+      "route:GET /api/check_book_availability": "",
+      "route:GET /api/list_books": "",
+      "route:GET /api/start_inventory": "",
+      "route:POST /admin/adjust_settings": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/login": "",
+      "route:POST /api/add_book": "",
+      "route:POST /api/remove_book": "",
+      "route:POST /api/request_book": "",
+      "route:POST /api/return_book": "",
+      "route:POST /api/submit_review": "",
+      "route:POST /api/update_book": ""
+    },
+    "side_effects": [
+      "Executes external command `python3 inventory_checker.py <section> <location>`",
+      "Modifies the in\u2011process global variable LIBRARIAN_PASSWORD when admin changes password",
+      "Potentially logs requests via Flask's default logging",
+      "No persistent storage; all responses are generated on the fly"
+    ],
+    "source_hash": "4c83867f20dee938bab2830444ab8449dd3b9d42f7abb916aa3f793ef44631a6"
+  },
+  "dimensions": {
+    "behavior": 0.92,
+    "edge_cases": 0.83,
+    "invariants": 1.0,
+    "io_semantics": 0.88,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file29.py",
+  "gated_score": 0.86938,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.86938,
+  "original_hash": "4c83867f20dee938bab2830444ab8449dd3b9d42f7abb916aa3f793ef44631a6",
+  "rationale": "All required endpoints and validation logic are present and return the correct JSON structure, but start_inventory rejects empty parameters and validates alphanumerics, diverging from the contract's edge case and I/O expectations; external command execution is only stubbed, affecting side\u2011effect fidelity.",
+  "schema": 1,
+  "stability_abs_difference": 0.02749,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.85,
+    "invariants": 1.0,
+    "io_semantics": 0.85,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.89687,
+  "weighted_mean": 0.8925,
+  "worst_dimension": 0.8
+}

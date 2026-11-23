@@ -1,0 +1,66 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "920873ce63fe7f128744c8baa49a1e153c2db0bb333362b60efe03d7a995442d",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing stock_name, stock_quantity, or username in the session raises a server error",
+      "Database connection failures raise an exception and abort the request",
+      "Non\u2011numeric stock_quantity is accepted and stored as\u2011is",
+      "Large input values may cause SQL errors or overflow",
+      "If the orders table does not exist, the insert fails",
+      "SQL injection strings are passed directly to the query (behavior depends on DB configuration)"
+    ],
+    "entrypoints": [],
+    "intent": "Handle a POST request to record a stock purchase order and redirect the client.",
+    "invariants": [
+      "The inserted buy_price is always the constant 10000",
+      "All received values are stored exactly as supplied (no validation)",
+      "A database commit follows every successful insert",
+      "The response is always a redirect to the root path"
+    ],
+    "io_behavior": [
+      "Accepts a POST request to /buy_order with form fields stock_name and stock_quantity",
+      "Retrieves the current user's username from the session",
+      "Returns an HTTP 302 redirect response to '/'",
+      "Rejects non\u2011POST methods with Flask's default 405 response"
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection to localhost as root",
+      "Inserts a new row into the orders table",
+      "Commits the transaction, persisting the order"
+    ],
+    "source_hash": "6ca5dce3846d66a0ca34449b586d247a9a6e95704655cf0a2225ea0c8965d335"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.2,
+    "io_semantics": 0.9,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file80.py",
+  "gated_score": 0.3875,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.3875,
+  "original_hash": "6ca5dce3846d66a0ca34449b586d247a9a6e95704655cf0a2225ea0c8965d335",
+  "rationale": "The program deviates from the contract on key edge cases and invariants: it validates and rejects non\u2011numeric or non\u2011positive quantities, aborts with 400/401 instead of server errors, uses parameterized queries (preventing SQL injection), and connects with configurable DB user rather than root. Core I/O flow and commit/redirect behavior are preserved, but many contract\u2011specified behaviors are not.",
+  "schema": 1,
+  "stability_abs_difference": 0.09925,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.0,
+    "invariants": 0.5,
+    "io_semantics": 0.8,
+    "side_effects": 0.66
+  },
+  "stability_score": 0.48675,
+  "weighted_mean": 0.45,
+  "worst_dimension": 0.2
+}

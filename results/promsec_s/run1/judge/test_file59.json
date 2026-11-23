@@ -1,0 +1,68 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "64844b12388e31d4df40fb3f3435ae45283364abbe1e8831a3077d20897b6428",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'payload' query parameter results in a server error.",
+      "Malformed YAML causes a parsing exception.",
+      "Absent latitude, longitude, or date keys raise a KeyError.",
+      "No matching row in the database leads to an IndexError when accessing the result.",
+      "Database connection failures raise MySQLdb exceptions.",
+      "Non\u2011numeric latitude/longitude values may cause query mismatches or errors."
+    ],
+    "entrypoints": [],
+    "intent": "Return the temperature for a specified latitude, longitude, and date supplied in a YAML payload via an HTTP GET request.",
+    "invariants": [
+      "The endpoint path and HTTP method are fixed (/api/temperature_for_location, GET).",
+      "The payload must be valid YAML containing 'latitude', 'longitude', and 'date' keys.",
+      "The temperature is always returned as a string representation of the numeric value.",
+      "Database queries use exact matching on date, latitude, and longitude.",
+      "A new database connection is created for each request."
+    ],
+    "io_behavior": [
+      "Accepts a GET request to /api/temperature_for_location with a 'payload' query parameter.",
+      "Parses the YAML payload to extract latitude, longitude, and date.",
+      "Queries a MySQL database for a matching temperature record.",
+      "Responds with the temperature value as a plain\u2011text string in the HTTP response body.",
+      "Writes the extracted latitude, longitude, and date to the server's standard output (log)."
+    ],
+    "public_api": {
+      "route:GET /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Opens a connection to a local MySQL database.",
+      "Executes a SELECT query against the temperatures table.",
+      "Prints request data to the console (stdout)."
+    ],
+    "source_hash": "feadbd807376c4203d264d5b124013b8fa5e0e9fe545fae11c6f503748cfce63"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.2,
+    "invariants": 0.9,
+    "io_semantics": 0.6,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file59.py",
+  "gated_score": 0.45875,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.45875,
+  "original_hash": "feadbd807376c4203d264d5b124013b8fa5e0e9fe545fae11c6f503748cfce63",
+  "rationale": "The program implements the main request flow and returns the temperature as a string, but deviates from the contract on error handling (returns 400/404/500 instead of the specified exceptions), does not log the extracted data to stdout, and handles edge\u2011case failures differently than required.",
+  "schema": 1,
+  "stability_abs_difference": 0.193,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.3,
+    "invariants": 1.0,
+    "io_semantics": 0.8,
+    "side_effects": 0.66
+  },
+  "stability_score": 0.65175,
+  "weighted_mean": 0.545,
+  "worst_dimension": 0.2
+}

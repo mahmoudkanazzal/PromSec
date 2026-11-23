@@ -1,0 +1,76 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "969a3f1c8af9904513fb1a664d189b44e63721da1aa5675ecb9e61d709d9d8c5",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields cause a server error (e.g., KeyError).",
+      "Providing an empty search term returns all products because the LIKE pattern becomes '%%'.",
+      "Attempting to add a product with a name that already exists results in a redirect back to the add page.",
+      "Extremely long or malformed input strings may cause query failures or server errors.",
+      "Database connection failures or query errors result in a 500 Internal Server Error response."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple HTTP API for managing a product catalog stored in a MySQL database, allowing clients to add, update, delete, view, and search products.",
+    "invariants": [
+      "Product names are unique; duplicate names are never inserted.",
+      "Every database connection opened during a request is closed before the response is sent.",
+      "Only the HTTP methods defined for each route are accepted (POST for modifications, GET for reads).",
+      "Responses are deterministic based on the current state of the Products table.",
+      "Price values are stored exactly as received (as strings) without validation."
+    ],
+    "io_behavior": [
+      "POST /add_product with form fields 'name' and 'price' returns a redirect to './add_product' if the name already exists, otherwise redirects to './view_products'.",
+      "POST /update_price with form fields 'name' and 'price' returns the plain\u2011text response \"Price updated successfully\".",
+      "POST /delete_product with form field 'name' returns the plain\u2011text response \"Product deleted successfully\".",
+      "GET /search_products?term=XYZ returns a string representation of a list of matching product rows.",
+      "GET /view_products returns a string representation of a list of all product rows."
+    ],
+    "public_api": {
+      "route:GET /search_products": "",
+      "route:GET /view_products": "",
+      "route:POST /add_product": "",
+      "route:POST /delete_product": "",
+      "route:POST /update_price": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the Products table when a unique product is added.",
+      "Updates the Price column of an existing product row.",
+      "Deletes a product row matching the given name.",
+      "Each request opens a MySQL connection, performs a query, commits changes (if any), and closes the connection.",
+      "Redirect responses cause the client\u2019s browser to navigate to another endpoint."
+    ],
+    "source_hash": "27601feea594ef545b4981973fd012496ae91f0e9386b9bf28a423c58eae2c4d"
+  },
+  "dimensions": {
+    "behavior": 0.95,
+    "edge_cases": 0.6,
+    "invariants": 0.8,
+    "io_semantics": 0.7,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file90.py",
+  "gated_score": 0.76312,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.76312,
+  "original_hash": "27601feea594ef545b4981973fd012496ae91f0e9386b9bf28a423c58eae2c4d",
+  "rationale": "Main API routes and responses match the contract, redirects and plain\u2011text messages are correct, and DB connections are properly closed. However, price validation and storage as a float violate the invariant that prices are stored as received strings, and missing form fields return 400 errors instead of the expected server error, reducing edge\u2011case and I/O scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.11563,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.8,
+    "invariants": 0.8,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.87875,
+  "weighted_mean": 0.8175,
+  "worst_dimension": 0.6
+}

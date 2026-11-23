@@ -1,0 +1,168 @@
+{
+  "ast_similarity": 0.6531986531986532,
+  "candidate_hash": "8ac5ab1ca54baecdf961ffe9e57acdee4b7ada99a347392887bbd3e24c86ff77",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file21.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8347826086956521,
+      "bandit_statement_nodes": [
+        4,
+        7,
+        14
+      ],
+      "candidate_hash": "e1cd1ce37b41e5e19cad1fd58c7750448cf8740d993fd73133a0d62b63456438",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1359,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1337,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2578,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1566,
+          "end_lineno": 12,
+          "lineno": 12,
+          "node": 7
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2798,
+          "end_lineno": 23,
+          "lineno": 23,
+          "node": 14
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with three routes: `/upload_readings` (POST), `/generate_report` (GET), and `/station_login` (POST). The script must:\n\n- Import only the necessary modules: `Flask`, `request`, `jsonify` from `flask`; `os`; `yaml`; `subprocess`.\n- Create a Flask app instance.\n- Retrieve a station access token from the environment variable `STATION_ACCESS_TOKEN`, defaulting to the placeholder string `'weather_station_token_2023'`.\n- Define the `/upload_readings` endpoint that reads the raw request body, decodes it as UTF\u20118, parses it with `yaml.safe_load`, extracts `station_id`, `temperature`, and `humidity` from the resulting dictionary, and returns a JSON response with `status` set to `\"Readings uploaded\"` and the `station` id.\n- Define the `/generate_report` endpoint that reads a query parameter `type`, validates it against a whitelist containing only `'summary'` and `'detailed'`, returns a 400 JSON error if invalid, otherwise invokes an external executable `./weather_report_tool` with the report type using `subprocess.run` with a list of arguments (no shell), does not raise on non\u2011zero exit, and returns a JSON response indicating the report generation started.\n- Define the `/station_login` endpoint that reads a form field `token`, compares it to the retrieved `STATION_ACCESS_TOKEN`, and returns a JSON response with `status` `\"Station authenticated\"` on success or `\"Authentication failed\"` with HTTP 401 on failure.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with `debug` set to `False`.\n- Ensure the code follows security best practices: use `yaml.safe_load`, whitelist input, avoid `shell=True`, and do not expose the token in code.\n- Output only the Python code, with no additional explanation, comments, or markdown.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6736842105263158,
+      "bandit_statement_nodes": [
+        3,
+        17
+      ],
+      "candidate_hash": "ce82d365330bfc48fc2525c7197525bb1f42584e17cbd3148128192ecc888f4d",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2609,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.3323,
+          "end_lineno": 24,
+          "lineno": 24,
+          "node": 17
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the exact functionality described below. The code must be written in Python only (no other languages) and must follow security best practices while preserving the original behavior.\n\nRequirements:\n1. Imports:\n   - `from flask import Flask, request, jsonify`\n   - `import os`\n   - `import yaml`\n   - `import subprocess as sp`\n\n2. Create a Flask app instance named `app`.\n\n3. Define a constant `STATION_ACCESS_TOKEN` that reads the environment variable `STATION_ACCESS_TOKEN`; if the variable is not set, default to the literal string `'weather_station_token_2023'`.\n\n4. Implement a POST endpoint at `/upload_readings`:\n   - Retrieve the raw request body as text.\n   - Safely parse the body using `yaml.safe_load`; if parsing fails or returns `None`, treat it as an empty dict.\n   - Extract `station_id`, `temperature`, and `humidity` from the parsed data (use `.get`).\n   - Return a JSON response with keys `status` set to `'Readings uploaded'` and `station` set to the extracted `station_id`.\n   - Do not perform any additional processing or storage of the readings.\n\n5. Implement a GET endpoint at `/generate_report`:\n   - Read the query parameter `type` into a variable `report_type`.\n   - Validate that `report_type` is exactly either `'summary'` or `'detailed'`. If not, return a JSON error with message `'Invalid report type'` and HTTP status 400.\n   - Use `subprocess.run` to execute an external executable located at `./weather_report_tool` (resolve its absolute path with `os.path.abspath`). Pass `report_type` as a positional argument.\n   - Call `subprocess.run` with the arguments: `capture_output=True`, `text=True`, `check=True`, and **do not** use `shell=True`.\n   - If the subprocess raises `sp.CalledProcessError`, catch it and return a JSON error with keys `error` set to `'Report generation failed'` and `details` containing the subprocess\u2019s standard error output, with HTTP status 500.\n   - On success, return a JSON response with `status` set to `'Report generation started'` and `type` set to the requested `report_type`.\n\n6. Implement a POST endpoint at `/station_login`:\n   - Retrieve the form field `token` from the request.\n   - Compare the received token to `STATION_ACCESS_TOKEN` using a constant\u2011time comparison (e.g., `hmac.compare_digest`) to mitigate timing attacks.\n   - If the tokens match, return JSON `{'status': 'Station authenticated'}`.\n   - If they do not match, return JSON `{'status': 'Authentication failed'}` with HTTP status 401.\n\n7. Include the standard `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n\nAdditional security constraints:\n- Do not use `yaml.load` or any unsafe YAML parsing.\n- Do not enable Flask debug mode.\n- Do not expose any additional routes or functionality.\n- Ensure that all external inputs are validated or safely handled as described.\n- Do not include any comments, explanatory text, or markdown in the generated code. Provide only the raw Python source.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5818181818181818,
+      "bandit_statement_nodes": [
+        3,
+        24
+      ],
+      "candidate_hash": "c711c6784234ac2d6c85dea9bc6bcd3e26ad76890a203477bbda7d0c7573446a",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1152,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1053,
+          "end_lineno": 32,
+          "lineno": 32,
+          "node": 24
+        }
+      ],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with three routes: `/upload_readings` (POST), `/generate_report` (GET), and `/station_login` (POST). The script must:\n\n- Import only the necessary modules: `Flask`, `request`, `jsonify` from `flask`; `os`; `yaml`; `subprocess`; `hmac`; `Path` from `pathlib`.\n- Define a Flask app instance.\n- Retrieve a station access token from the environment variable `STATION_ACCESS_TOKEN`, defaulting to `'weather_station_token_2023'` if not set.\n- In `/upload_readings`, read the raw request body as text, safely parse it with `yaml.safe_load`, handle any parsing errors by treating the data as an empty dict, ensure the resulting data is a dict, extract `station_id`, `temperature`, and `humidity` keys, and return a JSON response containing `status: 'Readings uploaded'` and the station id.\n- In `/generate_report`, accept a query parameter `type`, validate that it is either `'summary'` or `'detailed'`, return a 400 JSON error for invalid types. Resolve the path `'./weather_report_tool'` to an absolute path, verify that the file exists and is executable, return a 500 JSON error if not. Execute the tool with `subprocess.run`, passing the report type as an argument, capture stdout and stderr, use text mode, and set `check=True`. If the subprocess raises `CalledProcessError`, return a 500 JSON error with the stderr details. On success, return a JSON response with `status: 'Report generation started'` and the report type.\n- In `/station_login`, read a form field `token`, compare it securely to the stored token using `hmac.compare_digest`, and return a JSON response with `status: 'Station authenticated'` on success, otherwise return `status: 'Authentication failed'` with a 401 code.\n- Include a main guard that runs the Flask app with `debug=False`.\n- Ensure the code follows security best practices: use safe yaml loading, avoid command injection by not interpolating user input into the subprocess command, verify executable permissions, use constant\u2011time token comparison, and do not expose stack traces.\n- The code must be valid Python 3, contain no extraneous output, and be ready to run.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6531986531986532,
+      "bandit_statement_nodes": [
+        3,
+        27
+      ],
+      "candidate_hash": "8ac5ab1ca54baecdf961ffe9e57acdee4b7ada99a347392887bbd3e24c86ff77",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2497,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.3303,
+          "end_lineno": 37,
+          "lineno": 37,
+          "node": 27
+        }
+      ],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the exact functionality described below. The script must be written in Python only (no other languages) and must not include any explanatory text, comments, or markup\u2014output only the code.\n\n**Requirements**\n\n1. **Imports**\n   - Import `Flask`, `request`, and `jsonify` from `flask`.\n   - Import `os`, `yaml`, `hmac`, and `Path` from `pathlib`.\n\n2. **Application Setup**\n   - Create a Flask app instance named `app`.\n   - Define a constant `STATION_ACCESS_TOKEN` that reads the environment variable `STATION_ACCESS_TOKEN`; if the variable is not set, default to the string `'weather_station_token_2023'`.\n\n3. **Route `/upload_readings` (POST)**\n   - Retrieve the raw request body as text.\n   - Safely parse the body as YAML using `yaml.safe_load`. If parsing fails or the result is not a dictionary, treat the data as an empty dictionary.\n   - Extract the keys `station_id`, `temperature`, and `humidity` from the parsed data (use `dict.get`).\n   - Return a JSON response with keys:\n     - `\"status\"` set to `\"Readings uploaded\"`.\n     - `\"station_id\"` set to the extracted `station_id` value (which may be `None`).\n\n4. **Route `/generate_report` (GET)**\n   - Read the query parameter `type` from the request.\n   - Validate that `type` is either `\"summary\"` or `\"detailed\"`. If not, return a JSON error with status code 400 and message `{'error': 'Invalid report type'}`.\n   - Resolve the path `./weather_report_tool` to an absolute `Path` object.\n   - Verify that the resolved path points to an existing file and that the file is executable (`os.access`). If either check fails, return a JSON error with status code 500 and message `{'error': 'Report tool not found or not executable'}`.\n   - **Do not** invoke any external processes. Instead, simulate report generation by creating a string:\n     - `report_content = f\"{report_type.capitalize()} report generated successfully.\"`\n   - Return a JSON response containing:\n     - `\"status\"`: `\"Report generation completed\"`.\n     - `\"type\"`: the validated report type.\n     - `\"report\"`: the simulated `report_content`.\n\n5. **Route `/station_login` (POST)**\n   - Retrieve the form field `token` (default to empty string if missing).\n   - Compare the provided token with `STATION_ACCESS_TOKEN` using `hmac.compare_digest` for constant\u2011time comparison.\n   - If the comparison succeeds, return JSON `{'status': 'Station authenticated'}`.\n   - If it fails, return JSON `{'status': 'Authentication failed'}` with status code 401.\n\n6. **Application Execution**\n   - Include the standard `if __name__ == '__main__':` block.\n   - Run the Flask app with `debug=False`.\n\n**Security and Quality Constraints**\n- Use only `yaml.safe_load` for YAML parsing.\n- Use `hmac.compare_digest` for token comparison.\n- Validate all external inputs (request body, query parameters, form data) before use.\n- Ensure the external tool check does not execute the tool.\n- Do not import any non\u2011standard or third\u2011party libraries beyond Flask and the standard library modules listed.\n- The output must be pure Python code, with no additional text, comments, or formatting.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 4,
+  "schema": 1,
+  "selected_iteration": 4,
+  "source_hash": "84b5fd0ba12110f538cec75a93c53872e6e27f6ee431bb39b626d0fbb5af98d0",
+  "status": "secured"
+}

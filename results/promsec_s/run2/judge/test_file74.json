@@ -1,0 +1,71 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "43f02f83afc38fe571e69a97c4532991eb54055543d2e926edb234810e3cfa8f",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'username' or 'password' fields may cause a database error or unexpected message.",
+      "SQL injection is possible because the SELECT query concatenates the raw username.",
+      "If the database is unreachable, the function will raise an exception or return a generic failure message.",
+      "Duplicate usernames trigger the 'Username already exists' response.",
+      "Very long input values may exceed database column limits or cause performance issues.",
+      "The 'confirm_password' field is read but never validated, allowing mismatched passwords to be accepted."
+    ],
+    "entrypoints": [],
+    "intent": "Provide a user registration service that creates a new account with a hashed password if the username does not already exist.",
+    "invariants": [
+      "A username can appear at most once in the users table.",
+      "Passwords are never stored in plain text; only a bcrypt hash is persisted.",
+      "Database connections are always closed before the function returns.",
+      "The function always returns a string message to the client.",
+      "Successful registration always results in a committed transaction."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /register with form fields 'username', 'password', and 'confirm_password'.",
+      "Returns a plain\u2011text response indicating success, duplicate username, or registration failure.",
+      "Reads the submitted username and password from the request body.",
+      "Generates a bcrypt hash of the supplied password.",
+      "Queries a MySQL database to check for an existing user with the same username.",
+      "Inserts a new record into the users table when the username is unique."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Creates a new row in the MySQL 'users' table containing the username and password hash.",
+      "Commits or rolls back a database transaction based on success or failure.",
+      "Closes the database connection after each request.",
+      "Potentially logs errors via the default Flask error handling (not shown).",
+      "Consumes network resources for the HTTP request/response cycle."
+    ],
+    "source_hash": "06e708a7b4ad639efd4a0d86556d5374fa58ed79501c414b2611df3f8bd5c195"
+  },
+  "dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.2,
+    "invariants": 0.95,
+    "io_semantics": 0.6,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file74.py",
+  "gated_score": 0.50188,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.50188,
+  "original_hash": "06e708a7b4ad639efd4a0d86556d5374fa58ed79501c414b2611df3f8bd5c195",
+  "rationale": "Core registration flow matches intent, but added input validation and parameterized queries diverge from listed edge cases and contract expectations, reducing behavior and edge\u2011case preservation while side\u2011effects and invariants remain largely intact.",
+  "schema": 1,
+  "stability_abs_difference": 0.46187,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.9,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.96375,
+  "weighted_mean": 0.6025,
+  "worst_dimension": 0.2
+}

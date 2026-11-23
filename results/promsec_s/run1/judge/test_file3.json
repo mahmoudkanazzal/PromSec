@@ -1,0 +1,79 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "9f0b3f2f7c511d8495695734305343fe044732a9a0c8a6e6f3a8c3aac622a0a8",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payload in /library/add_book results in a 400 error.",
+      "Missing required fields (title, author, isbn) in add_book or missing isbn in other endpoints yields a 400 error.",
+      "Providing a non\u2011integer year_published in add_book triggers a 400 error.",
+      "Incorrect admin credentials return a 401 Unauthorized response.",
+      "Calling /inventory/check with empty or missing parameters still launches the script.",
+      "Changing the password to an empty string is allowed if the old password matches."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple library management HTTP API with endpoints for adding, removing, listing, updating, and retrieving book information, as well as admin authentication and inventory checking.",
+    "invariants": [
+      "A book must include non\u2011empty 'title', 'author', and 'isbn' fields to be added.",
+      "The 'year_published' field must be an integer; otherwise the request is rejected.",
+      "Admin login succeeds only if both password and secret_key match the hard\u2011coded values.",
+      "Changing the password requires the correct current password; otherwise access is denied.",
+      "All successful responses are JSON objects with a 'status' field describing the outcome."
+    ],
+    "io_behavior": [
+      "POST /library/add_book expects raw YAML in the request body and returns JSON with book details or error messages.",
+      "POST /library/remove_book expects form field 'isbn' and returns JSON confirming removal or error.",
+      "GET /inventory/check expects query parameters 'section' and 'location' and returns a JSON acknowledgement.",
+      "POST /admin/login expects form fields 'password' and 'secret_key' and returns JSON indicating success or 401 error.",
+      "POST /admin/change_password expects form fields 'old_password' and 'new_password' and returns JSON indicating success or 401 error.",
+      "GET /library/book_info expects query parameter 'isbn' and returns static JSON book details or error."
+    ],
+    "public_api": {
+      "route:GET /inventory/check": "",
+      "route:GET /library/book_info": "",
+      "route:GET /library/list_books": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/login": "",
+      "route:POST /library/add_book": "",
+      "route:POST /library/remove_book": "",
+      "route:POST /library/update_book": ""
+    },
+    "side_effects": [
+      "Executes an external Python script via os.system when /inventory/check is called.",
+      "Updates the in\u2011memory LIBRARIAN_PASSWORD variable when the admin changes the password.",
+      "No persistent storage; all data is transient and exists only for the duration of the process."
+    ],
+    "source_hash": "150f610fd1bdaaeee8cf652e99d3fd9f1b9c911112f987adf9e70c06a38f0410"
+  },
+  "dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.6,
+    "invariants": 0.95,
+    "io_semantics": 0.9,
+    "side_effects": 0.2
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file3.py",
+  "gated_score": 0.59187,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.59187,
+  "original_hash": "150f610fd1bdaaeee8cf652e99d3fd9f1b9c911112f987adf9e70c06a38f0410",
+  "rationale": "The program implements most required endpoints and validates inputs per contract, preserving invariants and I/O formats. It correctly handles YAML errors, missing fields, non\u2011integer years, and admin authentication, and allows empty password changes. However, it omits the specified side effect of executing an external script in /inventory/check and does not launch that script when parameters are empty, breaking one edge case and the side\u2011effects requirement.",
+  "schema": 1,
+  "stability_abs_difference": 0.23788,
+  "stability_dimensions": {
+    "behavior": 0.88,
+    "edge_cases": 0.83,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 0.67
+  },
+  "stability_score": 0.82975,
+  "weighted_mean": 0.7225,
+  "worst_dimension": 0.2
+}

@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "43b7dc31c7e6ec49335937b280f192edcf11717d3c04d1e8b763bceb2a3a5dd3",
+  "compile_ok": true,
+  "confidence": 0.8,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'content' leads to yaml.load on an empty string, causing a parsing error.",
+      "Malformed YAML or missing 'title'/'body' keys results in a server error.",
+      "Absent 'type' query parameter causes the shell command to be invoked with an empty argument.",
+      "Special characters in 'type' can trigger command injection via os.system.",
+      "Incorrect admin password returns a 401 response.",
+      "Large payloads may cause performance degradation or timeouts."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a Flask web API with endpoints to create a post, generate a report, and authenticate an admin user.",
+    "invariants": [
+      "Responses are plain text strings indicating success or failure.",
+      "HTTP status 200 is returned for successful create_post and generate_report calls.",
+      "HTTP status 401 is returned only for admin_login when the password does not match.",
+      "The admin password is compared exactly to a hard\u2011coded string."
+    ],
+    "io_behavior": [
+      "POST /create_post with form field 'content' (YAML) returns a success string containing the post title.",
+      "GET /generate_report with query parameter 'type' returns a success string containing the requested report type.",
+      "POST /admin_login with form field 'password' returns a success message on correct password or a 401 error on failure."
+    ],
+    "public_api": {
+      "route:GET /generate_report": "",
+      "route:POST /admin_login": "",
+      "route:POST /create_post": ""
+    },
+    "side_effects": [
+      "Parses YAML from user input using yaml.load (potentially unsafe).",
+      "Executes an external shell script generate_report.sh with the supplied type argument.",
+      "May write a new post to persistent storage (implementation omitted)."
+    ],
+    "source_hash": "b2bd06c70a1e9957f5bda8685f64368788573f32345a6eab82c15ec5cef5484a"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.2,
+    "io_semantics": 0.5,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file17.py",
+  "gated_score": 0.4175,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.4175,
+  "original_hash": "b2bd06c70a1e9957f5bda8685f64368788573f32345a6eab82c15ec5cef5484a",
+  "rationale": "Core endpoints exist and perform similar actions, but response formats, status codes, error handling, and security checks differ from the contract, breaking several invariants and edge\u2011case expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.0375,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.3,
+    "invariants": 0.2,
+    "io_semantics": 0.4,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.38,
+  "weighted_mean": 0.49,
+  "worst_dimension": 0.2
+}

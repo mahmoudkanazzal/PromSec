@@ -1,0 +1,80 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "a0736108a9e7ef4635ad9215744c5bfa8af0971b1786a3d047a6ca893b9a3d33",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML in /config/load results in a 400 error.",
+      "Missing or empty required parameters (e.g., config_id, secret, user_id) trigger 400 responses.",
+      "Providing an incorrect secret to any auth\u2011protected endpoint returns 401.",
+      "Calling /system/start or /data/backup with empty arguments still runs the underlying command with empty strings.",
+      "Updating the secret to an empty string is rejected with a 400 error."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a small HTTP API for loading, retrieving, and managing configuration data, controlling system modules, handling authentication, and fetching user/profile information.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" field.",
+      "Endpoints that require a secret compare against the current ADMIN_SECRET value.",
+      "Required query or form parameters must be non\u2011empty, otherwise a 400 error is returned.",
+      "The ADMIN_SECRET value persists for the lifetime of the process after being changed."
+    ],
+    "io_behavior": [
+      "POST /config/load with raw YAML body \u2192 JSON response containing config_id and config_value or 400 error.",
+      "GET /system/start?module=&param= \u2192 triggers a shell script and returns JSON status.",
+      "POST /auth/validate with form field secret \u2192 JSON success or 401 failure.",
+      "POST /auth/update_secret with current_secret and new_secret \u2192 updates secret and returns JSON status.",
+      "GET /config/retrieve?config_id= \u2192 JSON with sample config or 400 error.",
+      "GET /user/profile?user_id= \u2192 JSON with static user profile or 400 error"
+    ],
+    "public_api": {
+      "route:GET /config/retrieve": "",
+      "route:GET /data/backup": "",
+      "route:GET /system/logs": "",
+      "route:GET /system/start": "",
+      "route:GET /system/status": "",
+      "route:GET /user/profile": "",
+      "route:POST /auth/configure": "",
+      "route:POST /auth/update_secret": "",
+      "route:POST /auth/validate": "",
+      "route:POST /config/load": "",
+      "route:POST /config/remove": ""
+    },
+    "side_effects": [
+      "Executes external commands via os.system (start_module.sh, backup_data.py).",
+      "Modifies the in\u2011memory ADMIN_SECRET variable when updated.",
+      "Potentially runs backup_data.py with chosen type.",
+      "No file or database writes; all state is kept in process memory."
+    ],
+    "source_hash": "1df6d907f426eca2d05825dfef5ac8252ca575c55947c17926a7d09df5a454bb"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.4,
+    "invariants": 0.8,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file13.py",
+  "gated_score": 0.595,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.595,
+  "original_hash": "1df6d907f426eca2d05825dfef5ac8252ca575c55947c17926a7d09df5a454bb",
+  "rationale": "The program implements all listed routes and most invariants, but deviates on key edge cases: missing secret returns 401 instead of 400, and /system/start /data/backup reject empty arguments instead of executing with empty strings. These gaps lower behavior, I/O semantics, and edge\u2011case scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.09812,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.5,
+    "invariants": 0.75,
+    "io_semantics": 0.8,
+    "side_effects": 0.75
+  },
+  "stability_score": 0.69312,
+  "weighted_mean": 0.66,
+  "worst_dimension": 0.4
+}

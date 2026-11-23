@@ -1,0 +1,82 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "dc06a98453a10ed4423db816954cccf8106309bc9effb5d083b52b2b99fbd57f",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty required fields result in HTTP 400 with an error message.",
+      "Invalid YAML in /config/upload yields a 400 error.",
+      "Incorrect admin token on verification or update routes returns HTTP 401.",
+      "Providing an empty new_token on /admin/update_token returns HTTP 400.",
+      "Omitting task or param on /task/execute still triggers the shell script with empty arguments.",
+      "Unsupported backup format defaults to \"json\" but still invokes the backup script."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a lightweight HTTP API that allows uploading and retrieving configuration data, executing tasks, managing an admin token, updating settings, fetching user profiles, and initiating backups.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" field.",
+      "Protected endpoints require the request token to equal the current SECRET_TOKEN.",
+      "Required parameters (e.g., config_name, config_value, task_id, user_id) must be non\u2011empty, otherwise a 400 error is returned.",
+      "The SECRET_TOKEN value persists only for the lifetime of the running process.",
+      "YAML payloads are parsed with yaml.FullLoader; malformed YAML triggers a 400 error."
+    ],
+    "io_behavior": [
+      "POST /config/upload with raw YAML body \u2192 JSON response with config_name and config_value or 400 error.",
+      "GET /task/execute?task=...&param=... \u2192 JSON response confirming task start.",
+      "POST /admin/verify with form field token \u2192 JSON success or 401 failure.",
+      "POST /admin/update_token with current_token and new_token \u2192 JSON confirmation or error codes.",
+      "GET /config/retrieve?config_name=... \u2192 JSON containing a placeholder config value or 400 error.",
+      "GET /user/profile?user_id=... \u2192 JSON with static user profile or 400 error."
+    ],
+    "public_api": {
+      "route:GET /backup/data": "",
+      "route:GET /config/retrieve": "",
+      "route:GET /task/execute": "",
+      "route:GET /task/logs": "",
+      "route:GET /task/status": "",
+      "route:GET /user/profile": "",
+      "route:POST /admin/settings": "",
+      "route:POST /admin/update_token": "",
+      "route:POST /admin/verify": "",
+      "route:POST /config/delete": "",
+      "route:POST /config/upload": ""
+    },
+    "side_effects": [
+      "os.system call to run \"sh execute_task.sh <task> <param>\" on /task/execute.",
+      "os.system call to run \"python3 backup_data.py <format>\" on /backup/data.",
+      "In\u2011memory update of the global SECRET_TOKEN variable on /admin/update_token.",
+      "Potential logging or stdout from the invoked shell scripts (observable outside the process)."
+    ],
+    "source_hash": "7d880d6e183f6046022b31df25f287bd639a6d249de095d83cc40451caa8ff19"
+  },
+  "dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.8,
+    "invariants": 0.9,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file2.py",
+  "gated_score": 0.86187,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.86187,
+  "original_hash": "7d880d6e183f6046022b31df25f287bd639a6d249de095d83cc40451caa8ff19",
+  "rationale": "Program fulfills most contract requirements\u2014JSON responses, token verification, task execution, config upload/retrieve, and user profile\u2014but uses yaml.safe_load instead of yaml.FullLoader and does not default unsupported backup formats to \"json\", causing minor deviations in invariants and edge\u2011case handling.",
+  "schema": 1,
+  "stability_abs_difference": 0.04125,
+  "stability_dimensions": {
+    "behavior": 0.95,
+    "edge_cases": 0.9,
+    "invariants": 0.8,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.90312,
+  "weighted_mean": 0.8825,
+  "worst_dimension": 0.8
+}

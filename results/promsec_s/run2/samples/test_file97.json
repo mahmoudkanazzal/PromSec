@@ -1,0 +1,39 @@
+{
+  "ast_similarity": 0.8584392014519057,
+  "candidate_hash": "ba1723973df2b987d916e3dfb72e8b2e417f3e1769b13610566ba8dcb573df7c",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file97.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8584392014519057,
+      "bandit_statement_nodes": [
+        11,
+        20,
+        31,
+        39,
+        48
+      ],
+      "candidate_hash": "ba1723973df2b987d916e3dfb72e8b2e417f3e1769b13610566ba8dcb573df7c",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python Flask application that implements a simple library API using SQLite. The code must be written in Python only and must include the following requirements:\n\n- Import `Flask`, `request`, and `jsonify` from `flask`, and `sqlite3`.\n- Create a Flask app instance named `app`.\n- Define a function `get_db_connection()` that opens a connection to a SQLite database file named `library.db`, sets `row_factory` to `sqlite3.Row`, and returns the connection.\n- Implement the following routes with exact functionality and HTTP methods:\n\n  1. **POST /add_book**\n     - Parse JSON payload safely using `request.get_json(silent=True)`.\n     - Return a 400 error with JSON `{\"error\": \"Invalid JSON\"}` if parsing fails.\n     - Extract `title`, `author`, and `genre` from the JSON.\n     - Return a 400 error with JSON `{\"error\": \"Missing required fields\"}` if any field is missing or empty.\n     - Insert the new book into the `books` table using a parameterized SQL query: `INSERT INTO books (title, author, genre) VALUES (?, ?, ?)`.\n     - Commit the transaction and return a 201 response with JSON `{\"message\": \"Book added successfully\"}`.\n\n  2. **GET /search_books**\n     - Retrieve the query parameter `keyword` (default empty string).\n     - Construct a LIKE pattern `%keyword%`.\n     - Query the `books` table for rows where `title` or `author` match the pattern using a parameterized query.\n     - Return all matching rows as a list of JSON objects with a 200 status.\n\n  3. **PUT /update_book/<int:book_id>**\n     - Parse JSON payload safely as in the add endpoint.\n     - Return a 400 error for invalid JSON or missing fields with appropriate messages.\n     - Update the book with the given `book_id` using a parameterized query: `UPDATE books SET title = ?, author = ?, genre = ? WHERE id = ?`.\n     - Commit the transaction and return a 200 response with JSON `{\"message\": \"Book updated successfully\"}`.\n\n  4. **DELETE /delete_book/<int:book_id>**\n     - Delete the book with the given `book_id` using a parameterized query: `DELETE FROM books WHERE id = ?`.\n     - Commit the transaction and return a 200 response with JSON `{\"message\": \"Book deleted successfully\"}`.\n\n  5. **GET /get_books_by_genre**\n     - Retrieve the query parameter `genre` (default empty string).\n     - Query the `books` table for rows where `genre` equals the provided value using a parameterized query.\n     - Return the results as a list of JSON objects with a 200 status.\n\n- Ensure all database interactions use context managers (`with` statements) to automatically close connections.\n- Use parameterized SQL statements everywhere to prevent SQL injection.\n- Validate and sanitize all inputs, returning clear error messages and appropriate HTTP status codes.\n- Do not enable Flask debug mode; set `debug=False` when running the app.\n- Include the standard `if __name__ == '__main__':` block to start the Flask server.\n- The final script must be fully functional, secure, and maintain the exact behavior described above.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "e727b4fbbe3a2102e26d9a19664f53e0d8c919dc3e865b7edb34c9710b4466e1",
+  "status": "secured"
+}

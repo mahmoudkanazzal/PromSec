@@ -1,0 +1,115 @@
+{
+  "ast_similarity": 0.8600451467268623,
+  "candidate_hash": "41919e7b18c0b84163b7f7d7c6a7a4650446bdda54e5a0256e0722cbaeff464e",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file10.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9080047789725209,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        19,
+        68
+      ],
+      "candidate_hash": "253bb587cb69d1af7ac4442e40696123dc5d299b1ed5cccf93c95769e707960f",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.142,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2688,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1648,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2077,
+          "end_lineno": 30,
+          "lineno": 30,
+          "node": 19
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2798,
+          "end_lineno": 114,
+          "lineno": 114,
+          "node": 68
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.8+) that implements a Flask web application with the exact functionality described below. The code must be pure Python (no other languages) and must follow security best practices while preserving the original behavior.\n\n**General requirements**\n- Use only standard library modules and the following third\u2011party packages: `flask`, `pyyaml`.\n- The script must be executable as a module (`if __name__ == \"__main__\": app.run(debug=False)`).\n- Do not include any explanatory text, comments, or markup outside the Python code.\n- Do not output anything other than the Python source code.\n\n**Environment**\n- Load an admin password from the environment variable `ADMIN_PASSWORD`. If the variable is not set, default to the placeholder string `\"change_me_securely\"`.\n\n**Utility function**\n- Implement a private helper `_is_safe_identifier(value)` that returns `True` only if `value` matches the regular expression `^[A-Za-z0-9_-]+$`.\n\n**Routes**\n\n1. `POST /event/add`\n   - Read raw request body, decode as UTF\u20118.\n   - Parse the body as YAML using `yaml.safe_load`. Return HTTP\u202f400 with JSON `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` on parsing errors.\n   - Extract `event_id`, `event_name`, `event_date` from the parsed dict.\n   - If any of those fields are missing or empty, return HTTP\u202f400 with JSON `{\"status\":\"Error\",\"message\":\"Missing event information\"}`.\n   - On success, return JSON `{\"status\":\"Event added\",\"event_id\":..., \"event_name\":..., \"event_date\":...}`.\n\n2. `GET /event/start`\n   - Retrieve query parameters `event_id` and `task`.\n   - Validate both with `_is_safe_identifier`. If validation fails, return HTTP\u202f400 with JSON `{\"status\":\"Error\",\"message\":\"Invalid parameters\"}`.\n   - Execute the shell script `start_event.sh` with arguments `event_id` and `task` using `subprocess.run(['sh','start_event.sh',event_id,task], check=False)`.\n   - Return JSON `{\"status\":\"Event started\"}`.\n\n3. `POST /auth/login`\n   - Read form field `password`.\n   - If it matches the loaded admin password, return JSON `{\"status\":\"Login successful\"}`; otherwise return HTTP\u202f401 with JSON `{\"status\":\"Login failed\"}`.\n\n4. `POST /auth/update_password`\n   - Require the current password via form field `password`. If it does not match the admin password, return HTTP\u202f401 with JSON `{\"status\":\"Login failed\"}`.\n   - Read new password from form field `new_password`. If empty, return HTTP\u202f400 with JSON `{\"status\":\"Error\",\"message\":\"Invalid new password\"}`.\n   - Update the in\u2011memory `ADMIN_PASSWORD` variable to the new value.\n   - Return JSON `{\"status\":\"Password updated\"}`.\n\n5. `GET /event/get`\n   - Require query parameter `event_id`. If missing, return HTTP\u202f400 with JSON `{\"status\":\"Error\",\"message\":\"Event ID is required\"}`.\n   - Return a placeholder event dict:\n     ```json\n     {\"event_id\":event_id,\"event_name\":\"Sample Event\",\"event_date\":\"2024-01-01\"}\n     ```\n   - Respond with JSON `{\"status\":\"Event retrieved\",\"event\":<event_dict>}`.\n\n6. `POST /event/remove`\n   - Require form field `event_id`. If missing, return HTTP\u202f400 with JSON `{\"status\":\"Error\",\"message\":\"Event ID is required\"}`.\n   - Return JSON `{\"status\":\"Event removed\",\"event_id\":...}`.\n\n7. `GET /task/status`\n   - Require query parameter `task_id`. If missing, return HTTP\u202f400 with JSON `{\"status\":\"Error\",\"message\":\"Task ID is required\"}`.\n   - Return JSON `{\"status\":\"Task status\",\"task_id\":...,\"status\":\"In Progress\"}`.\n\n8. `POST /auth/settings`\n   - Require form field `password`. If it does not match the admin password, return HTTP\u202f401 with JSON `{\"status\":\"Access denied\"}`.\n   - Require form field `setting`. If empty, return HTTP\u202f400 with JSON `{\"status\":\"Error\",\"message\":\"Invalid setting\"}`.\n   - Return JSON `{\"status\":\"Setting updated\",\"setting\":...}`.\n\n9. `GET /task/logs`\n   - Require query parameter `task_id`. If missing, return HTTP\u202f400 with JSON `{\"status\":\"Error\",\"message\":\"Task ID is required\"}`.\n   - Construct a log string `\"Logs for task \" + task_id`.\n   - Return JSON `{\"status\":\"Task logs\",\"task_id\":...,\"logs\":...}`.\n\n10. `GET /data/export`\n    - Accept query parameter `format` (default `\"json\"`). Convert to lowercase.\n    - Allow only `\"json\"`, `\"csv\"`, `\"xml\"`; otherwise return HTTP\u202f400 with JSON `{\"status\":\"Error\",\"message\":\"Unsupported export format\"}`.\n    - Run `export_event_data.py` with the chosen format using `subprocess.run(['python','export_event_data.py',export_format], check=False)`.\n    - Return JSON `{\"status\":\"Data export started\"}`.\n\n11. `GET /user/info`\n    - Require query parameter `user_id`. If missing, return HTTP\u202f400 with JSON `{\"status\":\"Error\",\"message\":\"User ID is required\"}`.\n    - Return placeholder user info:\n      ```json\n      {\"user_id\":user_id,\"name\":\"John Doe\",\"email\":\"john.doe@example.com\"}\n      ```\n    - Respond with JSON `{\"status\":\"User information retrieved\",\"user_info\":<user_info_dict>}`.\n\n**Security constraints**\n- All external command executions must use a list argument to `subprocess.run` (no `shell=True`).\n- Input validation must be performed exactly as described.\n- Use `yaml.safe_load` to prevent arbitrary code execution.\n- Do not expose the admin password in any response.\n\nGenerate only the Python source code that satisfies all the above specifications.",
+      "syntax_repair_rounds": 2
+    },
+    {
+      "ast_similarity_to_original": 0.8600451467268623,
+      "bandit_statement_nodes": [
+        2,
+        27,
+        78
+      ],
+      "candidate_hash": "41919e7b18c0b84163b7f7d7c6a7a4650446bdda54e5a0256e0722cbaeff464e",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.3092,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2378,
+          "end_lineno": 39,
+          "lineno": 39,
+          "node": 27
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.302,
+          "end_lineno": 114,
+          "lineno": 114,
+          "node": 78
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "You are to write a complete, self\u2011contained Python script that implements a Flask web application with the exact functionality described below. The code must be written in Python only (no other languages) and must follow security best practices, including proper input validation, safe handling of external data, and avoidance of command injection or unsafe subprocess calls.\n\n**General requirements**\n- Use only the standard library and the following third\u2011party packages: `flask`, `pyyaml`.\n- Import modules in the order: `os`, `re`, `flask` components, `yaml`.\n- Create a Flask app instance named `app`.\n- Retrieve an admin password from the environment variable `ADMIN_PASSWORD`; if not set, default to the literal string `'change_me_securely'`.\n- Define a helper function `_is_safe_identifier(value)` that returns `True` only if `value` is a string matching the regular expression `^[A-Za-z0-9_-]+$`.\n- Define two internal placeholder functions:\n  1. `_start_event_internal(event_id, task)` \u2013 logs the start of an event using `app.logger.info` and returns `True`. Do **not** invoke any external scripts or subprocesses.\n  2. `_export_data_internal(export_format)` \u2013 logs the export action using `app.logger.info` and returns `True`. Do **not** invoke any external scripts or subprocesses.\n\n**Endpoints**\n1. `POST /event/add`\n   - Read raw request body as text.\n   - Parse it with `yaml.safe_load`; on parsing error return JSON `{'status':'Error','message':'Invalid YAML format'}` with HTTP 400.\n   - Ensure the parsed data is a dictionary; otherwise return the same error response.\n   - Extract `event_id`, `event_name`, `event_date`; if any are missing, return JSON `{'status':'Error','message':'Missing event information'}` with HTTP 400.\n   - On success return JSON `{'status':'Event added','event_id':event_id,'event_name':event_name,'event_date':event_date}`.\n\n2. `GET /event/start`\n   - Retrieve query parameters `event_id` and `task`.\n   - Validate both with `_is_safe_identifier`; if validation fails return JSON `{'status':'Error','message':'Invalid parameters'}` with HTTP 400.\n   - Call `_start_event_internal(event_id, task)`.\n   - Return JSON `{'status':'Event started'}`.\n\n3. `POST /auth/login`\n   - Read form field `password` (default empty string).\n   - If it matches `ADMIN_PASSWORD`, return JSON `{'status':'Login successful'}`.\n   - Otherwise return JSON `{'status':'Login failed'}` with HTTP 401.\n\n4. `POST /auth/update_password`\n   - Declare `global ADMIN_PASSWORD`.\n   - Read form field `password` as the current password.\n   - If it does not match `ADMIN_PASSWORD`, return JSON `{'status':'Login failed'}` with HTTP 401.\n   - Read form field `new_password`; if empty, return JSON `{'status':'Error','message':'Invalid new password'}` with HTTP 400.\n   - Update `ADMIN_PASSWORD` to the new value and return JSON `{'status':'Password updated'}`.\n\n5. `GET /event/get`\n   - Retrieve query parameter `event_id`; if missing return JSON `{'status':'Error','message':'Event ID is required'}` with HTTP 400.\n   - Return a placeholder event dictionary `{'event_id': event_id, 'event_name': 'Sample Event', 'event_date': '2024-01-01'}` inside JSON `{'status':'Event retrieved','event': event}`.\n\n6. `POST /event/remove`\n   - Read form field `event_id`; if missing return JSON `{'status':'Error','message':'Event ID is required'}` with HTTP 400.\n   - Return JSON `{'status':'Event removed','event_id': event_id}`.\n\n7. `GET /task/status`\n   - Retrieve query parameter `task_id`; if missing return JSON `{'status':'Error','message':'Task ID is required'}` with HTTP 400.\n   - Return JSON `{'status':'Task status','task_id': task_id,'task_status':'In Progress'}`.\n\n8. `POST /auth/settings`\n   - Read form field `password`; if it does not match `ADMIN_PASSWORD`, return JSON `{'status':'Access denied'}` with HTTP 401.\n   - Read form field `setting`; if empty, return JSON `{'status':'Error','message':'Invalid setting'}` with HTTP 400.\n   - Return JSON `{'status':'Setting updated','setting': setting}`.\n\n9. `GET /task/logs`\n   - Retrieve query parameter `task_id`; if missing return JSON `{'status':'Error','message':'Task ID is required'}` with HTTP 400.\n   - Construct a simple log string `\"Logs for task \" + task_id`.\n   - Return JSON `{'status':'Task logs','task_id': task_id,'logs': logs}`.\n\n10. `GET /data/export`\n    - Retrieve query parameter `format`; default to `'json'` and convert to lowercase.\n    - Accept only `'json'`, `'csv'`, or `'xml'`; otherwise return JSON `{'status':'Error','message':'Unsupported export format'}` with HTTP 400.\n    - Call `_export_data_internal(export_format)`.\n    - Return JSON `{'status':'Data export started'}`.\n\n11. `GET /user/info`\n    - Retrieve query parameter `user_id`; if missing return JSON `{'status':'Error','message':'User ID is required'}` with HTTP 400.\n    - Return a placeholder user dictionary `{'user_id': user_id, 'name': 'John Doe', 'email': 'john.doe@example.com'}` inside JSON `{'status':'User information retrieved','user_info': user}`.\n\n**Application entry point**\n- Include the standard `if __name__ == '__main__':` block.\n- Call `app.run(debug=False)`.\n\n**Security constraints**\n- Do not use `subprocess`, `os.system`, or any external script execution.\n- Validate all external inputs strictly as described.\n- Use `yaml.safe_load` (never `yaml.load`).\n- Ensure the regex in `_is_safe_identifier` prevents injection of special characters.\n- Do not expose the admin password in logs or responses.\n- Keep the code free of any hard\u2011coded secrets other than the fallback password.\n\nProduce the full Python source code meeting all the above specifications. Do not include any explanatory text, comments, or markup outside the code. Ensure the file can be run directly with `python <filename>.py`.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "1fe10c3a94b4f4ce46d789133eb8a4d34fc953a85d1d3497c79fad96d5cb565b",
+  "status": "secured"
+}

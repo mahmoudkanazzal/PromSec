@@ -1,0 +1,37 @@
+{
+  "ast_similarity": 0.7067510548523207,
+  "candidate_hash": "05570cf860672759565714067f3c17fb59db6d801922ae8dde719a9dfeb0458d",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file93.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7067510548523207,
+      "bandit_statement_nodes": [
+        10,
+        19,
+        29
+      ],
+      "candidate_hash": "05570cf860672759565714067f3c17fb59db6d801922ae8dde719a9dfeb0458d",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (no markdown, no comments, no explanatory text) that implements a secure Flask web service with the exact functionality described below. The script must be written entirely in Python and must not contain any code in other languages.\n\n**Requirements**\n\n1. **Imports**\n   - Import `Flask`, `request`, and `jsonify` from `flask`.\n   - Import `sqlite3`.\n\n2. **Application Setup**\n   - Create a Flask app instance named `app`.\n   - Do **not** enable debug mode when running the app.\n\n3. **Database Helper**\n   - Define a function `get_db_connection()` that:\n     - Connects to an SQLite database file named `election.db`.\n     - Sets `row_factory` to `sqlite3.Row`.\n     - Returns the connection object.\n\n4. **Endpoints**\n   - **POST /register_candidate**\n     - Accept JSON payload with keys `name` and `party`.\n     - Validate that both fields are present and non\u2011empty; return `400` with JSON `{\"error\": \"Missing name or party\"}` on failure.\n     - Use a parameterized `INSERT` query to add the candidate to the `candidates` table.\n     - Commit the transaction, close the connection, and return `201` with JSON `{\"message\": \"Candidate registered successfully\"}`.\n\n   - **GET /get_candidate**\n     - Accept query parameter `id`.\n     - Validate that `id` is present and consists only of digits; return `400` with JSON `{\"error\": \"Invalid or missing candidate id\"}` on failure.\n     - Use a parameterized `SELECT` query to retrieve the candidate row by integer `id`.\n     - Close the connection.\n     - If no row is found, return `404` with JSON `{\"error\": \"Candidate not found\"}`.\n     - If found, convert the row to a dictionary and return `200` with the JSON representation.\n\n   - **POST /update_votes**\n     - Accept JSON payload with keys `candidate_id` and `votes`.\n     - Validate that both values are integers; return `400` with JSON `{\"error\": \"candidate_id and votes must be integers\"}` on failure.\n     - Use a parameterized `UPDATE` query to increment the `votes` column for the specified candidate.\n     - Commit the transaction, close the connection, and return `200` with JSON `{\"message\": \"Votes updated successfully\"}`.\n\n   - **GET /get_results**\n     - Retrieve all candidates ordered by `votes` descending using a parameterized `SELECT` query.\n     - Close the connection.\n     - Convert each row to a dictionary, collect them into a list, and return `200` with the JSON list.\n\n5. **Application Entry Point**\n   - Include the standard `if __name__ == '__main__':` block.\n   - Call `app.run(debug=False)`.\n\n6. **Security and Best Practices**\n   - Use only parameterized queries (`?` placeholders) to prevent SQL injection.\n   - Validate all external input (JSON payloads and query parameters) before using them.\n   - Ensure database connections are closed in every code path.\n   - Do not expose stack traces or internal errors; return only the specified JSON error messages with appropriate HTTP status codes.\n   - Do not import or use any modules other than those specified.\n   - Do not enable Flask\u2019s debug mode.\n\nProduce only the Python code that satisfies all the above requirements. Do not include any additional text, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "47679752c6580ec721a4e649dd63089f102ea9f5858a6f578e464ff2959c276d",
+  "status": "secured"
+}

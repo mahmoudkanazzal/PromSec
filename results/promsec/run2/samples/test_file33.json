@@ -1,0 +1,64 @@
+{
+  "ast_similarity": 0.991044776119403,
+  "candidate_hash": "7c54ba705d1d0a713266e9e0bc530c880ae619818e5318b7b0a31cf4f4eb273d",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    703
+  ],
+  "error": "",
+  "file": "test_file33.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.991044776119403,
+      "bandit_statement_nodes": [
+        55
+      ],
+      "candidate_hash": "7c54ba705d1d0a713266e9e0bc530c880ae619818e5318b7b0a31cf4f4eb273d",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "ImportFrom",
+          "change": 0.1105,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 4
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1187,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 5
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1658,
+          "end_lineno": 19,
+          "lineno": 19,
+          "node": 13
+        },
+        {
+          "ast_type": "Assert",
+          "change": 0.3181,
+          "end_lineno": 115,
+          "lineno": 115,
+          "node": 55
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "You are an expert Python developer. Write a single, self\u2011contained Python module that implements the exact functionality described below, using only standard library modules and the specified third\u2011party packages (twisted, OpenSSL, six, zope.interface, sydent). The code must be secure, avoid unsafe operations (e.g., eval, exec, insecure defaults), and preserve the original behavior. Do not include any explanatory text, comments, or markup outside the code itself.\n\nRequirements:\n1. Imports:\n   - json, io.BytesIO, logging, os\n   - dataclasses (dataclass, field)\n   - six.text_type\n   - zope.interface.implementer\n   - twisted.internet._resolver.SimpleResolverComplexifier\n   - twisted.internet.defer.fail, succeed\n   - twisted.internet.error.DNSLookupError\n   - twisted.internet.interfaces IHostnameResolver, IReactorPluggableNameResolver, IResolverSimple\n   - twisted.internet.address\n   - twisted.web.http_headers.Headers\n   - twisted.web.server.Request, Site\n   - twisted.web.http.unquote\n   - twisted.test.proto_helpers.MemoryReactorClock\n   - OpenSSL.crypto\n   - sydent.sydent.Sydent, parse_config_dict\n\n2. Define a constant `FAKE_SERVER_CERT_PEM` containing the provided PEM certificate string (preserve line breaks).\n\n3. Implement `make_sydent(test_config=None)`:\n   - Accept optional dict `test_config`.\n   - Ensure a SQLite in\u2011memory database is used unless overridden.\n   - Create a `ResolvingMemoryReactorClock` instance.\n   - Return `Sydent(reactor=reactor, cfg=parse_config_dict(test_config), use_tls_for_federation=False)`.\n\n4. Define a `@dataclass` `FakeChannel` with fields:\n   - `site: Site`\n   - `_reactor: object`\n   - `result: dict = field(default_factory=dict)`\n   - `_producer: object = None`\n   - `producerStreaming: object = None`\n   - Provide read\u2011only properties `json_body`, `code`, `headers` that raise an exception if `result` is empty.\n   - Implement methods `writeHeaders`, `write`, `registerProducer`, `unregisterProducer`, `requestDone`, `getPeer`, `getHost`, `transport` property, and `getPeerCertificate` returning the loaded certificate from `FAKE_SERVER_CERT_PEM`.\n\n5. Define an empty class `FakeSite` that inherits from `Site` (or simply `pass` if not needed).\n\n6. Implement `make_request` with signature:\n   ```python\n   def make_request(\n       reactor,\n       method,\n       path,\n       content=b\"\",\n       access_token=None,\n       request=Request,\n       shorthand=True,\n       federation_auth_origin=None,\n   ):\n   ```\n   - Convert `method` and `path` to bytes if necessary.\n   - If `shorthand` and path does not start with `b\"/_matrix\"`, prepend `b\"/_matrix/identity/v2/\"` and collapse duplicate slashes.\n   - Ensure path starts with a leading slash.\n   - If `content` is a dict, JSON\u2011encode it; if it is a text_type, encode as UTF\u20118.\n   - Instantiate `FakeSite` and `FakeChannel`.\n   - Create a request object via `request(channel)`.\n   - Set `req.process` to a lambda returning empty bytes.\n   - Set `req.content` to `BytesIO(content)`.\n   - Populate `req.postpath` by splitting the URL path on `/` and unquoting each segment.\n   - Add appropriate `Authorization` headers for `access_token` and `federation_auth_origin`.\n   - If there is content, add a `Content-Type: application/json` header.\n   - Call `req.requestReceived(method, path, b\"1.1\")`.\n   - Return the tuple `(req, channel)`.\n\n7. Implement `setup_logging()`:\n   - Configure the root logger with a `StreamHandler` and a formatter `\"%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s\"`.\n   - Set log level from environment variable `SYDENT_TEST_LOG_LEVEL` defaulting to `\"ERROR\"`.\n\n8. Call `setup_logging()` at module import time.\n\n9. Implement `ResolvingMemoryReactorClock`:\n   - Subclass `MemoryReactorClock` and implement `IReactorPluggableNameResolver`.\n   - In `__init__`, create a dict `lookups` for hostname\u2192IP mapping.\n   - Define an inner class `FakeResolver` implementing `IResolverSimple` with method `getHostByName(name, timeout=None)` that returns `fail(DNSLookupError(...))` if name not in `lookups`, otherwise `succeed(lookups[name])`.\n   - Set `self.nameResolver` to `SimpleResolverComplexifier(FakeResolver())`.\n   - Call `super().__init__()`.\n   - Implement `installNameResolver(self, resolver: IHostnameResolver) -> IHostnameResolver` that raises `NotImplementedError`.\n\nEnsure all functions and methods have proper type hints where appropriate, handle errors securely, and avoid any insecure defaults. The final output must be only the Python code fulfilling these specifications.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "1a39a4177928ac3d32e74a2ff0d447c7f6ce1c7a9a28105b4f5d40c44d317349",
+  "status": "secured"
+}

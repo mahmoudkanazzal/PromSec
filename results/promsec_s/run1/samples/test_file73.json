@@ -1,0 +1,77 @@
+{
+  "ast_similarity": 0.9900771775082691,
+  "candidate_hash": "9f19797ecfab46afca1910a038b69cff80bade62851ffc60888efdf60cc2fd61",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file73.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9900771775082691,
+      "bandit_statement_nodes": [
+        16,
+        30,
+        54,
+        68,
+        72,
+        88,
+        92
+      ],
+      "candidate_hash": "9f19797ecfab46afca1910a038b69cff80bade62851ffc60888efdf60cc2fd61",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9993,
+          "end_lineno": 37,
+          "lineno": 37,
+          "node": 30
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9987,
+          "end_lineno": 64,
+          "lineno": 64,
+          "node": 54
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9992,
+          "end_lineno": 81,
+          "lineno": 81,
+          "node": 68
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9676,
+          "end_lineno": 85,
+          "lineno": 85,
+          "node": 72
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9993,
+          "end_lineno": 105,
+          "lineno": 105,
+          "node": 88
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, production\u2011ready Flask application in **Python** that implements the following functionality exactly as described, while applying security best practices:\n\n- **Environment configuration**: Read MySQL connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) from environment variables. Do not hard\u2011code credentials.\n- **Database access**: Use `MySQLdb` with **parameterized queries** for every SQL statement. Manage connections and cursors with context managers (`with` statements) to ensure proper cleanup.\n- **Password handling**: On registration, generate a 16\u2011byte random salt with `os.urandom`, hash the UTF\u20118 encoded password concatenated with the salt using `hashlib.sha256`, and store the concatenation of the hash digest and the salt as a hex string. On login, retrieve the stored hex string, decode it, extract the salt, recompute the hash, and compare securely.\n- **Routes**:\n  - `POST /register`: Accept `username` and `password` from `request.form`, create the salted SHA\u2011256 hash as described, insert `(username, hashed_password_hex)` into `users`, commit, and return a **302 redirect** to `/home`. On any error, log the exception (without exposing details to the client) and also redirect to `/home`.\n  - `POST /login`: Accept `username` and `password`, retrieve the stored password for the given username, verify the hash as described, and on success return a **302 redirect** to `/dashboard`. On failure return the plain text `\"Invalid credentials\"`. Log exceptions internally.\n  - `POST /add_book`: Accept `book_id`, `title`, and `author`, insert them into `books`, commit, and return the plain text `\"Book successfully added\"`. On error return `\"Failed to add book\"` and log the exception.\n  - `POST /checkout`: Accept `username` and `book_id`. Verify that the user exists in `users`; if so, insert a record into `checkouts` and return `\"Book successfully checked out\"`. If the user does not exist, return `\"User not found\"`. On any error return `\"Checkout failed\"` and log the exception.\n  - `POST /return`: Accept `username` and `book_id`. Verify a matching record exists in `checkouts`; if so, delete it and return `\"Book successfully returned\"`. If not, return `\"Checkout record not found\"`. On any error return `\"Return failed\"` and log the exception.\n  - `GET /view_books`: Retrieve all rows from `books` and return them as JSON using `flask.jsonify`. On error return `\"Failed to retrieve books\"` and log the exception.\n- **Error handling**: Catch all exceptions, log them using `print` or a logger, and return only generic error messages to the client. Do not expose stack traces or internal details.\n- **Response handling**: Use `flask.redirect` for the required redirects, `flask.jsonify` for JSON output, and plain strings for other responses.\n- **Application setup**: Create the Flask app with `app = Flask(__name__)`, ensure `debug=False` in `app.run()`, and protect the entry point with `if __name__ == '__main__':`.\n- **Security considerations**: \n  - Validate that required form fields are present; if any are missing, return an appropriate error message.\n  - Use `werkzeug.security.safe_str_cmp` or a constant\u2011time comparison for hash verification if available.\n  - Ensure the salt is stored alongside the hash as described.\n  - Do not use any non\u2011Python languages or external scripts.\n\nProduce only the Python code for this Flask application, with no additional explanations, comments, or markup.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "a4a023812d8d87d69ca6b7c153a086fae31bb10841e6483047d43e29bb8d72c9",
+  "status": "secured"
+}

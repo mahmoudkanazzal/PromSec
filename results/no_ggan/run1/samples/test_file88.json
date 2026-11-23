@@ -1,0 +1,40 @@
+{
+  "ast_similarity": 0.7785016286644951,
+  "candidate_hash": "a0877072ffc574fb543fdae689117085d2378a80a1afc26fb60c19ff1d9724ab",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file88.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7785016286644951,
+      "bandit_statement_nodes": [
+        8,
+        12,
+        26,
+        38,
+        47,
+        56
+      ],
+      "candidate_hash": "a0877072ffc574fb543fdae689117085d2378a80a1afc26fb60c19ff1d9724ab",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, production\u2011ready Python script (compatible with Python\u202f3.8+) that implements a Flask web application with the following specifications, ensuring the code is secure, follows best practices, and preserves the exact functionality described:\n\n1. **Imports**  \n   - Import only the standard `os` module, the `MySQLdb` package, and the required objects from `flask` (`Flask`, `request`).\n\n2. **Flask App Initialization**  \n   - Create a Flask instance named `app`.\n\n3. **Database Connection Helper**  \n   - Define a function `get_db_connection()` that:\n     - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) from environment variables, providing safe default values (`'127.0.0.1'`, `'root'`, `'password'`, `'community_db'` respectively) only if the variables are missing.\n     - Returns a `MySQLdb.connect` object using the retrieved parameters.\n     - Sets the connection charset to `utf8mb4`.\n     - Does **not** expose credentials in the source code.\n\n4. **Route `/add_member` (POST)**  \n   - Extract `name` and `email` from `request.form` with empty\u2011string defaults.\n   - Use `get_db_connection()` to obtain a connection and create a cursor.\n   - Perform a **parameterized** SELECT query to check if a member with the given name already exists.\n   - If the member does not exist, execute a **parameterized** INSERT query to add the new member, commit the transaction, and return the message `\"Member added successfully\"`.\n   - If the INSERT fails, roll back the transaction and return `\"Failed to add member\"`.\n   - If the member already exists, return `\"Member already exists\"`.\n   - Ensure the cursor and connection are closed in a `finally` block.\n\n5. **Route `/login_member` (POST)**  \n   - Extract `name` and `email` from `request.form`.\n   - Use a **parameterized** SELECT query to verify both name and email.\n   - Close resources properly.\n   - Return `\"Login successful\"` if a matching record is found; otherwise return `\"Invalid credentials\"`.\n\n6. **Route `/update_member_profile` (POST)**  \n   - Extract `name` and `new_email` from `request.form`.\n   - Execute a **parameterized** UPDATE query to set the new email for the given name.\n   - Commit the transaction, close resources, and return `\"Profile updated successfully\"`.\n\n7. **Route `/search_members` (GET)**  \n   - Retrieve the query parameter `term` from `request.args`.\n   - Construct a LIKE pattern safely (e.g., `f\"%{term}%\"`) and use a **parameterized** SELECT query to fetch all member names matching the pattern.\n   - Return the fetched rows as a string representation.\n   - Ensure proper cleanup of cursor and connection.\n\n8. **Route `/remove_member` (POST)**  \n   - Extract `name` from `request.form`.\n   - Execute a **parameterized** DELETE query to remove the member with that name.\n   - Commit the transaction, close resources, and return `\"Member removed successfully\"`.\n\n9. **Application Execution**  \n   - Include the standard `if __name__ == '__main__':` guard.\n   - Run the Flask app with `debug=False`.\n\n10. **Security & Quality Requirements**  \n    - Use only **parameterized** queries to prevent SQL injection.  \n    - Do not hard\u2011code any secrets; rely exclusively on environment variables.  \n    - Wrap all database interactions in try/finally blocks to guarantee that cursors and connections are closed even on exceptions.  \n    - Handle transaction commit/rollback explicitly where needed.  \n    - Ensure the script contains **no** code in any language other than Python.  \n    - Do not include any explanatory comments, markdown, or additional text outside the required Python code.  \n\nGenerate only the Python code that satisfies all the above criteria.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "2f00a8a0eeaa9a8317ae9d6ebfc23b6a24b31f8a7b3914bd4807a398fd0ad8ff",
+  "status": "secured"
+}

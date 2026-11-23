@@ -1,0 +1,76 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "a0f91771a79754869087fbdddbabfe34d107c35a8e6db2867f6fd77d8a76b7fc",
+  "compile_ok": true,
+  "confidence": 0.94,
+  "contract": {
+    "edge_cases": [
+      "Missing required fields in the JSON payload (e.g., title or year) may cause a server error",
+      "Providing a non\u2011integer value for year or book_id can lead to a 500 error or malformed query",
+      "Searching with an empty keyword returns all books (because LIKE '%%' matches everything)",
+      "Updating or deleting a book_id that does not exist results in a successful response but no rows changed",
+      "Very large input strings may cause performance degradation or exceed SQLite limits",
+      "Malformed or malicious input can trigger SQL injection due to string interpolation in queries"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a RESTful HTTP API that lets clients add, search, update, delete, and list books stored in a SQLite database.",
+    "invariants": [
+      "All responses are JSON-encoded and include an HTTP status code (200 for success, 201 for creation)",
+      "Each book record is expected to have columns id (integer primary key), title (text), author (text), year (integer)",
+      "Database connections are opened, used for a single query, then closed for every request",
+      "The API does not perform authentication or authorization; any client can invoke the endpoints"
+    ],
+    "io_behavior": [
+      "POST /add_book with JSON {title, author, year} \u2192 201 and JSON {\"message\":\"Book added successfully\"}",
+      "GET /search_books?keyword=\u2026 \u2192 200 and JSON array of matching book rows",
+      "PUT /update_book/<book_id> with JSON {title?, author?, year?} \u2192 200 and JSON {\"message\":\"Book updated successfully\"}",
+      "DELETE /delete_book/<book_id> \u2192 200 and JSON {\"message\":\"Book deleted successfully\"}",
+      "GET /get_books_by_year?year=\u2026 \u2192 200 and JSON array of books from that year"
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:DELETE /delete_book/<int:book_id>": "",
+      "route:GET /get_books_by_year": "",
+      "route:GET /search_books": "",
+      "route:POST /add_book": "",
+      "route:PUT /update_book/<int:book_id>": ""
+    },
+    "side_effects": [
+      "Creates or modifies the file library.db on the server filesystem",
+      "Inserts, updates, or deletes rows in the books table of the SQLite database",
+      "Opens a network socket to listen for HTTP requests while the Flask app runs",
+      "Commits transactions to persist changes in the database"
+    ],
+    "source_hash": "3c14a77e03a4f047bcd38fd49f48160e1f4423dbfe27ee323cf586f69962ee2f"
+  },
+  "dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.2,
+    "invariants": 1.0,
+    "io_semantics": 0.96,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file95.py",
+  "gated_score": 0.66463,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.66463,
+  "original_hash": "3c14a77e03a4f047bcd38fd49f48160e1f4423dbfe27ee323cf586f69962ee2f",
+  "rationale": "The program implements all required routes with correct JSON responses and proper DB handling, preserving core behavior, I/O semantics, invariants, and side effects. However, it mitigates many listed edge cases (e.g., input validation, 404 on missing records, parameterized queries) rather than reproducing the contract's vulnerable behaviors, resulting in low edge\u2011case preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.17262,
+  "stability_dimensions": {
+    "behavior": 0.95,
+    "edge_cases": 0.67,
+    "invariants": 1.0,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.83725,
+  "weighted_mean": 0.8195,
+  "worst_dimension": 0.2
+}

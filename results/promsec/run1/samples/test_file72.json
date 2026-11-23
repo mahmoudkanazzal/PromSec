@@ -1,0 +1,35 @@
+{
+  "ast_similarity": 0.6332288401253918,
+  "candidate_hash": "b4a3db6f8ffebd3132300d46557db95cf48c5dd6e53bbc20af2942b4e7e653f4",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file72.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6332288401253918,
+      "bandit_statement_nodes": [
+        21
+      ],
+      "candidate_hash": "b4a3db6f8ffebd3132300d46557db95cf48c5dd6e53bbc20af2942b4e7e653f4",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the following exact specifications and security requirements:\n\n- The script must be written **only in Python** and must not contain any code in other languages.\n- Import the modules: `Flask`, `request`, `redirect` from `flask`; `hashlib`; `os`; `MySQLdb`; and `sys`.\n- Create a Flask app instance named `app`.\n- Define a function `get_db_connection()` that:\n  - Attempts to connect to a MySQL database using `MySQLdb.connect`.\n  - Retrieves connection parameters (`host`, `user`, `passwd`, `db`) from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`, providing sensible defaults (`'localhost'`, `'root'`, `''`, `'mysite'` respectively) if the variables are not set.\n  - Returns the database connection object on success.\n  - Catches any `MySQLdb.Error`, writes a clear error message to `sys.stderr` prefixed with \u201cDatabase connection error: \u201d, and returns `None`.\n- Define a route `@app.route('/register', methods=['POST'])` with a view function `register()` that:\n  - Retrieves `username` from `request.form` using `get('username', '')`, strips whitespace, and retrieves `password` using `get('password', '')`.\n  - If either `username` or `password` is empty, immediately returns `redirect('/home')`.\n  - Generates a cryptographically secure random 16\u2011byte salt using `os.urandom`.\n  - Derives a password hash using `hashlib.pbkdf2_hmac` with the algorithm `'sha256'`, the UTF\u20118 encoded password, the generated salt, and **100,000** iterations.\n  - Concatenates the hex\u2011encoded salt and hex\u2011encoded derived key (`dk`) into a single string `stored_password`.\n  - Calls `get_db_connection()`; if it returns `None`, returns `redirect('/home')`.\n  - Uses a `try/except/finally` block to:\n    - Create a cursor from the connection.\n    - Execute a parameterized SQL statement `INSERT INTO user (username, password) VALUES (%s, %s)` with the tuple `(username, stored_password)` to prevent SQL injection.\n    - Commit the transaction on success.\n    - On any `MySQLdb.Error`, write an error message to `sys.stderr` prefixed with \u201cDatabase error during registration: \u201d, roll back the transaction, and continue to the `finally` block.\n    - In the `finally` block, close the cursor and the database connection.\n  - After the database operation, return `redirect('/home')`.\n- Ensure that all error handling writes to `sys.stderr` and does not expose sensitive information.\n- The script must be ready to run (i.e., include the typical `if __name__ == '__main__':` block to start the Flask development server on a default port) but you may omit the actual `app.run()` call if you prefer to keep the script import\u2011safe.\n- Do not include any additional functionality, comments, or explanatory text beyond what is required to meet the specifications above.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "1d85cc97c3c3687ad4e1f27b1e2cf9944d891a79de7a2dc960b45beaf7549667",
+  "status": "secured"
+}

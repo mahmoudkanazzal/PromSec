@@ -1,0 +1,62 @@
+{
+  "ast_similarity": 0.4868913857677903,
+  "candidate_hash": "17a4fe7f6eb4df0a788c12c54637ae34531931129d6fb9d50134cbd6c796a586",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    259,
+    327
+  ],
+  "error": "",
+  "file": "test_file54.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5855855855855856,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        14
+      ],
+      "candidate_hash": "2649d938d516c5f6d9e5f10b57fdeba7cf47c5a5aaca7eb9f9e8db5db0564536",
+      "cwe_count": 1,
+      "cwes": [
+        327
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9993,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements the following functionality exactly as described, while applying security best practices:\n\n- Use Flask to create a web application (`app = Flask(__name__)`).\n- Define a route `@app.route('/login', methods=['POST'])` with a function named `login`.\n- Inside `login`, read `username` and `password` from `request.form`.\n- Connect to a MySQL database using `MySQLdb.connect`. Do **not** hard\u2011code the connection parameters; retrieve `host`, `user`, `passwd`, and `db` from environment variables (`os.getenv`) and provide sensible defaults only for development.\n- Create a cursor and execute a **parameterized** query to fetch the stored password hash for the given username:  \n  `SELECT password FROM user_info WHERE username=%s`.\n- Fetch one row. If no row is returned, treat it as a failed login.\n- Compute the MD5 hash of the supplied password (`hashlib.md5(password.encode('utf-8')).hexdigest()`), matching the original code\u2019s behavior.\n- Compare the stored hash and the computed hash using a **constant\u2011time** comparison (`hmac.compare_digest`) to mitigate timing attacks.\n- If the hashes match, return `redirect('/')`; otherwise, return `redirect('/error')`.\n- Ensure the database connection and cursor are properly closed in a `finally` block.\n- Include necessary imports: `from flask import Flask, request, redirect`, `import os`, `import sys`, `import hashlib`, `import hmac`, `import MySQLdb`.\n- Add a file\u2011level comment indicating the file was assembled by `gen.py` and authored by \u201credactedAuthorFirstname redactedAuthorLastname\u201d.\n- The script must be ready to run (include the typical `if __name__ == '__main__': app.run()` guard) and must not contain any code in languages other than Python.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4868913857677903,
+      "bandit_statement_nodes": [
+        21
+      ],
+      "candidate_hash": "17a4fe7f6eb4df0a788c12c54637ae34531931129d6fb9d50134cbd6c796a586",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (compatible with Python\u202f3.8+ and using `from __future__ import annotations`) that implements a Flask web application with the following exact specifications and security considerations:\n\n- Import only the modules: `Flask`, `request`, `redirect` from `flask`; `os`; `sys`; `hashlib`; `hmac`; and `MySQLdb`.\n- Create a Flask app instance named `app`.\n- Configure the app\u2019s `SECRET_KEY` to be read from the environment variable `FLASK_SECRET`; if that variable is not set, generate a secure random 24\u2011byte key using `os.urandom`.\n- Define a route at `/login` that accepts only POST requests.\n- Inside the route handler:\n  - Retrieve `username` and `password` from `request.form` using `get` with a default empty string.\n  - Establish a MySQL connection using `MySQLdb.connect` with the following parameters, each read from environment variables with the given defaults if not set: `host` from `DB_HOST` (default `'localhost'`), `user` from `DB_USER` (default `'root'`), `passwd` from `DB_PASS` (default `''`), `db` from `DB_NAME` (default `'test'`). Also set `charset='utf8mb4'` and `use_unicode=True`.\n  - Use a cursor obtained from the connection to execute a parameterized query that selects the `password` column from the `user_info` table where `username` matches the supplied username. Use `%s` placeholder syntax and pass the username as a single\u2011element tuple to prevent SQL injection.\n  - Fetch one row; if no row is returned, immediately return a redirect to `/error`.\n  - Extract the stored password hash from the fetched row.\n  - Compute the SHA\u2011256 hash of the supplied password (encode the password as UTF\u20118 before hashing) and obtain its hexadecimal digest.\n  - Compare the stored hash and the computed hash using `hmac.compare_digest` to ensure constant\u2011time comparison.\n  - If the hashes match, return a redirect to `/`; otherwise, return a redirect to `/error`.\n  - Ensure that both the cursor and the connection are closed in a `finally` block, checking that each is not `None` before calling `close`.\n- Include the standard `if __name__ == '__main__':` guard to run the Flask development server with `app.run()`.\n- The script must contain no additional functionality, no extraneous imports, and must be written entirely in Python. Ensure that all security best practices mentioned (environment\u2011based configuration, parameterized queries, constant\u2011time comparison, proper resource cleanup) are followed while preserving the exact behavior described.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "b2e18a09915013ea97ddd9cc2f500be31621fcde49a46a732060f7b6516dc55f",
+  "status": "secured"
+}

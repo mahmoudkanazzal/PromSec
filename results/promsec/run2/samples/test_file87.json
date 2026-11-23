@@ -1,0 +1,93 @@
+{
+  "ast_similarity": 0.6204033214709371,
+  "candidate_hash": "fc3f2137e50d44ac20fc7356abc19ec0b7c6a6ab3254991c9ca4ae1981200d9d",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file87.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.803125,
+      "bandit_statement_nodes": [
+        8,
+        12,
+        26,
+        38,
+        47,
+        56
+      ],
+      "candidate_hash": "e0ab00e7cffc5d025912554763e41f93c328b1eba3200390c67774b1009aec7b",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1209,
+          "end_lineno": 21,
+          "lineno": 21,
+          "node": 12
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1361,
+          "end_lineno": 43,
+          "lineno": 43,
+          "node": 26
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1252,
+          "end_lineno": 63,
+          "lineno": 63,
+          "node": 38
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1289,
+          "end_lineno": 95,
+          "lineno": 95,
+          "node": 56
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that uses Flask and MySQLdb to implement the following web endpoints with the exact same behavior as described:\n\n- **/register** (POST): Accept `username` and `password` from `request.form`. Connect to MySQL at `127.0.0.1` with user `root`, password `password`, database `cwe_900`. Use a cursor to execute a **non\u2011parameterized** SELECT query that concatenates the `username` directly into the SQL string (`\"SELECT * from users where username='\" + username + \"'\"`). If no rows are returned, insert the new user with a **parameterized** INSERT query (`\"INSERT INTO users(username, password) VALUES(%s, %s)\"`). Commit on success, rollback on failure, and close the cursor and connection. Return `\"You have successfully registered\"` on success, `\"Registration Failed\"` on insert error, or `\"Username already exists\"` if the user already exists.\n\n- **/login** (POST): Accept `username` and `password`. Connect to the same MySQL instance. Execute a **parameterized** SELECT query (`\"SELECT * from users where username=%s AND password=%s\"`). If a row is found, return `\"Login successful\"`; otherwise return `\"Invalid credentials\"`. Close cursor and connection.\n\n- **/update_profile** (POST): Accept `username` and `email` (field name `email`). Connect to MySQL. Execute a **parameterized** UPDATE query (`\"UPDATE users SET email=%s WHERE username=%s\"`). Commit the transaction, close cursor and connection, and return `\"Profile updated successfully\"`.\n\n- **/search_users** (GET): Accept a query parameter `term` (default empty string). Connect to MySQL. Execute a **non\u2011parameterized** SELECT query that concatenates the term into a LIKE clause (`\"SELECT username FROM users WHERE username LIKE '%\" + search_term + \"%'\"`). Fetch all matching rows, close cursor and connection, and return the string representation of the result set.\n\n- **/delete_account** (POST): Accept `username`. Connect to MySQL. Execute a **parameterized** DELETE query (`\"DELETE FROM users WHERE username=%s\"`). Commit, close cursor and connection, and return `\"Account deleted successfully\"`.\n\nAdditional requirements:\n1. The script must be pure Python; no other programming languages are allowed.\n2. Use `from flask import Flask, request, redirect` (even if `redirect` is not used) and `import MySQLdb`.\n3. Define `app = Flask(__name__)` and include the `if __name__ == '__main__':` block to run the app with `debug=False`.\n4. Ensure all database connections and cursors are properly closed in every code path.\n5. Use explicit error handling for the INSERT operation in `/register` (try/except with rollback on exception).\n6. Do not add any explanatory comments, markdown, or extra text outside the required code.\n7. The generated code must exactly match the functionality described, preserving the intentional SQL\u2011injection vulnerabilities only in the two specified queries.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6204033214709371,
+      "bandit_statement_nodes": [
+        18,
+        75
+      ],
+      "candidate_hash": "fc3f2137e50d44ac20fc7356abc19ec0b7c6a6ab3254991c9ca4ae1981200d9d",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.109,
+          "end_lineno": 23,
+          "lineno": 23,
+          "node": 18
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3) that implements a Flask web application with the following routes and behavior, matching the functionality of the reference code exactly, while improving security:\n\n- **Environment configuration**: Load MySQL connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) from environment variables with sensible defaults. Use `os.getenv`.\n- **Database connection**: Provide a `get_connection()` function that returns a `MySQLdb` connection using UTF\u20118 (`utf8mb4`) charset.\n- **Password handling**: Do **not** store passwords in plain text. Use the `bcrypt` library to hash passwords on registration and to verify passwords on login. Store the hashed password in the `users` table.\n- **Input validation**: Ensure that `username`, `password`, `email`, and search terms are non\u2011empty strings. Strip leading/trailing whitespace.\n- **SQL safety**: Use only parameterized queries (`%s` placeholders) for all database operations to prevent SQL injection.\n- **Error handling**: Wrap all database interactions in `try/except/finally` blocks. On any exception, roll back the transaction, close cursor and connection, and return a generic error message without leaking internal details.\n- **Resource cleanup**: Always close the cursor and connection in a `finally` block.\n- **Routes**:\n  1. `POST /register` \u2013 Accept `username` and `password`. Check if the username already exists; if not, hash the password with `bcrypt.gensalt()` and insert the new user. Return `\"You have successfully registered\"` on success, `\"Username already exists\"` if taken, or `\"Registration Failed\"` on error.\n  2. `POST /login` \u2013 Accept `username` and `password`. Retrieve the stored hashed password for the given username and verify it with `bcrypt.checkpw`. Return `\"Login successful\"` if the password matches, otherwise `\"Invalid credentials\"`.\n  3. `POST /update_profile` \u2013 Accept `username` and `email`. Update the `email` field for the given username. Return `\"Profile updated successfully\"` on success.\n  4. `GET /search_users` \u2013 Accept query parameter `term`. Perform a case\u2011insensitive search for usernames containing the term using `LIKE %s`. Return the list of matching usernames as a JSON array.\n  5. `POST /delete_account` \u2013 Accept `username`. Delete the user record. Return `\"Account deleted successfully\"` on success.\n- **Response format**: Return plain text strings exactly as specified above, except for the search route which should return JSON.\n- **Application entry point**: Include the standard `if __name__ == '__main__':` block to run the Flask app with `debug=False`.\n- **Dependencies**: Only import `os`, `flask` (`Flask`, `request`), `MySQLdb`, and `bcrypt`. Do not import any other modules.\n- **Output requirement**: The response must be **only** the Python source code implementing the above specifications, with no additional explanatory text, comments, or markup. Ensure the code is syntactically correct and ready to run.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "e736b28ab6a9cb96dc6b61defd2475b82d94a9935a882c8c823b4c8adcca5700",
+  "status": "secured"
+}

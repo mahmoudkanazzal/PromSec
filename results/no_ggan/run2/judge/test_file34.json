@@ -1,0 +1,78 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "10bc5ca966977a5187224ba6f9320b6ed9f95aab09e7469a6079062c03fd2a27",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Calling make_request with non\u2011bytes method or path triggers automatic ASCII encoding.",
+      "Providing a dict as content results in JSON serialization; non\u2011dict non\u2011bytes content must already be bytes.",
+      "If access_token is None, no Authorization header is added; if provided, it is prefixed with 'Bearer '.",
+      "When federation_auth_origin is set, an additional Authorization header with a fake Matrix signature is added.",
+      "If FakeChannel.json_body is accessed before any response is written, an exception is raised.",
+      "If make_sydent receives a test_config with a 'db' key but without 'db.file', ':memory:' is injected as the default."
+    ],
+    "entrypoints": [],
+    "intent": "Provide test utilities for the Sydent identity server, including functions to create a test Sydent instance, simulate HTTP requests, and route Python logging into Twisted's logging system.",
+    "invariants": [
+      "make_sydent always ensures a 'db.file' entry of ':memory:' unless explicitly overridden.",
+      "FakeChannel.result always contains 'code', 'headers', and optionally 'body' after a request is processed.",
+      "make_request always prefixes paths with '/_matrix/identity/v2/' when shorthand is true and the path lacks that prefix.",
+      "Content passed to make_request is JSON\u2011encoded if it is a dict, and always sent as UTF\u20118 bytes.",
+      "The logging handler formats records using the same timestamp\u2011name\u2011line\u2011level pattern for all logs.",
+      "FakeChannel.getPeer always returns the same IPv4 address, ensuring a deterministic client IP."
+    ],
+    "io_behavior": [
+      "make_sydent returns a Sydent object configured with an in-memory SQLite database and a MemoryReactorClock.",
+      "make_request builds a Twisted Request object and a FakeChannel, populates request headers and body, and returns both objects for inspection.",
+      "FakeChannel captures response code, headers, and body in an in\u2011memory dict that can be accessed via its properties.",
+      "ToTwistedHandler.emit forwards formatted log records to Twisted's logger.",
+      "setup_logging reads the SYDENT_TEST_LOG_LEVEL environment variable to set the root logger level.",
+      "When the module is imported, setup_logging is executed, attaching the custom logging handler."
+    ],
+    "public_api": {
+      "class:FakeChannel": "code(self);getHost(self);getPeer(self);getPeerCertificate(self);headers(self);json_body(self);registerProducer(self, producer, streaming);requestDone(self, _self);transport(self);unregisterProducer(self);write(self, content);writeHeaders(self, version, code, reason, headers)",
+      "class:FakeSite": "",
+      "class:ToTwistedHandler": "emit(self, record)",
+      "func:make_request": "(reactor, method, path, content=b'', access_token=None, request=Request, shorthand=True, federation_auth_origin=None)",
+      "func:make_sydent": "(test_config={})",
+      "func:setup_logging": "()"
+    },
+    "side_effects": [
+      "Adds a ToTwistedHandler instance to the root Python logger.",
+      "Sets the root logger's level based on an environment variable.",
+      "Loads a hard\u2011coded PEM certificate into an OpenSSL X509 object when getPeerCertificate is called.",
+      "Creates a MemoryReactorClock instance for each call to make_sydent.",
+      "Modifies the request object's headers and content in place.",
+      "Potentially registers Twisted log observers via the ToTwistedHandler."
+    ],
+    "source_hash": "fd29062fb5da351e7ce1cb83718776fe9a07e90f399c3bc40f4bb17f4e310c47"
+  },
+  "dimensions": {
+    "behavior": 0.75,
+    "edge_cases": 0.4,
+    "invariants": 0.85,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file34.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.67,
+  "original_hash": "fd29062fb5da351e7ce1cb83718776fe9a07e90f399c3bc40f4bb17f4e310c47",
+  "rationale": "The implementation matches most core functionalities (logging, request construction, in\u2011memory DB, header handling) but deviates on several edge\u2011case specifications (path encoding, content type enforcement, nested db config) and does not automatically record response code in FakeChannel, affecting some invariants and I/O semantics.",
+  "schema": 1,
+  "stability_abs_difference": 0.0675,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.4,
+    "invariants": 0.6,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.6025,
+  "weighted_mean": 0.76,
+  "worst_dimension": 0.4
+}

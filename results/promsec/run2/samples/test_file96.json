@@ -1,0 +1,560 @@
+{
+  "ast_similarity": 0.6643258426966292,
+  "candidate_hash": "56e10481edcc2b44bd15c98cdd7076cda16c82130dc5b858b106d43e936f85cc",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 1,
+  "cwe_count_before": 1,
+  "cwes_after": [
+    89
+  ],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file96.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6643258426966292,
+      "bandit_statement_nodes": [
+        11,
+        20,
+        31,
+        39,
+        48
+      ],
+      "candidate_hash": "56e10481edcc2b44bd15c98cdd7076cda16c82130dc5b858b106d43e936f85cc",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1752,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1346,
+          "end_lineno": 63,
+          "lineno": 63,
+          "node": 39
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.10+) that implements a Flask web service with the exact functionality of the provided code while improving security and code quality. The script must:\n\n1. Import only standard library modules and Flask; do not use any dynamic imports (e.g., __import__) or third\u2011party packages beyond Flask.\n2. Define a function `get_db_connection() -> sqlite3.Connection` that:\n   - Connects to an SQLite database file named `events.db`.\n   - Sets `row_factory` to `sqlite3.Row`.\n   - Uses a context manager (`with` statement) wherever possible to ensure the connection is properly closed.\n3. Provide the following routes with the specified HTTP methods, request handling, and JSON responses:\n   - `POST /add_event`:\n     * Expects a JSON body containing `name`, `date`, and `location`.\n     * Validates that all three fields are present and are non\u2011empty strings; return a 400 error with a descriptive JSON message if validation fails.\n     * Inserts the new event using a parameterized SQL query.\n     * Returns `{\"message\": \"Event added successfully\"}` with status code 201.\n   - `GET /search_events`:\n     * Accepts an optional query parameter `keyword`.\n     * Performs a case\u2011insensitive search on `name` and `location` using a parameterized `LIKE` query with `%keyword%`.\n     * Returns a JSON list of matching events (each event as a dictionary) with status code 200.\n   - `PUT /update_event/<int:event_id>`:\n     * Expects a JSON body that may contain any of `name`, `date`, `location`.\n     * Validates that at least one of these fields is provided; otherwise return a 400 error.\n     * Updates only the provided fields in the `events` table for the given `event_id` using a parameterized query.\n     * Returns `{\"message\": \"Event updated successfully\"}` with status code 200.\n   - `DELETE /delete_event/<int:event_id>`:\n     * Deletes the event with the specified `event_id` using a parameterized query.\n     * Returns `{\"message\": \"Event deleted successfully\"}` with status code 200.\n   - `GET /get_events_by_date`:\n     * Accepts a required query parameter `date`.\n     * Retrieves all events occurring on that exact date using a parameterized query.\n     * Returns a JSON list of events with status code 200.\n4. Use proper error handling:\n   - Wrap database operations in try/except blocks.\n   - Return a 500 error with a generic JSON message if an unexpected exception occurs.\n5. Ensure all responses are JSON and include appropriate `Content\u2011Type` headers.\n6. Include type hints for all functions and route handlers.\n7. Add concise docstrings to each function explaining its purpose.\n8. At the bottom, include the standard `if __name__ == '__main__':` guard to run the Flask app with `debug=False`.\n9. Do not include any code in languages other than Python, and do not add explanatory comments outside of the required docstrings.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5755743651753326,
+      "bandit_statement_nodes": [
+        45
+      ],
+      "candidate_hash": "c1dc9794027787d6faed35e913edf5d6b3335e70f14c45ae48b58bfadc6381fe",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (Python\u202f3) that implements a Flask web application with the exact functionality described below. The code must be written in Python only, use only the standard library and the Flask package, and follow security best practices (e.g., use parameterized SQL queries, validate and sanitize all user input, avoid code injection, handle exceptions without exposing stack traces). Do not include any explanatory text, comments, or markup outside the code.\n\nRequirements:\n\n1. **Imports**\n   - `from __future__ import annotations`\n   - `import sqlite3`\n   - `from typing import Any`\n   - `from flask import Flask, request, jsonify, make_response`\n\n2. **Flask app initialization**\n   - Create a Flask instance named `app`.\n\n3. **Database connection helper**\n   - Define a function `get_db_connection() -> sqlite3.Connection` that:\n     - Connects to a SQLite database file named `events.db`.\n     - Sets `row_factory` to `sqlite3.Row`.\n     - Returns the connection object.\n\n4. **Route `/add_event` (POST)**\n   - Retrieve JSON payload (silent mode) and extract `name`, `date`, `location`.\n   - Validate that each field is a non\u2011empty string after stripping whitespace.\n   - If validation fails, return a 400 response with JSON `{'error': 'All fields name, date, and location must be non\u2011empty strings'}`.\n   - Insert the event into the `events` table using a parameterized query:\n     ```sql\n     INSERT INTO events (name, date, location) VALUES (?, ?, ?)\n     ```\n   - Commit the transaction and return a 201 response with JSON `{'message': 'Event added successfully'}`.\n   - On any exception, return a 500 response with JSON `{'error': 'Internal server error'}`.\n\n5. **Route `/search_events` (GET)**\n   - Accept optional query parameter `keyword`.\n   - If `keyword` is provided (non\u2011empty), perform a case\u2011insensitive search on `name` and `location` using `LIKE` with `COLLATE NOCASE` and a pattern `%keyword%`.\n   - If `keyword` is empty or missing, return all rows.\n   - Fetch results, convert each `sqlite3.Row` to a dictionary, and return a 200 response with the list of events as JSON.\n   - On any exception, return a 500 response with JSON `{'error': 'Internal server error'}`.\n\n6. **Route `/update_event/<int:event_id>` (PUT)**\n   - Retrieve JSON payload (silent mode).\n   - Build a dictionary `fields` containing only keys `name`, `date`, `location` whose values are non\u2011empty strings after stripping.\n   - If `fields` is empty, return a 400 response with JSON `{'error': 'At least one of name, date, or location must be provided'}`.\n   - Construct a dynamic `SET` clause using the keys in `fields` and execute a parameterized `UPDATE` query:\n     ```sql\n     UPDATE events SET <set_clause> WHERE id = ?\n     ```\n   - Commit the transaction and return a 200 response with JSON `{'message': 'Event updated successfully'}`.\n   - On any exception, return a 500 response with JSON `{'error': 'Internal server error'}`.\n\n7. **Route `/delete_event/<int:event_id>` (DELETE)**\n   - Execute a parameterized `DELETE` query:\n     ```sql\n     DELETE FROM events WHERE id = ?\n     ```\n   - Commit the transaction and return a 200 response with JSON `{'message': 'Event deleted successfully'}`.\n   - On any exception, return a 500 response with JSON `{'error': 'Internal server error'}`.\n\n8. **Route `/get_events_by_date` (GET)**\n   - Require query parameter `date`.\n   - Validate that `date` is a non\u2011empty string after stripping; if not, return a 400 response with JSON `{'error': 'Query parameter \"date\" is required'}`.\n   - Retrieve rows where `date` matches the provided value using a parameterized query.\n   - Convert rows to dictionaries and return a 200 response with the list as JSON.\n   - On any exception, return a 500 response with JSON `{'error': 'Internal server error'}`.\n\n9. **Application entry point**\n   - Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\nThe generated script must exactly implement the above specifications, maintain the same functionality as the reference code, and ensure security and robustness. Do not add any extra routes, functions, or code beyond what is described. Do not include any explanatory text or comments. Only output the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.567342073897497,
+      "bandit_statement_nodes": [
+        59
+      ],
+      "candidate_hash": "0f347473405cd8fe3f2375e39fab11dc63b130f0f0b4bb3f04de958ae7373c46",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.9+ and using `from __future__ import annotations`) that implements a Flask web API for managing events stored in a SQLite database named `events.db`. The program must:\n\n1. Import only the following modules: `sqlite3`, `typing.Any`, and the necessary objects from `flask` (`Flask`, `request`, `jsonify`, `make_response`).\n2. Create a Flask app instance named `app`.\n3. Define a helper function `get_db_connection() -> sqlite3.Connection` that:\n   - Opens a connection to `events.db`.\n   - Sets `row_factory` to `sqlite3.Row`.\n   - Returns the connection object.\n4. Implement the following routes with exact signatures, HTTP methods, and behavior:\n\n   - **POST `/add_event`**\n     - Parse JSON payload safely (`request.get_json(silent=True) or {}`).\n     - Extract `name`, `date`, and `location` fields; ensure each is a non\u2011empty string after stripping whitespace.\n     - If validation fails, respond with status\u202f400 and JSON `{'error': 'All fields name, date, and location must be non-empty strings'}`.\n     - Insert the validated values into the `events` table using a parameterized SQL statement (`INSERT INTO events (name, date, location) VALUES (?, ?, ?)`).\n     - Commit, close the connection, and respond with status\u202f201 and JSON `{'message': 'Event added successfully'}`.\n     - On any unexpected exception, respond with status\u202f500 and JSON `{'error': 'Internal server error'}`.\n\n   - **GET `/search_events`**\n     - Read optional query parameter `keyword`.\n     - If `keyword` is a non\u2011empty string, perform a case\u2011insensitive search on both `name` and `location` using `LIKE` with wildcards (`%keyword%`) and `COLLATE NOCASE`.\n     - If `keyword` is missing or empty, return all rows.\n     - Return the result set as a list of dictionaries (convert each `sqlite3.Row` to `dict`) with status\u202f200.\n     - On any unexpected exception, respond with status\u202f500 and JSON `{'error': 'Internal server error'}`.\n\n   - **PUT `/update_event/<int:event_id>`**\n     - Parse JSON payload safely.\n     - Build a dictionary `fields` containing any of `name`, `date`, `location` that are present, are strings, and are non\u2011empty after stripping.\n     - If `fields` is empty, respond with status\u202f400 and JSON `{'error': 'At least one of name, date, or location must be provided'}`.\n     - Dynamically construct a safe `SET` clause (`\"name = ?, date = ?, ...\"`), preserving the order of keys.\n     - Execute a parameterized `UPDATE events SET ... WHERE id = ?` statement with the collected values followed by `event_id`.\n     - Commit, close the connection, and respond with status\u202f200 and JSON `{'message': 'Event updated successfully'}`.\n     - On any unexpected exception, respond with status\u202f500 and JSON `{'error': 'Internal server error'}`.\n\n   - **DELETE `/delete_event/<int:event_id>`**\n     - Execute a parameterized `DELETE FROM events WHERE id = ?`.\n     - Commit, close the connection, and respond with status\u202f200 and JSON `{'message': 'Event deleted successfully'}`.\n     - On any unexpected exception, respond with status\u202f500 and JSON `{'error': 'Internal server error'}`.\n\n   - **GET `/get_events_by_date`**\n     - Require a query parameter `date`; if missing, empty, or not a string, respond with status\u202f400 and JSON `{'error': 'Query parameter \\\"date\\\" is required'}`.\n     - Strip whitespace from `date` and query `SELECT * FROM events WHERE date = ?` using a parameterized statement.\n     - Return matching rows as a list of dictionaries with status\u202f200.\n     - On any unexpected exception, respond with status\u202f500 and JSON `{'error': 'Internal server error'}`.\n\n5. Ensure all database interactions use parameterized queries to prevent SQL injection.\n6. Use explicit input validation and sanitization (type checks, `strip()`, non\u2011empty checks) as described.\n7. Return all responses using `make_response(jsonify(...), status_code)`.\n8. Include a standard `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n9. Do not include any code comments, explanatory text, or imports of modules not listed above.\n10. The entire output must be valid Python code only; no additional narrative or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.544,
+      "bandit_statement_nodes": [
+        62
+      ],
+      "candidate_hash": "84b8dce62e725db0e356442cf35554c8fa9519fc87a119d1e1baf6645cda2d85",
+      "cwe_count": 2,
+      "cwes": [
+        89,
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1046,
+          "end_lineno": 45,
+          "lineno": 45,
+          "node": 37
+        }
+      ],
+      "iteration": 4,
+      "optimized_prompt": "You are an expert Python developer. Write a complete, self\u2011contained Python script that implements a Flask web application with a SQLite backend named **events.db**. The script must:\n\n1. Begin with `from __future__ import annotations`.\n2. Import only the following modules: `sqlite3`, `typing.Any`, and from `flask` import `Flask`, `request`, `jsonify`, `make_response`.\n3. Create a Flask app instance named `app`.\n4. Define a function `get_db_connection() -> sqlite3.Connection` that:\n   - Connects to `events.db`.\n   - Sets `row_factory` to `sqlite3.Row`.\n   - Returns the connection object.\n5. Define a private helper `_escape_like(value: str) -> str` that escapes backslashes, `%`, and `_` for use in SQLite `LIKE` clauses.\n6. Implement the following routes with exact functionality, security, and error handling:\n\n   - **POST /add_event**\n     - Parse JSON body (silent mode) and extract `name`, `date`, `location`.\n     - Validate that each is a non\u2011empty string; strip whitespace.\n     - On validation failure, respond with JSON `{'error': 'All fields name, date, and location must be non-empty strings'}` and status 400.\n     - Insert the event using a parameterized `INSERT INTO events (name, date, location) VALUES (?, ?, ?)` query.\n     - Commit, close the connection, and respond with JSON `{'message': 'Event added successfully'}` and status 201.\n     - On any exception, respond with JSON `{'error': 'Internal server error'}` and status 500.\n\n   - **GET /search_events**\n     - Read query parameter `keyword` (default empty string).\n     - If `keyword` is a non\u2011empty string, strip it, escape it with `_escape_like`, build pattern `'%{escaped_keyword}%'`.\n     - Execute a parameterized `SELECT * FROM events WHERE name LIKE ? ESCAPE '\\' COLLATE NOCASE OR location LIKE ? ESCAPE '\\' COLLATE NOCASE` query with the pattern for both placeholders.\n     - If `keyword` is empty, execute `SELECT * FROM events`.\n     - Fetch all rows, close the connection, convert each row to a dict, and return the list as JSON with status 200.\n     - On any exception, respond with JSON `{'error': 'Internal server error'}` and status 500.\n\n   - **PUT /update_event/<int:event_id>**\n     - Parse JSON body (silent mode).\n     - For each of `name`, `date`, `location`, if the value is a non\u2011empty string after stripping, include it in an update dictionary.\n     - If no fields are provided, respond with JSON `{'error': 'At least one of name, date, or location must be provided'}` and status 400.\n     - Build a dynamic `SET` clause using placeholders (e.g., `name = ?, date = ?`) based on the keys in the update dictionary.\n     - Append `event_id` to the values list.\n     - Execute a parameterized `UPDATE events SET {set_clause} WHERE id = ?` query.\n     - Commit, close the connection, and respond with JSON `{'message': 'Event updated successfully'}` and status 200.\n     - On any exception, respond with JSON `{'error': 'Internal server error'}` and status 500.\n\n   - **DELETE /delete_event/<int:event_id>**\n     - Execute a parameterized `DELETE FROM events WHERE id = ?` query.\n     - Commit, close the connection, and respond with JSON `{'message': 'Event deleted successfully'}` and status 200.\n     - On any exception, respond with JSON `{'error': 'Internal server error'}` and status 500.\n\n   - **GET /get_events_by_date**\n     - Read required query parameter `date`.\n     - Validate that `date` is a non\u2011empty string after stripping; if not, respond with JSON `{'error': 'Query parameter \"date\" is required'}` and status 400.\n     - Execute a parameterized `SELECT * FROM events WHERE date = ?` query.\n     - Fetch rows, close the connection, convert to list of dicts, and return as JSON with status 200.\n     - On any exception, respond with JSON `{'error': 'Internal server error'}` and status 500.\n\n7. Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n8. Use only parameterized SQL statements (no string interpolation) to prevent SQL injection.\n9. Ensure all database connections are closed after each request.\n10. Do not include any comments, explanatory text, or code in any language other than Python. Output only the complete Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6205997392438071,
+      "bandit_statement_nodes": [
+        29,
+        48,
+        68,
+        71,
+        82,
+        98
+      ],
+      "candidate_hash": "35ef0d2f24d925593fe10654a59e41dfe68834a12b8ca18748500fca5f09ffcc",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1528,
+          "end_lineno": 53,
+          "lineno": 53,
+          "node": 42
+        }
+      ],
+      "iteration": 5,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.11+) that implements a Flask web service for managing events stored in a SQLite database named `events.db`. The script must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the standard library modules `sqlite3` and `typing.Any`, and the Flask objects `Flask, request, jsonify, make_response`.\n- Define a Flask app instance named `app`.\n- Provide a function `get_db_connection() -> sqlite3.Connection` that returns a SQLite connection with `row_factory = sqlite3.Row`.\n- Provide a helper `_escape_like(value: str) -> str` that escapes backslashes, percent signs, and underscores for use in SQL LIKE clauses.\n- Implement the following routes with exact signatures and behavior:\n\n  1. `POST /add_event`  \n     - Expect JSON with string fields `name`, `date`, `location`.  \n     - Validate each field is a non\u2011empty string after stripping whitespace; if validation fails, return `jsonify({'error': 'All fields name, date, and location must be non-empty strings'}), 400`.  \n     - Insert a new row into `events(name, date, location)` using a parameterized query, commit, and return `jsonify({'message': 'Event added successfully'}), 201`.  \n     - On any other exception, return `jsonify({'error': 'Internal server error'}), 500`.  \n     - Ensure the database connection is closed in a `finally` block.\n\n  2. `GET /search_events`  \n     - Optional query parameter `keyword`.  \n     - If provided and non\u2011empty, escape it with `_escape_like`, build a pattern `%escaped%`, and execute a parameterized SELECT that searches `name` **or** `location` using `LIKE ? ESCAPE '\\\\' COLLATE NOCASE`.  \n     - If no keyword, select all rows.  \n     - Return the rows as a list of dictionaries via `jsonify(result), 200`.  \n     - On exception, return the generic internal server error JSON with status 500.  \n     - Close the connection in `finally`.\n\n  3. `PUT /update_event/<int:event_id>`  \n     - Expect JSON with optional string fields `name`, `date`, `location`.  \n     - For each provided field, strip whitespace and include only non\u2011empty values in the UPDATE.  \n     - If no fields to update, return `jsonify({'error': 'At least one of name, date, or location must be provided'}), 400`.  \n     - Dynamically build the SET clause using parameter placeholders, execute a parameterized UPDATE `events SET ... WHERE id = ?`, commit, and return `jsonify({'message': 'Event updated successfully'}), 200`.  \n     - Handle errors as above and close the connection in `finally`.\n\n  4. `DELETE /delete_event/<int:event_id>`  \n     - Delete the row with the given `id` using a parameterized DELETE, commit, and return `jsonify({'message': 'Event deleted successfully'}), 200`.  \n     - On error, return the generic internal server error JSON with status 500.  \n     - Ensure the connection is closed in `finally`.\n\n  5. `GET /get_events_by_date`  \n     - Required query parameter `date`.  \n     - Validate it is a non\u2011empty string after stripping; if missing or empty, return `jsonify({'error': 'Query parameter \"date\" is required'}), 400`.  \n     - Select rows where `date = ?` using a parameterized query, return results as a list of dictionaries via `jsonify(result), 200`.  \n     - On exception, return the generic internal server error JSON with status 500.  \n     - Close the connection in `finally`.\n\n- At the bottom, include the guard `if __name__ == '__main__':` that runs `app.run(debug=False)`.\n- Use only parameterized SQL statements to prevent injection.\n- Do not expose stack traces or raw exceptions; always return the generic internal server error JSON.\n- Do not include any additional text, comments, or explanations outside of the required code.\n- Ensure the code is syntactically correct and follows the described behavior exactly.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6134889753566797,
+      "bandit_statement_nodes": [
+        61
+      ],
+      "candidate_hash": "d86385ea1a1c5c78d65caa66d61529ad00f180012a806792738d13d840406711",
+      "cwe_count": 2,
+      "cwes": [
+        89,
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1233,
+          "end_lineno": 76,
+          "lineno": 76,
+          "node": 58
+        }
+      ],
+      "iteration": 6,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.9+ and using only the standard library and the Flask package) that implements a RESTful API for managing events stored in an SQLite database named **events.db**. The program must:\n\n1. Import `__future__` annotations, `sqlite3`, `typing.Any`, and the necessary objects from `flask`.\n2. Create a Flask app instance named `app`.\n3. Define a function `get_db_connection() -> sqlite3.Connection` that:\n   - Opens a connection to **events.db**.\n   - Sets `row_factory` to `sqlite3.Row`.\n   - Returns the connection object.\n4. Define a helper function `_escape_like(value: str) -> str` that safely escapes backslashes, percent signs, and underscores for use in SQLite `LIKE` clauses.\n5. Implement the following route handlers, each returning JSON responses and appropriate HTTP status codes, handling all exceptions by returning a generic 500 error, and always closing the database connection in a `finally` block:\n\n   - **POST /add_event**\n     - Parse JSON payload; require non\u2011empty string fields `name`, `date`, and `location`.\n     - Insert a new row into the `events` table using a parameterized `INSERT` statement.\n     - On success return `{'message': 'Event added successfully'}` with status 201; on validation failure return a 400 error with a descriptive message.\n\n   - **GET /search_events**\n     - Accept an optional query parameter `keyword`.\n     - If `keyword` is provided, escape it with `_escape_like`, build a pattern `%escaped%`, and execute a parameterized `SELECT` that searches `name` **or** `location` using `LIKE ? ESCAPE '\\\\' COLLATE NOCASE`.\n     - If `keyword` is omitted, return all rows.\n     - Return the result set as a list of dictionaries with status 200.\n\n   - **PUT /update_event/<int:event_id>**\n     - Parse JSON payload; allow any subset of the fields `name`, `date`, `location` that are non\u2011empty strings.\n     - Validate that only these three column names are present (allowlist) to prevent SQL injection via column names.\n     - Dynamically build a safe `SET` clause using the allowed fields and execute a parameterized `UPDATE` statement for the given `event_id`.\n     - Return a success message with status 200; if no valid fields are supplied, return a 400 error.\n\n   - **DELETE /delete_event/<int:event_id>**\n     - Execute a parameterized `DELETE FROM events WHERE id = ?`.\n     - Return a success message with status 200.\n\n   - **GET /get_events_by_date**\n     - Require a query parameter `date`; if missing, return a 400 error.\n     - Execute a parameterized `SELECT * FROM events WHERE date = ?`.\n     - Return the matching rows as a list of dictionaries with status 200.\n\n6. Ensure that all SQL statements use **parameterized queries** to prevent SQL injection.\n7. Ensure that any user\u2011supplied column names are validated against an explicit allowlist before being interpolated into SQL.\n8. Ensure that the `_escape_like` function correctly escapes backslashes, `%`, and `_` characters.\n9. Wrap the Flask app launch in the standard `if __name__ == '__main__':` guard and call `app.run(debug=False)`.\n\nThe generated code must be valid Python, contain no extraneous comments or explanatory text, and must exactly implement the functionality and security measures described above. Do not include any additional output, explanations, or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5826193390452876,
+      "bandit_statement_nodes": [
+        24,
+        41,
+        56,
+        59,
+        70,
+        85
+      ],
+      "candidate_hash": "e47edc46447376b77ed65c8b94b849a33660f026ce8225fac0193dd038ee8177",
+      "cwe_count": 2,
+      "cwes": [
+        89,
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1235,
+          "end_lineno": 46,
+          "lineno": 46,
+          "node": 35
+        }
+      ],
+      "iteration": 7,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.9+ and using only the standard library and the Flask package) that implements a secure REST API for managing events stored in an SQLite database named **events.db**. The script must:\n\n- Import `__future__` annotations, `sqlite3`, `typing.Any`, and the necessary objects from `flask`.\n- Create a Flask app instance named `app`.\n- Define a function `get_db_connection() -> sqlite3.Connection` that opens a connection to **events.db**, sets `row_factory` to `sqlite3.Row`, and returns the connection.\n- Define a helper function `_escape_like(value: str) -> str` that safely escapes backslashes, percent signs, and underscores for use in SQL `LIKE` clauses.\n- Implement the following routes with exact functionality, using only parameterized queries (no string interpolation for SQL) and proper error handling:\n\n  1. **POST /add_event**\n     - Parse JSON payload (force parsing).\n     - Extract `name`, `date`, and `location` as stripped strings.\n     - Validate that all three fields are present and non\u2011empty; on failure return JSON `{'error': 'Fields name, date, and location are required and must be non-empty strings'}` with status 400.\n     - Insert a new row into `events(name, date, location)` using a prepared statement.\n     - Commit the transaction and return JSON `{'message': 'Event added successfully'}` with status 201.\n     - On any exception return JSON `{'error': 'Internal server error'}` with status 500.\n     - Ensure the database connection is closed in a `finally` block, suppressing any close errors.\n\n  2. **GET /search_events**\n     - Accept optional query parameter `keyword`.\n     - If `keyword` is provided, escape it with `_escape_like`, build a pattern `%escaped%`, and execute a SELECT that searches `name` **or** `location` using `LIKE ? ESCAPE '\\\\' COLLATE NOCASE` for each column, passing the pattern twice.\n     - If `keyword` is omitted, select all rows.\n     - Fetch all rows, convert each `sqlite3.Row` to a plain dict, and return the list as JSON with status 200.\n     - On any exception return JSON `{'error': 'Internal server error'}` with status 500.\n     - Close the connection in a `finally` block.\n\n  3. **PUT /update_event/<int:event_id>**\n     - Parse JSON payload (force parsing).\n     - Allow only the fields `name`, `date`, `location`; ignore others.\n     - For each allowed field, keep the stripped non\u2011empty string value.\n     - If no valid fields remain, return JSON `{'error': 'No valid fields provided for update'}` with status 400.\n     - Dynamically build a `SET` clause like `name=? , date=? , location=?` based on the provided fields, preserving the order of fields.\n     - Execute an `UPDATE events SET ... WHERE id = ?` using a prepared statement with the field values followed by `event_id`.\n     - Commit and return JSON `{'message': 'Event updated successfully'}` with status 200.\n     - On any exception return JSON `{'error': 'Internal server error'}` with status 500.\n     - Close the connection in a `finally` block.\n\n  4. **DELETE /delete_event/<int:event_id>**\n     - Execute `DELETE FROM events WHERE id = ?` with the provided `event_id`.\n     - Commit and return JSON `{'message': 'Event deleted successfully'}` with status 200.\n     - On any exception return JSON `{'error': 'Internal server error'}` with status 500.\n     - Close the connection in a `finally` block.\n\n  5. **GET /get_events_by_date**\n     - Require query parameter `date`; if missing return JSON `{'error': 'Query parameter date is required'}` with status 400.\n     - Execute `SELECT * FROM events WHERE date = ?` with the supplied date.\n     - Return the fetched rows as a list of dicts in JSON with status 200.\n     - On any exception return JSON `{'error': 'Internal server error'}` with status 500.\n     - Close the connection in a `finally` block.\n\n- Include the standard `if __name__ == '__main__':` guard that runs `app.run(debug=False)`.\n- Ensure the script contains **no comments, no explanatory text, and no code in any language other than Python**. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5534883720930233,
+      "bandit_statement_nodes": [
+        24,
+        42,
+        60,
+        67,
+        79,
+        94
+      ],
+      "candidate_hash": "93e1213f4de384a72e8f85a83711646aaa4abcea2cfa2cba559485960500c2f9",
+      "cwe_count": 2,
+      "cwes": [
+        89,
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1256,
+          "end_lineno": 79,
+          "lineno": 79,
+          "node": 59
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1829,
+          "end_lineno": 80,
+          "lineno": 80,
+          "node": 60
+        }
+      ],
+      "iteration": 8,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other languages) that implements a Flask web service with the exact functionality described below. The code must be secure, maintain the same behavior, and follow best practices for input validation, SQL injection protection, resource cleanup, and error handling. Include the following requirements in the implementation:\n\n- Use `from __future__ import annotations` at the top of the file.\n- Import only the standard library modules `sqlite3` and `typing` (specifically `Any`, `Dict`, `List`) and the Flask classes `Flask`, `request`, and `jsonify`.\n- Create a Flask app instance named `app`.\n- Define a helper function `get_db_connection() -> sqlite3.Connection` that opens a connection to a SQLite database file named `events.db`, sets `row_factory` to `sqlite3.Row`, and returns the connection.\n- Define a helper function `_escape_like(value: str) -> str` that escapes backslashes, percent signs, and underscores for use in SQL `LIKE` clauses.\n- Implement the following route handlers with exact signatures, behavior, and HTTP status codes:\n\n  1. `@app.route('/add_event', methods=['POST'])`  \n     - Parse JSON payload using `request.get_json(force=True)`.  \n     - Extract `name`, `date`, and `location` as trimmed strings.  \n     - If any field is missing or empty, return `jsonify(error='Fields name, date, and location are required and must be non-empty strings')` with status 400.  \n     - Insert the event into the `events` table using a parameterized `INSERT` statement.  \n     - Commit the transaction and return `jsonify(message='Event added successfully')` with status 201.  \n     - On any exception, return `jsonify(error='Internal server error')` with status 500.  \n     - Ensure the database connection is closed in a `finally` block, suppressing any close errors.\n\n  2. `@app.route('/search_events', methods=['GET'])`  \n     - Retrieve optional query parameter `keyword`.  \n     - If `keyword` is provided, escape it with `_escape_like`, build a pattern `%{escaped}%`, and execute a parameterized `SELECT` that searches `name` and `location` using `LIKE ? ESCAPE '\\\\' COLLATE NOCASE`.  \n     - If `keyword` is not provided, select all rows.  \n     - Convert each row to a dictionary and return the list as JSON with status 200.  \n     - On any exception, return `jsonify(error='Internal server error')` with status 500.  \n     - Ensure the connection is closed safely.\n\n  3. `@app.route('/update_event/<int:event_id>', methods=['PUT'])`  \n     - Parse JSON payload.  \n     - Define an `allowed_fields` mapping for `name`, `date`, and `location`.  \n     - Build an `updates` dictionary containing only non\u2011empty string values for allowed fields present in the payload.  \n     - If `updates` is empty, return `jsonify(error='No valid fields provided for update')` with status 400.  \n     - Dynamically construct a `SET` clause using placeholders for each field, collect corresponding parameters, append `event_id` as the final parameter, and execute a parameterized `UPDATE` statement.  \n     - Commit and return `jsonify(message='Event updated successfully')` with status 200.  \n     - On any exception, return `jsonify(error='Internal server error')` with status 500.  \n     - Ensure the connection is closed safely.\n\n  4. `@app.route('/delete_event/<int:event_id>', methods=['DELETE'])`  \n     - Execute a parameterized `DELETE FROM events WHERE id = ?`.  \n     - Commit and return `jsonify(message='Event deleted successfully')` with status 200.  \n     - On any exception, return `jsonify(error='Internal server error')` with status 500.  \n     - Ensure the connection is closed safely.\n\n  5. `@app.route('/get_events_by_date', methods=['GET'])`  \n     - Retrieve required query parameter `date`.  \n     - If missing, return `jsonify(error='Query parameter date is required')` with status 400.  \n     - Execute a parameterized `SELECT * FROM events WHERE date = ?`.  \n     - Return the resulting rows as a list of dictionaries in JSON with status 200.  \n     - On any exception, return `jsonify(error='Internal server error')` with status 500.  \n     - Ensure the connection is closed safely.\n\n- Wrap each route handler in a top\u2011level `try/except` block that catches any unexpected exception and returns the generic internal server error response as specified.\n- Use type hints throughout (`Dict[str, str]`, `List[Any]`, etc.) and ensure all variables are appropriately annotated.\n- At the bottom of the file, include the standard `if __name__ == '__main__':` guard that runs `app.run(debug=False)`.\n- Do not include any code in languages other than Python, and do not add explanatory comments or extraneous text. The output must be only the Python source code fulfilling the above specifications.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4722222222222222,
+      "bandit_statement_nodes": [
+        24,
+        40,
+        61,
+        64,
+        75,
+        89
+      ],
+      "candidate_hash": "c1a13df9ecdf1c3f6bd8aea4ac06b82614e1b3c698b925dc5c1b8bda6f94246b",
+      "cwe_count": 2,
+      "cwes": [
+        89,
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2222,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "AnnAssign",
+          "change": 0.1838,
+          "end_lineno": 20,
+          "lineno": 20,
+          "node": 14
+        },
+        {
+          "ast_type": "AnnAssign",
+          "change": 0.1394,
+          "end_lineno": 21,
+          "lineno": 21,
+          "node": 15
+        },
+        {
+          "ast_type": "AnnAssign",
+          "change": 0.2182,
+          "end_lineno": 79,
+          "lineno": 79,
+          "node": 56
+        },
+        {
+          "ast_type": "AnnAssign",
+          "change": 0.1631,
+          "end_lineno": 80,
+          "lineno": 80,
+          "node": 57
+        }
+      ],
+      "iteration": 9,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service for managing events stored in a SQLite database. The script must:\n\n- Begin with `from __future__ import annotations` and import only the standard library modules `re`, `sqlite3`, `typing` (Any, Dict, List) and the Flask classes `Flask`, `request`, `jsonify`.\n- Define a Flask app instance named `app`.\n- Compile two regular expressions: `DATE_REGEX` matching `YYYY\u2011MM\u2011DD` and `NAME_LOCATION_REGEX` allowing letters, numbers, whitespace, hyphens, periods, commas and apostrophes.\n- Provide a function `get_db_connection()` that returns a `sqlite3.Connection` to a file `events.db` with `detect_types=sqlite3.PARSE_DECLTYPES`, `timeout=5`, and `row_factory=sqlite3.Row`.\n- Provide a helper `_escape_like(value: str) -> str` that escapes backslashes, percent signs and underscores for use in a SQLite LIKE clause.\n- Provide validation helpers `_validate_name_location(value: str) -> str | None` and `_validate_date(value: str) -> str | None` that trim input, return `None` on empty or non\u2011matching values, otherwise return the cleaned string.\n- Implement the following routes with exact signatures, HTTP methods, and behavior, using only parameterized SQL statements, proper input validation, and comprehensive error handling that returns JSON with appropriate HTTP status codes:\n  * `POST /add_event` \u2013 expects JSON with `name`, `date`, `location`; validates all three; inserts a new row into `events(name, date, location)`; returns 201 on success, 400 if validation fails, 500 on unexpected errors.\n  * `GET /search_events` \u2013 optional query parameter `keyword`; if present, escape it with `_escape_like`, build a pattern `%keyword%`, and search `name` and `location` with `LIKE ? ESCAPE '\\\\' COLLATE NOCASE`; otherwise return all rows; return JSON list of rows and status 200; 500 on errors.\n  * `PUT /update_event/<int:event_id>` \u2013 expects JSON with any of `name`, `date`, `location`; validates provided fields; builds a dynamic `SET` clause using only whitelisted column names; updates the row with the given `event_id`; returns 200 on success, 400 if no valid fields, 500 on errors.\n  * `DELETE /delete_event/<int:event_id>` \u2013 deletes the row with the given `event_id`; returns 200 on success, 500 on errors.\n  * `GET /get_events_by_date` \u2013 required query parameter `date` matching `DATE_REGEX`; returns rows where `date = ?`; 400 if missing or invalid date, 200 with JSON list on success, 500 on errors.\n- Ensure every database connection is closed in a `finally` block, swallowing any exceptions from `close()`.\n- Wrap each route body in a top\u2011level `try/except` that catches generic exceptions and returns a JSON error with status 500.\n- At the bottom, include the standard `if __name__ == \"__main__\": app.run(debug=False)` guard.\n- The code must be valid Python 3.11+ syntax, use type hints as shown, and must not contain any code in another language or any placeholder text.\n- Do not include any explanatory comments, markdown formatting, or additional output; output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4231111111111111,
+      "bandit_statement_nodes": [
+        33,
+        50,
+        66,
+        96,
+        101,
+        114,
+        129
+      ],
+      "candidate_hash": "35326e6891f579dd554c1798e32161e64fd88084f6c4b5ccb976831b8b052beb",
+      "cwe_count": 2,
+      "cwes": [
+        89,
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 10,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program (compatible with Python\u202f3.9+) that uses Flask to provide a REST API for managing events stored in a SQLite database named `events.db`. The program must:\n\n- Import `__future__` annotations, `re`, `sqlite3`, `typing` (`Any`, `Dict`, `List`), and Flask components (`Flask`, `request`, `jsonify`).\n- Define a Flask app instance.\n- Compile two regular expressions: `DATE_REGEX` matching `YYYY\u2011MM\u2011DD` and `NAME_LOCATION_REGEX` allowing letters, numbers, spaces, hyphens, periods, commas, and apostrophes.\n- Provide a function `get_db_connection() -> sqlite3.Connection` that returns a SQLite connection with `detect_types=sqlite3.PARSE_DECLTYPES`, `timeout=5`, and `row_factory=sqlite3.Row`.\n- Provide a helper `_escape_like(value: str) -> str` that escapes backslashes, `%` and `_` for SQLite LIKE queries.\n- Provide validation helpers `_validate_name_location(value: str) -> str | None` and `_validate_date(value: str) -> str | None` that strip input, return `None` on empty or regex mismatch, otherwise return the cleaned string.\n- Provide an `_init_db() -> None` function that creates an `events` table with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `name` (TEXT NOT NULL), `date` (TEXT NOT NULL), `location` (TEXT NOT NULL) if it does not exist, committing the transaction and safely closing the connection.\n- Call `_init_db()` at module import.\n- Implement the following Flask routes with exact signatures and behavior:\n  * `POST /add_event`: parse JSON, validate `name`, `date`, `location` using the helpers, return 400 with JSON error on invalid input, otherwise insert a new row using a parameterized `INSERT`, commit, return 201 with JSON message.\n  * `GET /search_events`: accept optional query parameter `keyword`, obtain a DB connection, if `keyword` is provided escape it with `_escape_like`, build a pattern `%escaped%`, perform a case\u2011insensitive `LIKE` search on `name` and `location` using a parameterized query with `ESCAPE '\\\\'`, otherwise return all rows. Return JSON list of rows, status 200. Handle errors with 500.\n  * `PUT /update_event/<int:event_id>`: parse JSON, for each of `name`, `date`, `location` present validate using the helpers, build a dynamic `SET` clause with only valid fields, use a parameterized `UPDATE`, commit, return 200 with JSON message on success, 404 if no rows updated, 400 if no valid fields, 500 on exception.\n  * `DELETE /delete_event/<int:event_id>`: perform a parameterized `DELETE`, commit, return 200 with JSON message on success, 404 if no rows deleted, 500 on exception.\n  * `GET /get_events_by_date`: require query parameter `date`, validate it, return 400 if invalid, otherwise `SELECT` rows where `date` equals the validated date using a parameterized query, return JSON list, 200 on success, 500 on exception.\n- Ensure every database connection is closed in a `finally` block, swallowing any exception on close.\n- Wrap each route handler in a `try/except` that returns a JSON error with the exception string and HTTP 500 on unexpected errors.\n- At the bottom, include the usual `if __name__ == \"__main__\":` block that runs `app.run(debug=False)`.\n- Do not import or use any libraries beyond those listed. Do not include any code in languages other than Python. Follow security best practices: use parameterized queries, validate all external input, escape LIKE patterns, handle exceptions, and avoid exposing stack traces.\n\nProduce only the Python code, no additional explanation, comments, or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.43391066545123064,
+      "bandit_statement_nodes": [
+        35,
+        60,
+        78,
+        110,
+        115,
+        130,
+        149
+      ],
+      "candidate_hash": "d0202e73700cc6ce7ce5ad433ab7f5ea08641c7eada2b3d8e40b570e61a46e35",
+      "cwe_count": 2,
+      "cwes": [
+        89,
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 11,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 script that implements a Flask web application with an SQLite backend, reproducing exactly the functionality of the reference code below. The script must:\n\n- Import only Python standard library modules and the Flask package.\n- Use `from __future__ import annotations`.\n- Define regular expressions `DATE_REGEX` (YYYY\u2011MM\u2011DD) and `NAME_LOCATION_REGEX` (allow letters, numbers, spaces, hyphens, periods, commas, apostrophes).\n- Provide a `get_db_connection()` function that returns a `sqlite3.Connection` to a file named `events.db`, with `detect_types=sqlite3.PARSE_DECLTYPES`, `timeout=5`, and `row_factory=sqlite3.Row`.\n- Implement a private helper `_escape_like(value: str) -> str` that escapes backslashes, percent signs, and underscores for SQLite LIKE queries.\n- Implement private validators `_validate_name_location(value: str) -> str | None` and `_validate_date(value: str) -> str | None` that strip input, return `None` on empty or non\u2011matching values, otherwise return the cleaned string.\n- Include an `_init_db()` function that creates the `events` table with columns `id INTEGER PRIMARY KEY AUTOINCREMENT`, `name TEXT NOT NULL`, `date TEXT NOT NULL`, `location TEXT NOT NULL`. Ensure the connection is closed safely even on errors.\n- Call `_init_db()` at import time.\n\nDefine the following Flask routes with exact behavior:\n\n1. `POST /add_event`\n   - Parse JSON body (force parsing).\n   - Extract `name`, `date`, `location`.\n   - Validate each field using the helpers; on failure return JSON `{'error': 'Invalid <field>'}` with status 400.\n   - Insert a new row using a parameterized `INSERT` statement.\n   - Return JSON `{'message': 'Event added'}` with status 201.\n   - Catch any unexpected exception and return JSON `{'error': str(e)}` with status 500.\n\n2. `GET /search_events`\n   - Optional query parameter `keyword`.\n   - If provided, escape it with `_escape_like`, build pattern `%escaped%`, and execute a parameterized `SELECT` using `LIKE ? ESCAPE '\\\\' COLLATE NOCASE` on both `name` and `location`.\n   - If not provided, select all rows.\n   - Return a JSON list of row dictionaries with status 200.\n   - On error return JSON `{'error': str(e)}` with status 500.\n\n3. `PUT /update_event/<int:event_id>`\n   - Parse JSON body (force parsing).\n   - For each of `name`, `date`, `location` present, validate using the appropriate helper; if valid, add `field = ?` to the SET clause and the value to parameters.\n   - If no valid fields are supplied, return JSON `{'error': 'No valid fields to update'}` with status 400.\n   - Execute a parameterized `UPDATE events SET <set_clause> WHERE id = ?`.\n   - If `rowcount` is 0, return JSON `{'error': 'Event not found'}` with status 404.\n   - On success return JSON `{'message': 'Event updated'}` with status 200.\n   - On error return JSON `{'error': str(e)}` with status 500.\n\n4. `DELETE /delete_event/<int:event_id>`\n   - Execute a parameterized `DELETE FROM events WHERE id = ?`.\n   - If `rowcount` is 0, return JSON `{'error': 'Event not found'}` with status 404.\n   - On success return JSON `{'message': 'Event deleted'}` with status 200.\n   - On error return JSON `{'error': str(e)}` with status 500.\n\n5. `GET /get_events_by_date`\n   - Required query parameter `date`.\n   - Validate the date; on failure return JSON `{'error': 'Invalid date'}` with status 400.\n   - Execute a parameterized `SELECT * FROM events WHERE date = ?`.\n   - Return a JSON list of matching rows with status 200.\n   - On error return JSON `{'error': str(e)}` with status 500.\n\nAdditional requirements:\n- All database connections must be opened with `get_db_connection()` and closed in a `finally` block, swallowing any exception on close.\n- Use only parameterized queries; never concatenate user input into SQL strings.\n- Ensure the LIKE pattern uses the escaped value and the ESCAPE clause to prevent injection.\n- Do not include any code in languages other than Python.\n- Do not add any explanatory comments, docstrings, or extra output; the script should consist solely of the required Python code. \n- At the end, include the typical `if __name__ == '__main__':` block that runs `app.run(debug=False)`.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4803229061553986,
+      "bandit_statement_nodes": [
+        29,
+        55,
+        72,
+        104,
+        109,
+        124,
+        142
+      ],
+      "candidate_hash": "87eabbdf8726bff8c9c767219c0ede403e30f42de4ee880acb5fbd6b03677967",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [],
+      "iteration": 12,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that implements a Flask web service for managing events stored in a SQLite database. The program must:\n\n- Begin with `from __future__ import annotations`.\n- Import only `re`, `sqlite3`, and the necessary objects from `flask`.\n- Define two compiled regular expressions: `DATE_REGEX` matching `YYYY-MM-DD` and `NAME_LOCATION_REGEX` allowing letters, numbers, spaces, hyphens, periods, commas, and apostrophes.\n- Provide a function `get_db_connection() -> sqlite3.Connection` that returns a connection to a file named `events.db` with `detect_types=sqlite3.PARSE_DECLTYPES`, `timeout=5`, and `row_factory=sqlite3.Row`.\n- Provide a helper `_escape_like(value: str) -> str` that escapes backslashes, `%` and `_` for use in a LIKE clause.\n- Provide validation helpers `_validate_name_location(value: str) -> str | None` and `_validate_date(value: str) -> str | None` that strip whitespace, return `None` for empty or non\u2011matching input, otherwise return the cleaned string.\n- Include a function `_init_db() -> None` that creates the table `events` with columns `id INTEGER PRIMARY KEY AUTOINCREMENT`, `name TEXT NOT NULL`, `date TEXT NOT NULL`, `location TEXT NOT NULL`. Ensure the connection is closed safely even on error.\n- Call `_init_db()` before creating the Flask app.\n- Create a Flask app instance named `app`.\n- Implement the following routes with exact signatures, using only parameterised SQL statements, proper input validation, and secure handling of resources and errors:\n  * `POST /add_event` \u2013 expects JSON with `name`, `date`, `location`; validates each field; inserts a new row; returns JSON `{'message': 'Event added'}` with status 201 or appropriate error messages with status 400/500.\n  * `GET /search_events` \u2013 optional query parameter `keyword`; if provided, escape it for LIKE, search `name` and `location` case\u2011insensitively using `LIKE ? ESCAPE '\\\\' COLLATE NOCASE`; otherwise return all rows; respond with a JSON list of objects.\n  * `PUT /update_event/<int:event_id>` \u2013 expects JSON with any of `name`, `date`, `location`; validates provided fields; builds a dynamic SET clause using only the validated fields; updates the row with the given `event_id`; returns JSON `{'message': 'Event updated'}` with status 200, or 404 if not found, or 400 if no valid fields.\n  * `DELETE /delete_event/<int:event_id>` \u2013 deletes the row with the given `event_id`; returns JSON `{'message': 'Event deleted'}` with status 200 or 404 if not found.\n  * `GET /get_events_by_date` \u2013 requires query parameter `date`; validates the date; returns all rows with that date as JSON list.\n- Ensure every database connection is closed in a `finally` block or using a context manager, and any exceptions are caught and returned as JSON with status 500.\n- At the bottom, include the standard `if __name__ == '__main__':` guard that runs `app.run(debug=False)`.\n- Use type hints throughout, follow PEP\u202f8 naming conventions, and avoid any code that could lead to SQL injection, command injection, or other security issues.\n- Do not include any explanatory comments, markdown, or additional text; output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.476,
+      "bandit_statement_nodes": [
+        92
+      ],
+      "candidate_hash": "09c2c55cada7d3ea09dde3767ce1acbd62ecd64d5b2ba6e9d7cdb7b48302a011",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [],
+      "iteration": 13,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (Python\u202f3.11+) that implements a secure Flask web service for managing events stored in a SQLite database. The script must:\n\n- Import only `re`, `sqlite3` from the standard library and `Flask`, `request`, `jsonify` from Flask.\n- Include `from __future__ import annotations` at the top.\n- Define `DATE_REGEX` to match dates in the format YYYY\u2011MM\u2011DD and `NAME_LOCATION_REGEX` to allow letters, numbers, spaces, hyphens, periods, commas, and apostrophes.\n- Provide a function `get_db_connection() -> sqlite3.Connection` that opens `events.db` with `detect_types=sqlite3.PARSE_DECLTYPES`, a timeout of 5 seconds, and sets `row_factory` to `sqlite3.Row`.\n- Provide a helper `_escape_like(value: str) -> str` that escapes backslashes, `%` and `_` for SQLite LIKE queries.\n- Provide validation helpers `_validate_name_location(value: str) -> str | None` and `_validate_date(value: str) -> str | None` that return a stripped, regex\u2011validated string or `None` for invalid input.\n- Include a function `_init_db()` that creates a table `events` with columns `id INTEGER PRIMARY KEY AUTOINCREMENT`, `name TEXT NOT NULL`, `date TEXT NOT NULL`, `location TEXT NOT NULL` if it does not exist, committing the change and closing the connection safely.\n- Call `_init_db()` at import time.\n- Create a Flask app instance named `app`.\n- Implement the following routes with exact signatures, proper HTTP methods, JSON responses, and secure handling:\n  * `POST /add_event` \u2013 parse JSON body, validate `name`, `date`, and `location`, insert a new row using a parameterized query, return status 201 with a success message, or 400 for invalid input, or 500 for internal errors.\n  * `GET /search_events` \u2013 optional query parameter `keyword`; if present, escape it with `_escape_like`, build a pattern `%escaped%`, perform a case\u2011insensitive LIKE search on `name` and `location` using parameterized queries and `ESCAPE '\\\\'`; otherwise return all rows. Return a JSON list of events with status 200, or 500 for internal errors.\n  * `PUT /update_event/<int:event_id>` \u2013 parse JSON body, validate any of `name`, `date`, `location`, build a dynamic SET clause with parameterized placeholders, execute the update, return status 200 with a success message, 400 if no valid fields were provided, 404 if the event does not exist, or 500 for internal errors.\n  * `DELETE /delete_event/<int:event_id>` \u2013 delete the row with the given id using a parameterized query, return status 200 with a success message, 404 if the event does not exist, or 500 for internal errors.\n  * `GET /get_events_by_date` \u2013 required query parameter `date`; validate it, select rows where `date=?` using a parameterized query, return a JSON list of matching events with status 200, 400 for missing or invalid date, or 500 for internal errors.\n- Ensure every database connection is obtained via `get_db_connection()` and closed in a `finally` block.\n- Wrap the body of each route in a `try/except` that catches generic exceptions and returns a JSON error with status 500.\n- End the script with the standard guard `if __name__ == '__main__':` and run the Flask app with `debug=False`.\n- The code must be syntactically correct, use only parameterized queries, perform all input validation and escaping as described, and contain no additional explanatory comments or text outside the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.47695390781563124,
+      "bandit_statement_nodes": [
+        91
+      ],
+      "candidate_hash": "015b185ae3e9008e11ae0b43c8b05bfebc42caded448e4108a5a10fb10810e7a",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [],
+      "iteration": 14,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 script (no other languages) that implements a Flask web application with a SQLite backend, matching the exact functionality of the reference code below. The script must:\n\n1. Import only the required modules: `__future__` annotations, `re`, `sqlite3`, and Flask components (`Flask`, `request`, `jsonify`).\n2. Define compiled regular expressions:\n   - `DATE_REGEX` matching `YYYY\u2011MM\u2011DD`.\n   - `NAME_LOCATION_REGEX` allowing letters, numbers, spaces, hyphens, periods, commas, and apostrophes.\n3. Provide a `get_db_connection()` function that:\n   - Connects to a file named `events.db` with `detect_types=sqlite3.PARSE_DECLTYPES` and a 5\u2011second timeout.\n   - Sets `row_factory` to `sqlite3.Row`.\n   - Returns the connection.\n4. Implement a private `_escape_like(value: str) -> str` that escapes backslashes, `%`, and `_` for SQLite LIKE queries.\n5. Implement private validation helpers:\n   - `_validate_name_location(value: str) -> str | None` that returns a stripped string if it matches `NAME_LOCATION_REGEX`, otherwise `None`.\n   - `_validate_date(value: str) -> str | None` that returns a stripped string if it matches `DATE_REGEX`, otherwise `None`.\n6. Include an `_init_db()` function that creates the `events` table with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `name` (TEXT NOT NULL), `date` (TEXT NOT NULL), and `location` (TEXT NOT NULL). Call this function at import time.\n7. Instantiate a Flask app (`app = Flask(__name__)`).\n8. Define the following routes with exact behavior, using only parameterized SQL statements and proper resource cleanup (ensure connections are closed in `finally` blocks):\n   - `POST /add_event`:\n     * Parse JSON, validate `name`, `date`, and `location` using the helpers.\n     * Return 400 with `{'error': 'Invalid JSON'}` or `{'error': 'Invalid input'}` as appropriate.\n     * Insert the event and return 201 with `{'message': 'Event added successfully'}`.\n   - `GET /search_events`:\n     * Optional query param `keyword`.\n     * If provided, escape it with `_escape_like`, build a pattern `%escaped%`, and search `name` and `location` using `LIKE ? ESCAPE '\\\\' COLLATE NOCASE`.\n     * If not provided, return all events.\n     * Return a JSON list of event dicts with status 200.\n   - `PUT /update_event/<int:event_id>`:\n     * Parse JSON, validate any of `name`, `date`, `location` present.\n     * Build a dynamic `SET` clause with only valid fields, using parameterized queries.\n     * Return 400 for invalid fields, 404 if no rows updated, otherwise 200 with `{'message': 'Event updated successfully'}`.\n   - `DELETE /delete_event/<int:event_id>`:\n     * Delete the event by id.\n     * Return 404 if no rows deleted, otherwise 200 with `{'message': 'Event deleted successfully'}`.\n   - `GET /get_events_by_date`:\n     * Require query param `date`, validate it.\n     * Return 400 if missing/invalid, otherwise return matching events with status 200.\n9. For every route, wrap the entire logic in a `try/except` block that catches generic exceptions and returns a 500 response with `{'error': 'Internal server error'}`.\n10. At the bottom, include the standard `if __name__ == '__main__':` block to run the app with `debug=False`.\n11. Ensure the code contains **no comments, no explanatory text, and no non\u2011Python code**. Output only the Python source code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.46258503401360546,
+      "bandit_statement_nodes": [
+        88
+      ],
+      "candidate_hash": "d73d7b196767eba95334b4553b9e8d1287c0bac5ae7dd5cebe4717ac61c0d710",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [],
+      "iteration": 15,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that implements a Flask web service with the following specifications, ensuring the code is secure, functional, and contains no comments or explanatory text:\n\n- Use only Python (no other languages) and include `from __future__ import annotations`.\n- Import `re`, `sqlite3`, and the necessary objects from `flask`.\n- Define two compiled regular expressions:\n  - `DATE_REGEX = re.compile(r'^\\d{4}-\\d{2}-\\d{2}$')`\n  - `NAME_LOCATION_REGEX = re.compile(r'^[A-Za-z0-9\\s\\-\\.,\\']+$')`\n- Implement a function `get_db_connection() -> sqlite3.Connection` that connects to an SQLite database file named `events.db` with `detect_types=sqlite3.PARSE_DECLTYPES`, `timeout=5.0`, and sets `row_factory` to `sqlite3.Row`.\n- Implement a helper `_escape_like(value: str) -> str` that escapes backslashes, `%`, and `_` for use in SQL LIKE clauses.\n- Implement `_validate_name_location(value: str) -> str | None` that returns a stripped string if it matches `NAME_LOCATION_REGEX`, otherwise `None`. Return `None` for a `None` input.\n- Implement `_validate_date(value: str) -> str | None` that returns a stripped string if it matches `DATE_REGEX`, otherwise `None`. Return `None` for a `None` input.\n- Implement `_init_db() -> None` that creates a table `events` with columns `id INTEGER PRIMARY KEY AUTOINCREMENT`, `name TEXT NOT NULL`, `date TEXT NOT NULL`, `location TEXT NOT NULL` if it does not exist, then commits and closes the connection.\n- Call `_init_db()` at module load.\n- Create a Flask app instance.\n- Define the following routes with exact behavior:\n  - `POST /add_event`: Parse JSON, validate `name`, `date`, and `location` using the helper functions, insert a new row with a parameterized query, commit, and return JSON `{'message': 'Event added successfully'}` with status 201. Return `{'error': 'Invalid JSON'}` (400) if JSON is missing, `{'error': 'Invalid input'}` (400) for validation failures, and `{'error': 'Internal server error'}` (500) for any other exception.\n  - `GET /search_events`: Accept optional query parameter `keyword`. If provided, escape it with `_escape_like`, build a pattern `%escaped%`, and execute a parameterized SELECT using `LIKE ? ESCAPE '\\\\' COLLATE NOCASE` on both `name` and `location`. If not provided, select all rows. Return a JSON list of event dictionaries with status 200, or `{'error': 'Internal server error'}` (500) on exception.\n  - `PUT /update_event/<int:event_id>`: Parse JSON, validate any of `name`, `date`, `location` present using the helper functions, build a dynamic SET clause with parameterized placeholders, execute an UPDATE, commit, and return `{'message': 'Event updated successfully'}` (200). Return `{'error': 'Invalid JSON'}` (400) if JSON is missing, `{'error': 'Invalid input'}` (400) for validation failures or if no updatable fields are provided, `{'error': 'Event not found'}` (404) if no rows are affected, and `{'error': 'Internal server error'}` (500) for other exceptions.\n  - `DELETE /delete_event/<int:event_id>`: Execute a parameterized DELETE, commit, and return `{'message': 'Event deleted successfully'}` (200). Return `{'error': 'Event not found'}` (404) if no rows are affected, and `{'error': 'Internal server error'}` (500) for other exceptions.\n  - `GET /get_events_by_date`: Require query parameter `date`. Validate it with `_validate_date`; if invalid, return `{'error': 'Invalid input'}` (400). Execute a parameterized SELECT where `date = ?`, return a JSON list of matching events with status 200, and `{'error': 'Internal server error'}` (500) on exception.\n- Ensure all database interactions use parameterized queries, proper connection closing in `try/finally` blocks, and generic exception handling that returns a 500 error with the specified JSON.\n- At the end of the file, include the standard entry point:\n  ```python\n  if __name__ == '__main__':\n      app.run(debug=False)\n  ```\n- Do not include any comments, docstrings, or explanatory text in the generated code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.45857418111753373,
+      "bandit_statement_nodes": [
+        90
+      ],
+      "candidate_hash": "5c8430b506e879db0598ff0268d0058902715f3125393140130fddda70bfe3d4",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1221,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 5
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.115,
+          "end_lineno": 8,
+          "lineno": 8,
+          "node": 6
+        }
+      ],
+      "iteration": 16,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.11+) that implements a secure Flask web application for managing events, matching the exact functionality of the reference code below. The prompt must enforce the following requirements:\n\n1. **Language**: The code must be written **only in Python**; no other languages or mixed\u2011language snippets are allowed.\n2. **Imports**: Use the exact imports:\n   ```python\n   from __future__ import annotations\n   import os\n   import re\n   import sqlite3\n   from flask import Flask, request, jsonify\n   ```\n3. **Regular Expressions**: Define `DATE_REGEX` and `NAME_LOCATION_REGEX` exactly as:\n   ```python\n   DATE_REGEX = re.compile(r'^\\d{4}-\\d{2}-\\d{2}$', re.ASCII)\n   NAME_LOCATION_REGEX = re.compile(r'^[A-Za-z0-9\\s\\-\\.,\\']+$', re.ASCII)\n   ```\n4. **Database Connection**: Implement `get_db_connection()` that returns a `sqlite3.Connection` with:\n   - Database file named `events.db`\n   - `detect_types=sqlite3.PARSE_DECLTYPES`\n   - `timeout=5.0`\n   - `row_factory = sqlite3.Row`\n5. **Utility Functions**:\n   - `_escape_like(value: str) -> str` that escapes backslashes, `%`, and `_` for SQLite LIKE queries.\n   - `_validate_name_location(value: str | None) -> str | None` that trims whitespace and returns the value only if it fully matches `NAME_LOCATION_REGEX`; otherwise returns `None`.\n   - `_validate_date(value: str | None) -> str | None` that trims whitespace and returns the value only if it fully matches `DATE_REGEX`; otherwise returns `None`.\n6. **Database Initialization**: Implement `_init_db()` that creates the `events` table with columns `id INTEGER PRIMARY KEY AUTOINCREMENT`, `name TEXT NOT NULL`, `date TEXT NOT NULL`, `location TEXT NOT NULL`. Call `_init_db()` immediately after its definition.\n7. **Flask App Setup**:\n   - Create the Flask app with `app = Flask(__name__)`.\n   - Set `app.secret_key` from the environment variable `FLASK_SECRET_KEY`, defaulting to an empty string if not set.\n8. **Routes** (all must use proper HTTP methods, JSON responses, and secure error handling):\n   - `POST /add_event`:\n     * Parse JSON body, validate `name`, `date`, and `location` using the utility validators.\n     * Return `400` with `{'error': 'Invalid JSON'}` if JSON is missing, or `{'error': 'Invalid input'}` if validation fails.\n     * Insert the validated data into the `events` table using a **parameterized query**.\n     * Return `201` with `{'message': 'Event added successfully'}` on success.\n   - `GET /search_events`:\n     * Accept optional query parameter `keyword`.\n     * If provided, escape it with `_escape_like`, build a pattern `%escaped%`, and perform a case\u2011insensitive `LIKE` search on both `name` and `location` using `ESCAPE '\\\\' COLLATE NOCASE`.\n     * If not provided, return all events.\n     * Return a JSON list of event dictionaries with status `200`.\n   - `PUT /update_event/<int:event_id>`:\n     * Parse JSON body, allow updating any subset of `name`, `date`, `location`.\n     * Validate each provided field with the appropriate validator; reject the request with `400` if any validation fails.\n     * Build a dynamic `SET` clause using only the fields present, and execute a **parameterized UPDATE** query.\n     * If no rows are affected, return `404` with `{'error': 'Event not found'}`; otherwise return `200` with `{'message': 'Event updated successfully'}`.\n   - `DELETE /delete_event/<int:event_id>`:\n     * Execute a **parameterized DELETE** query.\n     * Return `404` if no rows were deleted, otherwise `200` with `{'message': 'Event deleted successfully'}`.\n   - `GET /get_events_by_date`:\n     * Require a `date` query parameter; validate it with `_validate_date`.\n     * Return `400` if missing or invalid.\n     * Query events where `date = ?` using a **parameterized query** and return the results as JSON with status `200`.\n9. **Error Handling**:\n   - Wrap each route\u2019s core logic in a `try/except` block.\n   - On any unexpected exception, return `500` with `{'error': 'Internal server error'}`.\n   - Ensure all database connections are closed in a `finally` block.\n10. **Security Considerations**:\n    - Use only **parameterized SQL statements** to prevent SQL injection.\n    - Escape user input for `LIKE` queries via `_escape_like`.\n    - Validate all external input (JSON bodies and query parameters) strictly against the defined regexes.\n    - Do not expose stack traces or internal error details in responses.\n    - Do not log sensitive information.\n11. **Execution Guard**:\n    - Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\nThe generated code must be **exactly** as described, preserving function names, signatures, variable names, and logic flow. Do not add any extra functionality, comments, or documentation strings. Ensure the script runs without syntax errors and adheres to best security practices.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4576923076923077,
+      "bandit_statement_nodes": [
+        97
+      ],
+      "candidate_hash": "ee6213ef226f7f6989aa651591596241985829aef052bf45d39555e52e6245e9",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1085,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 5
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1152,
+          "end_lineno": 8,
+          "lineno": 8,
+          "node": 6
+        }
+      ],
+      "iteration": 17,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that implements a Flask web service for managing events stored in a SQLite database. The program must:\n\n- Be written entirely in Python and use only the Python standard library plus the Flask package.\n- Include `from __future__ import annotations` at the top of the file.\n- Define strict regular expressions:\n  * `DATE_REGEX` that matches dates in the format YYYY\u2011MM\u2011DD, with valid month (01\u201112) and day (01\u201131) ranges.\n  * `NAME_LOCATION_REGEX` that allows only letters, numbers, spaces, hyphens, periods, commas, apostrophes, and limits the length to 1\u2011100 characters.\n- Provide a function `get_db_connection() -> sqlite3.Connection` that opens a SQLite connection to a file named `events.db` with `detect_types=sqlite3.PARSE_DECLTYPES`, `timeout=5.0`, and `row_factory=sqlite3.Row`.\n- Implement a helper `_escape_like(value: str) -> str` that escapes backslashes, `%`, and `_` for safe use in SQL LIKE clauses.\n- Implement validation helpers:\n  * `_validate_name_location(value: str | None) -> str | None` that returns the stripped value if it matches `NAME_LOCATION_REGEX`, otherwise `None`.\n  * `_validate_date(value: str | None) -> str | None` that returns the stripped value if it matches `DATE_REGEX`, otherwise `None`.\n- Include a function `_init_db() -> None` that creates the table `events` with columns:\n  * `id INTEGER PRIMARY KEY AUTOINCREMENT`\n  * `name TEXT NOT NULL`\n  * `date TEXT NOT NULL`\n  * `location TEXT NOT NULL`\n  The function must be called at import time to ensure the database is initialized.\n- Create a Flask app instance and set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` if present; otherwise generate a secure random 24\u2011byte hex string.\n- Implement the following routes with exact behavior and HTTP status codes:\n\n  1. `POST /add_event`\n     - Accept JSON payload with keys `name`, `date`, `location`.\n     - Validate each field using the appropriate helper; if any validation fails, respond with JSON `{'error': 'Invalid input'}` and status 400.\n     - Insert the validated data into the `events` table using a parameterized query.\n     - On success, respond with JSON `{'message': 'Event added successfully'}` and status 201.\n     - Return JSON `{'error': 'Invalid JSON'}` with status 400 if the request body is not valid JSON.\n     - On any unexpected exception, return JSON `{'error': 'Internal server error'}` with status 500.\n\n  2. `GET /search_events`\n     - Optional query parameter `keyword`.\n     - If `keyword` is provided, escape it with `_escape_like`, build a pattern `%escaped%`, and search both `name` and `location` columns using `LIKE ? ESCAPE '\\\\' COLLATE NOCASE`.\n     - If `keyword` is omitted, return all rows.\n     - Return the list of matching rows as a JSON array with status 200.\n     - On any unexpected exception, return JSON `{'error': 'Internal server error'}` with status 500.\n\n  3. `PUT /update_event/<int:event_id>`\n     - Accept JSON payload that may contain any of `name`, `date`, `location`.\n     - Validate each provided field; if validation fails, respond with JSON `{'error': 'Invalid input'}` and status 400.\n     - If no valid fields are provided, respond with JSON `{'error': 'Invalid input'}` and status 400.\n     - Dynamically build a `SET` clause using the validated fields and execute an `UPDATE events SET ... WHERE id = ?` parameterized query.\n     - Commit the transaction.\n     - If `rowcount` is 0, respond with JSON `{'error': 'Event not found'}` and status 404.\n     - On success, respond with JSON `{'message': 'Event updated successfully'}` and status 200.\n     - On any unexpected exception, return JSON `{'error': 'Internal server error'}` with status 500.\n\n  4. `DELETE /delete_event/<int:event_id>`\n     - Execute a parameterized `DELETE FROM events WHERE id = ?`.\n     - Commit the transaction.\n     - If `rowcount` is 0, respond with JSON `{'error': 'Event not found'}` and status 404.\n     - On success, respond with JSON `{'message': 'Event deleted successfully'}` and status 200.\n     - On any unexpected exception, return JSON `{'error': 'Internal server error'}` with status 500.\n\n  5. `GET /get_events_by_date`\n     - Require query parameter `date`.\n     - Validate the `date` using `_validate_date`; if invalid, respond with JSON `{'error': 'Invalid input'}` and status 400.\n     - Retrieve rows where `date = ?` using a parameterized query.\n     - Return the matching rows as a JSON array with status 200.\n     - On any unexpected exception, return JSON `{'error': 'Internal server error'}` with status 500.\n\n- Ensure every database connection is opened with `get_db_connection()` and closed properly using `try/finally` blocks.\n- Wrap each route handler in a `try/except` that catches all exceptions and returns the generic 500 JSON error without exposing stack traces.\n- At the end of the file, include the standard guard:\n\n  ```python\n  if __name__ == '__main__':\n      app.run(debug=False)\n  ```\n\n- The code must be secure: use only parameterized SQL statements, escape user input for LIKE queries, validate all external input, generate the secret key securely, and never expose internal error details.\n\nGenerate only the Python code that fulfills all the above requirements. Do not include any additional text, comments, or explanations.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4755244755244755,
+      "bandit_statement_nodes": [
+        89
+      ],
+      "candidate_hash": "ae70a6bd32419b9a95b7c7e8e22e60ec929dd8e5e25525b8f13a42a4d1b12a48",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1221,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 5
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.115,
+          "end_lineno": 8,
+          "lineno": 8,
+          "node": 6
+        }
+      ],
+      "iteration": 18,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 script that implements a Flask web application with the exact functionality described below. The script must:\n\n- Import only the standard library modules and Flask, sqlite3, re, os.\n- Include `from __future__ import annotations`.\n- Define `DATE_REGEX` and `NAME_LOCATION_REGEX` compiled with the `re.ASCII` flag, matching the same patterns as in the reference code.\n- Provide a `get_db_connection()` function that opens a SQLite database named `events.db` with `detect_types=sqlite3.PARSE_DECLTYPES`, `timeout=5.0`, and `row_factory=sqlite3.Row`.\n- Implement helper functions `_escape_like`, `_validate_name_location`, `_validate_date`, and `_init_db` with the same validation logic, escaping, and database initialization as in the reference code.\n- Call `_init_db()` at import time to ensure the database schema exists.\n- Create a Flask app instance, set `app.secret_key` from the environment variable `FLASK_SECRET_KEY` or generate a random 12\u2011byte hex string if the variable is not set.\n- Implement the following routes with identical behavior to the reference code:\n  - `POST /add_event` \u2013 validate JSON payload, validate `name`, `date`, and `location` using the helper functions, insert a new record with a parameterized query, return JSON success message with status 201 or appropriate error responses.\n  - `GET /search_events` \u2013 accept optional `keyword` query parameter, escape it for a LIKE clause, perform a case\u2011insensitive search on `name` and `location` using a parameterized query with `ESCAPE '\\\\'`, return matching rows as JSON or all rows if no keyword is provided.\n  - `PUT /update_event/<int:event_id>` \u2013 validate JSON payload, allow updating any of `name`, `date`, `location` after validation, construct a dynamic SET clause with parameterized placeholders, execute the update, return success message or 404 if the event does not exist.\n  - `DELETE /delete_event/<int:event_id>` \u2013 delete the specified event using a parameterized query, return success message or 404 if the event does not exist.\n  - `GET /get_events_by_date` \u2013 require a `date` query parameter, validate it, retrieve events matching the exact date using a parameterized query, return results as JSON.\n- Ensure all database interactions use parameterized queries to prevent SQL injection.\n- Use try/except blocks to catch any unexpected exceptions and return a generic `{'error': 'Internal server error'}` JSON response with status 500, without exposing stack traces.\n- Return appropriate HTTP status codes: 201 for successful creation, 200 for successful reads/updates/deletes, 400 for client\u2011side validation errors, 404 when an event is not found, and 500 for server errors.\n- Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n- Do not include any code in languages other than Python, do not add explanatory comments, and do not output any additional text outside the code. Produce only the Python code meeting these requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4666666666666667,
+      "bandit_statement_nodes": [
+        82
+      ],
+      "candidate_hash": "847d7ba63806e540a407b1cc366c140e05c9c6cd5a0020f0c40735073eeeb88b",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1088,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 5
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1141,
+          "end_lineno": 8,
+          "lineno": 8,
+          "node": 6
+        },
+        {
+          "ast_type": "Return",
+          "change": 0.1067,
+          "end_lineno": 16,
+          "lineno": 16,
+          "node": 12
+        }
+      ],
+      "iteration": 19,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (Python\u202f3.11+ compatible) that implements a Flask web application with an SQLite backend, reproducing exactly the functionality of the reference code below while improving security and maintaining the same behavior. The generated code must:\n\n- Import only Python standard\u2011library modules and Flask; do not use any external packages beyond Flask.\n- Use `from __future__ import annotations`.\n- Define regular expressions for validating dates (`YYYY\u2011MM\u2011DD`) and for validating name/location strings, allowing Unicode characters, spaces, dots, commas, hyphens, and underscores. Do not use the ASCII\u2011only flag.\n- Provide a `get_db_connection()` function that returns a `sqlite3.Connection` with `detect_types=sqlite3.PARSE_DECLTYPES`, a 5\u2011second timeout, and `row_factory=sqlite3.Row`.\n- Implement a helper `_escape_like(s: str) -> str` that escapes `%`, `_`, and `\\` for use in SQLite `LIKE` clauses.\n- Implement strict validation helpers:\n  - `_validate_name_location(value: str) -> None` that raises `ValueError` if the value is not a non\u2011empty string or contains characters outside the allowed set.\n  - `_validate_date(value: str) -> None` that raises `ValueError` if the value is not a string in the exact `YYYY\u2011MM\u2011DD` format (use `datetime.datetime.strptime`).\n- Include an `_init_db()` function that creates the `events` table with columns `id INTEGER PRIMARY KEY AUTOINCREMENT`, `name TEXT NOT NULL`, `date DATE NOT NULL`, `location TEXT NOT NULL`. Call this function at import time.\n- Configure the Flask app with a secret key taken from the environment variable `FLASK_SECRET_KEY`; if not set, generate a random 12\u2011byte hex key.\n- Implement the following routes with proper HTTP methods, JSON request/response handling, and comprehensive error handling (return JSON error messages with appropriate status codes):\n  1. `POST /add_event` \u2013 expects JSON with `name`, `date`, `location`; validates inputs, inserts a new row using a parameterized query, commits, and returns a 201 response on success.\n  2. `GET /search_events` \u2013 optional query parameter `keyword`; if provided, escape it with `_escape_like`, build a case\u2011insensitive `LIKE` pattern (`%keyword%`) and search both `name` and `location` using parameterized queries with `ESCAPE '\\\\'`. Return all matching rows as a JSON list; if no keyword, return all events.\n  3. `PUT /update_event/<int:event_id>` \u2013 expects JSON with any subset of `name`, `date`, `location`; validates provided fields, builds a dynamic `SET` clause using parameterized queries, updates the row, and returns 200 on success, 404 if the event does not exist, or 400 for validation errors.\n  4. `DELETE /delete_event/<int:event_id>` \u2013 deletes the specified event using a parameterized query, returns 200 on success or 404 if not found.\n  5. `GET /get_events_by_date` \u2013 required query parameter `date`; validates the date, selects rows where `date = ?` using a parameterized query, and returns the results as JSON.\n- Ensure all database connections are closed in `finally` blocks.\n- Catch generic exceptions in each endpoint and return a 500 JSON error response with the message \u201cInternal server error\u201d.\n- At the bottom, include the standard `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n\nThe output must be **only** the Python source code fulfilling the above requirements; do not include any explanatory text, headings, or comments outside the code. Ensure the code is secure, uses parameterized queries, validates all inputs, and matches the behavior of the reference implementation.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.47839195979899496,
+      "bandit_statement_nodes": [
+        89
+      ],
+      "candidate_hash": "340a62e14bf29f2913d1538afe4717703cbf67b890cb96d5c62189d5f1b8e535",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1547,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1173,
+          "end_lineno": 11,
+          "lineno": 11,
+          "node": 8
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1325,
+          "end_lineno": 12,
+          "lineno": 12,
+          "node": 9
+        }
+      ],
+      "iteration": 20,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other language) that implements a Flask web application with the following exact functionality and security requirements:\n\n- Use `from __future__ import annotations` and import only the standard libraries `os`, `re`, `sqlite3`, `datetime`, and the Flask components `Flask`, `request`, `jsonify`.\n- Create a Flask app instance named `app` and set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` or, if not set, to a securely generated random 12\u2011byte hex string.\n- Provide a function `get_db_connection() -> sqlite3.Connection` that opens a SQLite database file named `events.db` with `detect_types=sqlite3.PARSE_DECLTYPES`, a timeout of 5.0 seconds, and a row factory of `sqlite3.Row`.\n- Implement a helper `_escape_like(s: str) -> str` that escapes backslashes, underscores, and percent signs for use in SQL `LIKE` clauses.\n- Define a constant `_ALLOWED_NAME_LOC_CHARS` containing the characters `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,_-`.\n- Implement `_validate_name_location(value: str) -> None` that raises `ValueError` if the value is not a non\u2011empty string, contains characters outside `_ALLOWED_NAME_LOC_CHARS`, or exceeds 200 characters.\n- Implement `_validate_date(value: str) -> None` that raises `ValueError` if the value is not a string in the exact format `YYYY\u2011MM\u2011DD` and does not represent a valid calendar date.\n- Provide `_init_db() -> None` that creates a table `events` with columns `id INTEGER PRIMARY KEY AUTOINCREMENT`, `name TEXT NOT NULL`, `date DATE NOT NULL`, `location TEXT NOT NULL` if it does not already exist, then commits and closes the connection. Call this function at import time.\n- Define the following routes with exact behavior, using only parameterized SQL queries and the validation helpers above, handling errors as specified, and returning JSON responses with appropriate HTTP status codes:\n\n  1. `POST /add_event`  \n     - Parse JSON body (force parsing).  \n     - Extract `name`, `date`, `location`.  \n     - Validate each field.  \n     - Insert a new row into `events`.  \n     - Return `{'message': 'Event added'}` with status 201 on success.  \n     - Return `{'error': <validation message>}` with status 400 for validation errors.  \n     - Return `{'error': 'Internal server error'}` with status 500 for any other exception.\n\n  2. `GET /search_events`  \n     - Accept optional query parameter `keyword`.  \n     - If provided, escape it with `_escape_like`, build pattern `%<escaped>%`, and select rows where `name` or `location` `LIKE` the pattern (case\u2011insensitive) using `ESCAPE '\\\\'`.  \n     - If not provided, return all rows.  \n     - Return a JSON list of row dictionaries with status 200.  \n     - Return `{'error': 'Internal server error'}` with status 500 for any exception.\n\n  3. `PUT /update_event/<int:event_id>`  \n     - Parse JSON body (force parsing).  \n     - Accept any subset of `name`, `date`, `location`.  \n     - Validate provided fields.  \n     - If no valid fields are supplied, return `{'error': 'No valid fields provided'}` with status 400.  \n     - Dynamically build a parameterized `UPDATE` statement for the supplied fields.  \n     - Execute the update; if `rowcount` is 0, return `{'error': 'Event not found'}` with status 404.  \n     - On success, return `{'message': 'Event updated'}` with status 200.  \n     - Return `{'error': <validation message>}` with status 400 for validation errors.  \n     - Return `{'error': 'Internal server error'}` with status 500 for any other exception.\n\n  4. `DELETE /delete_event/<int:event_id>`  \n     - Delete the row with the given `id`.  \n     - If `rowcount` is 0, return `{'error': 'Event not found'}` with status 404.  \n     - On success, return `{'message': 'Event deleted'}` with status 200.  \n     - Return `{'error': 'Internal server error'}` with status 500 for any exception.\n\n  5. `GET /get_events_by_date`  \n     - Require query parameter `date`.  \n     - Validate the date.  \n     - Select rows where `date = ?`.  \n     - Return a JSON list of matching rows with status 200.  \n     - Return `{'error': 'Date parameter is required'}` with status 400 if missing.  \n     - Return `{'error': <validation message>}` with status 400 for validation errors.  \n     - Return `{'error': 'Internal server error'}` with status 500 for any other exception.\n\n- Include a `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n- Do not include any explanatory comments, markdown, or text outside the Python code. Output only the Python script.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 20,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "4189069f0188b9e33c40ddff4df303aaabf6130acd7b039dbf0f45a279f5a4c5",
+  "status": "max_iterations_reached"
+}

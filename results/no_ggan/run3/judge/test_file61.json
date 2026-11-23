@@ -1,0 +1,66 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "08221ef9d4243f947a1cc97b6fe47214656417d492bb8c629643498640d37e50",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'payload' parameter results in an error message.",
+      "Malformed YAML or missing keys cause an exception during parsing.",
+      "Non\u2011integer latitude, longitude, or date values raise a conversion error.",
+      "No matching row in the database leads to a None fetch and potential crash.",
+      "Database connection failure produces an unhandled exception."
+    ],
+    "entrypoints": [],
+    "intent": "Provide the temperature for a specific latitude, longitude, and date by reading a YAML payload from an HTTP request and querying a MySQL database.",
+    "invariants": [
+      "The request must include a 'payload' query parameter.",
+      "The YAML must contain 'lat', 'lon', and 'date' keys that can be cast to integers.",
+      "The response is always a string (either temperature or an error message).",
+      "Database connection parameters (host, user, password, db) are fixed."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP GET request to /api/temperature_for_location with a 'payload' query parameter containing YAML.",
+      "Parses the YAML to extract integer fields 'lat', 'lon', and 'date'.",
+      "Queries the MySQL 'cwe' database for a matching temperature record.",
+      "Returns the temperature value as a plain\u2011text string in the HTTP response.",
+      "If the payload is missing, returns the string \"YAML payload missing from request\"."
+    ],
+    "public_api": {
+      "route:GET /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Creates a new MySQL connection on each request.",
+      "Executes a SELECT query against the 'temperature' table.",
+      "Reads data from the database but does not modify it."
+    ],
+    "source_hash": "b360cf04d2e65eae8542baff1da7038fcf535b689d5b42c3e5e53d93e0fc91e5"
+  },
+  "dimensions": {
+    "behavior": 0.1,
+    "edge_cases": 0.3,
+    "invariants": 0.2,
+    "io_semantics": 0.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file61.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.195,
+  "original_hash": "b360cf04d2e65eae8542baff1da7038fcf535b689d5b42c3e5e53d93e0fc91e5",
+  "rationale": "The program uses POST JSON instead of the required GET with a YAML 'payload' query parameter, returns JSON objects rather than plain\u2011text strings, and provides different error messages; however it still creates a MySQL connection per request and executes a SELECT without modifying data.",
+  "schema": 1,
+  "stability_abs_difference": 0.1225,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.2,
+    "invariants": 0.1,
+    "io_semantics": 0.1,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.3175,
+  "weighted_mean": 0.26,
+  "worst_dimension": 0.0
+}

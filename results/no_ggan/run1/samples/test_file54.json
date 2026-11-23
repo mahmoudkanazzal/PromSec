@@ -1,0 +1,55 @@
+{
+  "ast_similarity": 0.3051643192488263,
+  "candidate_hash": "5a2014fc58eca1920f74af6b4183a17f8bb399c55d3c6038d418255cdb581654",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    259,
+    327
+  ],
+  "error": "",
+  "file": "test_file54.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5371900826446281,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        14
+      ],
+      "candidate_hash": "3e749d292004e781a9bddfd40e6d18e08f044aa32ec681da2b557b46e6309b6a",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other language) that implements a Flask web application with a single POST route at \u201c/login\u201d. The script must:\n\n- Import only the following modules: `Flask`, `request`, `redirect` from `flask`; `os`; `MySQLdb`; and `check_password_hash` from `werkzeug.security`.\n- Define a Flask app instance named `app`.\n- Include a helper function `_get_db_connection()` that creates and returns a new MySQLdb connection using environment variables `DB_HOST` (default \u201clocalhost\u201d), `DB_USER` (default \u201capp_user\u201d), `DB_PASSWORD` (default empty string), and `DB_NAME` (default \u201capp_db\u201d). Use these variables to call `MySQLdb.connect`.\n- Define a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  1. Retrieves `username` and `password` from `request.form` using `.get` with default empty strings.\n  2. Performs basic validation: if either value is missing, immediately `return redirect('/error')`.\n  3. Attempts to open a database connection via `_get_db_connection()`, creates a cursor, and executes a parameterized query to select the stored password hash for the given username: `SELECT password FROM user_info WHERE username=%s`. Use a tuple `(username,)` for parameters.\n  4. Fetches one row with `cur.fetchone()`. If any MySQLdb error occurs, handle it by returning `redirect('/error')`.\n  5. Ensures the database connection is closed in a `finally` block, swallowing any exception from `db.close()`.\n  6. If the query returns no row, `return redirect('/error')`.\n  7. Extract the stored hash from the row, and verify the supplied password using `check_password_hash(stored_hash, password)`. If the check succeeds, `return redirect('/')`; otherwise, `return redirect('/error')`.\n- Do not include any additional routes, functions, or code.\n- Do not add any comments, docstrings, or explanatory text in the output.\n- Output only the raw Python code, without markdown fences or any surrounding explanation.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3051643192488263,
+      "bandit_statement_nodes": [
+        24,
+        26
+      ],
+      "candidate_hash": "5a2014fc58eca1920f74af6b4183a17f8bb399c55d3c6038d418255cdb581654",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that implements a Flask web application with a login page. The program must:\n\n- Import only the following modules: `os`, `secrets`, `MySQLdb`, `Flask` (including `request`, `redirect`, `session`, `abort`, `render_template_string`), `werkzeug.security.check_password_hash`, `flask_limiter.Limiter`, `flask_limiter.util.get_remote_address`.\n- Create a Flask app, set `app.secret_key` from the environment variable `FLASK_SECRET_KEY` or generate a secure token with `secrets.token_urlsafe(32)` if not set.\n- Configure session cookies to be HttpOnly and Secure.\n- Set up a Flask\u2011Limiter instance with no default limits, using `get_remote_address` as the key function.\n- Define a private function `_get_db_connection()` that reads `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` from environment variables (with defaults for host, user, and name) and raises `RuntimeError` if `DB_PASSWORD` is missing. It must return a `MySQLdb` connection with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a private function `_generate_csrf_token()` that creates a token with `secrets.token_urlsafe(32)`, stores it in `session` under `'csrf_token'`, and returns it.\n- Define a private function `_validate_csrf_token(token)` that securely compares the provided token with the one stored in session using `secrets.compare_digest` and returns a boolean.\n- Provide a GET route `'/login'` that calls `_generate_csrf_token()`, renders an HTML form (using `render_template_string`) containing a hidden `csrf_token` field, username and password inputs, and posts to `'/login'`.\n- Provide a POST route `'/login'` that is rate\u2011limited to 5 requests per minute per IP using `@limiter.limit(\"5 per minute\")`.\n- In the POST handler, verify the CSRF token using `_validate_csrf_token()`; abort with 400 if invalid.\n- Retrieve and strip `'username'` and get `'password'` from `request.form`; if either is missing, redirect to `'/error'`.\n- Use `_get_db_connection()` to connect to the database, execute a parameterised query to fetch the password hash for the given username from table `user_info`, handle any `MySQLdb.Error` by redirecting to `'/error'`, and ensure the connection is closed in a `finally` block.\n- If no row is returned, redirect to `'/error'`.\n- Compare the stored hash with the supplied password using `check_password_hash`; on success redirect to `'/'`, otherwise redirect to `'/error'`.\n- Include the usual `if __name__ == '__main__':` block that runs `app.run()`.\n- Ensure the code follows security best practices: use environment variables for secrets, use parameterised queries, use secure cookie flags, use CSRF token, use rate limiting, and avoid exposing stack traces.\n- The entire output must be valid Python code only, with no additional explanation, comments, or markup.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "b2e18a09915013ea97ddd9cc2f500be31621fcde49a46a732060f7b6516dc55f",
+  "status": "secured"
+}

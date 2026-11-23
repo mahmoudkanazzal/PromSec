@@ -1,0 +1,69 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "c5166276fadff212766a251658e2dd294d98d62863223871d442f28c6cc6391f",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty payload results in a YAML parsing error or KeyError",
+      "Malformed YAML or non\u2011numeric latitude/longitude may cause exceptions",
+      "No matching row in the database returns \"Temperature not found\"",
+      "Database connection failure propagates an error to the client",
+      "Location string containing shell metacharacters can cause command injection",
+      "The external script failing or exiting with an error still returns a success message"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API that returns temperature data for a given location and date, and triggers an external script to update weather data for a specified location.",
+    "invariants": [
+      "temperature_for_location expects a YAML payload containing keys latitude, longitude, and date",
+      "The temperature query uses the exact values supplied for date, latitude, and longitude",
+      "update_weather_data always runs the script weather_update_script.py with the provided location argument"
+    ],
+    "io_behavior": [
+      "GET /api/temperature_for_location?payload=<yaml> returns a temperature string or \"Temperature not found\"",
+      "GET /api/update_weather_data?location=<string> returns a confirmation string",
+      "Both endpoints read query parameters from the HTTP request and write a plain\u2011text response to the HTTP response body"
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:GET /api/temperature_for_location": "",
+      "route:GET /api/update_weather_data": ""
+    },
+    "side_effects": [
+      "Executes a MySQL query against the local weather_database",
+      "Opens and closes a database connection for each temperature request",
+      "Invokes an external script via the operating system with the supplied location argument"
+    ],
+    "source_hash": "00ef446e4ffe7380744100a7e572276e4748c3bf5fdc961d646efa176ce770fa"
+  },
+  "dimensions": {
+    "behavior": 0.55,
+    "edge_cases": 0.3,
+    "invariants": 1.0,
+    "io_semantics": 0.55,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file16.py",
+  "gated_score": 0.56062,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.56062,
+  "original_hash": "00ef446e4ffe7380744100a7e572276e4748c3bf5fdc961d646efa176ce770fa",
+  "rationale": "Core endpoints and side\u2011effects are present, but error handling, injection protection, and script\u2011failure handling diverge from the specified contract, reducing behavior and edge\u2011case preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.29751,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.8,
+    "invariants": 1.0,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.85813,
+  "weighted_mean": 0.6475,
+  "worst_dimension": 0.3
+}

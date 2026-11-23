@@ -1,0 +1,67 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "998112e998aeb4e512c1fe380c4e230e21b629bf178e09c565c59902d663cbe0",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and result in a 500 response.",
+      "Extremely long input values may exceed database column limits and cause insertion failures.",
+      "The raw binary salt is interpolated into an SQL string, which can lead to malformed queries or data truncation.",
+      "The username is inserted via string formatting, making the endpoint vulnerable to SQL injection.",
+      "If the database connection fails, the request will result in a 500 error."
+    ],
+    "entrypoints": [],
+    "intent": "Create a new user account when a client POSTs a username and password to the /register endpoint.",
+    "invariants": [
+      "Usernames are stored uniquely; duplicate usernames trigger a redirect instead of insertion.",
+      "Passwords are never stored in plain text; they are stored as SHA\u2011256(salt + password).",
+      "A non\u2011null salt value is always stored alongside each password hash.",
+      "The 'account_created' column is always set to the integer 1 for new users."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /register with form fields 'username' and 'password'.",
+      "If the username already exists, responds with an HTTP 307 redirect to /login.",
+      "If the username is new, returns a default 200 OK response with an empty body.",
+      "May raise a 500 error if required form fields are missing or an internal exception occurs."
+    ],
+    "public_api": {
+      "func:register": "()",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Generates a 16\u2011byte random salt for each registration attempt.",
+      "Queries the MySQL 'users' table to check for an existing username.",
+      "Inserts a new row into the 'users' table containing the username, hashed password, salt, and a fixed account_created flag.",
+      "Commits the transaction and closes the database connection."
+    ],
+    "source_hash": "91acf2a5aef5bcd370c6a3200ba7ebb3820f83aa24caea6ae6604f49f50bfecf"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.4,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file1.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.32375,
+  "original_hash": "91acf2a5aef5bcd370c6a3200ba7ebb3820f83aa24caea6ae6604f49f50bfecf",
+  "rationale": "Core registration flow exists, but key contract details differ: missing fields return 400 not 500, successful registration redirects with 303 instead of 200, password hashing and account_created flag deviate, and SQL\u2011injection/ salt\u2011interpolation edge cases are mitigated rather than reproduced.",
+  "schema": 1,
+  "stability_abs_difference": 0.06187,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.4,
+    "invariants": 0.3,
+    "io_semantics": 0.2,
+    "side_effects": 0.85
+  },
+  "stability_score": 0.38562,
+  "weighted_mean": 0.365,
+  "worst_dimension": 0.2
+}

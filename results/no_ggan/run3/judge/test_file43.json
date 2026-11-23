@@ -1,0 +1,77 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "3caca3e2ad17d77735e4489e7b3a653d2288760799c2dcd64b6c3bf573db7230",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and result in a generic failure message.",
+      "Empty strings for username or password are accepted and may be stored.",
+      "Database connection failures produce \"Registration failed\" or \"Login failed\".",
+      "SQL injection payloads can alter query logic, potentially bypassing checks or corrupting data.",
+      "Very long input values may exceed MySQL field limits and cause errors.",
+      "Concurrent registrations with the same username may race, leading to duplicate entries if the DB does not enforce uniqueness."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide web endpoints for user registration and login, storing credentials in a MySQL database and redirecting on success.",
+    "invariants": [
+      "A username must be unique; duplicate usernames are not inserted.",
+      "Successful registration always results in a redirect response.",
+      "Successful login always results in a redirect response.",
+      "Database connections are closed before the response is sent.",
+      "The application never returns a stack trace; only generic failure messages.",
+      "All requests are handled via HTTP POST only."
+    ],
+    "io_behavior": [
+      "POST /register with form fields 'username' and 'password' returns a redirect to /home on success.",
+      "POST /register returns the plain text \"Username already exists\" if the username is found.",
+      "POST /register returns the plain text \"Registration failed\" on any exception.",
+      "POST /login with form fields 'username' and 'password' returns a redirect to /dashboard on valid credentials.",
+      "POST /login returns the plain text \"Invalid credentials\" when credentials do not match.",
+      "POST /login returns the plain text \"Login failed\" on any exception."
+    ],
+    "public_api": {
+      "route:POST /login": "",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Creates a new row in the 'user' table for a successful registration.",
+      "Performs SELECT queries on the 'user' table for both registration and login.",
+      "Commits the transaction after inserting a new user.",
+      "Closes the database cursor and connection after each request.",
+      "Issues HTTP redirects that cause the client to navigate to /home or /dashboard.",
+      "May trigger MySQL errors that are hidden by generic exception handling."
+    ],
+    "source_hash": "961a470c675273769ee3c7a270f64fbb8430961a14be43b8a5919a306f1f5f86"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.3,
+    "invariants": 0.5,
+    "io_semantics": 0.6,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file43.py",
+  "gated_score": 0.46125,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.46125,
+  "original_hash": "961a470c675273769ee3c7a270f64fbb8430961a14be43b8a5919a306f1f5f86",
+  "rationale": "The program implements the main registration/login flow and redirects correctly, but it diverges on several contract edge cases (missing/empty fields, SQL injection resistance, and specific error handling). Uniqueness is only checked, not enforced, risking duplicate usernames. IO responses mostly match, though status codes differ. Side\u2011effects and resource cleanup align with the specification.",
+  "schema": 1,
+  "stability_abs_difference": 0.33875,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.5,
+    "invariants": 0.8333333333,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.8,
+  "weighted_mean": 0.515,
+  "worst_dimension": 0.3
+}

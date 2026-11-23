@@ -1,0 +1,40 @@
+{
+  "ast_similarity": 0.7503429355281207,
+  "candidate_hash": "482ac4635d7469f4680ec29e325c91bf4a55a5b40310307956282582ed20a605",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file91.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7503429355281207,
+      "bandit_statement_nodes": [
+        8,
+        13,
+        23,
+        35,
+        44,
+        53
+      ],
+      "candidate_hash": "482ac4635d7469f4680ec29e325c91bf4a55a5b40310307956282582ed20a605",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with the following exact functionality and security requirements:\n\n- Use only the standard library and the packages `flask`, `MySQLdb`, and `werkzeug.security`.\n- Import `os`, `Flask`, `request`, `redirect`, `url_for`, `jsonify` from Flask, `MySQLdb`, and `generate_password_hash`, `check_password_hash` from `werkzeug.security`.\n- Create a Flask app instance named `app`.\n- Define a function `get_db_connection()` that returns a new MySQLdb connection using environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` with defaults `'localhost'`, `'testuser'`, `'test123'`, `'LIBRARYDB'`. Set charset to `'utf8mb4'` and `use_unicode=True`.\n- Implement the following routes with exact signatures, HTTP methods, input handling, validation, and responses:\n\n  1. `@app.route('/add_book', methods=['POST'])` \u2192 `add_book()`:\n     - Retrieve `title` and `author` from `request.form`, strip whitespace.\n     - Return HTTP 400 with message `\"Title and author are required\"` if either is missing.\n     - Use a parameterized SELECT query to check if a book with the same title already exists.\n     - If it exists, redirect to the route named `add_book_form`.\n     - Otherwise, insert the new book with a parameterized INSERT query, commit, close resources, and redirect to the route named `view_books`.\n\n  2. `@app.route('/login_member', methods=['POST'])` \u2192 `login_member()`:\n     - Retrieve `username` and `password` from `request.form`, strip whitespace from username.\n     - Return HTTP 400 with message `\"Username and password are required\"` if either is missing.\n     - Use a parameterized SELECT query to fetch the stored password hash for the given username.\n     - Verify the password with `check_password_hash`. If valid, return `\"Login successful\"`; otherwise return HTTP 401 with `\"Invalid credentials\"`.\n\n  3. `@app.route('/update_book_author', methods=['POST'])` \u2192 `update_book_author()`:\n     - Retrieve `title` and `new_author` from `request.form`, strip whitespace.\n     - Return HTTP 400 with message `\"Title and new author are required\"` if either is missing.\n     - Execute a parameterized UPDATE query to set `Author = %s` where `Title = %s`, commit, close resources, and return `\"Author updated successfully\"`.\n\n  4. `@app.route('/delete_book', methods=['POST'])` \u2192 `delete_book()`:\n     - Retrieve `title` from `request.form`, strip whitespace.\n     - Return HTTP 400 with message `\"Title is required\"` if missing.\n     - Execute a parameterized DELETE query for the given title, commit, close resources, and return `\"Book deleted successfully\"`.\n\n  5. `@app.route('/search_books', methods=['GET'])` \u2192 `search_books()`:\n     - Retrieve `term` from `request.args`, strip whitespace.\n     - Construct a LIKE pattern `%{term}%`.\n     - Execute a parameterized SELECT query that searches `Title` OR `Author` using the LIKE pattern, fetch all rows, close resources, and return the result as JSON via `jsonify`.\n\n  6. `@app.route('/view_books', methods=['GET'])` \u2192 `view_books()`:\n     - Execute a SELECT * FROM Books, fetch all rows, close resources, and return the result as JSON via `jsonify`.\n\n  7. `@app.route('/add_book_form', methods=['GET'])` \u2192 `add_book_form()`:\n     - Return a placeholder string `\"Add Book Form Placeholder\"`.\n\n- Ensure all database cursors and connections are closed in `finally` blocks.\n- Use parameterized queries (`%s` placeholders) everywhere to prevent SQL injection.\n- Do not enable Flask debug mode; set `debug=False` in `app.run()`.\n- Include the standard `if __name__ == '__main__':` block to run the app.\n- The script must be syntactically correct, follow PEP\u202f8 style where reasonable, and contain no extraneous code or comments.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "cb06a60bd3c87cb816d5f35e1b33a8e48b64e66f77d2ece4ac8da06b6fb415c7",
+  "status": "secured"
+}

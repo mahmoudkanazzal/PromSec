@@ -1,0 +1,85 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "b87c1dbc0f896301b5a3f68cef4e089b8f0c35b018d2e89ede7fe449b5ddbff6",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields (e.g., username, password) cause a server error due to KeyError.",
+      "Providing a duplicate username on /register results in a redirect back to the registration page.",
+      "Incorrect login credentials return the string \"Invalid credentials\" without a redirect.",
+      "Omitting the department query parameter on /view_employees results in a query for department='None' and may return an empty list.",
+      "Updating an employee with absent JSON fields (position or department) may raise an exception or set those columns to NULL.",
+      "Deleting or updating a non\u2011existent employee ID still returns a success message despite no rows being affected."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for user registration/login and basic CRUD operations on employees, departments, and projects using a MySQL backend.",
+    "invariants": [
+      "Usernames are unique; duplicate registration triggers a redirect.",
+      "Passwords are never stored in plain text, only as SHA\u2011256 hashes.",
+      "Each employee, department, and project operation opens a fresh DB connection that is closed after the request.",
+      "Employee IDs are treated as integers in URL paths and SQL statements.",
+      "All successful write operations return a fixed success message.",
+      "Read\u2011only endpoints return JSON representations of the selected rows."
+    ],
+    "io_behavior": [
+      "POST /register \u2013 redirects to ./register if username exists, otherwise redirects to ./login.",
+      "POST /login \u2013 redirects to ./dashboard on successful authentication, otherwise returns plain text \"Invalid credentials\".",
+      "POST /add_employee \u2013 returns plain text \"Employee added successfully\".",
+      "GET /view_employees?department=\u2026 \u2013 returns a JSON array of employee rows filtered by department.",
+      "PUT /update_employee/<id> \u2013 returns plain text \"Employee updated successfully\".",
+      "DELETE /delete_employee/<id> \u2013 returns plain text \"Employee deleted successfully\"."
+    ],
+    "public_api": {
+      "route:DELETE /delete_employee/<int:employee_id>": "",
+      "route:GET /view_departments": "",
+      "route:GET /view_employees": "",
+      "route:GET /view_projects": "",
+      "route:POST /add_department": "",
+      "route:POST /add_employee": "",
+      "route:POST /assign_project": "",
+      "route:POST /login": "",
+      "route:POST /register": "",
+      "route:PUT /update_employee/<int:employee_id>": ""
+    },
+    "side_effects": [
+      "Inserts a new user record with a SHA\u2011256 hashed password.",
+      "Inserts, updates, or deletes employee rows in the employees table.",
+      "Inserts new department rows in the departments table.",
+      "Inserts new project rows in the projects table.",
+      "Commits each database transaction before closing the connection.",
+      "Issues HTTP redirects for registration and login flows."
+    ],
+    "source_hash": "6d224dfac0d370910bb1adaa21b30883e0ef8f0b9bf680deb4132b53a5a0eb08"
+  },
+  "dimensions": {
+    "behavior": 0.78,
+    "edge_cases": 0.33,
+    "invariants": 0.85,
+    "io_semantics": 0.92,
+    "side_effects": 0.93
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file67.py",
+  "gated_score": 0.66263,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.66263,
+  "original_hash": "6d224dfac0d370910bb1adaa21b30883e0ef8f0b9bf680deb4132b53a5a0eb08",
+  "rationale": "Matches main endpoints, redirects, and success messages, and uses fresh DB connections, but deviates on several edge\u2011case requirements (missing fields cause 400 abort instead of KeyError, default department handling, update with empty JSON) and does not store passwords as SHA\u2011256 hashes.",
+  "schema": 1,
+  "stability_abs_difference": 0.09237,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.5,
+    "invariants": 0.9,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.755,
+  "weighted_mean": 0.7735,
+  "worst_dimension": 0.33
+}

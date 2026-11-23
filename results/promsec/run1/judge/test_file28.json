@@ -1,0 +1,84 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "e59154e304a04c826e58d51341af2d0352f4f6cc52e81df29596377487c998bb",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payload to /api/add_book triggers a 400 error",
+      "Missing required fields (title, author, isbn, or isbn in other endpoints) results in a 400 error",
+      "Providing a non\u2011integer year_published to /api/add_book yields a 400 error",
+      "Incorrect admin credentials to /admin/login or /admin/adjust_settings return 401",
+      "Calling /admin/change_password with an empty new_password still changes the password (no validation)",
+      "Running /api/start_inventory with empty section or location still launches the script with empty arguments"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a REST\u2011like HTTP API for basic library operations (add, remove, query, update books), admin authentication and settings, and to trigger an external inventory script.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" key",
+      "Endpoints that require authentication compare supplied credentials against the current LIBRARIAN_PASSWORD and a fixed admin secret",
+      "Required parameters (e.g., isbn, title, author) must be non\u2011empty strings; otherwise a 400 error is returned",
+      "Year published for add_book must be an integer; otherwise a 400 error is returned",
+      "Password change only succeeds if the old password matches the current LIBRARIAN_PASSWORD"
+    ],
+    "io_behavior": [
+      "POST /api/add_book with YAML body \u2192 JSON response (200 on success, 400 on malformed YAML, missing fields, or non\u2011int year)",
+      "POST /api/remove_book with form field isbn \u2192 JSON response (200 on success, 400 if isbn missing)",
+      "GET /api/start_inventory?section=&location= \u2192 launches inventory_checker.py and returns JSON status",
+      "POST /admin/login with form fields password and secret_key \u2192 JSON response (200 if both match, 401 otherwise)",
+      "POST /admin/change_password with old_password and new_password \u2192 JSON response (200 if old matches, 401 otherwise)",
+      "Various GET/POST endpoints (/api/book_info, /api/update_book, /api/list_books, /api/check_book_availability, /api/request_book, /api/return_book, /admin/adjust_settings) returning JSON payloads and appropriate HTTP status codes"
+    ],
+    "public_api": {
+      "route:GET /api/book_info": "",
+      "route:GET /api/check_book_availability": "",
+      "route:GET /api/list_books": "",
+      "route:GET /api/start_inventory": "",
+      "route:POST /admin/adjust_settings": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/login": "",
+      "route:POST /api/add_book": "",
+      "route:POST /api/remove_book": "",
+      "route:POST /api/request_book": "",
+      "route:POST /api/return_book": "",
+      "route:POST /api/update_book": ""
+    },
+    "side_effects": [
+      "Executes an external Python script via os.system when /api/start_inventory is called",
+      "Updates the in\u2011memory LIBRARIAN_PASSWORD variable on successful password change",
+      "Logs HTTP requests/responses through Flask's built\u2011in request handling (visible in server logs)",
+      "Potentially spawns a subprocess that may affect the host environment"
+    ],
+    "source_hash": "57da26119eb9becbf1830dfb9351497ddbfeeaa09d2462e58b4bfbcd69099e12"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.83,
+    "invariants": 1.0,
+    "io_semantics": 0.85,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file28.py",
+  "gated_score": 0.85962,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.85962,
+  "original_hash": "57da26119eb9becbf1830dfb9351497ddbfeeaa09d2462e58b4bfbcd69099e12",
+  "rationale": "Program fulfills most contract specifications\u2014JSON responses, authentication checks, required\u2011field validation, and password change logic\u2014but diverges on /api/start_inventory by rejecting empty section/location (contract expects it to run) and invokes the inventory script via importlib rather than os.system, affecting side\u2011effect fidelity.",
+  "schema": 1,
+  "stability_abs_difference": 0.12487,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.83,
+    "invariants": 1.0,
+    "io_semantics": 0.83,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.73475,
+  "weighted_mean": 0.8795,
+  "worst_dimension": 0.8
+}

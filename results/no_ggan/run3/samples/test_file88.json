@@ -1,0 +1,40 @@
+{
+  "ast_similarity": 0.8948339483394834,
+  "candidate_hash": "79e1790c6eb3b9030c4580c90b1f15634ca207408be9ddacd8bccb8a672c2568",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file88.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8948339483394834,
+      "bandit_statement_nodes": [
+        8,
+        12,
+        26,
+        38,
+        47,
+        56
+      ],
+      "candidate_hash": "79e1790c6eb3b9030c4580c90b1f15634ca207408be9ddacd8bccb8a672c2568",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with the exact functionality described below. The code must be secure, use best practices, and preserve the original behavior.\n\n**Requirements**\n\n1. **Imports**\n   - `import os`\n   - `import MySQLdb`\n   - `from flask import Flask, request`\n\n2. **Flask app**\n   - Create the Flask instance with `app = Flask(__name__)`.\n\n3. **Database connection**\n   - Define a function `get_db_connection()` that:\n     - Reads the following environment variables with defaults:\n       - `DB_HOST` (default `'127.0.0.1'`)\n       - `DB_USER` (default `'root'`)\n       - `DB_PASSWORD` (default `'password'`)\n       - `DB_NAME` (default `'community_db'`)\n     - Returns a `MySQLdb.connect` object using those values and `charset='utf8mb4'`.\n   - Ensure the function does not expose credentials and uses only the environment variables.\n\n4. **Routes**\n   - **`/add_member`** (POST)\n     - Retrieve `name` and `email` from `request.form` (default empty strings).\n     - Open a DB connection via `get_db_connection()`.\n     - Use a cursor to:\n       - Check if a member with the given name exists (`SELECT 1 FROM members WHERE name = %s`).\n       - If not exists, insert the new member (`INSERT INTO members (name, email) VALUES (%s, %s)`).\n       - Commit on success, rollback on any `MySQLdb.Error`.\n       - Return one of the messages:\n         - `\"Member added successfully\"`\n         - `\"Failed to add member\"`\n         - `\"Member already exists\"`\n     - Ensure the cursor and connection are closed in a `finally` block.\n\n   - **`/login_member`** (POST)\n     - Retrieve `name` and `email` from `request.form`.\n     - Query `SELECT 1 FROM members WHERE name = %s AND email = %s`.\n     - Return `\"Login successful\"` if a row is found, otherwise `\"Invalid credentials\"`.\n     - Close cursor and connection properly.\n\n   - **`/update_member_profile`** (POST)\n     - Retrieve `name` and `new_email` from `request.form`.\n     - Execute `UPDATE members SET email = %s WHERE name = %s`.\n     - Commit the transaction.\n     - Return `\"Profile updated successfully\"`.\n     - Ensure resources are closed.\n\n   - **`/search_members`** (GET)\n     - Retrieve query parameter `term` from `request.args`.\n     - Build a LIKE pattern `%{term}%` safely.\n     - Execute `SELECT name FROM members WHERE name LIKE %s`.\n     - Fetch all matching rows and return them as a string representation.\n     - Close resources.\n\n   - **`/remove_member`** (POST)\n     - Retrieve `name` from `request.form`.\n     - Execute `DELETE FROM members WHERE name = %s`.\n     - Commit the transaction.\n     - Return `\"Member removed successfully\"`.\n     - Close resources.\n\n5. **Application entry point**\n   - Include the standard `if __name__ == '__main__':` block.\n   - Run the Flask app with `debug=False`.\n\n6. **Security and best practices**\n   - Use only parameterized queries (`%s` placeholders) to prevent SQL injection.\n   - Handle database errors with try/except, rolling back when needed.\n   - Ensure all cursors and connections are closed in `finally` blocks.\n   - Do not enable Flask debug mode.\n   - Do not expose any credentials or internal details in responses.\n\n**Output**\n- Provide only the Python code fulfilling all the above specifications. Do not include any explanatory text, comments, or markup. The code should be ready to run as a standalone script.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "2f00a8a0eeaa9a8317ae9d6ebfc23b6a24b31f8a7b3914bd4807a398fd0ad8ff",
+  "status": "secured"
+}

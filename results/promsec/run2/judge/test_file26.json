@@ -1,0 +1,66 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "6dc372f1ba57c59a42c39a412460296e3d11245e2f5422c4a2fd56b35f8dfa6f",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Malformed YAML in /add_new_book returns HTTP 400 with an error message.",
+      "Missing or empty required keys in the parsed YAML may cause an internal server error.",
+      "Omitting the password field in /admin_access results in \"Access denied\" (401).",
+      "Providing an empty or specially crafted \"section\" value to /execute_inventory may lead to unexpected command execution."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a simple web API with three endpoints: add a new book record, trigger an inventory script, and grant admin access based on a hard\u2011coded password.",
+    "invariants": [
+      "All responses are JSON objects with a \"status\" key.",
+      "The admin endpoint only succeeds when the supplied password exactly matches the hard\u2011coded string.",
+      "The add_new_book endpoint expects the YAML to contain the keys \"title\", \"author\", and \"isbn\"."
+    ],
+    "io_behavior": [
+      "POST /add_new_book with a YAML body \u2192 JSON response containing status, title, author, isbn (400 on malformed YAML).",
+      "GET /execute_inventory?section=VALUE \u2192 JSON response confirming start of inventory check.",
+      "POST /admin_access with form field password \u2192 JSON response granting or denying admin access (401 on denial)."
+    ],
+    "public_api": {
+      "route:GET /execute_inventory": "",
+      "route:POST /add_new_book": "",
+      "route:POST /admin_access": ""
+    },
+    "side_effects": [
+      "Executes the external command `python3 run_inventory.py <section>` via the operating system.",
+      "Potentially writes to server logs or stdout/stderr as part of Flask request handling."
+    ],
+    "source_hash": "19be0f99e4a6c9bdd8b028896bbe6cf6e30805b399f5ebcca3514b27b30e234d"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 1.0,
+    "invariants": 1.0,
+    "io_semantics": 0.95,
+    "side_effects": 0.2
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file26.py",
+  "gated_score": 0.67625,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.67625,
+  "original_hash": "19be0f99e4a6c9bdd8b028896bbe6cf6e30805b399f5ebcca3514b27b30e234d",
+  "rationale": "Endpoints and JSON responses match the contract, handling of malformed input and missing password is correct, but the inventory endpoint does not execute the required external command, deviating from the specified side effect.",
+  "schema": 1,
+  "stability_abs_difference": 0.07312,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.9,
+    "invariants": 0.85,
+    "io_semantics": 1.0,
+    "side_effects": 0.2
+  },
+  "stability_score": 0.60313,
+  "weighted_mean": 0.835,
+  "worst_dimension": 0.2
+}

@@ -1,0 +1,69 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "5bf7c95e9d1e06d1614ef4140c53f7d751ce7016764ed01c8565f0b8f8d12bda",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and result in a 500 error.",
+      "SQL injection is possible because the query concatenates raw input.",
+      "Empty strings for username/password are still sent to the database and may succeed if a matching record exists.",
+      "Database connection failures are caught and treated as authentication failure.",
+      "If multiple rows match, the first is accepted and the user is logged in.",
+      "Passwords are compared in plaintext, exposing credential storage weaknesses."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via POST /login and establish a session on success.",
+    "invariants": [
+      "Only the POST method is handled; other methods are ignored.",
+      "Both 'username' and 'password' form fields are accessed directly.",
+      "The response is either a redirect or the fixed error string.",
+      "No exception details are leaked to the client.",
+      "Session state is only modified on successful credential match."
+    ],
+    "io_behavior": [
+      "Accepts a POST request with form fields 'username' and 'password'.",
+      "Queries the MySQL 'cwe200' database for a matching user record.",
+      "On a match, sets session['username'] and returns an HTTP 302 redirect to '/session'.",
+      "On no match or database error, returns a 200 response with the text 'Incorrect username or password'.",
+      "Uses Flask's default response handling (status codes, headers)."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Executes a SELECT statement against the local MySQL server.",
+      "Creates or updates a session entry 'username' when authentication succeeds.",
+      "Opens a database connection that persists for the request duration.",
+      "May trigger MySQLdb.Error handling, but does not expose details to the client."
+    ],
+    "source_hash": "54b4a908d7f1247fd46a5202f5571fc186d5cba69bc007fe8d50b21b2702dea6"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.0,
+    "invariants": 0.6,
+    "io_semantics": 0.3,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file56.py",
+  "gated_score": 0.28125,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.28125,
+  "original_hash": "54b4a908d7f1247fd46a5202f5571fc186d5cba69bc007fe8d50b21b2702dea6",
+  "rationale": "Core authentication flow exists, but the implementation changes error handling, input validation, password comparison, and SQL construction, violating the contract's specified edge cases and response semantics.",
+  "schema": 1,
+  "stability_abs_difference": 0.36588,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.83,
+    "invariants": 0.4,
+    "io_semantics": 0.4,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.64713,
+  "weighted_mean": 0.375,
+  "worst_dimension": 0.0
+}

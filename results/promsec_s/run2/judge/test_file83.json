@@ -1,0 +1,67 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "fd3b657a29679fa594485e738a02f2c97e815c3b6816e4ce37b77eac02b518e0",
+  "compile_ok": true,
+  "confidence": 0.7,
+  "contract": {
+    "edge_cases": [
+      "Missing 'stock_name' or 'stock_quantity' in the form raises a KeyError.",
+      "Non\u2011numeric 'stock_quantity' causes a ValueError when converting to int.",
+      "Absent or invalid session['username'] results in a KeyError.",
+      "Database connection failures or query errors raise exceptions and abort the request.",
+      "If the user_portfolio table is empty or the username is new, the code inserts a new row."
+    ],
+    "entrypoints": [],
+    "intent": "Handle a POST request to record a buy order by creating or updating the caller's stock portfolio in the database.",
+    "invariants": [
+      "After a successful call, exactly one row for the username exists in user_portfolio.",
+      "The stored stock_quantity equals the previous quantity plus the submitted quantity (as an integer).",
+      "Database changes are persisted because of an explicit commit.",
+      "The response string accurately reflects whether the row was inserted or updated."
+    ],
+    "io_behavior": [
+      "Accepts a POST to /buy_order with form fields 'stock_name' and 'stock_quantity'.",
+      "Reads the current username from the Flask session.",
+      "Returns plain\u2011text \"updated\" if the user already has a portfolio entry.",
+      "Returns plain\u2011text \"initialized\" if a new portfolio entry is created.",
+      "Responds with HTTP 200 on success."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection to localhost using root credentials.",
+      "Queries the user_portfolio table for the given username.",
+      "Inserts a new row or updates the existing row with the new stock_quantity.",
+      "Commits the transaction and closes the database connection."
+    ],
+    "source_hash": "8f8582e327b09bad38bbe3adc8c22caea22ee2d220c765fc6fb258469061e46e"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.4,
+    "invariants": 0.2,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file83.py",
+  "gated_score": 0.61625,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.61625,
+  "original_hash": "8f8582e327b09bad38bbe3adc8c22caea22ee2d220c765fc6fb258469061e46e",
+  "rationale": "Core POST handling, DB updates, and responses are correct, but error handling deviates from required KeyError/ValueError semantics and the schema stores per\u2011stock rows, violating the single\u2011row\u2011per\u2011user invariant.",
+  "schema": 1,
+  "stability_abs_difference": 0.05875,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.3,
+    "invariants": 0.6,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.675,
+  "weighted_mean": 0.755,
+  "worst_dimension": 0.2
+}

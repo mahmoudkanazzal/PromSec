@@ -1,0 +1,72 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "8ac5ab1ca54baecdf961ffe9e57acdee4b7ada99a347392887bbd3e24c86ff77",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed YAML in /upload_readings results in a server error (500).",
+      "Absent or empty station_id, temperature, or humidity fields cause a KeyError and a 500 response.",
+      "Providing an incorrect token to /station_login yields a 401 response.",
+      "Omitting the \"type\" query parameter in /generate_report runs the external tool with an empty argument.",
+      "Extremely large request bodies may exhaust server resources or cause timeouts.",
+      "Special characters in the \"type\" parameter could be interpreted by the shell when the external command is executed."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a web API for weather stations to authenticate, upload sensor readings, and trigger generation of weather reports.",
+    "invariants": [
+      "The authentication token is fixed to \"weather_station_token_2023\".",
+      "Responses are always JSON objects with a \"status\" field.",
+      "Successful authentication returns HTTP 200; failure returns HTTP 401.",
+      "The /upload_readings endpoint expects a POST request with a YAML payload.",
+      "The /generate_report endpoint expects a GET request with an optional \"type\" query parameter."
+    ],
+    "io_behavior": [
+      "POST /upload_readings with a YAML body containing station_id, temperature, and humidity returns JSON {\"status\":\"Readings uploaded\",\"station\":<station_id>}.",
+      "GET /generate_report?type=<report_type> returns JSON {\"status\":\"Report generation started\"}.",
+      "POST /station_login with form field token returns JSON {\"status\":\"Station authenticated\"} on success or {\"status\":\"Authentication failed\"} with HTTP 401 on failure."
+    ],
+    "public_api": {
+      "route:GET /generate_report": "",
+      "route:POST /station_login": "",
+      "route:POST /upload_readings": ""
+    },
+    "side_effects": [
+      "Executes an external command \"./weather_report_tool <report_type>\" via the operating system.",
+      "Consumes network traffic (HTTP requests and responses).",
+      "Flask may log request details to stdout/stderr.",
+      "Parses YAML input, which may raise parsing errors visible to the client."
+    ],
+    "source_hash": "84b5fd0ba12110f538cec75a93c53872e6e27f6ee431bb39b626d0fbb5af98d0"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.3,
+    "io_semantics": 0.2,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file21.py",
+  "gated_score": 0.1275,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.1275,
+  "original_hash": "84b5fd0ba12110f538cec75a93c53872e6e27f6ee431bb39b626d0fbb5af98d0",
+  "rationale": "The program deviates from the contract: it swallows YAML errors instead of 500, returns wrong JSON fields, validates report type and returns errors instead of invoking the external tool, and never executes the required command. Some invariants (fixed token) remain, but overall I/O, side\u2011effects, and edge\u2011case handling are not preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.19063,
+  "stability_dimensions": {
+    "behavior": 0.45,
+    "edge_cases": 0.2,
+    "invariants": 0.2,
+    "io_semantics": 0.4,
+    "side_effects": 0.4
+  },
+  "stability_score": 0.31813,
+  "weighted_mean": 0.17,
+  "worst_dimension": 0.0
+}

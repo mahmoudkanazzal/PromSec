@@ -1,0 +1,42 @@
+{
+  "ast_similarity": 0.5866336633663366,
+  "candidate_hash": "313aafb66f651e8b753a3f3c6259a87021b96d02a31f58175963cda98e7f5346",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file44.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5866336633663366,
+      "bandit_statement_nodes": [
+        9,
+        15,
+        28,
+        45,
+        48,
+        62,
+        75,
+        90
+      ],
+      "candidate_hash": "313aafb66f651e8b753a3f3c6259a87021b96d02a31f58175963cda98e7f5346",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a secure Flask web application with the exact functionality described below. The script must be pure Python (no other languages) and should run as `python script_name.py`. Follow these detailed requirements:\n\n- **Imports**: Use `os`, `MySQLdb`, `flask` (Flask, request, redirect, jsonify, abort), and `werkzeug.security` (generate_password_hash, check_password_hash). No additional third\u2011party libraries.\n- **Database connection**: Define a function `get_db_connection()` that creates a new MySQLdb connection using environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`. Default to `'localhost'`, `'app_user'`, empty password, and `'task_manager'` if variables are missing. Set charset to `'utf8mb4'` and `use_unicode=True`.\n- **Flask app**: Instantiate `app = Flask(__name__)`.\n\n- **/register (POST)**  \n  - Retrieve `username` and `password` from `request.form`.  \n  - Return JSON error 400 if missing.  \n  - Hash the password with `generate_password_hash`.  \n  - Use a parameterized SELECT to check if the username already exists; if so, return JSON error 409.  \n  - Insert the new user with a parameterized INSERT, commit, and redirect to `/home`.  \n  - Log any MySQLdb errors with `app.logger.error` and return JSON error 500.  \n  - Ensure cursor and connection are closed in a `finally` block.\n\n- **/login (POST)**  \n  - Retrieve `username` and `password` from `request.form`.  \n  - Return JSON error 400 if missing.  \n  - Select the stored password hash for the given username using a parameterized query.  \n  - Verify with `check_password_hash`; on success redirect to `/dashboard`, otherwise return JSON error 401.  \n  - Handle database errors as above and close resources properly.\n\n- **/add_task (POST)**  \n  - Retrieve `username`, `task_name`, and optional `task_description` from `request.form`.  \n  - Return JSON error 400 if `username` or `task_name` missing.  \n  - Verify the user exists with a parameterized SELECT; if not, return JSON error 404.  \n  - Insert the task into `tasks` table with a parameterized INSERT, commit, and return JSON message with status 201.  \n  - Handle errors and resource cleanup as above.\n\n- **/view_tasks (GET)**  \n  - Retrieve `username` from query parameters.  \n  - Return JSON error 400 if missing.  \n  - Use a cursor of type `MySQLdb.cursors.DictCursor` and a parameterized SELECT to fetch `task_id`, `task_name`, `task_description` for the user.  \n  - Return the list of tasks as JSON with status 200.  \n  - Handle errors and cleanup as above.\n\n- **/delete_task (POST)**  \n  - Retrieve `username` and `task_id` from `request.form`.  \n  - Return JSON error 400 if missing.  \n  - Validate that `task_id` can be cast to an integer; on failure return JSON error 400.  \n  - Execute a parameterized DELETE for the given `username` and `task_id`.  \n  - If `cursor.rowcount` is 0, return JSON error 404; otherwise commit and return JSON success message with status 200.  \n  - Handle errors and cleanup as above.\n\n- **/update_task (POST)**  \n  - Retrieve `username`, `task_id`, `new_task_name`, and optional `new_task_description` from `request.form`.  \n  - Return JSON error 400 if `username`, `task_id`, or `new_task_name` missing.  \n  - Validate `task_id` as an integer; on failure return JSON error 400.  \n  - Execute a parameterized UPDATE to set `task_name` and `task_description` for the matching record.  \n  - If no rows are affected, return JSON error 404; otherwise commit and return JSON success message with status 200.  \n  - Handle errors and cleanup as above.\n\n- **General security and best practices**  \n  - Use only parameterized queries to prevent SQL injection.  \n  - Validate and sanitize all input data.  \n  - Do not expose raw exception details to the client; log them internally.  \n  - Ensure all database cursors and connections are closed in `finally` blocks.  \n  - Do not enable Flask debug mode; set `debug=False` in `app.run()`.\n\n- **Entry point**  \n  - Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\nProduce only the Python code that satisfies all the above specifications, with no additional explanation, comments, or non\u2011Python content.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "fd8d3f80dfea0f7dacbff0e4f889261b1c0df6f0eae8c3c6b8814d368e3b41ef",
+  "status": "secured"
+}

@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "6c1d6f65c00e82cc6f80d795ceab3f127070881db474c92790e47f9505094ded",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed YAML in /upload_readings may raise an exception (observable as a 500 error).",
+      "Absent 'station_id', 'temperature', or 'humidity' keys cause a KeyError (500 error).",
+      "Omitting the 'type' query parameter in /generate_report results in an empty argument to the external tool.",
+      "Providing an invalid or dangerous 'type' value may cause the external command to fail or behave unexpectedly.",
+      "Sending a non\u2011string token or no token to /station_login triggers authentication failure (401).",
+      "Excessively large request bodies could exhaust server resources."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a web API for weather stations to authenticate, upload sensor readings, and trigger generation of weather reports.",
+    "invariants": [
+      "The authentication token is fixed to 'weather_station_token_2023'.",
+      "All responses are JSON objects with a 'status' field.",
+      "The '/upload_readings' endpoint always returns a 200 status code regardless of payload content.",
+      "The '/station_login' endpoint returns 401 only when the token does not match."
+    ],
+    "io_behavior": [
+      "POST /station_login with form field 'token' \u2192 JSON status, 200 on correct token, 401 on incorrect.",
+      "POST /upload_readings with raw YAML body containing station_id, temperature, humidity \u2192 JSON with status and station id.",
+      "GET /generate_report?type=TYPE \u2192 JSON status indicating report generation started."
+    ],
+    "public_api": {
+      "route:GET /generate_report": "",
+      "route:POST /station_login": "",
+      "route:POST /upload_readings": ""
+    },
+    "side_effects": [
+      "Executes an external command './weather_report_tool TYPE' via the operating system.",
+      "Consumes request payloads (YAML or form data) but does not persist them.",
+      "Returns HTTP responses that can be observed by clients."
+    ],
+    "source_hash": "aa4714f15323cdd76b1378a472537f5b2e740582b4227b12140c8b1ca6d25c1c"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.1,
+    "io_semantics": 0.2,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file20.py",
+  "gated_score": 0.18625,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.18625,
+  "original_hash": "aa4714f15323cdd76b1378a472537f5b2e740582b4227b12140c8b1ca6d25c1c",
+  "rationale": "Key contract expectations (error handling, fixed token, always\u2011200 upload, status field, empty report type) are not met; only basic routing and a limited external call are preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.3275,
+  "stability_dimensions": {
+    "behavior": 0.75,
+    "edge_cases": 0.2,
+    "invariants": 0.15,
+    "io_semantics": 0.85,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.51375,
+  "weighted_mean": 0.215,
+  "worst_dimension": 0.1
+}

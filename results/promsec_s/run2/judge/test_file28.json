@@ -1,0 +1,83 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "1cae0161b986771e2258d3cf2638c8173419b98ec6f6949f30919ea9476a7257",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payload to /api/add_book triggers a 400 error with \"Invalid YAML format\".",
+      "Providing a non\u2011integer year_published to /api/add_book yields a 400 error \"Invalid year published\".",
+      "Supplying an incorrect admin password or secret_key results in a 401 \"Access denied\" response.",
+      "Omitting required form fields (e.g., isbn on /api/remove_book) returns a 400 error.",
+      "Calling /admin/change_password with a wrong old password returns 401 and does not change the password.",
+      "If /api/start_inventory receives empty section or location, the external script is still invoked with empty arguments."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a REST\u2011like library management service that lets clients add, remove, query, and modify book records, and provides admin\u2011only operations such as login, password change, and settings adjustment.",
+    "invariants": [
+      "All admin\u2011only routes require the current LIBRARIAN_PASSWORD (and a fixed secret key for login).",
+      "Adding a book requires non\u2011empty title, author, and isbn fields; year_published must be an integer.",
+      "Endpoints return JSON with a \"status\" field and use HTTP 400 for client\u2011side validation errors and 401 for authentication failures.",
+      "Missing required parameters (e.g., isbn, user_id) result in an error response rather than processing."
+    ],
+    "io_behavior": [
+      "POST /api/add_book \u2013 accepts raw YAML in the request body, returns JSON with book details or error 400.",
+      "POST /api/remove_book \u2013 expects form field \"isbn\", returns JSON confirmation or error 400.",
+      "GET /api/start_inventory \u2013 reads query parameters \"section\" and \"location\", launches an external script via the OS, returns JSON status.",
+      "POST /admin/login \u2013 expects form fields \"password\" and \"secret_key\", returns JSON success (200) or denial (401).",
+      "POST /admin/change_password \u2013 expects old and new passwords, updates the in\u2011memory password on success, returns JSON status.",
+      "Various GET/POST endpoints (/api/book_info, /api/update_book, /api/list_books, /admin/adjust_settings, /api/check_book_availability, /api/request_book, /api/return_book) that read query or form parameters and return JSON responses with appropriate HTTP status codes."
+    ],
+    "public_api": {
+      "route:GET /api/book_info": "",
+      "route:GET /api/check_book_availability": "",
+      "route:GET /api/list_books": "",
+      "route:GET /api/start_inventory": "",
+      "route:POST /admin/adjust_settings": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/login": "",
+      "route:POST /api/add_book": "",
+      "route:POST /api/remove_book": "",
+      "route:POST /api/request_book": "",
+      "route:POST /api/return_book": "",
+      "route:POST /api/update_book": ""
+    },
+    "side_effects": [
+      "Calling /api/start_inventory spawns a subprocess that runs \"python3 inventory_checker.py <section> <location>\".",
+      "Successful /admin/change_password modifies the global LIBRARIAN_PASSWORD variable for the running process.",
+      "Successful /admin/adjust_settings does not persist settings but acknowledges the change in the response.",
+      "No persistent storage; all state changes exist only in memory for the lifetime of the server process."
+    ],
+    "source_hash": "57da26119eb9becbf1830dfb9351497ddbfeeaa09d2462e58b4bfbcd69099e12"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.3,
+    "invariants": 0.5,
+    "io_semantics": 0.4,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file28.py",
+  "gated_score": 0.3975,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.3975,
+  "original_hash": "57da26119eb9becbf1830dfb9351497ddbfeeaa09d2462e58b4bfbcd69099e12",
+  "rationale": "Program implements most routes but deviates from contract in validation (year_published), error response format, and does not invoke the required external script for start_inventory, resulting in only partial preservation of the specified behavior.",
+  "schema": 1,
+  "stability_abs_difference": 0.24688,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.6,
+    "invariants": 0.5,
+    "io_semantics": 0.85,
+    "side_effects": 0.75
+  },
+  "stability_score": 0.64438,
+  "weighted_mean": 0.43,
+  "worst_dimension": 0.3
+}

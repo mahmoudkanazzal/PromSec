@@ -1,0 +1,45 @@
+{
+  "ast_similarity": 0.67,
+  "candidate_hash": "fca75dc8c74cdc43e24b9ad0d48886827b7708433f37ac03e2b9fce116596d52",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file94.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.67,
+      "bandit_statement_nodes": [
+        10,
+        19,
+        29
+      ],
+      "candidate_hash": "fca75dc8c74cdc43e24b9ad0d48886827b7708433f37ac03e2b9fce116596d52",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.176,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (no other language) that implements a Flask web application with the exact functionality described below, while ensuring security best practices:\n\n- Use `sqlite3` with a database file named `library.db`. Set `row_factory` to `sqlite3.Row` for dictionary\u2011like access.\n- Provide a function `get_db_connection()` that returns a new connection each time and is used for all database interactions.\n- Implement the following routes:\n\n1. **POST /add_book**\n   - Accept JSON payload (silent parsing) containing `title` and `author`.\n   - Validate that both fields are present and non\u2011empty; return `400` with `{\"error\": \"Missing title or author\"}` if not.\n   - Insert the new book using a parameterized SQL statement: `INSERT INTO books (title, author) VALUES (?, ?)`.\n   - Commit the transaction, close the connection, and return `201` with `{\"message\": \"Book added successfully\"}`.\n\n2. **GET /get_book**\n   - Accept query parameter `id`.\n   - Validate that `id` is present and consists only of digits; return `400` with `{\"error\": \"Invalid or missing id\"}` if invalid.\n   - Retrieve the book with `SELECT * FROM books WHERE id = ?` using a parameterized query.\n   - Close the connection.\n   - If no row is found, return `404` with `{\"error\": \"Book not found\"}`; otherwise return `200` with the row converted to a JSON object.\n\n3. **POST /update_copies**\n   - Accept JSON payload (silent parsing) containing `book_id` and `copies`.\n   - Validate that both `book_id` and `copies` are integers; return `400` with `{\"error\": \"Invalid book_id or copies\"}` if not.\n   - Update the `copies` column safely with `UPDATE books SET copies = copies + ? WHERE id = ?` using a parameterized query.\n   - Commit, close the connection, and return `200` with `{\"message\": \"Copies updated successfully\"}`.\n\n4. **GET /get_catalog**\n   - Retrieve all books with `SELECT title, author, copies FROM books ORDER BY title`.\n   - Convert each row to a dictionary, close the connection, and return `200` with a JSON list of these dictionaries.\n\n- Ensure all database cursors and connections are properly closed in every code path.\n- Use only parameterized queries to prevent SQL injection.\n- Do not enable Flask debug mode; set `debug=False` when running the app.\n- Include the standard `if __name__ == '__main__':` block to start the Flask server.\n- The script must be fully functional, import only standard library modules and Flask, and contain no extraneous code or comments.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "e073dd9a61e0cb410dcefad0439b1bca1f2d3d6f7cbd533ee88fe43dc93f9972",
+  "status": "secured"
+}

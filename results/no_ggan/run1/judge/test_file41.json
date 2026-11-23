@@ -1,0 +1,68 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "bf223b6527022878412b65255dbe660b7a5ff46270020c1bb280b05bf6a55386",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a server error.",
+      "Providing a username that already exists returns \"Username already exists\".",
+      "SQL injection strings can alter query behavior.",
+      "Database connection failures result in an exception and no response message.",
+      "Empty or excessively long input values may trigger database errors."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Create a new user account via an HTTP POST request to the /register endpoint.",
+    "invariants": [
+      "The endpoint only processes POST requests.",
+      "A response message is always returned as a string.",
+      "Database connections are closed before the response is sent.",
+      "Username uniqueness is enforced by checking for existing rows before insertion."
+    ],
+    "io_behavior": [
+      "Accepts a POST request with form fields 'username' and 'password'.",
+      "Returns a plain\u2011text message indicating success, failure, or that the username already exists.",
+      "Responds with HTTP 200 on normal completion."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Queries the MySQL 'users' table for the supplied username.",
+      "Inserts a new row into the 'users' table when the username is not found.",
+      "Commits the transaction on success or rolls back on error.",
+      "Opens and closes a database connection for each request."
+    ],
+    "source_hash": "8f6905633ce84b756abc2530f40804adaa3e2210d0d61d05fcd07c4e1cd907ed"
+  },
+  "dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.3,
+    "invariants": 0.9,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file41.py",
+  "gated_score": 0.54375,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.54375,
+  "original_hash": "8f6905633ce84b756abc2530f40804adaa3e2210d0d61d05fcd07c4e1cd907ed",
+  "rationale": "Core functionality works and DB side\u2011effects are correct, but key edge cases (missing fields, SQL injection, DB failures, long inputs) are handled differently than the contract, and response handling deviates (returns 400 tuple instead of server error and always string).",
+  "schema": 1,
+  "stability_abs_difference": 0.18713,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.33,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.73088,
+  "weighted_mean": 0.625,
+  "worst_dimension": 0.3
+}

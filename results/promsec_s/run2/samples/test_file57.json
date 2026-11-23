@@ -1,0 +1,98 @@
+{
+  "ast_similarity": 0.6145454545454545,
+  "candidate_hash": "97d22c17e04fe54395068d996a241fdb67d097c9cc748eb6e2297ad74a8fcb34",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    89,
+    259
+  ],
+  "error": "",
+  "file": "test_file57.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6877470355731226,
+      "bandit_statement_nodes": [
+        2,
+        11,
+        13
+      ],
+      "candidate_hash": "67104444b4d2445833fb4432f305a618c55bfd34dc92caedbd7575293b2d0fd4",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9993,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.8035,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 3
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.6156,
+          "end_lineno": 21,
+          "lineno": 21,
+          "node": 11
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9655,
+          "end_lineno": 35,
+          "lineno": 35,
+          "node": 25
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 script that implements a Flask web application with a single POST endpoint at `/login`. The script must:\n\n1. Import only standard library modules and the following third\u2011party packages: `flask`, `os`, `hashlib`, and a MySQL driver such as `MySQLdb` or `pymysql`.\n2. Create a Flask app instance named `app`.\n3. Define the `/login` route to accept only POST requests.\n4. Retrieve `username` and `password` from `request.form`. Validate that both fields are present; if not, return an HTTP 400 response with a plain\u2011text message.\n5. Load database connection parameters (`DB_USER`, `DB_PASSWORD`, `DB_NAME`) from environment variables, providing sensible defaults (`app_user`, empty password, `cwe200`) if they are missing.\n6. Establish a connection to a MySQL database on `localhost` using the loaded credentials. Use a context manager or try/finally to guarantee the connection is closed.\n7. Use a **parameterized query** (prepared statement) to fetch the stored password hash for the supplied `username`. Do not concatenate user input into the SQL string.\n8. If the query returns no rows, treat the user as non\u2011existent and respond with the string `\"false\"` and HTTP 200.\n9. If a row is returned, compare the stored password hash with the hash of the supplied password:\n   - Compute the SHA\u2011256 hash of the supplied password using `hashlib.sha256`.\n   - Compare the resulting hex digest to the stored hash using a constant\u2011time comparison (`hmac.compare_digest`).\n   - If they match, respond with the string `\"true\"`; otherwise respond with `\"false\"`. Both responses must have HTTP 200 status.\n10. Log any database errors using `app.logger.error` with a clear message, but do not expose internal error details to the client. In case of an error, respond with `\"false\"` and HTTP 200.\n11. Ensure the Flask app runs only when the script is executed directly (`if __name__ == \"__main__\":`) and listen on `0.0.0.0` port `5000`.\n12. The entire script must be valid Python code, contain no comments, and must not import or use any language other than Python. The functionality must match the original insecure script while fixing the identified security issues (SQL injection, plain\u2011text password comparison, missing input validation, and proper resource cleanup).",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6145454545454545,
+      "bandit_statement_nodes": [
+        31
+      ],
+      "candidate_hash": "97d22c17e04fe54395068d996a241fdb67d097c9cc748eb6e2297ad74a8fcb34",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9755,
+          "end_lineno": 19,
+          "lineno": 19,
+          "node": 15
+        },
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 39,
+          "lineno": 39,
+          "node": 31
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, secure Python program (no other language) that implements the following functionality:\n\n- Use Flask to create a web application.\n- Define a route `/login` that only accepts POST requests.\n- Retrieve `username` and `password` from `request.form`. If either is missing, respond with the text `\"Missing username or password\"` and HTTP status 400.\n- Load database connection parameters from environment variables with these defaults:\n  - `DB_USER` default `\"app_user\"`\n  - `DB_PASSWORD` default empty string\n  - `DB_NAME` default `\"cwe200\"`\n  - `DB_HOST` default `\"127.0.0.1\"`\n- Connect to a MySQL database using `pymysql.connect` with:\n  - host, user, password, database as above\n  - `cursorclass=pymysql.cursors.DictCursor`\n  - `connect_timeout=10`\n- Use a `try/except` block to catch any exceptions during connection or query execution. On exception, log the error with `app.logger.error('Database error: %s', e)` and return the text `\"false\"` with HTTP status 200.\n- Within the successful connection block, use a context manager (`with conn.cursor() as cur`) and execute a parameterized query to select `password_hash` from the `users` table where `username=%s`. Pass the `username` as a tuple parameter to prevent SQL injection.\n- Fetch one row. If no row is returned, respond with `\"false\"` and HTTP status 200.\n- If a row is returned, retrieve the stored password hash from the `password_hash` column.\n- Compute the SHA\u2011256 hash of the supplied password using `hashlib.sha256(password.encode('utf-8')).hexdigest()`.\n- Compare the stored hash and the computed hash using `hmac.compare_digest` for constant\u2011time comparison.\n- If the hashes match, respond with `\"true\"` and HTTP status 200; otherwise respond with `\"false\"` and HTTP status 200.\n- Ensure the database connection is closed in a `finally` block.\n- At the bottom of the script, include the standard `if __name__ == '__main__':` guard to run the Flask app on host `127.0.0.1` and port `5000`.\n\nThe code must be fully functional, follow best security practices (use environment variables, parameterized queries, constant\u2011time comparison, proper error handling), and contain no comments or explanatory text. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "55839422c7e82b0affceca53de499b8c424c0256b63e5d5cec1b9eb6abce93b4",
+  "status": "secured"
+}

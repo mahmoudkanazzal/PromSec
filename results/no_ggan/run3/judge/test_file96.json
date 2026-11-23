@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "11a03bcc9a3f457de61a1cb1765df7ca77d5a7102b2600031cd8c2f6404c429c",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing required fields in POST /add_event results in a server error",
+      "Providing a non\u2011existent event_id to update or delete may affect zero rows",
+      "Empty or absent keyword/date query parameters return all rows or none respectively",
+      "Malformed JSON payloads cause a 400\u2011type error from Flask before reaching the handler",
+      "Large input strings may exceed SQLite column limits or cause performance issues",
+      "If the SQLite file is missing or inaccessible, all endpoints will fail with a server error"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a RESTful API for creating, reading, updating, and deleting event records stored in a SQLite database.",
+    "invariants": [
+      "Each event row contains id (primary key), name, date, and location columns",
+      "Successful write operations return a JSON message and a 2xx status code",
+      "Read operations always return a JSON array (empty if no rows match)",
+      "The API does not expose raw SQL; only the defined endpoints are reachable",
+      "Database connections are opened and closed per request",
+      "HTTP methods must match the endpoint definitions (POST, GET, PUT, DELETE)"
+    ],
+    "io_behavior": [
+      "POST /add_event with JSON {name, date, location} \u2192 201 and confirmation JSON",
+      "GET /search_events?keyword=\u2026 \u2192 200 and JSON array of matching events",
+      "PUT /update_event/<id> with JSON {name?, date?, location?} \u2192 200 and confirmation JSON",
+      "DELETE /delete_event/<id> \u2192 200 and confirmation JSON",
+      "GET /get_events_by_date?date=\u2026 \u2192 200 and JSON array of events on that date",
+      "All responses are JSON-encoded and use standard HTTP status codes"
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:DELETE /delete_event/<int:event_id>": "",
+      "route:GET /get_events_by_date": "",
+      "route:GET /search_events": "",
+      "route:POST /add_event": "",
+      "route:PUT /update_event/<int:event_id>": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the events table",
+      "Updates fields of an existing row identified by its id",
+      "Deletes a row identified by its id",
+      "Reads rows from the events table for search and date queries",
+      "Commits transactions to the SQLite file \"events.db\"",
+      "Closes the database connection after each request"
+    ],
+    "source_hash": "4189069f0188b9e33c40ddff4df303aaabf6130acd7b039dbf0f45a279f5a4c5"
+  },
+  "dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.3,
+    "invariants": 1.0,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file96.py",
+  "gated_score": 0.57,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.57,
+  "original_hash": "4189069f0188b9e33c40ddff4df303aaabf6130acd7b039dbf0f45a279f5a4c5",
+  "rationale": "Core CRUD endpoints exist and return JSON with correct 2xx codes, but required\u2011field handling, optional update fields, missing date query handling, and non\u2011existent ID responses differ from the contract, causing several edge\u2011case mismatches.",
+  "schema": 1,
+  "stability_abs_difference": 0.1925,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.5,
+    "invariants": 1.0,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.7625,
+  "weighted_mean": 0.66,
+  "worst_dimension": 0.3
+}

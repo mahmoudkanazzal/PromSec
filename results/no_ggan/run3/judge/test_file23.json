@@ -1,0 +1,79 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "f6591b3def71ea5b5e2877b1f04618d8f8b905d1eba046cd2279e6230672c68b",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required YAML keys or malformed YAML cause a server error (500).",
+      "Omitting the password field or providing a wrong password returns 401 \"Access denied\".",
+      "Providing an unsupported admin action returns 400 \"Invalid action\".",
+      "Empty query parameters (e.g., no section or type) still trigger script execution with an empty argument.",
+      "Large or non\u2011YAML request bodies may cause parsing failures or timeouts.",
+      "Using an unsupported HTTP method on any endpoint results in a 405 Method Not Allowed."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for basic library operations (add, update, delete, view books, run inventory, generate reports, admin backup/restore) with a simple librarian password check.",
+    "invariants": [
+      "All endpoints return a JSON object containing a \"status\" field.",
+      "POST /librarian_access grants access only when password equals the hard\u2011coded LIBRARIAN_PASSWORD.",
+      "Admin panel accepts only actions \"backup\" or \"restore\"; other values yield a 400 error.",
+      "Required keys (e.g., title, author, isbn) must be present in the YAML payloads for successful processing.",
+      "HTTP method must match the route definition; mismatched methods result in 405 errors."
+    ],
+    "io_behavior": [
+      "POST /add_book with YAML body (title, author, isbn, publication_year) \u2192 JSON response echoing those fields and status \"Book added\".",
+      "GET /run_inventory?section=NAME \u2192 JSON response with status \"Inventory check initiated\".",
+      "POST /librarian_access with form field password \u2192 JSON status \"Librarian access granted\" or 401 with \"Access denied\".",
+      "POST /update_book with YAML body (isbn, optional new_title, new_author, new_year) \u2192 JSON response showing isbn and any new values, status \"Book updated\".",
+      "POST /delete_book with YAML body (isbn) \u2192 JSON response with isbn and status \"Book deleted\".",
+      "GET /generate_reports?type=TYPE \u2192 JSON response with status \"Report generation started\"."
+    ],
+    "public_api": {
+      "route:GET /generate_reports": "",
+      "route:GET /run_inventory": "",
+      "route:GET /view_books": "",
+      "route:POST /add_book": "",
+      "route:POST /admin_panel": "",
+      "route:POST /delete_book": "",
+      "route:POST /librarian_access": "",
+      "route:POST /update_book": ""
+    },
+    "side_effects": [
+      "Executes external Python scripts via os.system for inventory, report generation, backup, restore, and book viewing.",
+      "No persistent data store is modified; responses are generated solely from request data.",
+      "Potential OS command execution based on query or form parameters."
+    ],
+    "source_hash": "1308832b93521f7bb6430dd40918c7597329f436d315da7bba1389c443eba676"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.3,
+    "invariants": 0.95,
+    "io_semantics": 0.95,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file23.py",
+  "gated_score": 0.69562,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.69562,
+  "original_hash": "1308832b93521f7bb6430dd40918c7597329f436d315da7bba1389c443eba676",
+  "rationale": "All required routes and JSON responses are present and match the contract, but error handling for malformed YAML and empty query arguments deviates from specified 500/empty\u2011arg behavior, reducing edge\u2011case coverage.",
+  "schema": 1,
+  "stability_abs_difference": 0.14538,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.67,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.841,
+  "weighted_mean": 0.8275,
+  "worst_dimension": 0.3
+}

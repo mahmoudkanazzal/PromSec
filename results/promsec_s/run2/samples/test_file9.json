@@ -1,0 +1,108 @@
+{
+  "ast_similarity": 0.9192546583850931,
+  "candidate_hash": "1a5791fedb44a91bb9dbd88a6fb3288852bede479beaa0f3c8aa06e9661cfecd",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file9.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9487179487179487,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        18,
+        67
+      ],
+      "candidate_hash": "b6c86c346c485e264489a02d7f8920aa17adf316ff2239dc0ecfb08a1b68f44e",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9472,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9554,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9092,
+          "end_lineno": 29,
+          "lineno": 29,
+          "node": 18
+        },
+        {
+          "ast_type": "Global",
+          "change": 0.5142,
+          "end_lineno": 52,
+          "lineno": 52,
+          "node": 32
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9743,
+          "end_lineno": 112,
+          "lineno": 112,
+          "node": 67
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with the exact functionality described below. The code must be secure, follow best practices, and preserve the behavior of the original specification.\n\n**Requirements**\n\n1. **Imports**\n   - `from flask import Flask, request, jsonify`\n   - `import os`\n   - `import yaml`\n   - `import subprocess`\n\n2. **Application setup**\n   - Create a Flask app instance.\n   - Load an admin password from the environment variable `ADMIN_PASSWORD`. If the variable is not set, default to `'admin_pass_2024'`.\n   - Store the password in `app.config['ADMIN_PASSWORD']`.\n\n3. **Routes**\n\n   - **POST `/config/add`**\n     - Read raw request body, decode as UTF\u20118.\n     - Parse the body as YAML using `yaml.safe_load`. Return a 400 error with JSON `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` on parsing failure.\n     - Extract `config_id` and `config_value` from the parsed data.\n     - If either is missing or empty, return a 400 error with JSON `{\"status\":\"Error\",\"message\":\"Missing configuration information\"}`.\n     - On success, return JSON `{\"status\":\"Configuration added\",\"config_id\":<id>,\"config_value\":<value>}`.\n\n   - **GET `/job/execute`**\n     - Retrieve query parameters `job_name` and `parameter` (default empty strings).\n     - Execute the script `execute_job.sh` with those arguments using `subprocess.run(['sh','execute_job.sh',job_name,parameter], check=False)` **without invoking a shell**.\n     - Return JSON `{\"status\":\"Job execution started\"}`.\n\n   - **POST `/auth/login`**\n     - Get form field `password`.\n     - If it matches `app.config['ADMIN_PASSWORD']`, return JSON `{\"status\":\"Login successful\"}`.\n     - Otherwise return JSON `{\"status\":\"Login failed\"}` with HTTP status 401.\n\n   - **POST `/auth/update_password`**\n     - Get form field `password`. Verify it matches the current admin password; otherwise return 401 with `{\"status\":\"Login failed\"}`.\n     - Get form field `new_password`. If missing or empty, return 400 with `{\"status\":\"Error\",\"message\":\"Invalid new password\"}`.\n     - Update `app.config['ADMIN_PASSWORD']` to the new password.\n     - Return JSON `{\"status\":\"Password updated\"}`.\n\n   - **GET `/config/get`**\n     - Require query parameter `config_id`. If missing, return 400 with `{\"status\":\"Error\",\"message\":\"Configuration ID is required\"}`.\n     - Return JSON `{\"status\":\"Configuration retrieved\",\"config\":{\"config_id\":<id>,\"config_value\":\"Sample Value\"}}`.\n\n   - **POST `/config/remove`**\n     - Get form field `config_id`. If missing, return 400 with `{\"status\":\"Error\",\"message\":\"Configuration ID is required\"}`.\n     - Return JSON `{\"status\":\"Configuration removed\",\"config_id\":<id>}`.\n\n   - **GET `/job/status`**\n     - Require query parameter `job_id`. If missing, return 400 with `{\"status\":\"Error\",\"message\":\"Job ID is required\"}`.\n     - Return JSON `{\"status\":\"Job status\",\"job_id\":<id>,\"status\":\"In Progress\"}`.\n\n   - **POST `/auth/settings`**\n     - Get form field `password`. If it does not match the admin password, return 401 with `{\"status\":\"Access denied\"}`.\n     - Get form field `setting`. If missing or empty, return 400 with `{\"status\":\"Error\",\"message\":\"Invalid setting\"}`.\n     - Return JSON `{\"status\":\"Setting updated\",\"setting\":<setting>}`.\n\n   - **GET `/job/logs`**\n     - Require query parameter `job_id`. If missing, return 400 with `{\"status\":\"Error\",\"message\":\"Job ID is required\"}`.\n     - Construct a string `logs = \"Logs for job \" + job_id`.\n     - Return JSON `{\"status\":\"Job logs\",\"job_id\":<id>,\"logs\":logs}`.\n\n   - **GET `/data/export`**\n     - Optional query parameter `format` defaulting to `'json'`.\n     - Run the script `export_data.py` with the format argument using `subprocess.run(['python','export_data.py',export_format], check=False)` **without a shell**.\n     - Return JSON `{\"status\":\"Data export started\"}`.\n\n   - **GET `/user/info`**\n     - Require query parameter `user_id`. If missing, return 400 with `{\"status\":\"Error\",\"message\":\"User ID is required\"}`.\n     - Return JSON `{\"status\":\"User information retrieved\",\"user_info\":{\"user_id\":<id>,\"name\":\"John Doe\",\"email\":\"john.doe@example.com\"}}`.\n\n4. **Application entry point**\n   - If the script is executed directly (`if __name__ == '__main__':`), start the Flask server with `app.run(debug=False)`.\n   - Ensure that when imported (`if __name__ != '__main__':`), the app does not automatically start.\n\n5. **Security and style**\n   - Use `yaml.safe_load` only.\n   - Use `subprocess.run` with a list argument and `shell=False` (default) to avoid command injection.\n   - Do not expose the admin password in logs or responses.\n   - Validate all required inputs and return appropriate HTTP status codes.\n   - Keep the code Python\u2011only, compatible with Python 3.8+.\n\n**Output**\n- Provide only the Python source code that fulfills all the above requirements. Do not include any explanatory text, comments, or markup outside the code. The response must be a single, syntactically correct Python file.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.9192546583850931,
+      "bandit_statement_nodes": [
+        3,
+        21,
+        68
+      ],
+      "candidate_hash": "1a5791fedb44a91bb9dbd88a6fb3288852bede479beaa0f3c8aa06e9661cfecd",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9532,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.7581,
+          "end_lineno": 91,
+          "lineno": 91,
+          "node": 68
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "You must generate a complete, self\u2011contained Python script that implements a Flask web application with the exact functionality described below. The code must be written **only in Python** and must follow security best practices, preserving the behavior of the original specification.\n\n**General requirements**\n- Use Python 3 and Flask.\n- Import only the necessary standard library modules and the following third\u2011party packages: `flask`, `os`, `yaml`.\n- Do not include any code in other languages or any external script execution.\n- Ensure all user\u2011provided data is validated and sanitized.\n- Use `yaml.safe_load` for parsing YAML.\n- Implement whitelists for job names and export formats to prevent injection attacks.\n- Store the admin password in `app.config['ADMIN_PASSWORD']`, defaulting to the environment variable `ADMIN_PASSWORD` or `\"admin_pass_2024\"` if not set.\n- Do not enable Flask debug mode in production (`debug=False`).\n\n**Endpoints and behavior**\n\n1. **POST /config/add**\n   - Read raw request body as text.\n   - Parse it with `yaml.safe_load`.\n   - Return 400 with JSON `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` if parsing fails or the result is not a dict.\n   - Extract `config_id` and `config_value`; if missing, return 400 with `{\"status\":\"Error\",\"message\":\"Missing configuration information\"}`.\n   - On success, return JSON `{\"status\":\"Configuration added\",\"config_id\":<config_id>,\"config_value\":<config_value>}`.\n\n2. **GET /job/execute**\n   - Retrieve query parameters `job_name` and `parameter` (default empty strings).\n   - Call internal function `_run_job(job_name, parameter)`.\n   - Always return JSON `{\"status\":\"Job execution started\"}`.\n\n3. **POST /auth/login**\n   - Read form field `password`.\n   - If it matches `app.config['ADMIN_PASSWORD']`, return JSON `{\"status\":\"Login successful\"}`.\n   - Otherwise return 401 with JSON `{\"status\":\"Login failed\"}`.\n\n4. **POST /auth/update_password**\n   - Read form fields `password` and `new_password`.\n   - Verify `password` matches current admin password; if not, return 401 with `{\"status\":\"Login failed\"}`.\n   - If `new_password` is empty, return 400 with `{\"status\":\"Error\",\"message\":\"Invalid new password\"}`.\n   - Update `app.config['ADMIN_PASSWORD']` to `new_password` and return JSON `{\"status\":\"Password updated\"}`.\n\n5. **GET /config/get**\n   - Require query parameter `config_id`; if missing, return 400 with `{\"status\":\"Error\",\"message\":\"Configuration ID is required\"}`.\n   - Return JSON `{\"status\":\"Configuration retrieved\",\"config\":{\"config_id\":<config_id>,\"config_value\":\"Sample Value\"}}`.\n\n6. **POST /config/remove**\n   - Read form field `config_id`; if missing, return 400 with `{\"status\":\"Error\",\"message\":\"Configuration ID is required\"}`.\n   - Return JSON `{\"status\":\"Configuration removed\",\"config_id\":<config_id>}`.\n\n7. **GET /job/status**\n   - Require query parameter `job_id`; if missing, return 400 with `{\"status\":\"Error\",\"message\":\"Job ID is required\"}`.\n   - Return JSON `{\"status\":\"Job status\",\"job_id\":<job_id>,\"status\":\"In Progress\"}`.\n\n8. **POST /auth/settings**\n   - Read form fields `password` and `setting`.\n   - Verify `password` matches admin password; if not, return 401 with `{\"status\":\"Access denied\"}`.\n   - If `setting` is missing, return 400 with `{\"status\":\"Error\",\"message\":\"Invalid setting\"}`.\n   - Return JSON `{\"status\":\"Setting updated\",\"setting\":<setting>}`.\n\n9. **GET /job/logs**\n   - Require query parameter `job_id`; if missing, return 400 with `{\"status\":\"Error\",\"message\":\"Job ID is required\"}`.\n   - Construct logs string `\"Logs for job \" + job_id`.\n   - Return JSON `{\"status\":\"Job logs\",\"job_id\":<job_id>,\"logs\":<logs>}`.\n\n10. **GET /data/export**\n    - Retrieve query parameter `format` defaulting to `\"json\"`.\n    - Call internal function `_export_data(format)`.\n    - Return JSON `{\"status\":\"Data export started\"}`.\n\n11. **GET /user/info**\n    - Require query parameter `user_id`; if missing, return 400 with `{\"status\":\"Error\",\"message\":\"User ID is required\"}`.\n    - Return JSON `{\"status\":\"User information retrieved\",\"user_info\":{\"user_id\":<user_id>,\"name\":\"John Doe\",\"email\":\"john.doe@example.com\"}}`.\n\n**Internal helper functions**\n- `_run_job(job_name, parameter)`: Define a whitelist `{'backup', 'cleanup', 'report'}`. If `job_name` not in whitelist, return `False`; otherwise perform placeholder logic and return `True`.\n- `_export_data(export_format)`: Define a whitelist `{'json', 'csv', 'xml'}`. If `export_format` not in whitelist, return `False`; otherwise perform placeholder logic and return `True`.\n\n**Application entry point**\n- Include `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\n**Security constraints**\n- Do not use `eval`, `exec`, or any subprocess calls.\n- Validate all inputs strictly as described.\n- Use only `yaml.safe_load` for YAML parsing.\n- Ensure the admin password is never logged or printed.\n- Do not expose stack traces; rely on Flask\u2019s default error handling.\n\nWrite the full Python source code meeting all the above specifications. Do not add any explanatory comments, markdown, or text outside the code. Ensure proper indentation and syntax.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "0525122ed53928fa8d282c5f392bfd0ac67a247d4fac9a62a54c08b0630bd854",
+  "status": "secured"
+}

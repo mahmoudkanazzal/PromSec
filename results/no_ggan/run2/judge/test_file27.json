@@ -1,0 +1,85 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "ba41713bf803af9136b57b97a6d72f8f779251af1995d79c2d19b16ac1476690",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Empty or whitespace\u2011only request bodies causing all fields to be missing.",
+      "YAML containing unexpected types (e.g., list instead of string) leading to missing\u2011field errors.",
+      "Providing an unknown section or report type; scripts may fail but API still returns 200.",
+      "Incorrect admin password triggers 401 without revealing the correct password.",
+      "Omitting the 'action' form field in /librarian_panel yields 400 \"Invalid action\".",
+      "Large payloads or extremely long query parameters may cause performance issues but are not validated by the API."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a RESTful HTTP API for library management tasks such as adding, updating, deleting books and members, triggering inventory/report scripts, and performing admin\u2011only operations like backup and restore.",
+    "invariants": [
+      "All successful responses are JSON objects containing a \"status\" key.",
+      "Endpoints that require YAML payload reject malformed YAML with HTTP 400.",
+      "Missing mandatory fields (e.g., title, author, isbn for books) result in HTTP 400.",
+      "Admin access requires the exact hard\u2011coded password; otherwise HTTP 401 is returned.",
+      "Unsupported actions in /librarian_panel return HTTP 400 with \"Invalid action\".",
+      "Successful operations return HTTP 200 (except admin denial which returns 401)."
+    ],
+    "io_behavior": [
+      "POST /add_new_book with YAML body \u2192 JSON response containing book details or 400 error on invalid YAML/missing fields.",
+      "GET /execute_inventory?section=NAME \u2192 JSON acknowledgement; triggers execution of run_inventory.py.",
+      "POST /admin_access with form field password \u2192 JSON success or 401 error.",
+      "POST /update_book_details with YAML body \u2192 JSON acknowledgement of update or 400 error.",
+      "GET /generate_reports?type=TYPE \u2192 JSON acknowledgement; runs report_generator.py.",
+      "POST /librarian_panel with form field action=backup|restore \u2192 JSON acknowledgement or 400 error."
+    ],
+    "public_api": {
+      "route:GET /execute_inventory": "",
+      "route:GET /generate_reports": "",
+      "route:GET /view_books": "",
+      "route:POST /add_new_book": "",
+      "route:POST /add_new_member": "",
+      "route:POST /admin_access": "",
+      "route:POST /delete_book": "",
+      "route:POST /librarian_panel": "",
+      "route:POST /update_book_details": "",
+      "route:POST /update_member_details": ""
+    },
+    "side_effects": [
+      "os.system call to run_inventory.py with supplied section.",
+      "os.system call to report_generator.py with supplied type.",
+      "os.system call to backup_script.py when action=backup.",
+      "os.system call to restore_script.py when action=restore.",
+      "os.system call to view_books.py with supplied category.",
+      "Potential creation/modification of external files or databases by the invoked scripts."
+    ],
+    "source_hash": "76dd5602682d017e8d799027a76b3dc516f12e33666b851d5e47359bb6ab8bf7"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 1.0,
+    "invariants": 0.8,
+    "io_semantics": 0.85,
+    "side_effects": 0.95
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file27.py",
+  "gated_score": 0.87312,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.87312,
+  "original_hash": "76dd5602682d017e8d799027a76b3dc516f12e33666b851d5e47359bb6ab8bf7",
+  "rationale": "The program implements all required endpoints and largely follows the contract, handling YAML, query params, and form fields correctly and returning JSON with a status key. It executes the expected scripts, preserving side effects. Minor deviations include using an environment variable instead of a hard\u2011coded admin password and using abort with a jsonify object, which may affect exact error response formatting.",
+  "schema": 1,
+  "stability_abs_difference": 0.12688,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 1.0,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 1.0,
+  "weighted_mean": 0.8975,
+  "worst_dimension": 0.8
+}

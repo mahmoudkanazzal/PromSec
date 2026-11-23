@@ -1,0 +1,68 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "e4680a5b8805703518c60b36df32dcdeee674371d2c9ebeca2e01380d4566928",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'payload' query parameter results in a server error.",
+      "Malformed YAML causes a parsing exception.",
+      "Absent latitude, longitude, or date keys raise a KeyError.",
+      "No matching row in the database leads to an IndexError when accessing the result.",
+      "Database connection failures raise MySQLdb exceptions.",
+      "Non\u2011numeric latitude/longitude values may cause query mismatches or errors."
+    ],
+    "entrypoints": [],
+    "intent": "Return the temperature for a specified latitude, longitude, and date supplied in a YAML payload via an HTTP GET request.",
+    "invariants": [
+      "The endpoint path and HTTP method are fixed (/api/temperature_for_location, GET).",
+      "The payload must be valid YAML containing 'latitude', 'longitude', and 'date' keys.",
+      "The temperature is always returned as a string representation of the numeric value.",
+      "Database queries use exact matching on date, latitude, and longitude.",
+      "A new database connection is created for each request."
+    ],
+    "io_behavior": [
+      "Accepts a GET request to /api/temperature_for_location with a 'payload' query parameter.",
+      "Parses the YAML payload to extract latitude, longitude, and date.",
+      "Queries a MySQL database for a matching temperature record.",
+      "Responds with the temperature value as a plain\u2011text string in the HTTP response body.",
+      "Writes the extracted latitude, longitude, and date to the server's standard output (log)."
+    ],
+    "public_api": {
+      "route:GET /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Opens a connection to a local MySQL database.",
+      "Executes a SELECT query against the temperatures table.",
+      "Prints request data to the console (stdout)."
+    ],
+    "source_hash": "feadbd807376c4203d264d5b124013b8fa5e0e9fe545fae11c6f503748cfce63"
+  },
+  "dimensions": {
+    "behavior": 0.55,
+    "edge_cases": 0.1,
+    "invariants": 0.9,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file59.py",
+  "gated_score": 0.52938,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.52938,
+  "original_hash": "feadbd807376c4203d264d5b124013b8fa5e0e9fe545fae11c6f503748cfce63",
+  "rationale": "The program implements the main request flow, logging, DB query, and returns temperature as a string, but deviates from the contract on error handling: it returns HTTP 400/404/500 instead of the specified exceptions (KeyError, IndexError, MySQLdb errors, etc.), and treats missing/invalid payload as a client error rather than a server error.",
+  "schema": 1,
+  "stability_abs_difference": 0.14437,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.1,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.67375,
+  "weighted_mean": 0.6725,
+  "worst_dimension": 0.1
+}

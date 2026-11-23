@@ -1,0 +1,72 @@
+{
+  "ast_similarity": 0.981042654028436,
+  "candidate_hash": "c58fcdeafe6e9d22fa5251b9a6f4b5dc1e02d36a636a547d0d77fb45bfbd1e47",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    703
+  ],
+  "error": "",
+  "file": "test_file40.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.981042654028436,
+      "bandit_statement_nodes": [
+        44,
+        52
+      ],
+      "candidate_hash": "c58fcdeafe6e9d22fa5251b9a6f4b5dc1e02d36a636a547d0d77fb45bfbd1e47",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2966,
+          "end_lineno": 18,
+          "lineno": 18,
+          "node": 2
+        },
+        {
+          "ast_type": "ImportFrom",
+          "change": 0.163,
+          "end_lineno": 30,
+          "lineno": 30,
+          "node": 12
+        },
+        {
+          "ast_type": "ImportFrom",
+          "change": 0.2,
+          "end_lineno": 31,
+          "lineno": 31,
+          "node": 13
+        },
+        {
+          "ast_type": "Assert",
+          "change": 0.1999,
+          "end_lineno": 88,
+          "lineno": 88,
+          "node": 44
+        },
+        {
+          "ast_type": "Assert",
+          "change": 0.2422,
+          "end_lineno": 98,
+          "lineno": 98,
+          "node": 52
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 module that reproduces the exact functionality of the provided Zope PageTemplates test suite while ensuring the code is secure. Follow these strict requirements:\n\n1. **Language** \u2013 The entire output must be valid Python code only; do not include any other language, markup, or explanatory text.\n2. **Imports** \u2013 Include exactly the same import statements as in the reference code, preserving their order:\n   - `unittest`\n   - `ExpressionError` from `chameleon.exc`\n   - `SecurityManager` from `AccessControl`\n   - `noSecurityManager` from `AccessControl.SecurityManagement`\n   - `Implicit` from `Acquisition`\n   - `IUnicodeEncodingConflictResolver` from `Products.PageTemplates.interfaces`\n   - `PageTemplate` from `Products.PageTemplates.PageTemplate`\n   - `util` from `Products.PageTemplates.tests`\n   - `DefaultUnicodeEncodingConflictResolver` and `PreferredCharsetResolver` from `Products.PageTemplates.unicodeconflictresolver`\n   - `NotFound` from `zExceptions`\n   - `getGlobalSiteManager` from `zope.component`\n   - `PlacelessSetup` from `zope.component.testing`\n   - `useChameleonEngine` from the local `.util` module\n3. **Class definitions** \u2013 Define the following classes exactly as in the reference:\n   - `AqPageTemplate` inheriting from `Implicit` and `PageTemplate` (empty body).\n   - `Folder` inheriting from `util.Base` (empty body).\n   - `UnitTestSecurityPolicy` with the two methods `validate` and `checkPermission` returning `1` and matching the signature shown.\n4. **Test case class** \u2013 Create `HTMLTests` that inherits from `PlacelessSetup` and `unittest.TestCase`. Implement:\n   - Class attribute `PREFIX = None`.\n   - `setUp` method that:\n     * Calls `super().setUp()`.\n     * Invokes `useChameleonEngine()`.\n     * Lazily registers `DefaultTraversable` from `zope.traversing.adapters` using `zope.component.provideAdapter`.\n     * Registers `DefaultUnicodeEncodingConflictResolver` as a utility for `IUnicodeEncodingConflictResolver`.\n     * Instantiates `Folder`, assigns `laf` and `t` attributes to `AqPageTemplate` instances.\n     * Sets `self.policy` to an instance of `UnitTestSecurityPolicy`.\n     * Stores the previous security policy with `SecurityManager.setSecurityPolicy(self.policy)` and calls `noSecurityManager()`.\n   - `tearDown` method that restores the original security policy and calls `noSecurityManager()`.\n   - Helper methods `assert_expected` and `assert_expected_unicode` that:\n     * Write template input using `util.read_input`.\n     * Raise `AssertionError` if `_v_errors` is present.\n     * Resolve the expected output file path using `self.PREFIX` when applicable.\n     * Read expected output with `util.read_output`.\n     * Convert expected output to `str` if it is not already a `str` (for Unicode handling).\n     * Execute the template with provided arguments and compare the result using `util.check_html`.\n   - `getProducts` method returning the two product dictionaries shown in the reference.\n   - All test methods (`test_1`, `test_2`, `test_3`, `testSimpleLoop`, `testFancyLoop`, `testGlobalsShadowLocals`, `testStringExpressions`, `testReplaceWithNothing`, `testWithXMLHeader`, `testNotExpression`, `testPathNothing`, `testPathAlt`, `testPathTraverse`, `testBatchIteration`, `testUnicodeInserts`, `testI18nTranslate`, `testImportOldStyleClass`, `testRepeatVariable`, `testBooleanAttributes`, `testBooleanAttributesAndDefault`, `testInterpolationInContent`, `testBadExpression`, `testPathAlternativesWithSpaces`, `testDefaultKeywordHandling`, `testSwitch`, `test_unicode_conflict_resolution`, `test_underscore_traversal`, `testHandleException`) exactly as listed, preserving their bodies, arguments, and expected exception handling.\n   - In `testPathTraverse`, import `Folder` from `OFS.Folder` and replace `self.folder` with a real Zope folder instance as shown.\n   - In `test_unicode_conflict_resolution`, register `PreferredCharsetResolver` as a utility before creating a new `PageTemplate`.\n   - In `test_underscore_traversal`, write the three template snippets and assert that each raises `NotFound`.\n   - In `testHandleException`, write a template that triggers a division\u2011by\u2011zero and assert that `ZeroDivisionError` is raised.\n5. **Security considerations** \u2013 Do not introduce any dynamic code execution (e.g., `eval`, `exec`, `compile`) beyond what the original tests already perform. Ensure that all imports are explicit and that the test suite does not perform network I/O, file system writes outside the provided `util` helpers, or any privileged operations.\n6. **Execution guard** \u2013 Include the standard `if __name__ == \"__main__\": unittest.main()` block at the end of the file.\n7. **Formatting** \u2013 Preserve the original indentation, line breaks, and naming conventions. Do not add extra comments, docstrings, or whitespace that changes the logical structure.\n8. **Output** \u2013 The final response must be the exact Python source code of the module, with no surrounding explanation, markdown fences, or additional text.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "9c44c438ad588374e7c508259d0b68610b89ace157dc4d31bcf0a91f5cba1300",
+  "status": "secured"
+}

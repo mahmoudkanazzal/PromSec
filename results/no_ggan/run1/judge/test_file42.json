@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "092aad2dbeb6b2bea07ddc6b35e21f2af85e126245331a060c5b8a7ae78f833c",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty form fields cause a KeyError before any database work.",
+      "Attempting to register an existing username returns \"Username already exists\".",
+      "Checkout with a non\u2011existent username returns \"User not found\".",
+      "Return for a non\u2011existent checkout record returns \"Checkout record not found\".",
+      "Database errors (e.g., constraint violations) trigger a rollback and a generic failure message."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple web API for user registration, book checkout, and book return in a library system.",
+    "invariants": [
+      "Usernames must be unique in the users table.",
+      "A checkout record must exist before it can be deleted (returned).",
+      "Each request is processed in its own database connection which is closed after the response.",
+      "The API always returns a plain\u2011text string, never JSON or HTML."
+    ],
+    "io_behavior": [
+      "POST /register with form fields username and password returns a plain\u2011text message indicating success, duplicate username, or failure.",
+      "POST /checkout with form fields username and book_id returns a plain\u2011text message indicating success, user not found, or failure.",
+      "POST /return with form fields username and book_id returns a plain\u2011text message indicating success, missing checkout record, or failure."
+    ],
+    "public_api": {
+      "route:POST /checkout": "",
+      "route:POST /register": "",
+      "route:POST /return": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the users table on successful registration.",
+      "Inserts a new row into the checkouts table on successful checkout.",
+      "Deletes the matching row from the checkouts table on successful return.",
+      "Commits or rolls back the database transaction depending on success or error."
+    ],
+    "source_hash": "e881625b1382fb99257852b9393da006d617bd99661d0afea64e23efc68587d0"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.0,
+    "invariants": 1.0,
+    "io_semantics": 0.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file42.py",
+  "gated_score": 0.2775,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.2775,
+  "original_hash": "e881625b1382fb99257852b9393da006d617bd99661d0afea64e23efc68587d0",
+  "rationale": "Core routes exist and perform DB inserts/deletes with proper commits/rollbacks, but all responses are JSON with status codes instead of required plain\u2011text strings, missing KeyError edge case, and error messages do not match the contract.",
+  "schema": 1,
+  "stability_abs_difference": 0.0225,
+  "stability_dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.255,
+  "weighted_mean": 0.37,
+  "worst_dimension": 0.0
+}

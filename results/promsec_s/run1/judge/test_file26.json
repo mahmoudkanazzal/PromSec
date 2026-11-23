@@ -1,0 +1,68 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "bc664131e2a75ae0865cd436d0c3178e3d9013e1b5e3fbda73ce7d3f1e8c0551",
+  "compile_ok": true,
+  "confidence": 0.96,
+  "contract": {
+    "edge_cases": [
+      "Malformed YAML in /add_new_book returns HTTP 400 with an error message.",
+      "Missing required keys (title, author, isbn) in the YAML payload triggers a server error (likely 500).",
+      "Omitting the password field in /admin_access results in access denied (401).",
+      "Providing no 'section' query parameter to /execute_inventory runs the script with an empty argument.",
+      "Any value supplied to 'section' is passed directly to the shell, enabling command injection."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API with three endpoints: add a new book via YAML payload, start an inventory check by invoking a script, and grant admin access based on a hard\u2011coded password.",
+    "invariants": [
+      "All responses are JSON objects with a \"status\" key.",
+      "The admin password is fixed to the literal string \"secret_admin_pass\".",
+      "The Flask app runs in production mode (debug=False).",
+      "YAML is parsed with `yaml.FullLoader` without additional validation."
+    ],
+    "io_behavior": [
+      "POST /add_new_book with YAML body \u2192 JSON response containing status, title, author, isbn (or 400 error on malformed YAML).",
+      "GET /execute_inventory?section=VALUE \u2192 JSON response confirming inventory start.",
+      "POST /admin_access with form field password \u2192 JSON response granting or denying admin access (401 on denial)."
+    ],
+    "public_api": {
+      "route:GET /execute_inventory": "",
+      "route:POST /add_new_book": "",
+      "route:POST /admin_access": ""
+    },
+    "side_effects": [
+      "Executes the external command `python3 run_inventory.py <section>` via the operating system.",
+      "Potentially writes to server logs (Flask request logging)."
+    ],
+    "source_hash": "19be0f99e4a6c9bdd8b028896bbe6cf6e30805b399f5ebcca3514b27b30e234d"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.0,
+    "invariants": 0.0,
+    "io_semantics": 0.2,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file26.py",
+  "gated_score": 0.0825,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.0825,
+  "original_hash": "19be0f99e4a6c9bdd8b028896bbe6cf6e30805b399f5ebcca3514b27b30e234d",
+  "rationale": "Key contract points are broken: uses safe_load instead of FullLoader, password is env var not fixed literal, error responses lack required 'status', missing fields return 400 not 500, admin access may succeed without password, execute_inventory validates input and imports module rather than invoking shell command, preventing injection and side\u2011effects.",
+  "schema": 1,
+  "stability_abs_difference": 0.22,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.7,
+    "side_effects": 0.3
+  },
+  "stability_score": 0.3025,
+  "weighted_mean": 0.11,
+  "worst_dimension": 0.0
+}

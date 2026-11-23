@@ -1,0 +1,82 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "d7df166ff1b722a901c20b5777688fcd971b11981197a74ba8b3cc52b6859b1d",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Invalid or malicious YAML causes load_config to return None \u2192 400 error.",
+      "Empty 'command' or 'param' still invokes the script with blank arguments.",
+      "Providing an incorrect secret to admin routes returns 401 without changing state.",
+      "Changing the secret to an empty string is rejected.",
+      "Requests with missing required fields (e.g., config_name, job_id, user_id) result in 400 errors."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a Flask\u2011based HTTP API that allows uploading and retrieving configuration data, executing system scripts, managing an admin secret, and querying simple system/user information.",
+    "invariants": [
+      "All endpoints require specific query or form parameters; missing parameters produce a 400 error.",
+      "Admin\u2011only routes succeed only if the provided secret matches the current SECRET_KEY.",
+      "Config upload succeeds only if the YAML parses and contains both 'config_name' and 'config_value'.",
+      "The secret can be changed only when the current secret is correct and a non\u2011empty new secret is supplied."
+    ],
+    "io_behavior": [
+      "POST /config/upload \u2013 accepts raw YAML body, returns JSON with status and the parsed config_name/value or 400 on invalid data.",
+      "GET /system/execute?command=\u2026&param=\u2026 \u2013 triggers a shell script and returns JSON status.",
+      "POST /admin/verify \u2013 form field 'secret' \u2192 JSON success or 401 failure.",
+      "POST /admin/change_secret \u2013 form fields 'current_secret' and 'new_secret' \u2192 updates secret on success, 401 otherwise.",
+      "GET /config/get?config_name=\u2026 \u2013 returns a placeholder config JSON or 400 if missing name.",
+      "GET /system/status?job_id=\u2026 \u2013 returns JSON with job_id and a fixed \"Running\" status or 400 if missing."
+    ],
+    "public_api": {
+      "class:AdminManager": "check_secret(secret);update_secret(new_secret)",
+      "class:ConfigManager": "load_config(yaml_data);validate_config(config)",
+      "route:GET /config/get": "",
+      "route:GET /data/backup": "",
+      "route:GET /system/execute": "",
+      "route:GET /system/logs": "",
+      "route:GET /system/status": "",
+      "route:GET /user/details": "",
+      "route:POST /admin/change_secret": "",
+      "route:POST /admin/settings": "",
+      "route:POST /admin/verify": "",
+      "route:POST /config/delete": "",
+      "route:POST /config/upload": ""
+    },
+    "side_effects": [
+      "Runs ./execute_script.sh with supplied arguments via subprocess.",
+      "Runs backup_data.py with chosen format via subprocess.",
+      "Updates the in\u2011process global SECRET_KEY when /admin/change_secret succeeds.",
+      "Potentially logs to the Flask console (debug disabled)."
+    ],
+    "source_hash": "d2a45383f48e5bb90e5fcbef12ed0fee4780907eb0698a4a431aa0e4938d041c"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.8,
+    "invariants": 0.9,
+    "io_semantics": 0.7,
+    "side_effects": 0.2
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file14.py",
+  "gated_score": 0.52625,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.52625,
+  "original_hash": "d2a45383f48e5bb90e5fcbef12ed0fee4780907eb0698a4a431aa0e4938d041c",
+  "rationale": "The program implements most routes, validates inputs, and enforces secret checks, matching many contract invariants and edge\u2011case handling. However it does not execute the required shell script in /system/execute (nor backup subprocesses) and rejects empty commands instead of invoking the script with blank arguments, violating key side\u2011effect and edge\u2011case requirements.",
+  "schema": 1,
+  "stability_abs_difference": 0.21825,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.8,
+    "invariants": 1.0,
+    "io_semantics": 0.83,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.7445,
+  "weighted_mean": 0.635,
+  "worst_dimension": 0.2
+}

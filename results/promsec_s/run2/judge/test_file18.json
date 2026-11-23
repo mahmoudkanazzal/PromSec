@@ -1,0 +1,69 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "129cf791efe4414d4b004854a5e62e27c77243b9f1b3340d865f56906240312d",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed YAML in /process_order or /update_inventory results in a server error.",
+      "Absent 'id' query parameter in /generate_invoice still triggers the external command with an empty argument.",
+      "Providing an incorrect admin key returns 'Access denied' and a 401 status.",
+      "Omitting required fields (product_id, quantity, shipping_address) in the order payload leads to a KeyError."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a small HTTP API that can process orders, trigger invoice generation, authenticate admin access, and update inventory data.",
+    "invariants": [
+      "All responses are JSON objects with a 'status' field.",
+      "Endpoints use the HTTP methods defined (POST for data submission, GET for invoice trigger).",
+      "The admin endpoint returns HTTP 401 on failed authentication.",
+      "The server runs without debug mode enabled."
+    ],
+    "io_behavior": [
+      "POST /process_order: accepts a YAML payload, returns JSON with status, product_id, quantity, and shipping address.",
+      "GET /generate_invoice?id=ORDER_ID: reads the id query parameter, returns JSON indicating the invoice job was started.",
+      "POST /admin_panel: expects a form field 'key', returns JSON granting or denying admin access with appropriate HTTP status.",
+      "POST /update_inventory: accepts a YAML payload describing inventory, returns JSON confirming the update and echoing the parsed data."
+    ],
+    "public_api": {
+      "route:GET /generate_invoice": "",
+      "route:POST /admin_panel": "",
+      "route:POST /process_order": "",
+      "route:POST /update_inventory": ""
+    },
+    "side_effects": [
+      "Executes an external command './invoice_generator <order_id>' when /generate_invoice is called.",
+      "Parses YAML input, which may trigger errors or unsafe loading depending on the YAML library behavior."
+    ],
+    "source_hash": "d1b2e1fa659084b46c0291c218285d039eac3923c82d3c44590b500aa94a21a2"
+  },
+  "dimensions": {
+    "behavior": 0.45,
+    "edge_cases": 0.0,
+    "invariants": 0.3,
+    "io_semantics": 0.48,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file18.py",
+  "gated_score": 0.22387,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.22387,
+  "original_hash": "d1b2e1fa659084b46c0291c218285d039eac3923c82d3c44590b500aa94a21a2",
+  "rationale": "Key endpoints exist but response fields differ from spec, error responses lack required 'status', external command not executed, and edge\u2011case handling (malformed YAML, missing id, missing order fields) does not produce the prescribed server errors.",
+  "schema": 1,
+  "stability_abs_difference": 0.22863,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.25,
+    "invariants": 0.75,
+    "io_semantics": 0.75,
+    "side_effects": 0.3
+  },
+  "stability_score": 0.4525,
+  "weighted_mean": 0.2985,
+  "worst_dimension": 0.0
+}

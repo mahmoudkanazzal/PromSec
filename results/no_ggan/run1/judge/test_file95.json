@@ -1,0 +1,76 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "aec5f770e583bb3bb21c49103b055acd45e45d7b2e99b9dfca69e469037a2b75",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing required JSON fields in /add_book or /update_book results in a server error",
+      "Non\u2011integer values for 'year' or 'book_id' cause SQLite type errors",
+      "Keyword or year parameters omitted or empty return an empty result set",
+      "Requests for a non\u2011existent book_id in update or delete still return a success message but affect zero rows",
+      "Very large input strings may exceed SQLite limits or cause performance degradation",
+      "SQL injection payloads can alter query behavior because inputs are interpolated directly"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a RESTful web service that lets clients add, search, update, delete, and list books stored in a SQLite 'library.db' database.",
+    "invariants": [
+      "The 'books' table must contain columns id (INTEGER PRIMARY KEY), title (TEXT), author (TEXT), year (INTEGER)",
+      "All successful responses are JSON-encoded and include either a message field or an array of rows",
+      "HTTP status codes are 201 for creation, 200 for other successful operations",
+      "Each request opens a fresh SQLite connection that is closed before the response is sent"
+    ],
+    "io_behavior": [
+      "POST /add_book with JSON {title, author, year} \u2192 201 and JSON {\"message\":\"Book added successfully\"}",
+      "GET /search_books?keyword=\u2026 \u2192 200 and JSON array of matching book rows",
+      "PUT /update_book/<book_id> with JSON {title?, author?, year?} \u2192 200 and JSON {\"message\":\"Book updated successfully\"}",
+      "DELETE /delete_book/<book_id> \u2192 200 and JSON {\"message\":\"Book deleted successfully\"}",
+      "GET /get_books_by_year?year=\u2026 \u2192 200 and JSON array of books from that year"
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:DELETE /delete_book/<int:book_id>": "",
+      "route:GET /get_books_by_year": "",
+      "route:GET /search_books": "",
+      "route:POST /add_book": "",
+      "route:PUT /update_book/<int:book_id>": ""
+    },
+    "side_effects": [
+      "Writes new rows, updates, or deletes rows in the 'books' table of library.db",
+      "Commits the SQLite transaction after each modifying request",
+      "Closes the database connection after each request",
+      "Returns HTTP status codes and JSON bodies to the client"
+    ],
+    "source_hash": "3c14a77e03a4f047bcd38fd49f48160e1f4423dbfe27ee323cf586f69962ee2f"
+  },
+  "dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.2,
+    "invariants": 1.0,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file95.py",
+  "gated_score": 0.57125,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.57125,
+  "original_hash": "3c14a77e03a4f047bcd38fd49f48160e1f4423dbfe27ee323cf586f69962ee2f",
+  "rationale": "The program implements the required routes and returns correct JSON and status codes for normal operations, but deviates on edge\u2011case handling (missing fields, non\u2011integer values, empty parameters, optional update fields, and SQL\u2011injection safety), reducing edge\u2011case and overall behavior scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.01125,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 1.0,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.56,
+  "weighted_mean": 0.695,
+  "worst_dimension": 0.2
+}

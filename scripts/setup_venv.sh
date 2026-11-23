@@ -8,5 +8,4 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 python -m pip freeze > .venv/installed-requirements.txt
 python -m promsec selftest-offline
-python smoke_test.py
 python -m promsec selftest

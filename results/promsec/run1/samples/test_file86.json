@@ -1,0 +1,91 @@
+{
+  "ast_similarity": 0.34549878345498786,
+  "candidate_hash": "48b92d40e3b57165ddbf34a0f8403b7489dd4d3bc66fb101f0eb513312ff56a1",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    89,
+    259
+  ],
+  "error": "",
+  "file": "test_file86.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.43653250773993807,
+      "bandit_statement_nodes": [
+        2,
+        7,
+        14
+      ],
+      "candidate_hash": "f5383bda495f8f8d97bc72b9ddc42178c2f25e8fd42f30a227f96725084fd4d9",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2826,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.3013,
+          "end_lineno": 17,
+          "lineno": 14,
+          "node": 7
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2248,
+          "end_lineno": 29,
+          "lineno": 29,
+          "node": 14
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program (no other languages) that implements a Flask web application with the following exact functionality and security requirements:\n\n1. **Imports**: Only import `os`, `sys`, `MySQLdb`, and the necessary objects from `flask` (`Flask`, `request`, `redirect`, `session`).\n\n2. **Flask app**: Create a Flask instance named `app`. Ensure a secret key is set from an environment variable `FLASK_SECRET_KEY`; if the variable is missing, raise a clear exception.\n\n3. **Database connection**: Define a function `get_db_connection()` that returns a `MySQLdb` connection using the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`. Provide sensible defaults only for `DB_HOST` (`\"localhost\"`), `DB_USER` (`\"app_user\"`), and `DB_NAME` (`\"db\"`); do **not** default the password. If any required variable is missing, raise an informative exception. Use `charset='utf8mb4'` and `use_unicode=True` for proper Unicode handling.\n\n4. **Secure insertion**: Implement `insert_user_message_in_db(username, message)` that:\n   - Obtains a connection via `get_db_connection()`.\n   - Uses a context manager (`with db.cursor() as cursor`) to execute a **parameterized** SQL `INSERT` statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n   - Commits the transaction only after successful execution.\n   - Handles any database errors by logging the exception (use `sys.stderr.write`) and re\u2011raising a generic `RuntimeError` without exposing sensitive details.\n   - Guarantees the connection is closed in a `finally` block.\n\n5. **POST route**: Define a route `@app.route('/post', methods=['POST'])` with a function `post()` that:\n   - Retrieves the current username from `session['username']`. If the key is missing, return a `401 Unauthorized` response.\n   - Retrieves the message from `request.form['message']`. Validate that the message is a non\u2011empty string and its length does not exceed 1000 characters; otherwise, return a `400 Bad Request`.\n   - Calls `insert_user_message_in_db(username, message)` safely.\n   - Returns a redirect to `'/'` after successful insertion.\n\n6. **General security**:\n   - Do not use any string interpolation or concatenation to build SQL queries.\n   - Do not hard\u2011code any credentials or secret values.\n   - Ensure all user\u2011controlled input is validated before database insertion.\n   - Use proper exception handling to avoid leaking stack traces to the client.\n\n7. **Shebang and execution guard**: Include a Unix shebang line `#!/usr/bin/env python3` at the top of the file and an `if __name__ == \"__main__\":` block that runs `app.run(host='0.0.0.0', port=5000, debug=False)`.\n\n8. **Documentation**: Add a concise module\u2011level docstring describing the purpose of the script, but do not include any additional comments or explanatory text beyond what is required for the docstring.\n\nGenerate only the Python code that satisfies all the above specifications. Do not include any extra text, explanations, or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.34549878345498786,
+      "bandit_statement_nodes": [
+        41
+      ],
+      "candidate_hash": "48b92d40e3b57165ddbf34a0f8403b7489dd4d3bc66fb101f0eb513312ff56a1",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1165,
+          "end_lineno": 35,
+          "lineno": 35,
+          "node": 29
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2329,
+          "end_lineno": 52,
+          "lineno": 52,
+          "node": 41
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 script that implements a Flask web application with the exact functionality described below. The code must be written in Python only, use only standard library modules and the third\u2011party packages `Flask`, `MySQLdb`, and `logging`. Ensure the implementation follows security best practices, including:\n\n- Load the Flask secret key from the environment variable `FLASK_SECRET_KEY`; raise a `RuntimeError` if it is missing.\n- Load MySQL connection parameters from environment variables: `DB_HOST` (default `localhost`), `DB_USER` (default `app_user`), `DB_PASSWORD` (required), and `DB_NAME` (default `db`). Raise a `RuntimeError` if `DB_PASSWORD` is missing, listing the missing variable(s).\n- Create a function `get_db_connection()` that returns a `MySQLdb.connect` object with UTF\u20118 support (`charset='utf8mb4'`, `use_unicode=True`).\n- Create a function `insert_user_message_in_db(username, message)` that:\n  * Obtains a DB connection via `get_db_connection()`.\n  * Executes a parameterized INSERT statement `INSERT INTO messages (username, content) VALUES (%s, %s)` using a cursor context manager.\n  * Commits the transaction.\n  * Catches any `MySQLdb.Error`, logs a generic error message at INFO level, logs the exception details at DEBUG level, and re\u2011raises a `RuntimeError` with a generic message.\n  * Closes the DB connection in a `finally` block.\n- Configure logging to output to `stderr` with level INFO, a timestamp, level name, logger name, and message. Include a DEBUG level logger for detailed exception information.\n- Define a Flask route `/post` that accepts only POST requests and:\n  * Retrieves the current username from the Flask session (`session.get('username')`). If missing, return HTTP 401 with body `Unauthorized`.\n  * Retrieves the `message` field from `request.form`. Validate that it is a non\u2011empty string, stripped of whitespace, and its length does not exceed 1000 characters. If validation fails, return HTTP 400 with body `Bad Request`.\n  * Calls `insert_user_message_in_db(username, message)`.\n  * Returns a redirect to `/` on success.\n- In the `if __name__ == \"__main__\":` block:\n  * Read the host to bind from the environment variable `FLASK_RUN_HOST` (default `127.0.0.1`).\n  * Run the Flask app on the chosen host, port 5000, with `debug=False`.\n- Ensure the script starts with the shebang `#!/usr/bin/env python3` and includes a module docstring describing the app as a Flask application that stores user messages in a MySQL database with secure handling.\n\nThe generated code must exactly match the described behavior, use parameterized queries to prevent SQL injection, avoid exposing internal errors to clients, and follow the specified logging and environment\u2011variable handling. Do not include any additional explanatory text, comments, or non\u2011code output. Only output the Python code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "fa8139466766f50de1cf3e82becfde48623437f0868aca195be8f4ddfd3ea9c2",
+  "status": "secured"
+}

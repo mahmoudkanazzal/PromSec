@@ -1,0 +1,38 @@
+{
+  "ast_similarity": 0.590990990990991,
+  "candidate_hash": "068907c4a1d000ff0d92db5006806d1f451ea6d7ee0f512052e9ae11fb67140f",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file99.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.590990990990991,
+      "bandit_statement_nodes": [
+        10,
+        14,
+        25,
+        34
+      ],
+      "candidate_hash": "068907c4a1d000ff0d92db5006806d1f451ea6d7ee0f512052e9ae11fb67140f",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python Flask application that implements the following functionality exactly as described, using only Python and standard libraries (including Flask and sqlite3):\n\n1. **Database Connection**\n   - Define a function `get_db_connection()` that opens a connection to an SQLite database file named `recipe.db`.\n   - Set the connection\u2019s `row_factory` to `sqlite3.Row`.\n   - Ensure the connection is used as a context manager (`with` statement) wherever possible.\n\n2. **Endpoint `/add_recipe` (POST)**\n   - Accept a JSON payload containing:\n     - `\"title\"` (string, required)\n     - `\"ingredients\"` (list of strings, required)\n   - Validate that the payload exists and includes both required fields; if not, abort with HTTP 400 and a clear description.\n   - Verify that `\"ingredients\"` is a list; otherwise abort with HTTP 400.\n   - Insert the recipe title into the `recipes` table using a parameterized SQL statement.\n   - Retrieve the newly created `recipe_id` (`lastrowid`).\n   - For each ingredient in the list, insert a row into the `ingredients` table with the `recipe_id` and ingredient text, using parameterized queries.\n   - Commit the transaction.\n   - Return a JSON response `{\"message\": \"Recipe added successfully\", \"recipe_id\": <id>}` with HTTP status 201.\n\n3. **Endpoint `/submit_review` (POST)**\n   - Accept a JSON payload containing:\n     - `\"recipe_id\"` (integer, required)\n     - `\"review\"` (string, required)\n     - `\"reviewer_id\"` (integer or string, required)\n   - Validate the presence of all fields; if any are missing, abort with HTTP 400 and a clear description.\n   - Insert the review into the `reviews` table using a parameterized SQL statement.\n   - Commit the transaction.\n   - Return a JSON response `{\"message\": \"Review submitted successfully\"}` with HTTP status 200.\n\n4. **Endpoint `/get_recipe_reviews` (GET)**\n   - Require a query parameter `recipe_id`.\n   - If `recipe_id` is missing, abort with HTTP 400 and a clear description.\n   - Execute a parameterized SELECT query that retrieves each review text and the count of rows for that review (use `COUNT(r.id) AS review_count`) from the `reviews` table where `recipe_id` matches, grouping appropriately.\n   - Convert the fetched rows to a list of dictionaries.\n   - Return the list as JSON with HTTP status 200.\n\n5. **Application Execution**\n   - Include the standard `if __name__ == '__main__':` block.\n   - Run the Flask app with `debug=False`.\n\n**Security and Best Practices Requirements**\n- Use only parameterized queries (`?` placeholders) to prevent SQL injection.\n- Perform thorough input validation and type checking for all incoming data.\n- Use `abort` with appropriate status codes and descriptive messages for error handling.\n- Manage database connections with context managers to ensure proper closing.\n- Do not import or use any non\u2011standard or external libraries beyond Flask and sqlite3.\n- Ensure the entire code is written in Python; no other programming languages or pseudo\u2011code are allowed.\n- Do not include any explanatory comments, markdown formatting, or additional text outside the required code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "05a8f2728379041b6e2e15e634979a3fa87f110fe73dca5cd6b12c3a325c1542",
+  "status": "secured"
+}

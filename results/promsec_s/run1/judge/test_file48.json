@@ -1,0 +1,65 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "5db7728ff7beaa08e9f389bc99ba4266ca655b59e730b6b2c1bd413ddb182bdb",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields raise a KeyError, resulting in a 500 error.",
+      "Providing a non\u2011byte password to hashlib.md5 may raise a TypeError.",
+      "SQL injection is possible because the query concatenates raw input.",
+      "Empty strings for username or password are still processed and may match empty records.",
+      "Database connection failures produce an exception and abort the request."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by verifying supplied username and password against records in a MySQL database.",
+    "invariants": [
+      "The response is always one of the two fixed strings.",
+      "The endpoint only processes POST requests; other methods are ignored.",
+      "The MD5 hash of the supplied password is always computed before the query.",
+      "Database connection parameters (host, user, password, db) never change at runtime."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST requests to the /login endpoint with form fields 'username' and 'password'.",
+      "Returns the plain\u2011text response \"Eingeloggt\" when credentials match a database record.",
+      "Returns the plain\u2011text response \"Falscher Benutzername oder Passwort\" when no matching record is found.",
+      "Uses the request body as the sole source of input; no other request data influences the output."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to a local MySQL server using hard\u2011coded credentials.",
+      "Executes a SELECT query that reads from the 'userdaten' table.",
+      "Closes the database cursor and connection after the query (implicit on process termination)."
+    ],
+    "source_hash": "d3279238c2bce3c13aeb41e0e7e2642c92d84b5a23a3c0cf24ce1578e1a94f1c"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.5,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file48.py",
+  "gated_score": 0.25375,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.25375,
+  "original_hash": "d3279238c2bce3c13aeb41e0e7e2642c92d84b5a23a3c0cf24ce1578e1a94f1c",
+  "rationale": "Core authentication logic, MD5 hashing, error handling, and invariant responses differ from contract; only endpoint and response strings match partially, leading to low preservation scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.07125,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.7,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.325,
+  "weighted_mean": 0.305,
+  "worst_dimension": 0.1
+}

@@ -1,0 +1,82 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "24021ec52794c8d4fe94e44cba4d2ed9a5d782a4f2f88699796570bb53e5471b",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML in /service/create results in a 400 error with \"Invalid YAML format\".",
+      "Missing required fields (service_id, service_name, password, etc.) cause 400 errors with specific messages.",
+      "Providing an empty new_password to /admin/update_password yields a 400 error.",
+      "Calling /operations/start without operation or parameter still runs the script with empty arguments.",
+      "Requesting /operations/status or /operations/logs without operation_id returns a 400 error.",
+      "Changing MASTER_PASSWORD affects all subsequent admin calls until changed again."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a REST\u2011like API for creating, retrieving, and deleting services, managing operations, and performing admin tasks such as login, password change, and configuration, while delegating some actions to external shell scripts.",
+    "invariants": [
+      "All responses are JSON objects with a \"status\" field.",
+      "Required request parameters (e.g., service_id, service_name, password) must be present; otherwise a 400 error is returned.",
+      "Admin\u2011only endpoints reject requests with an incorrect MASTER_PASSWORD, returning HTTP 401.",
+      "The API never returns raw data; it always wraps information in a JSON structure.",
+      "The server runs with Flask's default routing; no authentication token persists beyond the request."
+    ],
+    "io_behavior": [
+      "POST /service/create with YAML body returns JSON containing the supplied service_id and service_name.",
+      "GET /operations/start?operation=...&parameter=... triggers a shell script and returns a JSON status message.",
+      "POST /admin/login with form field password returns a JSON login result and HTTP 401 on failure.",
+      "POST /admin/update_password with correct current password and new_password updates the in\u2011memory password and returns a JSON confirmation.",
+      "GET /service/details?service_id=... returns a JSON object with static service information.",
+      "GET /data/backup?format=... runs a backup script and returns a JSON status message."
+    ],
+    "public_api": {
+      "route:GET /data/backup": "",
+      "route:GET /operations/logs": "",
+      "route:GET /operations/start": "",
+      "route:GET /operations/status": "",
+      "route:GET /service/details": "",
+      "route:GET /user/info": "",
+      "route:POST /admin/configure": "",
+      "route:POST /admin/login": "",
+      "route:POST /admin/update_password": "",
+      "route:POST /service/create": "",
+      "route:POST /service/delete": ""
+    },
+    "side_effects": [
+      "Execution of external command `sh run_operation.sh <operation> <parameter>` via os.system.",
+      "Execution of external command `python backup_data.py <format>` via os.system.",
+      "Modification of the global variable MASTER_PASSWORD (affects subsequent admin calls).",
+      "Potential creation of subprocesses that may write logs or files, depending on the invoked scripts."
+    ],
+    "source_hash": "8b59bd3ae154e82072eb04f1a36d3460a25aeba4d36cf11d86af2f20fa25870c"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.3,
+    "io_semantics": 0.15,
+    "side_effects": 0.05
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file11.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.13812,
+  "original_hash": "8b59bd3ae154e82072eb04f1a36d3460a25aeba4d36cf11d86af2f20fa25870c",
+  "rationale": "Many required routes, response formats, and side\u2011effects are missing or differ from the contract; only a few admin/login behaviours match, leading to low preservation scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.04438,
+  "stability_dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.3,
+    "io_semantics": 0.25,
+    "side_effects": 0.2
+  },
+  "stability_score": 0.1825,
+  "weighted_mean": 0.1675,
+  "worst_dimension": 0.05
+}

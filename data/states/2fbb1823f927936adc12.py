@@ -1,0 +1,141 @@
+from __future__ import print_function
+import sqlite3
+import threading
+import time
+import datetime
+import json
+import requests
+import yaml
+import hashlib
+import os
+import shutil
+from flask import Flask, request, jsonify
+
+DB_PATH = 'jobs.db'
+# Base directory for cleanup tasks; defaults to a dedicated subdirectory to avoid unsafe deletions
+CLEANUP_BASE_DIR = os.path.abspath(os.getenv('CLEANUP_BASE_DIR', '/tmp/clean'))
+app = Flask(__name__)
+
+def init_db():
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS tasks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            run_at TEXT NOT NULL,
+            params TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
+    # Ensure the cleanup base directory exists
+    os.makedirs(CLEANUP_BASE_DIR, exist_ok=True)
+
+def add_task(name, run_at, params):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    param_blob = yaml.dump(params)
+    cur.execute(
+        "INSERT INTO tasks (name, run_at, params) VALUES (?, ?, ?)",
+        (name, run_at.isoformat(), param_blob)
+    )
+    conn.commit()
+    conn.close()
+
+def fetch_due_tasks():
+    now = datetime.datetime.utcnow().isoformat()
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT id, name, run_at, params FROM tasks WHERE run_at <= ?",
+        (now,)
+    )
+    rows = cur.fetchall()
+    conn.close()
+    tasks = []
+    for row in rows:
+        task = {
+            'id': row[0],
+            'name': row[1],
+            'run_at': datetime.datetime.fromisoformat(row[2]),
+            'params': yaml.safe_load(row[3]) if row[3] else {}
+        }
+        tasks.append(task)
+    return tasks
+
+def delete_task(task_id):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+    conn.commit()
+    conn.close()
+
+def run_task(task):
+    name = task['name']
+    params = task['params']
+    if name == 'ping':
+        url = params.get('url', '')
+        try:
+            resp = requests.get(url, timeout=5)
+            print('Ping', url, resp.status_code)
+        except Exception as e:
+            print('Ping error:', e)
+    elif name == 'cleanup':
+        path = params.get('path', CLEANUP_BASE_DIR)
+        try:
+            abs_path = os.path.abspath(path)
+            real_path = os.path.realpath(abs_path)
+            # Ensure the cleanup target is within the allowed base directory
+            allowed_prefix = CLEANUP_BASE_DIR.rstrip(os.sep) + os.sep
+            if not real_path.startswith(allowed_prefix):
+                print('Cleanup error: path is outside allowed directory')
+                return
+            if os.path.isdir(real_path):
+                for entry in os.listdir(real_path):
+                    entry_path = os.path.join(real_path, entry)
+                    if os.path.isdir(entry_path):
+                        shutil.rmtree(entry_path)
+                    else:
+                        os.remove(entry_path)
+                print('Cleanup', real_path)
+            else:
+                print('Cleanup error: path is not a directory')
+        except Exception as e:
+            print('Cleanup error:', e)
+    elif name == 'hash':
+        data = params.get('data', '')
+        h = hashlib.sha256(data.encode()).hexdigest()
+        print('Hash of data:', h)
+    else:
+        print('Unknown task:', name)
+
+def scheduler_loop():
+    while True:
+        due = fetch_due_tasks()
+        for task in due:
+            run_task(task)
+            delete_task(task['id'])
+        time.sleep(10)
+
+@app.route('/schedule', methods=['POST'])
+def schedule():
+    payload = request.get_json()
+    name = payload.get('name')
+    run_at_str = payload.get('run_at')
+    params = payload.get('params', {})
+    try:
+        run_at = datetime.datetime.fromisoformat(run_at_str)
+    except Exception:
+        return jsonify({'error': 'Invalid run_at format'}), 400
+    add_task(name, run_at, params)
+    return jsonify({'status': 'scheduled'}), 201
+
+def main():
+    init_db()
+    t = threading.Thread(target=scheduler_loop, daemon=True)
+    t.start()
+    app.run(host='127.0.0.1', port=5000)
+
+if __name__ == '__main__':
+    main()

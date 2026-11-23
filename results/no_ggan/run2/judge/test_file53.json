@@ -1,0 +1,72 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "85a95b136f34461d13fde3e09241d96525e9bb51142cd6eb7a50a78c678df8fb",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError before any DB work.",
+      "Empty strings for username or password are still processed and may return \"wrong pw\" or \"username not found\".",
+      "SQL injection via crafted username can alter the query semantics.",
+      "Very long input values may exceed MySQL limits or cause performance issues.",
+      "Database connection failures result in an unhandled exception.",
+      "Non\u2011ASCII characters in the password affect MD5 hashing but are still processed."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by verifying the supplied username and password against records in a MySQL database and return a simple status message.",
+    "invariants": [
+      "The endpoint only processes POST requests.",
+      "The response is always one of the three fixed strings.",
+      "Database connection is always closed before the function returns.",
+      "Password comparison uses MD5 hash of the supplied password.",
+      "No data is written or modified in the database.",
+      "The function does not raise uncaught exceptions for normal inputs."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST requests to the /login endpoint with form fields 'username' and 'password'.",
+      "Returns a plain\u2011text response: \"success\", \"wrong pw\", or \"username not found\".",
+      "Closes the database connection after the query.",
+      "Uses MD5 to hash the supplied password before comparison.",
+      "Performs a SELECT query built by concatenating the raw username value.",
+      "Responds with HTTP 200 for valid POSTs; other methods get Flask's default 405."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to the local MySQL server.",
+      "Executes a read\u2011only SELECT query on the 'user' table.",
+      "Closes the MySQL connection after the query.",
+      "May log request details via Flask's default logging.",
+      "Potentially triggers MySQL error logging on malformed queries."
+    ],
+    "source_hash": "e504dc573d51ab243282d63290dd063e54015b47e69324ba5959d518da821e71"
+  },
+  "dimensions": {
+    "behavior": 0.0,
+    "edge_cases": 0.0,
+    "invariants": 0.2,
+    "io_semantics": 0.0,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file53.py",
+  "gated_score": 0.12375,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.12375,
+  "original_hash": "e504dc573d51ab243282d63290dd063e54015b47e69324ba5959d518da821e71",
+  "rationale": "The candidate deviates from the contract on key behaviors: it returns different error messages and status codes, validates empty inputs instead of raising KeyError, uses parameterized queries and werkzeug password checking instead of raw concatenation and MD5, and does not produce the exact three fixed response strings. Connection handling and read\u2011only SELECT side effects remain, but overall contract preservation is poor.",
+  "schema": 1,
+  "stability_abs_difference": 0.175,
+  "stability_dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.4,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.29875,
+  "weighted_mean": 0.165,
+  "worst_dimension": 0.0
+}

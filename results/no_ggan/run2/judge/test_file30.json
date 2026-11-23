@@ -1,0 +1,78 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "ffae72172d53c45910f013495495e6018bd3d253db9cddce1e615ca0a2988b03",
+  "compile_ok": true,
+  "confidence": 0.8,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed authentication pillar causes an immediate `CommandExecutionError`.",
+      "Requesting a non\u2011existent key from the pillar raises `CommandExecutionError`.",
+      "HTTP errors (e.g., 4xx/5xx) result in a `null` return rather than an exception.",
+      "API returns malformed JSON \u2192 `CommandExecutionError` is raised.",
+      "Network failures (timeouts, DNS errors) propagate as exceptions from the `requests` library.",
+      "Running `install_agent` on a system without curl or without write permission to `/tmp/` will fail."
+    ],
+    "entrypoints": [],
+    "intent": "Provide a Salt execution module that lets users create, delete, list, update Server Density devices and install the Server Density agent via the Server Density REST API.",
+    "invariants": [
+      "A pillar named `serverdensity` (or a custom name) must contain an `api_token` for every API call.",
+      "Successful API calls must return HTTP 200; otherwise the function returns `null`.",
+      "All returned data is JSON\u2011decoded; non\u2011JSON payloads trigger a `CommandExecutionError`.",
+      "Parameters beginning with `__` are stripped before being sent to the API.",
+      "Numeric filter values are converted to strings before being sent.",
+      "The `install_agent` function always uses `/tmp/` as its working directory."
+    ],
+    "io_behavior": [
+      "Accepts function arguments (e.g., device name, ID, filter parameters, agent key) from the Salt CLI or other Salt callers.",
+      "Returns a Python object parsed from the API's JSON response on success, or `null` when the HTTP status is not 200.",
+      "Raises a `CommandExecutionError` when required authentication data is missing or when the API response cannot be parsed as JSON.",
+      "Logs debug and error messages to the Salt logger.",
+      "For `install_agent`, writes a script to `/tmp/`, makes it executable, and runs it, returning the command's stdout.",
+      "All network interactions are performed over HTTPS to `api.serverdensity.io`."
+    ],
+    "public_api": {
+      "func:create": "(name, **params)",
+      "func:delete": "(device_id)",
+      "func:get_sd_auth": "(val, sd_auth_pillar_name='serverdensity')",
+      "func:install_agent": "(agent_key)",
+      "func:ls": "(**params)",
+      "func:update": "(device_id, **params)"
+    },
+    "side_effects": [
+      "Outbound HTTPS requests to Server Density (POST, GET, PUT, DELETE).",
+      "Writes a temporary shell script to `/tmp/install.sh` and executes it.",
+      "Executes shell commands via Salt's `cmd.run` (curl download, chmod, installer execution).",
+      "Potentially modifies remote Server Density inventory (create, delete, update).",
+      "Emits log entries at debug and error levels.",
+      "May raise exceptions that propagate to the caller."
+    ],
+    "source_hash": "9a7814512e2bc5f67a9fe142b80d8be93e1d5eca2b8f9bd58b82309698b5d16e"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.5,
+    "invariants": 0.5,
+    "io_semantics": 0.2,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file30.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.3125,
+  "original_hash": "9a7814512e2bc5f67a9fe142b80d8be93e1d5eca2b8f9bd58b82309698b5d16e",
+  "rationale": "The module implements most API calls and error handling, but deviates from the contract by raising CommandExecutionError on HTTP error statuses instead of returning null, wraps network exceptions rather than propagating them, and uses a temporary directory instead of /tmp for install_agent, violating several invariants and edge\u2011case expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.24625,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.3,
+    "invariants": 0.5,
+    "io_semantics": 0.5,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.55875,
+  "weighted_mean": 0.35,
+  "worst_dimension": 0.2
+}

@@ -1,0 +1,68 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "2207c5d12a475ba2cb1346e34a1d4f0a7844795c794eb3e74864208d6608a704",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'username' or 'password' fields results in a KeyError or empty string handling.",
+      "SQL injection is possible because the username is concatenated directly into the query.",
+      "If multiple rows are returned for a username, the first matching row determines the outcome.",
+      "Database connection failures produce an internal server error.",
+      "Non\u2011ASCII characters in the password are encoded to UTF\u20118 before hashing."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by verifying the supplied username and password against records in a MySQL database.",
+    "invariants": [
+      "The endpoint only responds to POST requests.",
+      "User passwords are stored as MD5 hashes in the database.",
+      "The 'username' column is expected to be unique.",
+      "The program does not modify any database rows.",
+      "The response is always one of the three fixed strings."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /login with form fields 'username' and 'password'.",
+      "Returns the plain\u2011text string \"success\" when credentials match.",
+      "Returns \"wrong pw\" when the username exists but the password hash does not match.",
+      "Returns \"username not found\" when no matching username is found.",
+      "Closes the database connection before sending the response."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to the local MySQL server.",
+      "Executes a SELECT query that reads user records.",
+      "Closes the MySQL connection after the query.",
+      "May raise an exception that propagates as a 500 HTTP error if the DB is unreachable."
+    ],
+    "source_hash": "e504dc573d51ab243282d63290dd063e54015b47e69324ba5959d518da821e71"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.5,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file53.py",
+  "gated_score": 0.3725,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.3725,
+  "original_hash": "e504dc573d51ab243282d63290dd063e54015b47e69324ba5959d518da821e71",
+  "rationale": "Program deviates from contract in password hashing (uses PBKDF2 instead of MD5), prevents SQL injection, returns non\u2011contract error strings, and handles DB failures with custom messages rather than a 500 error, though it preserves POST handling, basic response strings, and MySQL side\u2011effects.",
+  "schema": 1,
+  "stability_abs_difference": 0.0635,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.22,
+    "invariants": 0.3,
+    "io_semantics": 0.85,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.436,
+  "weighted_mean": 0.43,
+  "worst_dimension": 0.2
+}

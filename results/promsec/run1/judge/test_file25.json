@@ -1,0 +1,82 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "3dd3c19f26b296bb454238f8b84b1fa5ca15f039060864e2c3bbecb714ab0497",
+  "compile_ok": true,
+  "confidence": 0.8,
+  "contract": {
+    "edge_cases": [
+      "Empty or malformed YAML payload leads to a parsing exception (Flask returns 500).",
+      "Providing an unknown query parameter (e.g., missing 'section' or 'type') still triggers script execution with empty argument.",
+      "Submitting a POST without required form fields (e.g., missing password) results in default empty string handling.",
+      "Running admin_panel with an unsupported action returns a 400 error.",
+      "If the external script invoked by os.system fails, the API still returns success JSON, hiding the failure."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a Flask\u2011based HTTP API for basic library management operations (books, members, inventory, reports, and admin tasks).",
+    "invariants": [
+      "title, author, and isbn must be non\u2011empty for add_book; otherwise a 400 error is returned.",
+      "isbn is mandatory for update_book and delete_book; missing isbn yields 400.",
+      "member name and id are required for add_member; missing fields cause 400.",
+      "Only the exact string \"library_admin_2023\" grants librarian access; any other value returns 401.",
+      "admin_panel only accepts actions 'backup' or 'restore'; other values return 400."
+    ],
+    "io_behavior": [
+      "POST /add_book \u2013 accepts YAML with title, author, isbn (optional year) and returns JSON confirming addition or 400 error.",
+      "GET /run_inventory \u2013 takes optional 'section' query, launches inventory_script.py and returns JSON status.",
+      "POST /librarian_access \u2013 checks form field 'password' against a hard\u2011coded secret and returns access granted or 401.",
+      "POST /update_book \u2013 accepts YAML with isbn and optional new fields, returns JSON confirming update or 400 error.",
+      "POST /delete_book \u2013 accepts YAML with isbn, returns JSON confirming deletion or 400 error.",
+      "GET /generate_reports \u2013 takes 'type' query, runs report_generator.py and returns JSON status."
+    ],
+    "public_api": {
+      "route:GET /generate_reports": "",
+      "route:GET /run_inventory": "",
+      "route:GET /view_books": "",
+      "route:POST /add_book": "",
+      "route:POST /add_member": "",
+      "route:POST /admin_panel": "",
+      "route:POST /delete_book": "",
+      "route:POST /librarian_access": "",
+      "route:POST /update_book": "",
+      "route:POST /update_member": ""
+    },
+    "side_effects": [
+      "Calls external Python scripts via os.system for inventory, report generation, backup/restore, and book view.",
+      "Executes backup_script.py or restore_script.py when admin_panel receives action='backup' or 'restore'.",
+      "Potentially writes to stdout/stderr of the invoked scripts (observable in server logs).",
+      "Uses a fixed librarian password constant for privileged access.",
+      "Parses untrusted YAML without sanitization, which may affect process behavior."
+    ],
+    "source_hash": "289c03ce0525752ca513e1fac47268bf5c4aef9eeca6d6f2d1a2747263347a19"
+  },
+  "dimensions": {
+    "behavior": 0.25,
+    "edge_cases": 0.2,
+    "invariants": 0.3,
+    "io_semantics": 0.3,
+    "side_effects": 0.2
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file25.py",
+  "gated_score": 0.23938,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.23938,
+  "original_hash": "289c03ce0525752ca513e1fac47268bf5c4aef9eeca6d6f2d1a2747263347a19",
+  "rationale": "Key contract points are broken: malformed YAML returns 400 not 500, missing query params cause 400 instead of running with empty args, librarian password is env\u2011based not the hard\u2011coded secret, script failures return errors rather than hiding them, and external scripts are invoked via imported functions instead of os.system, violating side\u2011effect and invariant expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.22237,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.67,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.46175,
+  "weighted_mean": 0.2525,
+  "worst_dimension": 0.2
+}

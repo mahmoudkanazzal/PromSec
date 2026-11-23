@@ -1,0 +1,67 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "2a368e064801dc17ac79f3a02ef7b42809c729444fb2fe9f36deb18b04f01ee8",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'stock_name' or 'stock_quantity' in the form raises a KeyError.",
+      "Non\u2011numeric 'stock_quantity' causes a ValueError when converting to int.",
+      "Absent or invalid session['username'] results in a KeyError.",
+      "Database connection failures or query errors raise exceptions and abort the request.",
+      "If the user_portfolio table is empty or the username is new, the code inserts a new row."
+    ],
+    "entrypoints": [],
+    "intent": "Handle a POST request to record a buy order by creating or updating the caller's stock portfolio in the database.",
+    "invariants": [
+      "After a successful call, exactly one row for the username exists in user_portfolio.",
+      "The stored stock_quantity equals the previous quantity plus the submitted quantity (as an integer).",
+      "Database changes are persisted because of an explicit commit.",
+      "The response string accurately reflects whether the row was inserted or updated."
+    ],
+    "io_behavior": [
+      "Accepts a POST to /buy_order with form fields 'stock_name' and 'stock_quantity'.",
+      "Reads the current username from the Flask session.",
+      "Returns plain\u2011text \"updated\" if the user already has a portfolio entry.",
+      "Returns plain\u2011text \"initialized\" if a new portfolio entry is created.",
+      "Responds with HTTP 200 on success."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection to localhost using root credentials.",
+      "Queries the user_portfolio table for the given username.",
+      "Inserts a new row or updates the existing row with the new stock_quantity.",
+      "Commits the transaction and closes the database connection."
+    ],
+    "source_hash": "8f8582e327b09bad38bbe3adc8c22caea22ee2d220c765fc6fb258469061e46e"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.9,
+    "io_semantics": 0.6,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file83.py",
+  "gated_score": 0.35875,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.35875,
+  "original_hash": "8f8582e327b09bad38bbe3adc8c22caea22ee2d220c765fc6fb258469061e46e",
+  "rationale": "The program returns custom error responses instead of raising KeyError/ValueError as required, and uses env\u2011based DB credentials rather than fixed root/localhost, breaking several edge\u2011case expectations, though successful updates/inserts and response strings largely match the contract.",
+  "schema": 1,
+  "stability_abs_difference": 0.26438,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.4,
+    "invariants": 0.75,
+    "io_semantics": 0.8,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.62313,
+  "weighted_mean": 0.445,
+  "worst_dimension": 0.1
+}

@@ -1,0 +1,65 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "b1437656e28e06ada9d3cc73b1410c7991b2ba07c16db64686713d8d54d8e8d5",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Submitting an empty or whitespace\u2011only username or password may still be accepted unless validated elsewhere.",
+      "Providing a username that contains SQL special characters can lead to injection because the query is built via string concatenation.",
+      "Very long usernames or passwords may exceed database column limits and cause an error.",
+      "If the MySQL server is unreachable or credentials are wrong, the request will fail with a server error.",
+      "Missing form fields cause a KeyError in the request handling code."
+    ],
+    "entrypoints": [],
+    "intent": "Provide a web endpoint that allows a client to create a new user account by submitting a username and password.",
+    "invariants": [
+      "Each username can appear at most once in the `user` table.",
+      "Passwords are never stored in clear text; they are stored as a SHA\u20111 hexadecimal digest.",
+      "The endpoint does not modify any existing rows; it only inserts when the username is absent."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST requests at the path /register with form fields 'username' and 'password'.",
+      "Returns the plain\u2011text response \"register success\" when a new account is created.",
+      "Returns the plain\u2011text response \"user already exists\" when the supplied username is already present.",
+      "If required form fields are missing, the request will raise an error from the framework.",
+      "All responses are sent with the default HTTP status code 200 on success paths."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Creates a new row in the MySQL table `user` containing the supplied username and a SHA\u20111 hash of the password.",
+      "Commits the transaction to persist the new user record.",
+      "May open a network connection to the MySQL server at mysql.eecs.oregonstate.edu."
+    ],
+    "source_hash": "b6e3cdbb96decf7cd13844e5210a27a2089060571717bc243e0a1303df33bc57"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.3,
+    "io_semantics": 0.4,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file68.py",
+  "gated_score": 0.2725,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.2725,
+  "original_hash": "b6e3cdbb96decf7cd13844e5210a27a2089060571717bc243e0a1303df33bc57",
+  "rationale": "The program implements the /register POST endpoint but adds validation, different status codes, and uses a salted hash instead of SHA\u20111, violating the contract's response texts, status codes, and password storage invariant. It prevents SQL injection and rejects empty usernames, contrary to the specified edge cases. Side\u2011effects (row insertion, commit, DB connection) are largely preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.188,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.4,
+    "invariants": 0.66,
+    "io_semantics": 0.3,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.4605,
+  "weighted_mean": 0.33,
+  "worst_dimension": 0.1
+}

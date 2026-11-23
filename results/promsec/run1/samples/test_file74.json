@@ -1,0 +1,105 @@
+{
+  "ast_similarity": 0.6208955223880597,
+  "candidate_hash": "245a938a308ffa7c9bf4a26186c66c7d1a8a5c35ccee6a83e86a72647b0ecb37",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file74.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8353413654618473,
+      "bandit_statement_nodes": [
+        14
+      ],
+      "candidate_hash": "cd52f33d112eaec0453d491c17cddfa4c06b25dddfa556250d2ff6e3b52f77f2",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2448,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1835,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/register` route handling only POST requests. The script must:\n\n1. Import only Python standard libraries and the following third\u2011party packages: `flask`, `re`, `MySQLdb`, `bcrypt`.\n2. Create a Flask app instance named `app`.\n3. Define the `/register` view function `register()` that:\n   - Retrieves `username`, `password`, and `confirm_password` from `request.form`.\n   - Validates that `username` consists only of alphanumeric characters and underscores, is between 3 and 30 characters long, and that `password` and `confirm_password` are identical and at least 8 characters long. Return an appropriate error message string for any validation failure.\n   - Hashes the password using `bcrypt.hashpw` with a generated salt (`bcrypt.gensalt()`), encoding the password as UTF\u20118.\n   - Connects securely to a MySQL database located at `127.0.0.1` with user `root`, password `password`, database `cwe_900` using `MySQLdb.connect`. Use a context manager (`with` statement) for the connection and cursor to ensure they are closed automatically.\n   - Checks for an existing user with the same username using a **parameterized** SELECT query to prevent SQL injection.\n   - If the username does not exist, inserts the new user with a **parameterized** INSERT query, storing the username and the binary password hash. Commit the transaction on success; on any database error, roll back the transaction and return the message `\"Registration Failed\"`.\n   - If the username already exists, return the message `\"Username already exists\"`.\n   - On successful registration, return the message `\"You have successfully registered\"`.\n4. Ensure all database operations are wrapped in appropriate try/except blocks, catching `MySQLdb.Error` (or a generic exception if necessary) and handling rollbacks and resource cleanup correctly.\n5. Do not include any code in languages other than Python, and do not add explanatory comments or markdown. Return only the Python source code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6439628482972136,
+      "bandit_statement_nodes": [
+        31
+      ],
+      "candidate_hash": "5543e879f75dac7c797dfa982db02d33539e217cb29e3f9fb905f459436c8deb",
+      "cwe_count": 2,
+      "cwes": [
+        605,
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1011,
+          "end_lineno": 25,
+          "lineno": 25,
+          "node": 21
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.105,
+          "end_lineno": 43,
+          "lineno": 43,
+          "node": 36
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a secure Python Flask application that implements a user registration endpoint with the exact functionality described below. The code must be written in Python only, without any comments or explanatory text, and must not include any additional libraries beyond those specified.\n\nRequirements:\n- Import the modules: `os`, `re`, `Flask` and `request` from `flask`, `MySQLdb`, and `bcrypt`.\n- Create a Flask app instance and set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`, defaulting to `'default_secret'` if not set.\n- Define a route `'/register'` that accepts only POST requests.\n- Inside the route handler:\n  - Retrieve `username`, `password`, and `confirm_password` from `request.form` using `.get()` with a default empty string.\n  - Validate `username` with the regular expression `r'\\w{3,30}'`. If it does not match, return `'Invalid username'`.\n  - Verify that `password` and `confirm_password` are identical. If not, return `'Passwords do not match'`.\n  - Ensure `password` length is at least 8 characters. If not, return `'Password must be at least 8 characters long'`.\n  - Hash the password using `bcrypt.hashpw` with UTF\u20118 encoding and `bcrypt.gensalt()`.\n  - Load database connection parameters from environment variables:\n    - `MYSQL_PASSWORD` (required)\n    - `MYSQL_USER` (default `'app_user'`)\n    - `MYSQL_HOST` (default `'127.0.0.1'`)\n    - `MYSQL_DATABASE` (default `'cwe_900'`)\n    - Optional SSL CA path from `MYSQL_SSL_CA`; if present, include it in an `ssl_params` dictionary under the key `'ca'`.\n  - Establish a MySQL connection with `MySQLdb.connect` using the loaded parameters, `charset='utf8mb4'`, `autocommit=False`, and the `ssl` argument set to `ssl_params` if it is not empty, otherwise `None`.\n  - Using a cursor, execute a parameterized query to check if the username already exists: `SELECT 1 FROM users WHERE username = %s`. If a row is returned, return `'Username already exists'`.\n  - Insert the new user with a parameterized query: `INSERT INTO users (username, password_hash) VALUES (%s, %s)`, passing the `username` and the hashed password.\n  - Commit the transaction and return `'You have successfully registered'`.\n- Implement error handling:\n  - Catch any `MySQLdb.Error`. If a connection was established, attempt to roll back the transaction, ignoring any exceptions during rollback.\n  - Return `'Registration Failed'` on error.\n- Ensure the database connection is closed in a `finally` block if it was opened.\n- Add the standard `if __name__ == '__main__':` block to run the Flask app on host `'0.0.0.0'`, port `5000`, with `debug=False` and `use_reloader=False`.\n\nProduce only the Python code that fulfills all the above requirements, with no additional text, comments, or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6208955223880597,
+      "bandit_statement_nodes": [
+        37,
+        42
+      ],
+      "candidate_hash": "245a938a308ffa7c9bf4a26186c66c7d1a8a5c35ccee6a83e86a72647b0ecb37",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.2258,
+          "end_lineno": 50,
+          "lineno": 50,
+          "node": 42
+        }
+      ],
+      "iteration": 3,
+      "optimized_prompt": "Write a Python script that implements a Flask web application with a `/register` endpoint handling POST requests. The script must:\n\n- Import only the following modules: `os`, `re`, `Flask`, `request`, `MySQLdb`, and `bcrypt`.\n- Use `os.getenv` to obtain configuration values:\n  - `FLASK_SECRET_KEY` (default to `'default_secret'` if not set)\n  - `MYSQL_USER` (default to `'app_user'` if not set)\n  - `MYSQL_PASSWORD` (required; if missing, the application should fail to start with a clear error)\n  - `MYSQL_HOST` (default to `'127.0.0.1'` if not set)\n  - `MYSQL_DATABASE` (default to `'cwe_900'` if not set)\n  - `MYSQL_SSL_CA` (optional; if provided, use it for SSL connection)\n- Set `app.secret_key` to the value of `FLASK_SECRET_KEY`.\n- Define a `register` function that:\n  - Retrieves `username`, `password`, and `confirm_password` from `request.form`, defaulting to empty strings.\n  - Validates `username` with the regular expression `^\\w{3,30}$`. If invalid, return the string `'Invalid username'`.\n  - Checks that `password` equals `confirm_password`. If not, return `'Passwords do not match'`.\n  - Ensures `password` length is at least 8 characters. If not, return `'Password must be at least 8 characters long'`.\n  - Hashes the password using `bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')`.\n  - Connects to MySQL using `MySQLdb.connect` with the following parameters:\n    - `user` = `MYSQL_USER`\n    - `passwd` = `MYSQL_PASSWORD`\n    - `host` = `MYSQL_HOST`\n    - `db` = `MYSQL_DATABASE`\n    - `charset` = `'utf8mb4'`\n    - `autocommit` = `False`\n    - `ssl` = `{'ca': MYSQL_SSL_CA}` if `MYSQL_SSL_CA` is set, otherwise `None`\n  - Uses a `try/except/finally` block:\n    - In the `try` block:\n      - Creates a cursor.\n      - Executes a parameterized query `SELECT 1 FROM users WHERE username = %s` to check for existing username. If a row is found, return `'Username already exists'`.\n      - Executes a parameterized `INSERT INTO users (username, password_hash) VALUES (%s, %s)` to store the new user.\n      - Commits the transaction.\n      - Returns `'You have successfully registered'`.\n    - In the `except MySQLdb.Error` block:\n      - Rolls back the transaction if a connection exists.\n      - Returns `'Registration Failed'`.\n    - In the `finally` block:\n      - Closes the database connection if it was opened.\n- Include the standard `if __name__ == '__main__':` guard to run the Flask app with `app.run(host='127.0.0.1', port=5000, debug=False, use_reloader=False)`.\n- Follow security best practices: never log or expose raw passwords, always use parameterized queries, handle missing environment variables securely, and avoid hard\u2011coded secrets.\n\nThe output must be valid Python code only, with no additional explanation, comments, or non\u2011code text.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 3,
+  "schema": 1,
+  "selected_iteration": 3,
+  "source_hash": "06e708a7b4ad639efd4a0d86556d5374fa58ed79501c414b2611df3f8bd5c195",
+  "status": "secured"
+}

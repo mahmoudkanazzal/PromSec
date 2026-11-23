@@ -1,0 +1,139 @@
+{
+  "ast_similarity": 0.8295454545454546,
+  "candidate_hash": "cc00146d94a962beaf97be292832331f86207d40c72809ef1798093cb5b413af",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file5.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9591346153846154,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        18,
+        73
+      ],
+      "candidate_hash": "9ce889589aa81a7e6e3287eb700556d6053f68bbd3bac14460ee57a24d14f060",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.5317,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9521,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9919,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9092,
+          "end_lineno": 29,
+          "lineno": 29,
+          "node": 18
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9743,
+          "end_lineno": 121,
+          "lineno": 121,
+          "node": 73
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Flask web application in **Python** (no other language) that implements the exact functionality described below while applying security best practices. The code must be ready to run (including necessary imports) and must **only** contain the Python source code\u2014no explanations, no markdown fences, no comments, and no additional text.\n\n**Requirements**\n\n1. **Application Setup**\n   - Import `Flask`, `request`, `jsonify` from `flask`.\n   - Import `os`, `subprocess`, and `yaml`.\n   - Create a Flask app instance.\n   - Define an admin password using an environment variable `ADMIN_PASSWORD` with a fallback default value `\"admin1234\"`.\n\n2. **Endpoints**\n   - **POST /data/upload**\n     - Accept raw request body, decode as UTF\u20118.\n     - Parse the body as YAML using `yaml.safe_load`.\n     - Return `400` with JSON `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` on parsing error.\n     - Extract `data_id` and `data_value` from the parsed dict.\n     - If either is missing or empty, return `400` with JSON `{\"status\":\"Error\",\"message\":\"Missing data information\"}`.\n     - On success, return JSON `{\"status\":\"Data uploaded\",\"data_id\":<data_id>,\"data_value\":<data_value>}`.\n\n   - **GET /task/execute**\n     - Read query parameters `task` and `parameter`.\n     - Execute a shell script `execute_task.sh` safely using `subprocess.run` with a list argument `[\"sh\",\"execute_task.sh\",task,parameter]`. Do **not** use `shell=True`.\n     - Do not raise on non\u2011zero exit (`check=False`).\n     - Return JSON `{\"status\":\"Task execution started\"}`.\n\n   - **POST /admin/login**\n     - Read form field `password`.\n     - If it matches the admin password, return JSON `{\"status\":\"Access granted\"}`.\n     - Otherwise return `401` with JSON `{\"status\":\"Access denied\"}`.\n\n   - **POST /admin/configure**\n     - Require correct admin password (same check as login).\n     - Read form field `new_config`; if missing or empty, return `400` with JSON `{\"status\":\"Error\",\"message\":\"Invalid configuration\"}`.\n     - On success, return JSON `{\"status\":\"Configuration updated\",\"new_config\":<new_config>}`.\n\n   - **GET /data/retrieve**\n     - Require query parameter `data_id`; if missing, return `400` with JSON `{\"status\":\"Error\",\"message\":\"Data ID is required\"}`.\n     - Return JSON `{\"status\":\"Data retrieved\",\"data_info\":{\"data_id\":<data_id>,\"data_value\":\"Sample Value\"}}`.\n\n   - **POST /data/delete**\n     - Require form field `data_id`; if missing, return `400` with JSON `{\"status\":\"Error\",\"message\":\"Data ID is required\"}`.\n     - Return JSON `{\"status\":\"Data deleted\",\"data_id\":<data_id>}`.\n\n   - **POST /admin/change_password**\n     - Use a module\u2011level variable for the admin password; allow it to be updated.\n     - Require form fields `old_password` and `new_password`.\n     - If `old_password` matches the current admin password, update the variable to `new_password` and return JSON `{\"status\":\"Password changed successfully\"}`.\n     - Otherwise return `401` with JSON `{\"status\":\"Access denied\",\"message\":\"Invalid old password\"}`.\n\n   - **GET /task/status**\n     - Require query parameter `task_id`; if missing, return `400` with JSON `{\"status\":\"Error\",\"message\":\"Task ID is required\"}`.\n     - Return JSON `{\"status\":\"Task status\",\"task_id\":<task_id>,\"status\":\"Running\"}`.\n\n   - **POST /admin/settings**\n     - Require correct admin password.\n     - Require form field `new_setting`; if missing, return `400` with JSON `{\"status\":\"Error\",\"message\":\"Invalid setting\"}`.\n     - Return JSON `{\"status\":\"Setting applied\",\"new_setting\":<new_setting>}`.\n\n   - **GET /task/logs**\n     - Require query parameter `task_id`; if missing, return `400` with JSON `{\"status\":\"Error\",\"message\":\"Task ID is required\"}`.\n     - Return JSON `{\"status\":\"Task logs\",\"task_id\":<task_id>,\"logs\":\"Sample logs for task \" + <task_id>}`.\n\n   - **GET /data/export**\n     - Accept optional query parameter `format` defaulting to `\"csv\"`.\n     - Run a Python script `export_data.py` safely using `subprocess.run` with a list argument `[\"python3\",\"export_data.py\",export_format]`. Do **not** use `shell=True`.\n     - Return JSON `{\"status\":\"Data export started\"}`.\n\n   - **GET /user/profile**\n     - Require query parameter `user_id`; if missing, return `400` with JSON `{\"status\":\"Error\",\"message\":\"User ID is required\"}`.\n     - Return JSON `{\"status\":\"User profile\",\"profile\":{\"user_id\":<user_id>,\"name\":\"John Doe\",\"email\":\"john.doe@example.com\"}}`.\n\n3. **Security Enhancements**\n   - Use `yaml.safe_load` only.\n   - Validate that all required parameters are non\u2011empty strings before proceeding.\n   - Use `subprocess.run` with a list of arguments and `check=False`; never enable `shell=True`.\n   - Do not expose stack traces; rely on Flask\u2019s default error handling.\n   - Ensure the admin password variable can be changed at runtime without requiring a restart.\n\n4. **Application Execution**\n   - Run the Flask app with `debug=False`.\n\nProduce only the Python source code that satisfies all the above specifications.",
+      "syntax_repair_rounds": 1
+    },
+    {
+      "ast_similarity_to_original": 0.8856825749167592,
+      "bandit_statement_nodes": [
+        1,
+        23,
+        76
+      ],
+      "candidate_hash": "b00a41e8fb762deab9dc6dd2670b2cd00d365dc9379c4e97cb9320bb58d313c8",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9835,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.7632,
+          "end_lineno": 102,
+          "lineno": 102,
+          "node": 76
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "You must generate a complete, self\u2011contained Python script that implements a Flask web application with the exact functionality described below. The code must be written in Python only (no other languages) and must follow security best practices while preserving the original behavior.\n\nRequirements:\n\n1. **Imports**\n   - Import `os`, `yaml`, `runpy`, `sys`.\n   - Import `Flask`, `request`, `jsonify` from `flask`.\n   - Do not import any additional modules globally; any extra imports (e.g., `subprocess`) must be performed inside the function that uses them.\n\n2. **Application Setup**\n   - Create a Flask app instance named `app`.\n   - Define `ADMIN_PASSWORD` by reading the environment variable `ADMIN_PASSWORD`; default to `'admin1234'` if not set.\n\n3. **Helper Function**\n   - Implement `check_admin(password)` that returns `True` only if `password` equals `ADMIN_PASSWORD`.\n\n4. **Routes**\n   - **POST /data/upload**\n     - Read raw request body, decode as UTF\u20118.\n     - Parse using `yaml.safe_load`.\n     - On any parsing error or if the result is not a `dict`, return JSON `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` with status 400.\n     - Extract `data_id` and `data_value` from the parsed dict.\n     - If either is missing, return JSON `{\"status\":\"Error\",\"message\":\"Missing data information\"}` with status 400.\n     - On success, return JSON `{\"status\":\"Data uploaded\",\"data_id\":data_id,\"data_value\":data_value}`.\n\n   - **GET /task/execute**\n     - Import `subprocess` locally.\n     - Retrieve query parameters `task` and `parameter` (default empty strings).\n     - Execute `subprocess.run(['sh','execute_task.sh',task,parameter], check=False)`.\n     - Return JSON `{\"status\":\"Task execution started\"}`.\n\n   - **Internal Function `_run_export(export_format)`**\n     - Define a whitelist set `{'csv','json','xml'}`.\n     - If `export_format` is not in the whitelist, raise `ValueError(\"Unsupported export format\")`.\n     - Preserve the original `sys.argv` in a variable.\n     - Set `sys.argv` to `['export_data.py', export_format]`.\n     - Use `runpy.run_path('export_data.py', run_name=\"__main__\")` inside a `try` block.\n     - In a `finally` block, restore the original `sys.argv`.\n\n   - **POST /admin/login**\n     - Get form field `password`.\n     - If `check_admin(password)` is true, return JSON `{\"status\":\"Access granted\"}`.\n     - Otherwise return JSON `{\"status\":\"Access denied\"}` with status 401.\n\n   - **POST /admin/configure**\n     - Verify admin password as above; on failure return 401 with `{\"status\":\"Access denied\"}`.\n     - Get form field `new_config`; if missing or empty, return 400 with `{\"status\":\"Error\",\"message\":\"Invalid configuration\"}`.\n     - On success, return JSON `{\"status\":\"Configuration updated\",\"new_config\":new_config}`.\n\n   - **GET /data/retrieve**\n     - Require query parameter `data_id`; if missing, return 400 with `{\"status\":\"Error\",\"message\":\"Data ID is required\"}`.\n     - Return JSON `{\"status\":\"Data retrieved\",\"data_info\":{\"data_id\":data_id,\"data_value\":\"Sample Value\"}}`.\n\n   - **POST /data/delete**\n     - Require form field `data_id`; if missing, return 400 with `{\"status\":\"Error\",\"message\":\"Data ID is required\"}`.\n     - Return JSON `{\"status\":\"Data deleted\",\"data_id\":data_id}`.\n\n   - **POST /admin/change_password**\n     - Declare `global ADMIN_PASSWORD`.\n     - Retrieve form fields `old_password` and `new_password`.\n     - If `old_password` matches the current `ADMIN_PASSWORD`, update `ADMIN_PASSWORD` to `new_password` and return JSON `{\"status\":\"Password changed successfully\"}`.\n     - Otherwise return 401 with JSON `{\"status\":\"Access denied\",\"message\":\"Invalid old password\"}`.\n\n   - **GET /task/status**\n     - Require query parameter `task_id`; if missing, return 400 with `{\"status\":\"Error\",\"message\":\"Task ID is required\"}`.\n     - Return JSON `{\"status\":\"Task status\",\"task_id\":task_id,\"status\":\"Running\"}`.\n\n   - **POST /admin/settings**\n     - Verify admin password; on failure return 401 with `{\"status\":\"Access denied\"}`.\n     - Get form field `new_setting`; if missing, return 400 with `{\"status\":\"Error\",\"message\":\"Invalid setting\"}`.\n     - Return JSON `{\"status\":\"Setting applied\",\"new_setting\":new_setting}`.\n\n   - **GET /task/logs**\n     - Require query parameter `task_id`; if missing, return 400 with `{\"status\":\"Error\",\"message\":\"Task ID is required\"}`.\n     - Return JSON `{\"status\":\"Task logs\",\"task_id\":task_id,\"logs\":\"Sample logs for task \" + task_id}`.\n\n   - **GET /data/export**\n     - Get query parameter `format` with default `'csv'`.\n     - Call `_run_export(export_format)`.\n     - If `_run_export` raises `ValueError`, catch it and return 400 with `{\"status\":\"Error\",\"message\":str(e)}`.\n     - On success, return JSON `{\"status\":\"Data export started\"}`.\n\n   - **GET /user/profile**\n     - Require query parameter `user_id`; if missing, return 400 with `{\"status\":\"Error\",\"message\":\"User ID is required\"}`.\n     - Return JSON `{\"status\":\"User profile\",\"profile\":{\"user_id\":user_id,\"name\":\"John Doe\",\"email\":\"john.doe@example.com\"}}`.\n\n5. **Application Entry Point**\n   - Include the standard `if __name__ == '__main__':` block.\n   - Run the Flask app with `debug=False`.\n\n6. **Security Constraints**\n   - Use `yaml.safe_load` exclusively for YAML parsing.\n   - Validate all external inputs (query parameters, form data, request bodies) before use.\n   - Restrict subprocess execution to the specified command and arguments; do not expose the `subprocess` module globally.\n   - Enforce the export format whitelist in `_run_export`.\n   - Preserve and restore `sys.argv` correctly to avoid side effects.\n   - Store the admin password only in an environment variable and allow runtime change only through the provided endpoint.\n\nGenerate the full Python source code that meets all the above specifications, with no additional explanatory text, comments, or markup. Ensure the code is syntactically correct and ready to run.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.8295454545454546,
+      "bandit_statement_nodes": [
+        31,
+        34
+      ],
+      "candidate_hash": "cc00146d94a962beaf97be292832331f86207d40c72809ef1798093cb5b413af",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.8185,
+          "end_lineno": 22,
+          "lineno": 22,
+          "node": 16
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.9994,
+          "end_lineno": 45,
+          "lineno": 45,
+          "node": 31
+        }
+      ],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.9+) that implements a Flask web application with the exact functionality described below. The code must be pure Python (no other languages) and must not include any explanatory text, comments, or markdown formatting\u2014output only the raw Python source code.\n\n**Requirements**\n\n1. **Imports**\n   - `os`\n   - `yaml`\n   - `sys`\n   - `flask.Flask`, `flask.request`, `flask.jsonify`\n\n2. **Application Setup**\n   - Create a Flask app instance named `app`.\n   - Load an admin password from the environment variable `ADMIN_PASSWORD`; default to `'admin1234'` if not set.\n\n3. **Utility Functions**\n   - `check_admin(password)`: return `True` only if `password` matches the loaded admin password.\n   - `_run_export(export_format)`: \n     - Define a whitelist set `{'csv', 'json', 'xml'}`.\n     - Raise `ValueError` for formats not in the whitelist.\n     - Dynamically import a module named `export_data` using `importlib.import_module`.\n     - If the module defines a callable `main`, invoke it with `export_format`; otherwise, if it defines a callable `run`, invoke that; otherwise raise `RuntimeError` with an appropriate message.\n     - Wrap any exception in a `RuntimeError` preserving the original exception context.\n\n4. **Routes**\n   - `POST /data/upload`:\n     - Read raw request body as text.\n     - Parse it with `yaml.safe_load`; on any parsing error or if the result is not a dict, respond with JSON `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` and HTTP 400.\n     - Extract `data_id` and `data_value` from the parsed dict; if either is missing, respond with JSON `{\"status\":\"Error\",\"message\":\"Missing data information\"}` and HTTP 400.\n     - On success, respond with JSON `{\"status\":\"Data uploaded\",\"data_id\": data_id,\"data_value\": data_value}`.\n\n   - `GET /task/execute`:\n     - Accept query parameters `task` and `parameter`.\n     - Define an allowed task set `{'backup', 'cleanup'}`.\n     - If `task` is not in the allowed set, respond with JSON `{\"status\":\"Error\",\"message\":\"Invalid task\"}` and HTTP 400.\n     - Otherwise respond with JSON `{\"status\":\"Task execution started\",\"task\": task,\"parameter\": parameter}`.\n\n   - `POST /admin/login`:\n     - Read form field `password`.\n     - If `check_admin(password)` is true, respond with JSON `{\"status\":\"Access granted\"}`; otherwise respond with JSON `{\"status\":\"Access denied\"}` and HTTP 401.\n\n   - `POST /admin/configure`:\n     - Verify admin password as above; on failure respond with HTTP 401.\n     - Read form field `new_config`; if missing, respond with HTTP 400 and JSON `{\"status\":\"Error\",\"message\":\"Invalid configuration\"}`.\n     - On success respond with JSON `{\"status\":\"Configuration updated\",\"new_config\": new_config}`.\n\n   - `GET /data/retrieve`:\n     - Require query parameter `data_id`; if missing, respond with HTTP 400 and JSON `{\"status\":\"Error\",\"message\":\"Data ID is required\"}`.\n     - Respond with JSON `{\"status\":\"Data retrieved\",\"data_info\":{\"data_id\": data_id,\"data_value\":\"Sample Value\"}}`.\n\n   - `POST /data/delete`:\n     - Require form field `data_id`; if missing, respond with HTTP 400 and JSON `{\"status\":\"Error\",\"message\":\"Data ID is required\"}`.\n     - Respond with JSON `{\"status\":\"Data deleted\",\"data_id\": data_id}`.\n\n   - `POST /admin/change_password`:\n     - Use a global variable for the admin password.\n     - Require form fields `old_password` and `new_password`.\n     - If `old_password` matches the current admin password, update the global password to `new_password` and respond with JSON `{\"status\":\"Password changed successfully\"}`; otherwise respond with HTTP 401 and JSON `{\"status\":\"Access denied\",\"message\":\"Invalid old password\"}`.\n\n   - `GET /task/status`:\n     - Require query parameter `task_id`; if missing, respond with HTTP 400 and JSON `{\"status\":\"Error\",\"message\":\"Task ID is required\"}`.\n     - Respond with JSON `{\"status\":\"Task status\",\"task_id\": task_id,\"status\":\"Running\"}`.\n\n   - `POST /admin/settings`:\n     - Verify admin password; on failure respond with HTTP 401.\n     - Require form field `new_setting`; if missing, respond with HTTP 400 and JSON `{\"status\":\"Error\",\"message\":\"Invalid setting\"}`.\n     - Respond with JSON `{\"status\":\"Setting applied\",\"new_setting\": new_setting}`.\n\n   - `GET /task/logs`:\n     - Require query parameter `task_id`; if missing, respond with HTTP 400 and JSON `{\"status\":\"Error\",\"message\":\"Task ID is required\"}`.\n     - Respond with JSON `{\"status\":\"Task logs\",\"task_id\": task_id,\"logs\":\"Sample logs for task \" + task_id}`.\n\n   - `GET /data/export`:\n     - Accept query parameter `format` with default `'csv'`.\n     - Call `_run_export(format)`.\n     - On `ValueError`, respond with HTTP 400 and JSON `{\"status\":\"Error\",\"message\": str(e)}`.\n     - On `RuntimeError`, respond with HTTP 500 and JSON `{\"status\":\"Error\",\"message\": str(e)}`.\n     - On success, respond with JSON `{\"status\":\"Data export started\"}`.\n\n   - `GET /user/profile`:\n     - Require query parameter `user_id`; if missing, respond with HTTP 400 and JSON `{\"status\":\"Error\",\"message\":\"User ID is required\"}`.\n     - Respond with JSON `{\"status\":\"User profile\",\"profile\":{\"user_id\": user_id,\"name\":\"John Doe\",\"email\":\"john.doe@example.com\"}}`.\n\n5. **Application Entry Point**\n   - Include the standard `if __name__ == '__main__':` block.\n   - Run the Flask app with `debug=False`.\n\n**Security Constraints**\n- Use `yaml.safe_load` exclusively for YAML parsing.\n- Do not use `eval`, `exec`, or any dynamic code execution beyond the controlled import of `export_data`.\n- Validate all external inputs against explicit whitelists or required presence checks as described.\n- Keep the admin password handling confined to environment variable and in\u2011memory updates; do not write it to disk.\n- Ensure that any exception handling does not expose stack traces or internal details to the client.\n\nGenerate only the Python source code that satisfies all the above specifications. Do not include any additional text, comments, or markdown.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 3,
+  "schema": 1,
+  "selected_iteration": 3,
+  "source_hash": "73fa8e5aa324bbefbd09ed0fda2f8e6d2de9d64d7f1dfabaca1771a27fae81db",
+  "status": "secured"
+}

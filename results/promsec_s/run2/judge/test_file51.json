@@ -1,0 +1,65 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "01246d26e95d8dc0afdbb89b022cb9edbd06ac2485a33c69378306c9c23e9e3a",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and result in a 500 error.",
+      "SQL injection is possible because the username is concatenated directly into the query string.",
+      "Empty password results in the MD5 hash of an empty string being compared to the stored hash.",
+      "Non\u2011ASCII characters in the password may raise a TypeError when hashing.",
+      "Database connection failures raise an exception and produce a 500 error."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by verifying the supplied password against the stored MD5 hash and redirecting on success.",
+    "invariants": [
+      "The endpoint only responds to POST requests; other methods are ignored.",
+      "The response is always one of three values: a redirect, \"Incorrect Password\", or \"User does not exist\".",
+      "Password comparison is performed using an MD5 hash of the raw password value.",
+      "No data is written or modified in the database."
+    ],
+    "io_behavior": [
+      "Accepts a POST request to /login with form fields 'username' and 'password'.",
+      "Returns the plain text string \"Incorrect Password\" when the password hash does not match.",
+      "Returns the plain text string \"User does not exist\" when no matching username is found.",
+      "Issues an HTTP 302 redirect to \"/user\" when authentication succeeds."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to a local MySQL server.",
+      "Executes a SELECT query that reads data from the 'user' table.",
+      "Creates a database cursor object (resource allocation)."
+    ],
+    "source_hash": "eab027460cfa38735ab3752a9a2c224b29ac6214ceb144f47363617e22aab5ec"
+  },
+  "dimensions": {
+    "behavior": 0.35,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.65,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file51.py",
+  "gated_score": 0.41937,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.41937,
+  "original_hash": "eab027460cfa38735ab3752a9a2c224b29ac6214ceb144f47363617e22aab5ec",
+  "rationale": "The program handles the main success and failure paths but deviates from the contract on key edge cases (missing fields, SQL injection, MD5 usage, non\u2011ASCII handling) and adds an extra 500 error response, breaking several invariants while preserving side\u2011effects and basic I/O semantics.",
+  "schema": 1,
+  "stability_abs_difference": 0.02063,
+  "stability_dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.44,
+  "weighted_mean": 0.4925,
+  "worst_dimension": 0.2
+}

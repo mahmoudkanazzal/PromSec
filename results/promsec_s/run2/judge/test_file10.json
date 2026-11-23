@@ -1,0 +1,80 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "42faf245c30d5385e80eb11584a5fd98b2f6449fab95ce60395d699a846a97a0",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payload to /event/add results in a 400 error with \"Invalid YAML format\".",
+      "Missing required fields in any endpoint yields a 400 error with a specific message.",
+      "Providing an incorrect admin password to protected endpoints returns HTTP 401.",
+      "Empty new_password in /auth/update_password leads to a 400 error.",
+      "Omitting query parameters (e.g., event_id in /event/start) still triggers the shell script with empty arguments.",
+      "Unsupported export format in /data/export defaults to \"json\" but still runs the script."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a RESTful API for managing events and related tasks, with simple password\u2011based admin authentication and limited side\u2011effects such as invoking shell scripts.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" key.",
+      "Admin\u2011only endpoints (/auth/update_password, /auth/settings) succeed only if the supplied password matches the current ADMIN_PASSWORD value.",
+      "Required parameters (e.g., event_id, event_name, event_date, task_id) must be present; otherwise a 400 error is returned.",
+      "The ADMIN_PASSWORD variable is stored only in memory and persists for the lifetime of the process.",
+      "The server runs with Flask's default routing; no authentication token is persisted across requests."
+    ],
+    "io_behavior": [
+      "POST /event/add \u2013 accepts raw YAML in the request body, returns JSON with event_id, event_name, event_date on success or error messages on malformed YAML or missing fields.",
+      "GET /event/start \u2013 reads query parameters event_id and task, triggers a shell script and returns JSON status.",
+      "POST /auth/login \u2013 reads form field password, returns JSON indicating success or HTTP 401 on failure.",
+      "POST /auth/update_password \u2013 requires current admin password and new_password form fields, updates in\u2011memory password and returns JSON confirmation.",
+      "GET /event/get \u2013 requires event_id query parameter, returns a static sample event JSON or error if missing.",
+      "POST /event/remove \u2013 requires event_id form field, returns JSON confirming removal."
+    ],
+    "public_api": {
+      "route:GET /data/export": "",
+      "route:GET /event/get": "",
+      "route:GET /event/start": "",
+      "route:GET /task/logs": "",
+      "route:GET /task/status": "",
+      "route:GET /user/info": "",
+      "route:POST /auth/login": "",
+      "route:POST /auth/settings": "",
+      "route:POST /auth/update_password": "",
+      "route:POST /event/add": "",
+      "route:POST /event/remove": ""
+    },
+    "side_effects": [
+      "os.system call to execute \"sh start_event.sh <event_id> <task>\" when /event/start is invoked.",
+      "os.system call to run \"python export_event_data.py <format>\" when /data/export is invoked."
+    ],
+    "source_hash": "1fe10c3a94b4f4ce46d789133eb8a4d34fc953a85d1d3497c79fad96d5cb565b"
+  },
+  "dimensions": {
+    "behavior": 0.55,
+    "edge_cases": 0.67,
+    "invariants": 1.0,
+    "io_semantics": 0.6,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file10.py",
+  "gated_score": 0.42225,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.42225,
+  "original_hash": "1fe10c3a94b4f4ce46d789133eb8a4d34fc953a85d1d3497c79fad96d5cb565b",
+  "rationale": "Endpoints mostly follow the contract and return JSON with a status key, but the required os.system side\u2011effects for /event/start and /data/export are omitted, and unsupported export formats do not default to json nor trigger the script, violating two specified edge cases.",
+  "schema": 1,
+  "stability_abs_difference": 0.06713,
+  "stability_dimensions": {
+    "behavior": 0.75,
+    "edge_cases": 0.6,
+    "invariants": 0.8,
+    "io_semantics": 0.9,
+    "side_effects": 0.0
+  },
+  "stability_score": 0.48938,
+  "weighted_mean": 0.563,
+  "worst_dimension": 0.0
+}

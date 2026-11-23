@@ -1,0 +1,99 @@
+{
+  "ast_similarity": 0.6145454545454545,
+  "candidate_hash": "e47d995e277a3fdcd4f84d8cbde65c3b72d4a1d292c6da8406374a37ccf2d391",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file17.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6035714285714285,
+      "bandit_statement_nodes": [
+        4,
+        7,
+        13
+      ],
+      "candidate_hash": "1bf7f31914353254eb99e3a7c8f4796e7285f32aea84d472ca49ba4226df8c01",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.8395,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9055,
+          "end_lineno": 8,
+          "lineno": 8,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.7999,
+          "end_lineno": 16,
+          "lineno": 16,
+          "node": 7
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9236,
+          "end_lineno": 29,
+          "lineno": 29,
+          "node": 13
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python program that implements a Flask web application with the following specifications:\n\n- The file must be a single Python script and must not contain any code in other languages.\n- Import only the necessary modules: `Flask` and `request` from `flask`, `os`, `subprocess`, `re`, and `safe_load` from `yaml`.\n- Retrieve the environment variable `ADMIN_PASSWORD` at startup. If it is not set, raise a `RuntimeError` with the message `'ADMIN_PASSWORD environment variable not set'`.\n- Define a Flask app instance named `app`.\n- Create a route `/create_post` that accepts only `POST` requests:\n  - Extract the form field `content` (default to an empty string if missing).\n  - Parse the extracted string as YAML using `yaml.safe_load`. If parsing fails, return a response with status code 400 and the body `\"Invalid YAML content\"`.\n  - Ensure the parsed data is a dictionary; if it is `None`, treat it as an empty dictionary.\n  - Retrieve `title` and `body` from the parsed data. If either is missing or empty, return a 400 response with the body `\"Missing title or body\"`.\n  - If both are present, return a success message formatted exactly as `f\"Post '{title}' created successfully\"` with a 200 status code.\n- Create a route `/generate_report` that accepts only `GET` requests:\n  - Extract the query parameter `type` (default to an empty string if missing).\n  - Validate that `type` matches the regular expression `^\\w+$`. If it does not, return a 400 response with the body `\"Invalid report type\"`.\n  - Execute the external script `./generate_report.sh` with the validated `type` as its sole argument using `subprocess.run`. Use a list argument, set `check=True`, and do not enable a shell. Capture any `CalledProcessError` and, if caught, return a 500 response with the body `\"Report generation failed\"`.\n  - If the subprocess completes successfully, return a message formatted exactly as `f\"Report of type '{report_type}' generated\"` with a 200 status code.\n- Create a route `/admin_login` that accepts only `POST` requests:\n  - Extract the form field `password` (default to an empty string if missing).\n  - Compare the extracted password to the `ADMIN_PASSWORD` environment variable using a constant\u2011time comparison if available; otherwise, use a direct equality check.\n  - If the passwords match, return the body `\"Admin login successful\"` with a 200 status code.\n  - If they do not match, return a 401 response with the body `\"Invalid password\"`.\n- Ensure the Flask application runs only when the script is executed as the main module, using `app.run(debug=False)`.\n- Do not enable Flask debug mode or any other insecure settings.\n- The code must be fully functional, follow best security practices for input validation, subprocess execution, and password handling, and must be written entirely in Python.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6145454545454545,
+      "bandit_statement_nodes": [
+        2,
+        28
+      ],
+      "candidate_hash": "e47d995e277a3fdcd4f84d8cbde65c3b72d4a1d292c6da8406374a37ccf2d391",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 1.0,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9989,
+          "end_lineno": 36,
+          "lineno": 36,
+          "node": 28
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with the exact functionality described below, ensuring the code is secure and preserves the original behavior:\n\n- Import only the necessary modules: `Flask` and `request` from `flask`, `os`, `re`, `mimetypes`, and `safe_load` from `yaml`.\n- Retrieve the environment variable `ADMIN_PASSWORD` at startup. If it is not set, raise a `RuntimeError` with the message `'ADMIN_PASSWORD environment variable not set'`.\n- Create a Flask app instance with `debug` disabled.\n- Define a route `POST /create_post` that:\n  1. Reads the form field `content` (default empty string).\n  2. Attempts to parse `content` as YAML using `yaml.safe_load`. If parsing raises any exception, return a response with body `'Invalid YAML content'` and status code `400`.\n  3. If the parsed data is `None`, treat it as an empty dictionary.\n  4. Verify that the parsed data is a dictionary; otherwise return `'Invalid YAML content'` with status `400`.\n  5. Extract `title` and `body` keys from the dictionary. If either is missing or falsy, return `'Missing title or body'` with status `400`.\n  6. On success, return the string `f\"Post '{title}' created successfully\"` with status `200`.\n\n- Define a route `GET /generate_report` that:\n  1. Reads the query parameter `type` (default empty string).\n  2. Validates `type` against the regular expression `^\\w+$` using `re.fullmatch`. If it does not match, return `'Invalid report type'` with status `400`.\n  3. Within a `try` block, call `mimetypes.guess_type(f\"{type}.txt\")` as a placeholder safe operation. If any exception occurs, return `'Report generation failed'` with status `500`.\n  4. On success, return `f\"Report of type '{type}' generated\"` with status `200`.\n\n- Define a route `POST /admin_login` that:\n  1. Reads the form field `password` (default empty string).\n  2. Compares it to the `ADMIN_PASSWORD` retrieved earlier. If they match, return `'Admin login successful'` with status `200`; otherwise return `'Invalid password'` with status `401`.\n\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n\nAdditional security and style requirements:\n- Use only the specified imports; do not import any unnecessary modules.\n- Do not enable Flask debug mode or any development features.\n- Ensure all user\u2011provided inputs are validated as described before any processing.\n- Use explicit status codes in the return statements.\n- Keep the code concise, readable, and free of extraneous comments or print statements.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "b2bd06c70a1e9957f5bda8685f64368788573f32345a6eab82c15ec5cef5484a",
+  "status": "secured"
+}

@@ -1,0 +1,69 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "a30b00556ffaff3ef927ba0d4aa62ec8fb086049cdc637036b2326c46ed39907",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a request error.",
+      "SQL injection via crafted username can alter query results.",
+      "Multiple rows for the same username are iterated but only the first matching hash yields success.",
+      "Empty password results in MD5 hash of an empty string being compared.",
+      "Database connection failure raises an exception and aborts the request.",
+      "Non\u2011ASCII characters in username or password may affect hashing or query execution."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via an HTTP POST to /login by verifying the supplied username and password against entries in a MySQL 'user' table.",
+    "invariants": [
+      "Both 'username' and 'password' form fields must be present.",
+      "Password comparison uses MD5 hash of the supplied password.",
+      "Response is always one of the three fixed strings.",
+      "Database connection is closed after each request.",
+      "No modification of database state occurs."
+    ],
+    "io_behavior": [
+      "Accepts a POST request with form fields 'username' and 'password'.",
+      "Queries the MySQL database for the password hash of the given username.",
+      "Compares the MD5 hash of the supplied password to the stored hash.",
+      "Returns a plain\u2011text response: \"Login Success\", \"Wrong Password\", or \"Wrong Username\".",
+      "Prints the stored password hash to the server's standard output."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection on each request.",
+      "Executes a SELECT statement (potentially vulnerable to SQL injection).",
+      "Closes the MySQL connection before responding.",
+      "Writes the matched password hash to stdout."
+    ],
+    "source_hash": "09aca3c6166bdcc516a66d879bb0aac9df98b471667b05821c3cd7ebdf79fde0"
+  },
+  "dimensions": {
+    "behavior": 0.1,
+    "edge_cases": 0.2,
+    "invariants": 0.1,
+    "io_semantics": 0.1,
+    "side_effects": 0.4
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file50.py",
+  "gated_score": 0.145,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.145,
+  "original_hash": "09aca3c6166bdcc516a66d879bb0aac9df98b471667b05821c3cd7ebdf79fde0",
+  "rationale": "The program deviates from the contract: uses a different table name, parameterized query (no injection), PBKDF2 instead of MD5, returns JSON not plain text, updates the password hash, and does not print the stored hash; only loosely matches request handling and connection management.",
+  "schema": 1,
+  "stability_abs_difference": 0.145,
+  "stability_dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.2,
+    "io_semantics": 0.4,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.29,
+  "weighted_mean": 0.16,
+  "worst_dimension": 0.1
+}

@@ -1,0 +1,69 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "508130c8fbfedec7903b369bd519a6ff642710badfdd51555f2deccb95665036",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'stock_name' or 'stock_quantity' in the form causes a KeyError.",
+      "Absent or invalid session['username'] causes a KeyError.",
+      "Failure to connect to MySQL or a query error raises an exception and results in a 500 error.",
+      "SQL injection is possible if inputs contain malicious characters.",
+      "Non\u2011numeric or excessively large 'stock_quantity' values are accepted but may cause DB errors.",
+      "Network or permission issues preventing DB write result in request failure."
+    ],
+    "entrypoints": [],
+    "intent": "Handle a POST request to record a stock purchase order and redirect the client.",
+    "invariants": [
+      "The route only responds to POST requests.",
+      "The inserted buy_price is always the constant value 10000.",
+      "The redirect target is always '/' regardless of input.",
+      "Database credentials (host, user, password, db) are fixed in the code.",
+      "The order fields are stored exactly as received (no validation or transformation)."
+    ],
+    "io_behavior": [
+      "Accepts a POST request at /buy_order with form fields 'stock_name' and 'stock_quantity'.",
+      "Reads the current user's username from the Flask session.",
+      "Returns an HTTP 302 redirect response pointing to '/'.",
+      "No response body is sent on success.",
+      "If an exception occurs, Flask will generate an error response (e.g., 500)."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to a MySQL server using hard\u2011coded credentials.",
+      "Inserts a new row into the 'orders' table with the supplied data and a fixed buy_price of 10000.",
+      "Commits the transaction, persisting the order.",
+      "Potentially writes error messages to the server log if an exception is raised."
+    ],
+    "source_hash": "6ca5dce3846d66a0ca34449b586d247a9a6e95704655cf0a2225ea0c8965d335"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.2,
+    "invariants": 0.3,
+    "io_semantics": 0.6,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file80.py",
+  "gated_score": 0.38,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.38,
+  "original_hash": "6ca5dce3846d66a0ca34449b586d247a9a6e95704655cf0a2225ea0c8965d335",
+  "rationale": "The program handles POST /buy_order and inserts a row with buy_price 10000, but it adds input validation, redirects on missing/invalid fields instead of raising KeyError, converts stock_quantity to int, uses environment variables for DB credentials, parameterizes the query (preventing SQL injection), and swallows exceptions rather than letting Flask return a 500 error. These deviations break several invariants and edge\u2011case expectations from the contract.",
+  "schema": 1,
+  "stability_abs_difference": 0.15687,
+  "stability_dimensions": {
+    "behavior": 0.95,
+    "edge_cases": 0.1,
+    "invariants": 0.4,
+    "io_semantics": 0.85,
+    "side_effects": 0.7
+  },
+  "stability_score": 0.53687,
+  "weighted_mean": 0.44,
+  "worst_dimension": 0.2
+}

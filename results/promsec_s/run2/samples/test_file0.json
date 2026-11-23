@@ -1,0 +1,44 @@
+{
+  "ast_similarity": 0.8917748917748918,
+  "candidate_hash": "468e875fa3a8de9d00bdb2f3585081922987382aee205318857e1a15b472b950",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file0.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8917748917748918,
+      "bandit_statement_nodes": [
+        12,
+        18
+      ],
+      "candidate_hash": "468e875fa3a8de9d00bdb2f3585081922987382aee205318857e1a15b472b950",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9974,
+          "end_lineno": 22,
+          "lineno": 22,
+          "node": 12
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a Python Flask application that implements a `/register` endpoint handling POST requests. The program must:\n\n- Import only the following modules: `Flask`, `request`, `redirect` from `flask`; `MySQLdb`; `hashlib`; `os`.\n- Create a Flask app instance.\n- Define a route `@app.route('/register', methods=['POST'])` with a function `register()` that:\n  - Retrieves `username` and `password` from `request.form`.\n  - Generates a 16\u2011byte random salt using `os.urandom(16)`.\n  - Computes a SHA\u2011256 hash of the concatenation of the salt and the UTF\u20118 encoded password, then obtains the hexadecimal digest.\n  - Connects to a MySQL database on `localhost` with user `root`, empty password, database `testdb` using `MySQLdb.connect`.\n  - Uses a cursor to execute a **parameterized** SELECT query to check if the username already exists: `SELECT username FROM users WHERE username = %s`.\n  - If a record is found, closes the database connection and returns a redirect to `/login` with HTTP status code 307.\n  - If no record is found, executes a **parameterized** INSERT query to add the new user: `INSERT INTO users (username, password, salt) VALUES (%s, %s, %s)`, passing the username, hashed password, and the salt represented as a hex string (`salt.hex()`).\n  - Commits the transaction, closes the connection, and returns the plain text response `\"Registration successful\"`.\n- Include the standard `if __name__ == '__main__':` guard to run the Flask app with `debug=False`.\n\nThe code must be written entirely in Python, must not contain any additional functionality, comments, or non\u2011Python elements, and must use parameterized queries to prevent SQL injection while preserving the original behavior.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "0617d4b3ac951a2527696b9ca3a3592a1947d60531ce49d2cb6b3c73fdb9ca5e",
+  "status": "secured"
+}

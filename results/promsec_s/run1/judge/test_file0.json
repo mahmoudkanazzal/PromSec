@@ -1,0 +1,76 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "8243f629548cb14f25e57e35146921ec966bb4d99d525db706a1b24d2363aa41",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a server error",
+      "Extremely long input values may exceed database column limits",
+      "Database connection failures result in an internal server error",
+      "Special characters in username can break the SQL query (injection risk)",
+      "Repeated registration attempts with the same username trigger a redirect",
+      "Empty strings for username or password are accepted but may create invalid records"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Register a new user account via HTTP POST",
+    "invariants": [
+      "Each stored user has a unique username",
+      "Password is stored only as a SHA\u2011256 hash together with its salt",
+      "A database connection is opened and closed for each request",
+      "The salt is stored alongside the hash for later verification",
+      "The endpoint processes only POST requests",
+      "Responses are limited to either a redirect or a success message"
+    ],
+    "io_behavior": [
+      "Accepts POST request to /register with form fields 'username' and 'password'",
+      "Returns HTTP 307 redirect to /login if the username already exists",
+      "Returns plain text 'Registration successful' on successful creation",
+      "Responds with HTTP status 200 for the success message",
+      "Uses UTF-8 encoding when hashing the password",
+      "Closes the database connection before sending the response"
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Executes a SELECT query to check for an existing username",
+      "Inserts a new row into the users table in the MySQL database",
+      "Generates a 16\u2011byte random salt for each registration",
+      "Commits the transaction to persist the new user record",
+      "May cause a client redirect to /login",
+      "Potentially logs errors via Flask's default error handling"
+    ],
+    "source_hash": "0617d4b3ac951a2527696b9ca3a3592a1947d60531ce49d2cb6b3c73fdb9ca5e"
+  },
+  "dimensions": {
+    "behavior": 0.55,
+    "edge_cases": 0.2,
+    "invariants": 0.45,
+    "io_semantics": 0.85,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file0.py",
+  "gated_score": 0.47375,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.47375,
+  "original_hash": "0617d4b3ac951a2527696b9ca3a3592a1947d60531ce49d2cb6b3c73fdb9ca5e",
+  "rationale": "Main registration flow works and redirects correctly, but deviates on key contract points: rejects empty credentials, does not generate/store a proper salt, uses PBKDF2 instead of plain SHA\u2011256, returns extra error responses, and fails several listed edge\u2011case behaviors.",
+  "schema": 1,
+  "stability_abs_difference": 0.13187,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.3,
+    "invariants": 0.6,
+    "io_semantics": 1.0,
+    "side_effects": 0.85
+  },
+  "stability_score": 0.60562,
+  "weighted_mean": 0.565,
+  "worst_dimension": 0.2
+}

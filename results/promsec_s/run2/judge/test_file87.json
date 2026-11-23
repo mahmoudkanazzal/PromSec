@@ -1,0 +1,76 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "88b2b712d0886ea84ca67f00df8580016d9c21030dd728e9dfb6459d5f6867ec",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields cause a KeyError and result in a 500 internal server error.",
+      "Attempting to register an existing username returns \"Username already exists\" without altering the database.",
+      "Providing an empty search term returns all usernames because the LIKE pattern becomes '%%'.",
+      "Database errors (e.g., connection failure) trigger a rollback for registration and may propagate as server errors for other routes.",
+      "Extremely long or malicious input can break the SQL statement or cause injection, but the service still returns the raw message or result string."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a basic user\u2011management HTTP API that can register, authenticate, update profile information, search for users, and delete accounts.",
+    "invariants": [
+      "All database operations use the same hard\u2011coded MySQL credentials (root / password) and host (127.0.0.1).",
+      "Every endpoint creates a cursor, executes a single SQL statement, then closes the cursor and connection.",
+      "Mutating endpoints (register, update_profile, delete_account) use HTTP POST; the search endpoint uses HTTP GET.",
+      "Responses are always plain\u2011text strings; no JSON or HTML is rendered.",
+      "The application runs with Flask's built\u2011in server and debug mode disabled."
+    ],
+    "io_behavior": [
+      "POST /register with form fields username and password \u2192 returns a plain\u2011text message indicating success, duplicate username, or registration failure.",
+      "POST /login with form fields username and password \u2192 returns \"Login successful\" or \"Invalid credentials\".",
+      "POST /update_profile with form fields username and email \u2192 returns \"Profile updated successfully\".",
+      "GET /search_users?term=... \u2192 returns a string representation of a list of matching usernames.",
+      "POST /delete_account with form field username \u2192 returns \"Account deleted successfully\"."
+    ],
+    "public_api": {
+      "route:GET /search_users": "",
+      "route:POST /delete_account": "",
+      "route:POST /login": "",
+      "route:POST /register": "",
+      "route:POST /update_profile": ""
+    },
+    "side_effects": [
+      "Each request opens a new MySQL connection to the local cwe_900 database and closes it before responding.",
+      "Successful registration inserts a new row into the users table and commits the transaction.",
+      "Failed registration rolls back any pending changes.",
+      "Profile update, account deletion, and successful registration commit changes to the users table.",
+      "Login and search operations only read data; they do not modify the database."
+    ],
+    "source_hash": "e736b28ab6a9cb96dc6b61defd2475b82d94a9935a882c8c823b4c8adcca5700"
+  },
+  "dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.6,
+    "invariants": 0.9,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file87.py",
+  "gated_score": 0.77625,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.77625,
+  "original_hash": "e736b28ab6a9cb96dc6b61defd2475b82d94a9935a882c8c823b4c8adcca5700",
+  "rationale": "The program largely follows the contract: correct routes, HTTP methods, plain\u2011text responses, proper DB handling and commits/rollbacks. Deviations include missing required fields not raising KeyError (edge case 1), slight mismatch in search output format, and use of environment variables instead of strictly hard\u2011coded credentials.",
+  "schema": 1,
+  "stability_abs_difference": 0.00337,
+  "stability_dimensions": {
+    "behavior": 0.83,
+    "edge_cases": 0.6,
+    "invariants": 0.8,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.77288,
+  "weighted_mean": 0.835,
+  "worst_dimension": 0.6
+}

@@ -1,0 +1,82 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "9da57ce5659154c76d3cad299ef575c795af744b9263a4867c11907c4b853df5",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required fields result in 400 responses with an error message.",
+      "Invalid YAML in /event/add triggers a 400 error.",
+      "Incorrect admin password on protected endpoints returns 401.",
+      "Empty new_password in /auth/update_password yields a 400 error.",
+      "Omitting query parameters like event_id or task_id leads to 400 errors.",
+      "Providing an unsupported export format defaults to \"json\" but still launches the export script."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple event management HTTP API with authentication, allowing clients to add, retrieve, start, remove events, query task status and logs, update settings, export data, and fetch user info.",
+    "invariants": [
+      "All endpoints return JSON responses with a \"status\" field.",
+      "Authentication\u2011protected routes require the current ADMIN_PASSWORD in the form field \"password\".",
+      "Required parameters (event_id, event_name, event_date, task_id, user_id, etc.) must be non\u2011empty strings.",
+      "The admin password is stored only in memory and persists for the lifetime of the process.",
+      "YAML payloads are parsed with yaml.FullLoader; malformed YAML yields a 400 error.",
+      "The Flask app runs with debug disabled."
+    ],
+    "io_behavior": [
+      "POST /event/add with YAML body returns JSON with event details or 400 on invalid YAML/missing fields.",
+      "GET /event/start?event_id=...&task=... triggers a shell script and returns JSON status.",
+      "POST /auth/login with form field password returns success JSON or 401 on failure.",
+      "POST /auth/update_password with current password and new_password updates the in\u2011memory admin password and returns JSON.",
+      "GET /event/get?event_id=... returns a static sample event JSON or 400 if missing.",
+      "GET /task/status?task_id=... returns JSON with status \"In Progress\" or 400 if missing."
+    ],
+    "public_api": {
+      "route:GET /data/export": "",
+      "route:GET /event/get": "",
+      "route:GET /event/start": "",
+      "route:GET /task/logs": "",
+      "route:GET /task/status": "",
+      "route:GET /user/info": "",
+      "route:POST /auth/login": "",
+      "route:POST /auth/settings": "",
+      "route:POST /auth/update_password": "",
+      "route:POST /event/add": "",
+      "route:POST /event/remove": ""
+    },
+    "side_effects": [
+      "os.system call to execute \"sh start_event.sh <event_id> <task>\" when /event/start is invoked.",
+      "os.system call to run \"python export_event_data.py <format>\" when /data/export is invoked.",
+      "Modification of the global ADMIN_PASSWORD variable via /auth/update_password."
+    ],
+    "source_hash": "1fe10c3a94b4f4ce46d789133eb8a4d34fc953a85d1d3497c79fad96d5cb565b"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.6,
+    "invariants": 0.4,
+    "io_semantics": 0.5,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file10.py",
+  "gated_score": 0.345,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.345,
+  "original_hash": "1fe10c3a94b4f4ce46d789133eb8a4d34fc953a85d1d3497c79fad96d5cb565b",
+  "rationale": "Routes exist but key contract points are broken: missing \"status\" in some JSON responses, password stored via env and hash instead of in\u2011memory plain value, no os.system calls for start/export, unsupported export format returns error instead of defaulting, and yaml.FullLoader is not used.",
+  "schema": 1,
+  "stability_abs_difference": 0.11,
+  "stability_dimensions": {
+    "behavior": 0.55,
+    "edge_cases": 0.85,
+    "invariants": 0.6,
+    "io_semantics": 0.5,
+    "side_effects": 0.2
+  },
+  "stability_score": 0.455,
+  "weighted_mean": 0.46,
+  "worst_dimension": 0.0
+}

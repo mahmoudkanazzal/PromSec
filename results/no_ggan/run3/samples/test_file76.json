@@ -1,0 +1,38 @@
+{
+  "ast_similarity": 0.9122807017543859,
+  "candidate_hash": "9b4c0ca187be565bbba06bd37c345941380f2b3cfcdc834fae6b2a19cc549098",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file76.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9122807017543859,
+      "bandit_statement_nodes": [
+        16,
+        19,
+        23,
+        25
+      ],
+      "candidate_hash": "9b4c0ca187be565bbba06bd37c345941380f2b3cfcdc834fae6b2a19cc549098",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/register` POST endpoint. The script must:\n\n- Import only the following modules: `Flask`, `request`, `redirect`, `make_response` from `flask`; `re`; `hashlib`; `MySQLdb`; `os`; `bcrypt`; `random`; `string`; `urllib.parse`.\n- Create a Flask app instance named `app`.\n- Define a route `@app.route('/register', methods=['POST'])` with a function `register()` that:\n  1. Retrieves `username`, `password`, `name`, `cweid`, and `email` from `request.form`.\n  2. Hashes the password using `bcrypt.hashpw` with a generated salt and encodes it as UTF\u20118.\n  3. Connects to a MySQL database using `MySQLdb.connect` with `host`, `user`, `passwd`, and `db` values taken from the environment variables `DATABASE_URL`, `DATABASE_USER`, `DATABASE_PASSWORD`, and `DATABASE_NAME`.\n  4. Uses a cursor to execute a **parameterized** `SELECT` query to check if the `username` already exists.\n  5. If the username does not exist:\n     - Executes a **parameterized** `INSERT` query to add the new user with fields `username`, `password`, `name`, `email`, and `cweid`, storing the hashed password as a UTF\u20118 string.\n     - Commits the transaction.\n     - Retrieves the newly inserted user\u2019s ID via `cursor.lastrowid`.\n     - Generates a 16\u2011character `session_id` using `random.SystemRandom().choice` over uppercase ASCII letters and digits.\n     - Executes a **parameterized** `INSERT` query to create a session record with `username`, `user_id`, and `session_id`.\n     - Commits the transaction.\n     - Executes a **parameterized** `SELECT` query to fetch `username`, `password`, `session_id`, and `stake` from the `sessions` table for the newly created session.\n     - If the session record is found:\n       * Safely encodes the query parameters `username`, `session_id`, and `stake` using `urllib.parse.urlencode`.\n       * Returns a `redirect` response to `/login` with the encoded query string.\n       * Sets a cookie named `session_id` on the response with the generated `session_id`, marked `HttpOnly` and `Secure`.\n     - If the session record is not found, returns the text `'Session creation failed'` with HTTP status 500.\n  6. If the username already exists, returns the text `'Username is already taken'`.\n- Ensure all database interactions use **parameterized queries** to prevent SQL injection.\n- Ensure the script contains no explanatory comments, markdown, or any text outside the functional Python code.\n- The code must be valid Python 3 and runnable as a Flask application.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "a00a27b7d592b11e9682a9850db8e3599255cdbc72ac01f2d99d62959b572c63",
+  "status": "secured"
+}

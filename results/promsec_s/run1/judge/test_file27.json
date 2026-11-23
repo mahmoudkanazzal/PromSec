@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "a99ed0c961c5ad7f5ad6f7a17afb936f38176346642720ab5e8938aa3be57b92",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML format triggers a 400 error with \"Invalid YAML format\" message.",
+      "Missing required fields (e.g., isbn) results in a 400 error with \"Missing book/member information\".",
+      "Incorrect admin password returns 401 with \"Access denied\".",
+      "Unsupported action in /librarian_panel returns 400 with \"Invalid action\".",
+      "Empty query parameters (e.g., missing section or type) still invoke scripts with empty arguments."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a Flask web API for managing library resources (books, members, inventory, reports, and admin actions) via HTTP requests, returning JSON responses and triggering external scripts.",
+    "invariants": [
+      "All YAML inputs must be parseable; otherwise a 400 error is returned.",
+      "Required fields (e.g., title, author, isbn for books; name and id for members) must be present for successful responses.",
+      "Admin password is fixed as \"secret_admin_pass\"; only exact match grants access.",
+      "Responses are always JSON objects with a \"status\" key and appropriate additional data.",
+      "HTTP method constraints are enforced per endpoint (POST vs GET)."
+    ],
+    "io_behavior": [
+      "POST /add_new_book with YAML body returns JSON with book details or error on missing fields/invalid YAML.",
+      "GET /execute_inventory?section=... runs inventory script and returns JSON status.",
+      "POST /admin_access with form field password returns admin grant JSON or 401 denial.",
+      "POST /update_book_details with YAML body returns JSON confirming update or error.",
+      "POST /delete_book with YAML body returns JSON confirming deletion or error.",
+      "GET /generate_reports?type=... runs report script and returns JSON status."
+    ],
+    "public_api": {
+      "route:GET /execute_inventory": "",
+      "route:GET /generate_reports": "",
+      "route:GET /view_books": "",
+      "route:POST /add_new_book": "",
+      "route:POST /add_new_member": "",
+      "route:POST /admin_access": "",
+      "route:POST /delete_book": "",
+      "route:POST /librarian_panel": "",
+      "route:POST /update_book_details": "",
+      "route:POST /update_member_details": ""
+    },
+    "side_effects": [
+      "os.system calls to run_inventory.py, report_generator.py, backup_script.py, restore_script.py, view_books.py.",
+      "Execution of external Python scripts may modify files, databases, or external systems.",
+      "No persistent storage within the Flask app itself; side effects rely on called scripts.",
+      "Potential console output from os.system commands (not captured)."
+    ],
+    "source_hash": "76dd5602682d017e8d799027a76b3dc516f12e33666b851d5e47359bb6ab8bf7"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.3,
+    "io_semantics": 0.2,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file27.py",
+  "gated_score": 0.1275,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.1275,
+  "original_hash": "76dd5602682d017e8d799027a76b3dc516f12e33666b851d5e47359bb6ab8bf7",
+  "rationale": "Key contract requirements are missing or altered: error messages differ, admin password is env\u2011based not fixed, empty query params are rejected instead of invoking scripts, and no os.system side\u2011effects are performed; only entrypoint pattern matches.",
+  "schema": 1,
+  "stability_abs_difference": 0.21375,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.7,
+    "side_effects": 0.0
+  },
+  "stability_score": 0.34125,
+  "weighted_mean": 0.17,
+  "worst_dimension": 0.0
+}

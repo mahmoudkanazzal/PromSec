@@ -1,0 +1,99 @@
+{
+  "ast_similarity": 0.5993589743589743,
+  "candidate_hash": "cf0850ded59df3f829b6ad4fd4a0d059953efcf0b49a35e8d444736a97310580",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file22.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6426116838487973,
+      "bandit_statement_nodes": [
+        4,
+        7,
+        14
+      ],
+      "candidate_hash": "33034c7a0a103b5d775db0e6f2dbea61a02c087fc8bd1a4137f0c2b828b3d143",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1434,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.122,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2563,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2798,
+          "end_lineno": 23,
+          "lineno": 23,
+          "node": 14
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (Python 3) that implements a Flask web application with the exact functionality described below. The code must be written **only in Python** and must follow security best practices while preserving the original behavior.\n\n**Requirements**\n\n1. **Imports**\n   - Import `Flask`, `request`, and `jsonify` from `flask`.\n   - Import `yaml`.\n   - Import `subprocess`.\n   - Import `hashlib`.\n   - Import `re`.\n\n2. **Application Setup**\n   - Create a Flask app instance named `app`.\n\n3. **Password Handling**\n   - Define a constant `LIBRARIAN_PASSWORD_HASH` that stores the SHA\u2011256 hash (hex digest) of the literal string `\"library_admin_2023\"`.\n\n4. **Endpoint `/add_book` (POST)**\n   - Read the raw request body, decode it as UTF\u20118, and treat it as a YAML document.\n   - Safely parse the YAML using `yaml.safe_load`.\n   - Extract the fields `title`, `author`, and `isbn` from the resulting dictionary.\n   - Return a JSON response with keys `\"status\"` set to `\"Book added\"` and `\"title\"` set to the extracted title.\n   - If any required field is missing or the YAML is malformed, return a 400 response with a JSON error message.\n\n5. **Endpoint `/run_inventory` (GET)**\n   - Retrieve the query parameter `section` (default to empty string if not provided).\n   - Validate that `section` contains only alphanumeric characters and underscores (`\\w*`). If validation fails, return a 400 JSON response with `\"status\": \"Invalid section parameter\"`.\n   - Execute the external script `inventory_script.py` using `subprocess.run` with arguments `['python', 'inventory_script.py', section]`. Do **not** raise an exception on non\u2011zero exit codes (`check=False`).\n   - Return a JSON response with `\"status\": \"Inventory check initiated\"`.\n\n6. **Endpoint `/librarian_access` (POST)**\n   - Retrieve the form field `password` (default to empty string if missing).\n   - Compute the SHA\u2011256 hash (hex digest) of the provided password.\n   - Compare the computed hash to `LIBRARIAN_PASSWORD_HASH`.\n   - If they match, return a JSON response with `\"status\": \"Librarian access granted\"`.\n   - If they do not match, return a 401 JSON response with `\"status\": \"Access denied\"`.\n\n7. **Running the Application**\n   - Include the standard `if __name__ == '__main__':` guard.\n   - Call `app.run(debug=False)` inside the guard.\n\n**Security and Style Constraints**\n- Use `yaml.safe_load` exclusively; never use `yaml.load` or any unsafe loader.\n- Validate all external input (query parameters, form data, request body) as described.\n- Do not expose stack traces or internal errors; return generic error messages with appropriate HTTP status codes.\n- Ensure the script can be executed directly (`python script_name.py`) without requiring additional configuration.\n- Do not include any code in languages other than Python.\n- Do not add explanatory comments or documentation strings; only the functional code is required.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5993589743589743,
+      "bandit_statement_nodes": [
+        2,
+        24
+      ],
+      "candidate_hash": "cf0850ded59df3f829b6ad4fd4a0d059953efcf0b49a35e8d444736a97310580",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2612,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.3072,
+          "end_lineno": 32,
+          "lineno": 32,
+          "node": 24
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that implements a Flask web service with three endpoints: `/add_book` (POST), `/run_inventory` (GET), and `/librarian_access` (POST). Use only Python and the Flask, PyYAML, hashlib, re, and logging modules.  \n\n- For `/add_book`: read the raw request body as text, parse it with `yaml.safe_load`, ensure the result is a dictionary, extract the keys `title`, `author`, and `isbn`, verify all are present, and return a JSON response `{\"status\": \"Book added\", \"title\": <title>}`. On any error return `{\"error\": \"Invalid request\"}` with HTTP status 400.  \n\n- For `/run_inventory`: read the query parameter `section`, validate it matches the regular expression `^\\w*$` using `re.fullmatch`, log the request with `logging.info`, and return `{\"status\": \"Inventory check initiated\"}`. If validation fails return `{\"status\": \"Invalid section parameter\"}` with HTTP status 400.  \n\n- For `/librarian_access`: read the form field `password`, compute its SHA\u2011256 hash, compare it to a constant hash of the string `\"library_admin_2023\"` stored in `LIBRARIAN_PASSWORD_HASH`, and return `{\"status\": \"Librarian access granted\"}` on a match or `{\"status\": \"Access denied\"}` with HTTP status 401 otherwise.  \n\nConfigure basic logging at INFO level, define `LIBRARIAN_PASSWORD_HASH` as the hex digest of the SHA\u2011256 hash of `\"library_admin_2023\"`, and run the Flask app with `debug=False` when executed as `__main__`. Ensure the code follows security best practices: use `yaml.safe_load` only, avoid `exec`/`eval`, validate all inputs, do not expose stack traces, and use a constant\u2011time comparison for password hashes if possible. Provide only the Python code, no explanations, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "628bfae4caf2338a54a5f8ef7dc7334f333bb812ca122d3afea75a2734f26efc",
+  "status": "secured"
+}

@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "118b6c2edc12e5882e5042ef06f023a0613b67c12755bdcb2ae0652948be5902",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required fields results in HTTP 400 with an error message.",
+      "Incorrect admin password results in HTTP 401 for login, password update, and settings endpoints.",
+      "Invalid YAML (syntax error or missing keys) causes upload_config to return HTTP 400.",
+      "Empty new_password during password update yields HTTP 400.",
+      "Providing an unsupported backup format still triggers the backup script (no validation).",
+      "Running the service execution endpoint with empty service or param still launches the script with empty arguments."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for uploading/retrieving/deleting configurations, executing services, managing admin authentication and settings, fetching user info, and triggering backups.",
+    "invariants": [
+      "ADMIN_PASSWORD is stored in memory and must match the provided password for admin\u2011only endpoints.",
+      "All endpoints return JSON objects with a \"status\" field.",
+      "Required request parameters (e.g., config_name, job_id, password) must be present; otherwise a 400/401 error is returned.",
+      "YAML payload must contain both \"config_name\" and \"config_value\" keys to be accepted."
+    ],
+    "io_behavior": [
+      "POST /config/upload \u2013 accepts raw YAML, returns JSON with config_name and config_value or 400 on invalid data.",
+      "GET /service/execute \u2013 takes query parameters service and param, starts a shell script, returns JSON status.",
+      "POST /admin/login \u2013 expects form field password, returns success JSON or 401 on mismatch.",
+      "POST /admin/update_password \u2013 requires current_password and new_password, updates in\u2011memory password, returns JSON status.",
+      "GET /config/retrieve \u2013 requires config_name query, returns JSON with a sample config value.",
+      "GET /service/status \u2013 requires job_id query, returns JSON indicating the job is running."
+    ],
+    "public_api": {
+      "func:validate_yaml": "(data)",
+      "route:GET /backup/data": "",
+      "route:GET /config/retrieve": "",
+      "route:GET /service/execute": "",
+      "route:GET /service/logs": "",
+      "route:GET /service/status": "",
+      "route:GET /user/info": "",
+      "route:POST /admin/login": "",
+      "route:POST /admin/settings": "",
+      "route:POST /admin/update_password": "",
+      "route:POST /config/delete": "",
+      "route:POST /config/upload": ""
+    },
+    "side_effects": [
+      "Executes external commands via subprocess.run for service execution and data backup.",
+      "Modifies the global ADMIN_PASSWORD variable at runtime when password is updated.",
+      "Potentially runs a bash script (run_service.sh) and a Python backup script (backup_data.py)."
+    ],
+    "source_hash": "ca794296deaf0f617845cbc23b46b9470f11520f319806dfc3be9fa9095a96a8"
+  },
+  "dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.6,
+    "invariants": 0.75,
+    "io_semantics": 0.75,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file15.py",
+  "gated_score": 0.66563,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.66563,
+  "original_hash": "ca794296deaf0f617845cbc23b46b9470f11520f319806dfc3be9fa9095a96a8",
+  "rationale": "Endpoints and required\u2011field checks largely match the contract, but backup format validation and service\u2011allowlist change expected edge\u2011case behavior, and the admin password is stored as a hash rather than updating the ADMIN_PASSWORD variable, breaking some invariants.",
+  "schema": 1,
+  "stability_abs_difference": 0.11999,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.6,
+    "invariants": 1.0,
+    "io_semantics": 0.95,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.78562,
+  "weighted_mean": 0.6875,
+  "worst_dimension": 0.6
+}

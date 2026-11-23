@@ -1,0 +1,98 @@
+{
+  "ast_similarity": 0.7003105590062112,
+  "candidate_hash": "b08fee12a3ca6db51367e06b91ff9b846fac8cb1c3ce5c6b3f29592cbf221c2a",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file92.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.765704584040747,
+      "bandit_statement_nodes": [
+        8,
+        13,
+        23,
+        32,
+        41
+      ],
+      "candidate_hash": "6160667b6d511722b0ec14ced3657d1f45cbe22afa286e9a1acd353affe970bf",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.9999,
+          "end_lineno": 14,
+          "lineno": 14,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9733,
+          "end_lineno": 20,
+          "lineno": 20,
+          "node": 13
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.998,
+          "end_lineno": 34,
+          "lineno": 34,
+          "node": 23
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.999,
+          "end_lineno": 49,
+          "lineno": 49,
+          "node": 32
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9983,
+          "end_lineno": 64,
+          "lineno": 64,
+          "node": 41
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the following requirements:\n\n- Use only Python (no other languages) and import `Flask`, `request`, `redirect` from `flask` and `MySQLdb` (or `mysqlclient`) for database access.\n- Connect to a MySQL database on `localhost` named `EVENTDB` with username `testuser` and password `test123`.\n- Implement the routes exactly as described, preserving functionality:\n  - `POST /add_event`: receive `title` and `date` from `request.form`; check if an event with the same title exists; if it does, redirect to `./add_event`; otherwise insert the new event and redirect to `./view_events`.\n  - `POST /update_event_date`: receive `title` and `new_date` from `request.form`; update the event\u2019s date and return the plain\u2011text message `\"Event date updated successfully\"`.\n  - `POST /delete_event`: receive `title` from `request.form`; delete the event and return the plain\u2011text message `\"Event deleted successfully\"`.\n  - `GET /search_events`: accept a query parameter `term`; return all events whose title contains the term.\n  - `GET /view_events`: return all events.\n- All SQL statements must be **parameterized** to prevent SQL injection.\n- Use **context managers** (`with` statements) for database connections and cursors to ensure they are closed properly, even on exceptions.\n- Include **error handling** for database operations; on error return an appropriate HTTP error response (e.g., 500) with a generic message, without exposing internal details.\n- Return **JSON** responses for the list\u2011returning endpoints (`/search_events` and `/view_events`) and plain\u2011text responses for the success messages.\n- Do **not** enable Flask debug mode; set `debug=False`.\n- Include a `if __name__ == '__main__':` block that runs the app on host `0.0.0.0` and port `5000`.\n- Do not include any explanatory comments, markdown, or non\u2011code text in the generated script.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.7003105590062112,
+      "bandit_statement_nodes": [
+        65
+      ],
+      "candidate_hash": "b08fee12a3ca6db51367e06b91ff9b846fac8cb1c3ce5c6b3f29592cbf221c2a",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 90,
+          "lineno": 90,
+          "node": 65
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3) that implements a Flask web application with the exact functionality described below. The code must be pure Python\u2014no other languages or embedded scripts. Follow these security and style requirements strictly:\n\n1. **Environment variables**: Retrieve the MySQL username and password from the environment variables `DB_USER` and `DB_PASS`. Do not hard\u2011code credentials.\n2. **Database connection**: Use `MySQLdb.connect` with the following parameters:\n   - `host='localhost'`\n   - `user` from `DB_USER`\n   - `passwd` from `DB_PASS`\n   - `db='EVENTDB'`\n   - `charset='utf8mb4'`\n   Encapsulate the connection logic in a function `get_db_connection()` that returns a new connection each call.\n3. **Context management**: Use `with` statements for both the connection and cursor to ensure proper cleanup.\n4. **Parameterized queries**: All SQL statements must use placeholders (`%s`) and pass parameters as a tuple to prevent SQL injection.\n5. **Input validation**: For each route, verify that required form fields or query parameters are present; if not, return a `400` response with the text \u201cMissing parameters\u201d.\n6. **Error handling**: Catch `MySQLdb.Error` exceptions for any database operation and return a `500` response with the text \u201cDatabase error\u201d. Do not expose stack traces or internal error details.\n7. **Routes and behavior**:\n   - `POST /add_event`: Accept `title` and `date` from `request.form`. If an event with the same title already exists, redirect to `./add_event`. Otherwise insert the new event and redirect to `./view_events`.\n   - `POST /update_event_date`: Accept `title` and `new_date` from `request.form`. Update the `date` of the matching event and return the plain text \u201cEvent date updated successfully\u201d.\n   - `POST /delete_event`: Accept `title` from `request.form`. Delete the matching event and return the plain text \u201cEvent deleted successfully\u201d.\n   - `GET /search_events`: Accept a query parameter `term` (default empty string). Perform a case\u2011insensitive `LIKE` search on the `title` column using the pattern `%term%`. Return a JSON array of objects `{ \"title\": ..., \"date\": ... }`, where dates are ISO\u2011formatted strings if possible.\n   - `GET /view_events`: Return a JSON array of all events with the same structure as above.\n8. **Response format**: Use `jsonify` for JSON responses. Use `redirect` for redirects. Return plain strings for error or success messages as specified.\n9. **Application entry point**: Include the standard `if __name__ == '__main__':` block that runs the Flask app on host `127.0.0.1`, port `5000`, with `debug=False`.\n10. **Security**: Do not enable Flask debug mode, do not log sensitive information, and ensure all external inputs are handled safely as described.\n11. **Output**: Provide only the Python source code\u2014no explanations, comments, markdown fences, or any non\u2011code text.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "d84a9609bbb8f855b34f74858f98b2d52127ee7a0edd954cac0ab277af3ac497",
+  "status": "secured"
+}

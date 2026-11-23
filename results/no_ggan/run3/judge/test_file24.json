@@ -1,0 +1,68 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "6d61a9060122fd15349a82f028ffa6dcaf1f50490ddcc9c0de3d415cc16047be",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Empty or malformed YAML in /add_book leads to a parsing error or 400 response.",
+      "Missing title, author, or isbn in the YAML causes a 400 error.",
+      "Omitting the 'section' query parameter in /run_inventory results in the command being run with an empty argument.",
+      "Providing an incorrect password in /librarian_access returns access denied.",
+      "Large request bodies may cause performance degradation or timeouts."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a Flask web API for adding books, triggering an inventory script, and granting librarian access based on a password.",
+    "invariants": [
+      "All responses are JSON objects with a \"status\" field.",
+      "If required fields are missing in /add_book, the endpoint returns HTTP 400.",
+      "If the password is incorrect in /librarian_access, the endpoint returns HTTP 401.",
+      "The Flask server runs with debug mode disabled."
+    ],
+    "io_behavior": [
+      "POST /add_book: accepts raw YAML in the request body and returns JSON with status and the parsed title, author, and isbn.",
+      "GET /run_inventory: reads optional 'section' query parameter and returns JSON indicating the inventory check was started.",
+      "POST /librarian_access: reads form field 'password' and returns JSON indicating whether access is granted or denied."
+    ],
+    "public_api": {
+      "route:GET /run_inventory": "",
+      "route:POST /add_book": "",
+      "route:POST /librarian_access": ""
+    },
+    "side_effects": [
+      "Executes the external command `python inventory_script.py <section>` via the operating system.",
+      "Writes HTTP response bodies (JSON) to the client for each endpoint."
+    ],
+    "source_hash": "4251288cddc13a68efb62bf4d36cdff4d2878f85e27fdeb199093c399c6e410b"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.5,
+    "invariants": 0.5,
+    "io_semantics": 0.6,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file24.py",
+  "gated_score": 0.56375,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.56375,
+  "original_hash": "4251288cddc13a68efb62bf4d36cdff4d2878f85e27fdeb199093c399c6e410b",
+  "rationale": "The program mostly follows the contract but deviates on key edge cases: it rejects missing 'section' instead of running with empty argument, and error responses lack the required 'status' field, violating invariants. Other endpoints behave correctly and debug mode is disabled.",
+  "schema": 1,
+  "stability_abs_difference": 0.27438,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.8,
+    "invariants": 0.75,
+    "io_semantics": 0.85,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.83813,
+  "weighted_mean": 0.585,
+  "worst_dimension": 0.5
+}

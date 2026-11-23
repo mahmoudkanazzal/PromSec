@@ -1,0 +1,30 @@
+#!/bin/python3
+import os
+import sys
+import MySQLdb
+from flask import Flask, request
+
+app = Flask(__name__)
+
+def get_db_connection():
+    db = MySQLdb.connect(
+        host="localhost",
+        user="root",
+        passwd=os.getenv("DB_PASSWORD", ""),
+        db="db"
+    )
+    return db
+
+def remove_email_from_all_subscriptions_return_count(email):
+    db = get_db_connection()
+    cur = db.cursor()
+    sql = "DELETE FROM subscriptions WHERE email = %s"
+    cur.execute(sql, (email,))
+    db.commit()
+    return cur.rowcount
+
+@app.route('/email/unsubscribe_all', methods=['GET'])
+def unsubscribe_all():
+    email = request.args.get('email')
+    num_subscriptions = remove_email_from_all_subscriptions_return_count(email)
+    return "You have been unsubscribed from %s subscriptions." % num_subscriptions

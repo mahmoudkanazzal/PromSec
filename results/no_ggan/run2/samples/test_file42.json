@@ -1,0 +1,40 @@
+{
+  "ast_similarity": 0.6857142857142857,
+  "candidate_hash": "32e4b6bdf0b99b98db044b9277a9a1ec70f8537110716ccdd5d645af6a043dd9",
+  "complete": true,
+  "config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file42.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6857142857142857,
+      "bandit_statement_nodes": [
+        8,
+        12,
+        26,
+        30,
+        44,
+        48
+      ],
+      "candidate_hash": "32e4b6bdf0b99b98db044b9277a9a1ec70f8537110716ccdd5d645af6a043dd9",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other language) that implements a Flask web application with the following requirements:\n\n- Use only Python standard library modules and the third\u2011party packages `Flask`, `MySQLdb`, and `werkzeug.security`.\n- Load database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) from environment variables, providing sensible defaults (`127.0.0.1`, `app_user`, `secure_password`, `library_db`).\n- Define a function `get_db_connection()` that returns a new `MySQLdb` connection using the loaded parameters and sets the charset to `utf8mb4`.\n- Create a Flask app instance named `app`.\n- Implement three POST endpoints:\n\n  1. **/register**\n     - Retrieve `username` and `password` from `request.form`.\n     - If either is missing, abort with HTTP\u202f400 and a clear description.\n     - Use a parameterized query to check if the username already exists; if it does, return a 409 response with the message \u201cUsername already exists\u201d.\n     - Hash the password securely with `werkzeug.security.generate_password_hash`.\n     - Insert the new user with a parameterized `INSERT` statement, commit the transaction, and return a 201 response with the message \u201cYou have successfully registered\u201d.\n     - On any `MySQLdb.Error`, roll back the transaction and return a 500 response with the message \u201cRegistration Failed\u201d.\n     - Ensure the cursor and connection are closed in a `finally` block.\n\n  2. **/checkout**\n     - Retrieve `username` and `book_id` from `request.form`.\n     - If either is missing, abort with HTTP\u202f400 and a clear description.\n     - Verify the user exists using a parameterized `SELECT`; if not, return a 404 response with \u201cUser not found\u201d.\n     - Record the checkout with a parameterized `INSERT` into a `checkouts` table, commit, and return a 200 response with \u201cBook successfully checked out\u201d.\n     - On any `MySQLdb.Error`, roll back and return a 500 response with \u201cCheckout Failed\u201d.\n     - Ensure proper cleanup of cursor and connection.\n\n  3. **/return**\n     - Retrieve `username` and `book_id` from `request.form`.\n     - If either is missing, abort with HTTP\u202f400 and a clear description.\n     - Verify a matching checkout record exists using a parameterized `SELECT`; if not, return a 404 response with \u201cCheckout record not found\u201d.\n     - Delete the checkout record with a parameterized `DELETE`, commit, and return a 200 response with \u201cBook successfully returned\u201d.\n     - On any `MySQLdb.Error`, roll back and return a 500 response with \u201cReturn Failed\u201d.\n     - Ensure proper cleanup of cursor and connection.\n\n- At the end of the script, include the standard `if __name__ == '__main__':` guard that runs the Flask app with `debug=False`.\n- Follow security best practices: never hard\u2011code secrets, always use parameterized queries, hash passwords before storage, and close all resources.\n- Output **only** the Python code, with no additional explanations, comments, or markup.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "e881625b1382fb99257852b9393da006d617bd99661d0afea64e23efc68587d0",
+  "status": "secured"
+}

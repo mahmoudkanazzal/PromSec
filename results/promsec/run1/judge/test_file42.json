@@ -1,0 +1,72 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "0839234ed32b5beccb0d526f3c30fe851ddb9f5e4ed80feb4ac51e22a0c1234c",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields results in a server error (unhandled KeyError).",
+      "Attempting to register an existing username returns \"Username already exists\".",
+      "Checkout with a non\u2011existent username returns \"User not found\".",
+      "Return with no matching checkout record returns \"Checkout record not found\".",
+      "Any database exception triggers a rollback and returns a generic failure message.",
+      "SQL injection is possible because user input is concatenated directly into queries."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API that lets clients register users, check out books, and return books in a library system.",
+    "invariants": [
+      "Each request opens a database connection, creates a cursor, and closes both before returning.",
+      "All responses are plain\u2011text strings; no JSON or HTML is returned.",
+      "Database commits are performed only on successful INSERT/DELETE; otherwise a rollback occurs.",
+      "The same MySQL credentials and host are used for every request."
+    ],
+    "io_behavior": [
+      "POST /register with form fields 'username' and 'password' returns a plain\u2011text message indicating success, duplicate username, or failure.",
+      "POST /checkout with form fields 'username' and 'book_id' returns a plain\u2011text message indicating success, user not found, or failure.",
+      "POST /return with form fields 'username' and 'book_id' returns a plain\u2011text message indicating success, missing checkout record, or failure."
+    ],
+    "public_api": {
+      "route:POST /checkout": "",
+      "route:POST /register": "",
+      "route:POST /return": ""
+    },
+    "side_effects": [
+      "Opens a TCP listener on the Flask server port.",
+      "Creates a new MySQL connection for each request.",
+      "Writes to the 'users' table on successful registration.",
+      "Inserts a row into the 'checkouts' table on successful checkout.",
+      "Deletes a row from the 'checkouts' table on successful return."
+    ],
+    "source_hash": "e881625b1382fb99257852b9393da006d617bd99661d0afea64e23efc68587d0"
+  },
+  "dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.5,
+    "invariants": 0.9,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file42.py",
+  "gated_score": 0.76813,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.76813,
+  "original_hash": "e881625b1382fb99257852b9393da006d617bd99661d0afea64e23efc68587d0",
+  "rationale": "Main API, routes, and side\u2011effects match the contract, but missing\u2011field handling returns a 400 instead of an unhandled KeyError, and parameterized queries prevent the expected SQL\u2011injection vulnerability, reducing edge\u2011case preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.11225,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.67,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.88038,
+  "weighted_mean": 0.8575,
+  "worst_dimension": 0.5
+}

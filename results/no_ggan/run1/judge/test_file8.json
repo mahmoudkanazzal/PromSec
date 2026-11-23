@@ -1,0 +1,84 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "21ee864594256ec82588c30edb49ec3de71e083290e9dcec067fff6b29013950",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Providing malformed YAML to /user/add triggers a 400 error with an \"Invalid YAML format\" message.",
+      "Supplying an incorrect admin key results in a 401 response for authentication\u2011protected endpoints.",
+      "Omitting required query or form parameters (e.g., id, task, argument) yields a 400 error with a specific missing\u2011parameter message.",
+      "Calling /admin/change_key with an empty new_key will replace the secret key with an empty string, effectively disabling future authentication.",
+      "Passing special characters or spaces in task/argument parameters may affect the behavior of the invoked shell scripts.",
+      "If the external scripts (start_task.sh, execute_task.sh, export_data.py) are missing or fail, the endpoint still returns a success JSON because the program does not capture the command exit status."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a Flask web service with endpoints for user management, task control, and admin configuration, responding with JSON and performing limited system commands.",
+    "invariants": [
+      "All admin\u2011protected routes require the request form field 'key' to equal the current SECRET_KEY.",
+      "Endpoints that expect required parameters return HTTP 400 with an error JSON if the parameter is missing or empty.",
+      "YAML parsing in /user/add must succeed; otherwise a 400 error is returned.",
+      "The Flask app runs with debug disabled and only returns JSON payloads; no HTML is rendered.",
+      "The SECRET_KEY is a module\u2011level variable that can be updated only via /admin/change_key with correct authentication."
+    ],
+    "io_behavior": [
+      "POST /user/add accepts raw YAML in the request body and returns JSON with the provided id and name or an error for invalid/missing data.",
+      "GET /system/start_task, /task/execute, and /data/export invoke external shell scripts or Python scripts via os.system and return a JSON status message.",
+      "POST /admin/authenticate, /admin/update_config, /admin/change_key, and /admin/set_preference require a form field 'key' matching the secret key and return JSON indicating success or authentication failure.",
+      "GET /user/fetch, /user/details, /task/status, /task/logs, and /logs/view return JSON with sample data based on query parameters.",
+      "POST /user/delete removes a user identifier supplied in form data and returns a JSON confirmation.",
+      "POST /admin/update_config and /admin/set_preference accept additional form fields (new_config, preference) and echo them back in the JSON response."
+    ],
+    "public_api": {
+      "route:GET /data/export": "",
+      "route:GET /logs/view": "",
+      "route:GET /system/start_task": "",
+      "route:GET /task/execute": "",
+      "route:GET /task/logs": "",
+      "route:GET /task/status": "",
+      "route:GET /user/details": "",
+      "route:GET /user/fetch": "",
+      "route:POST /admin/authenticate": "",
+      "route:POST /admin/change_key": "",
+      "route:POST /admin/set_preference": "",
+      "route:POST /admin/update_config": "",
+      "route:POST /user/add": "",
+      "route:POST /user/delete": ""
+    },
+    "side_effects": [
+      "Execution of external commands: start_task.sh, execute_task.sh, and export_data.py are run with arguments from request parameters.",
+      "Changing the in\u2011memory SECRET_KEY when /admin/change_key is called with the correct old key.",
+      "No persistent storage is used; all responses are generated dynamically without writing to files or databases."
+    ],
+    "source_hash": "1ef5b7c7771f2d9799a1475311356c10cf924731da431f8408647e90727c54ac"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.3,
+    "invariants": 0.5,
+    "io_semantics": 0.5,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file8.py",
+  "gated_score": 0.49875,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.49875,
+  "original_hash": "1ef5b7c7771f2d9799a1475311356c10cf924731da431f8408647e90727c54ac",
+  "rationale": "Most endpoints and JSON responses match the contract, but key deviations include disallowing empty new_key (contract allows it), capturing external script exit status (contract ignores failures), and using 'old_key' instead of a generic 'key' field for admin_change_key, breaking several invariants and edge\u2011case expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.23,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.5,
+    "invariants": 0.8,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.72875,
+  "weighted_mean": 0.565,
+  "worst_dimension": 0.3
+}

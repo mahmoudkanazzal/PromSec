@@ -1,0 +1,37 @@
+{
+  "ast_similarity": 0.5894428152492669,
+  "candidate_hash": "743590572d10d2e0f0cbe76280e879da556d7cb0d28c9425ce65438ae927648b",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 2,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file81.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5894428152492669,
+      "bandit_statement_nodes": [
+        2,
+        10
+      ],
+      "candidate_hash": "743590572d10d2e0f0cbe76280e879da556d7cb0d28c9425ce65438ae927648b",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3) that implements the following functionality securely and without any changes to behavior:\n\n- Use UTF\u20118 encoding.\n- Import only the necessary modules: `os`, `sys`, `MySQLdb`, and the Flask components `Flask`, `request`, `session`, `abort`.\n- Create a Flask application instance named `app`.\n- Define a function `get_db_connection()` that:\n  * Retrieves MySQL connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) from environment variables, providing sensible defaults (`localhost`, `root`, `root`, `db`).\n  * Returns a `MySQLdb.connect` object with `charset='utf8mb4'` and `use_unicode=True`.\n  * Catches any `MySQLdb.Error` and aborts the request with a 500 status and description \u201cDatabase connection failed.\u201d\n- Define a route `'/buy_order'` that accepts only POST requests and performs the following steps:\n  * Verify that the form data contains both `stock_name` and `stock_quantity`; otherwise abort with a 400 status and description \u201cMissing required parameters.\u201d\n  * Verify that the session contains a `username`; otherwise abort with a 401 status and description \u201cUser not authenticated.\u201d\n  * Extract `stock_name`, `stock_quantity` (as a raw string), and `username` from the request and session.\n  * Convert `stock_quantity` to an integer, ensuring it is a positive integer; if conversion fails or the value is \u2264\u202f0, abort with a 400 status and description \u201cInvalid stock quantity. Must be a positive integer.\u201d\n  * Obtain a database connection via `get_db_connection()`.\n  * Using a cursor, execute a parameterized SELECT query to retrieve the current `stock_quantity` for the given `username` from the `user_portfolio` table.\n  * If a row exists:\n    - Compute `new_quantity` as the sum of the existing quantity (treat NULL as 0) and the requested `stock_quantity`.\n    - Execute a parameterized UPDATE query to set `stock_quantity` to `new_quantity` for that `username`.\n    - Commit the transaction.\n    - Return the plain text response \u201cupdated\u201d.\n  * If no row exists:\n    - Execute a parameterized INSERT query to add a new record with `username` and the requested `stock_quantity`.\n    - Commit the transaction.\n    - Return the plain text response \u201cinitialized\u201d.\n  * Ensure the database connection is closed in a `finally` block.\n- Do not include any comments, explanatory text, or non\u2011Python code in the output. The entire response must be valid Python code only.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "8f8582e327b09bad38bbe3adc8c22caea22ee2d220c765fc6fb258469061e46e",
+  "status": "secured"
+}

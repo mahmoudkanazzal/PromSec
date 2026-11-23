@@ -1,0 +1,403 @@
+{
+  "ast_similarity": 0.7441860465116279,
+  "candidate_hash": "d64dbbd438b30a0058748488a69b09028230e23760540f46743cfa95e28a9506",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 1,
+  "cwe_count_before": 1,
+  "cwes_after": [
+    703
+  ],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file43.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7441860465116279,
+      "bandit_statement_nodes": [
+        9,
+        13,
+        26
+      ],
+      "candidate_hash": "d64dbbd438b30a0058748488a69b09028230e23760540f46743cfa95e28a9506",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9967,
+          "end_lineno": 16,
+          "lineno": 16,
+          "node": 9
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.98,
+          "end_lineno": 23,
+          "lineno": 23,
+          "node": 13
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9971,
+          "end_lineno": 44,
+          "lineno": 44,
+          "node": 26
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that implements a secure Flask web application with the following specifications:\n\n- The program must be written **only in Python** and use no other programming languages.\n- Import `Flask`, `request`, and `redirect` from `flask`, and import `MySQLdb`.\n- Create a Flask app instance named `app`.\n- Define a route `/register` that accepts only **POST** requests.\n  - Retrieve `username` and `password` from `request.form`.\n  - Connect to a MySQL database on `localhost` using user `root`, password `cisco123`, and database `mysite`.\n  - Use **parameterized queries** (placeholders) for all SQL statements to prevent SQL injection.\n  - First, execute a `SELECT` query to check if the supplied `username` already exists in the `user` table.\n    - If a record is found, return the plain text response `\"Username already exists\"`.\n  - If the username does not exist, execute an `INSERT` query to add the new `username` and `password` into the `user` table.\n  - Commit the transaction, close the cursor and connection, and then `redirect` the client to `/home`.\n  - Implement robust error handling:\n    - Catch specific database exceptions (e.g., `MySQLdb.Error`) and any other relevant exceptions.\n    - Ensure that the cursor and connection are closed in a `finally` block or by using context managers.\n    - On error, return the plain text response `\"Registration failed\"`.\n\n- Define a route `/login` that accepts only **POST** requests.\n  - Retrieve `username` and `password` from `request.form`.\n  - Connect to the same MySQL database with the same credentials.\n  - Use a **parameterized** `SELECT` query to verify that a record exists in the `user` table with both the supplied `username` and `password`.\n    - If a matching record is found, close the cursor and connection and `redirect` the client to `/dashboard`.\n    - If no matching record is found, close the cursor and connection and return the plain text response `\"Invalid credentials\"`.\n  - Implement the same robust error handling as in the `/register` route, returning `\"Login failed\"` on any exception.\n\n- At the bottom of the file, include the standard `if __name__ == '__main__':` guard and start the Flask development server with `debug=False`.\n\n- Ensure the code follows best practices for security and resource management:\n  - No bare `except:` clauses; catch specific exceptions.\n  - Use context managers (`with` statements) for the database connection and cursor if possible.\n  - Do not store plain\u2011text passwords in production code (the prompt does not require hashing, but note that this is a security consideration).\n  - Do not include any additional routes, functions, or imports beyond what is described.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.7619047619047619,
+      "bandit_statement_nodes": [
+        23,
+        27,
+        47,
+        51
+      ],
+      "candidate_hash": "c75f387e91debda9b5c9358eed3d0f5eacce4488a5c91d522e65016c284f4fb1",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a Python script that implements a Flask web application with the following exact specifications and security considerations:\n\n- The script must be written entirely in Python and must not contain any code in other languages.\n- Import only the modules: `os`, `flask.Flask`, `flask.request`, `flask.redirect`, and `MySQLdb`.\n- Create a Flask app instance named `app`.\n- Define a private helper function `_get_connection()` that returns a `MySQLdb` connection to a MySQL server on `localhost` with user `root`, password taken from the environment variable `DB_PASSWORD` (default to an empty string if not set), database name `mysite`, and charset `utf8mb4`.\n- Implement a route `@app.route('/register', methods=['POST'])` with a function `register()` that:\n  - Retrieves `username` and `password` from `request.form` using `.get()`.\n  - Returns the string `'Registration failed'` if either field is missing.\n  - Opens a database connection using `_get_connection()` and obtains a cursor.\n  - Executes a parameterized SELECT query `SELECT 1 FROM user WHERE username = %s` to check for existing usernames.\n  - If a record is found, returns the string `'Username already exists'`.\n  - Executes a parameterized INSERT query `INSERT INTO user (username, password) VALUES (%s, %s)` to add the new user.\n  - Commits the transaction.\n  - Returns a redirect to `'/home'` on success.\n  - Catches `MySQLdb.Error` and any generic `Exception`, returning `'Registration failed'` for each.\n  - Ensures that both cursor and connection are closed in a `finally` block, suppressing any exceptions that occur during close.\n- Implement a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  - Retrieves `username` and `password` from `request.form` using `.get()`.\n  - Returns the string `'Login failed'` if either field is missing.\n  - Opens a database connection using `_get_connection()` and obtains a cursor.\n  - Executes a parameterized SELECT query `SELECT 1 FROM user WHERE username = %s AND password = %s` to verify credentials.\n  - If a record is found, returns a redirect to `'/dashboard'`.\n  - If no record is found, returns the string `'Invalid credentials'`.\n  - Catches `MySQLdb.Error` and any generic `Exception`, returning `'Login failed'` for each.\n  - Ensures that both cursor and connection are closed in a `finally` block, suppressing any exceptions that occur during close.\n- Include the standard Python idiom `if __name__ == '__main__':` to run the Flask app with `debug=False`.\n- Follow security best practices:\n  - Use only parameterized queries to prevent SQL injection.\n  - Do not expose stack traces or internal error details to the client.\n  - Do not enable Flask debug mode.\n  - Retrieve the database password from an environment variable rather than hard\u2011coding it.\n- The generated code must exactly match the described functionality and structure, with no additional features, comments, or explanatory text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.7441860465116279,
+      "bandit_statement_nodes": [
+        23,
+        27,
+        47,
+        51
+      ],
+      "candidate_hash": "a8afef28cc44770f39cd65270c5c5b22f3c497c5c13eea97dac65364d8022958",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other languages) that implements a Flask web application with the following requirements:\n\n- Import only the standard library modules, `flask.Flask`, `flask.request`, `flask.redirect`, `os`, and `MySQLdb`.\n- Define a Flask app instance named `app`.\n- Create a private helper function `_get_connection()` that returns a `MySQLdb.connect` object using:\n  - host: `'localhost'`\n  - user: `'root'`\n  - password: read from the environment variable `DB_PASSWORD` (default to empty string if not set)\n  - database: `'mysite'`\n  - charset: `'utf8mb4'`\n- Implement a route `'/register'` that accepts only POST requests:\n  - Retrieve `username` and `password` from `request.form`.\n  - If either field is missing, return the plain text response `'Registration failed'`.\n  - Use a try/except/finally block:\n    - Acquire a connection via `_get_connection()` and a cursor.\n    - Use a **parameterized** SELECT query to check if the username already exists: `SELECT 1 FROM user WHERE username = %s`.\n    - If a row is found, return `'Username already exists'`.\n    - Use a **parameterized** INSERT query to add the new user: `INSERT INTO user (username, password) VALUES (%s, %s)`.\n    - Commit the transaction.\n    - On success, return `redirect('/home')`.\n    - Catch `MySQLdb.Error` and any generic `Exception`, returning `'Registration failed'` for both.\n    - In the finally clause, close the cursor and connection safely, ignoring any errors during close.\n- Implement a route `'/login'` that accepts only POST requests:\n  - Retrieve `username` and `password` from `request.form`.\n  - If either field is missing, return `'Login failed'`.\n  - Use a try/except/finally block:\n    - Acquire a connection via `_get_connection()` and a cursor.\n    - Use a **parameterized** SELECT query to verify credentials: `SELECT 1 FROM user WHERE username = %s AND password = %s`.\n    - If a row is found, return `redirect('/dashboard')`; otherwise return `'Invalid credentials'`.\n    - Catch `MySQLdb.Error` and any generic `Exception`, returning `'Login failed'` for both.\n    - In the finally clause, close the cursor and connection safely, ignoring any errors during close.\n- Include the standard `if __name__ == '__main__':` guard that runs `app.run(debug=False)`.\n- Ensure the code contains **no comments, no explanatory text, and no markup**; only the required Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6280193236714976,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        46,
+        50
+      ],
+      "candidate_hash": "d3b52e5e8c4f2411041f6f93ff72d35f7361e5c9867732e2de755ba728c7fdaf",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with the exact functionality described below. The script must:\n\n- Import only the required modules: `Flask`, `request`, `redirect`, `url_for` from `flask`; `os`; `MySQLdb`; `generate_password_hash` and `check_password_hash` from `werkzeug.security`.\n- Define a Flask app instance.\n- Provide a private helper function `_get_connection()` that returns a MySQLdb connection using the following parameters, each read from environment variables with the given defaults:\n  - host: `DB_HOST` (default `'localhost'`)\n  - user: `DB_USER` (default `'appuser'`)\n  - password: `DB_PASSWORD` (default empty string)\n  - database: `'mysite'`\n  - charset: `'utf8mb4'`\n- Implement a `/register` route that accepts only POST requests and:\n  1. Retrieves `username` and `password` from `request.form`.\n  2. Returns the literal string `'Registration failed'` if either field is missing.\n  3. Opens a database connection using `_get_connection()`, creates a cursor, and checks if the username already exists with a parameterized query `SELECT 1 FROM user WHERE username = %s`.\n  4. If the username exists, returns the literal string `'Username already exists'`.\n  5. Hashes the password with `generate_password_hash`.\n  6. Inserts the new user with a parameterized query `INSERT INTO user (username, password) VALUES (%s, %s)`.\n  7. Commits the transaction.\n  8. Redirects to the route named `home` using `url_for`.\n  9. Handles any `MySQLdb.Error` or generic `Exception` by returning `'Registration failed'`.\n  10. Ensures the cursor and connection are closed in a `finally` block, suppressing any errors during close.\n- Implement a `/login` route that accepts only POST requests and:\n  1. Retrieves `username` and `password` from `request.form`.\n  2. Returns `'Login failed'` if either field is missing.\n  3. Opens a database connection, creates a cursor, and fetches the stored password hash for the given username with a parameterized query `SELECT password FROM user WHERE username = %s`.\n  4. If a row is returned and `check_password_hash` validates the supplied password against the stored hash, redirects to the route named `dashboard`.\n  5. Otherwise returns the literal string `'Invalid credentials'`.\n  6. Handles any `MySQLdb.Error` or generic `Exception` by returning `'Login failed'`.\n  7. Ensures the cursor and connection are closed in a `finally` block, suppressing any errors during close.\n- Implement a `/home` route that returns the literal string `'Welcome to the home page.'`.\n- Implement a `/dashboard` route that returns the literal string `'Welcome to your dashboard.'`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n\nThe generated code must be secure: use parameterized queries, never expose raw passwords, never enable Flask debug mode, and properly close all database resources. Output **only** the Python code, with no comments, explanations, or additional text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6132075471698113,
+      "bandit_statement_nodes": [
+        28,
+        32,
+        52,
+        56
+      ],
+      "candidate_hash": "7eafd9d457432f751395f0fb596558fb667b2c565a8394274c10c3687e983c73",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 5,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with the exact functionality described below, ensuring the code follows security best practices and maintains the same behavior:\n\n- Import only the required modules: `Flask`, `request`, `redirect`, `url_for` from `flask`; `os`; `MySQLdb`; `generate_password_hash` and `check_password_hash` from `werkzeug.security`.\n- Create a Flask app instance named `app`.\n- Define a private helper function `_get_connection()` that:\n  - Reads database connection parameters from environment variables `DB_HOST` (default `\"localhost\"`), `DB_USER` (default `\"appuser\"`), and `DB_PASSWORD` (default empty string).\n  - Returns a `MySQLdb.connect` object using the host, user, password, database name `\"mysite\"`, and charset `\"utf8mb4\"`.\n- Implement a `/register` route that accepts only POST requests and:\n  - Retrieves `username` and `password` from `request.form`.\n  - Returns the plain string `\"Registration failed\"` if either field is missing.\n  - Opens a database connection using `_get_connection()`.\n  - Uses a cursor to execute a parameterized query `SELECT 1 FROM user WHERE username = %s` to check for existing usernames.\n  - If a row is found, returns the plain string `\"Username already exists\"`.\n  - Otherwise, hashes the password with `generate_password_hash`.\n  - Inserts the new user with a parameterized query `INSERT INTO user (username, password) VALUES (%s, %s)`.\n  - Commits the transaction.\n  - Redirects to the endpoint named `home` using `redirect(url_for('home'))`.\n  - Catches any `MySQLdb.Error` or generic `Exception` and returns `\"Registration failed\"`.\n  - Ensures the cursor and connection are closed in a `finally` block, handling any close errors silently.\n- Implement a `/login` route that accepts only POST requests and:\n  - Retrieves `username` and `password` from `request.form`.\n  - Returns `\"Login failed\"` if either field is missing.\n  - Opens a database connection using `_get_connection()`.\n  - Executes a parameterized query `SELECT password FROM user WHERE username = %s` to fetch the stored hash.\n  - If a row is returned and `check_password_hash` validates the supplied password, redirects to the endpoint named `dashboard`.\n  - Otherwise, returns `\"Invalid credentials\"`.\n  - Catches any `MySQLdb.Error` or generic `Exception` and returns `\"Login failed\"`.\n  - Ensures the cursor and connection are closed in a `finally` block, handling any close errors silently.\n- Implement a `/home` route that returns the plain string `\"Welcome to the home page.\"`.\n- Implement a `/dashboard` route that returns the plain string `\"Welcome to your dashboard.\"`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n- Ensure all SQL statements use parameterized queries to prevent SQL injection.\n- Do not enable Flask debug mode or expose any sensitive information.\n- Do not add any additional functionality, comments, or explanatory text; output only the required Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5990783410138248,
+      "bandit_statement_nodes": [
+        28,
+        32,
+        53,
+        57
+      ],
+      "candidate_hash": "2ec48892e0a266f6b7674c96bdbcdc76a389ee637a99fb5af09423af498d7a70",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 6,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the following exact specifications and security requirements. The code must be in Python only, with no other languages or extraneous text.\n\n**General requirements**\n- Use only the standard library and the following third\u2011party packages: `Flask`, `MySQLdb`, and `werkzeug.security`.\n- All database connection parameters (host, user, password) must be read from environment variables `DB_HOST`, `DB_USER`, and `DB_PASSWORD`, providing sensible defaults (`localhost`, `appuser`, empty password) if the variables are not set.\n- Connect to a MySQL database named `mysite` using UTF\u20118\u2011mb4 charset.\n- Define a helper function `_get_connection()` that returns a new `MySQLdb` connection using the parameters above.\n- Do **not** enable Flask debug mode (`debug=False`).\n\n**Routes and functionality**\n1. **POST `/register`**\n   - Retrieve `username` and `password` from `request.form`.\n   - If either field is missing, return the plain string `\"Registration failed\"`.\n   - Use a parameterized query to check whether the username already exists: `SELECT 1 FROM user WHERE username = %s`.\n   - If the username exists, return the plain string `\"Username already exists\"`.\n   - Hash the password with `werkzeug.security.generate_password_hash`.\n   - Insert the new user with a parameterized query: `INSERT INTO user (username, password) VALUES (%s, %s)`.\n   - Commit the transaction.\n   - On success, redirect to the route named `home` using `url_for`.\n   - On any `MySQLdb.Error` or generic exception, return `\"Registration failed\"`.\n   - Ensure the cursor and connection are closed in a `finally` block, swallowing any errors that occur during close.\n\n2. **POST `/login`**\n   - Retrieve `username` and `password` from `request.form`.\n   - If either field is missing, return `\"Login failed\"`.\n   - Use a parameterized query to fetch the stored password hash: `SELECT password FROM user WHERE username = %s`.\n   - If a row is returned and `werkzeug.security.check_password_hash` validates the supplied password, redirect to the route named `dashboard`.\n   - If validation fails, return `\"Invalid credentials\"`.\n   - On any `MySQLdb.Error` or generic exception, return `\"Login failed\"`.\n   - Ensure proper cleanup of cursor and connection in a `finally` block.\n\n3. **GET `/home`**\n   - Return the plain string `\"Welcome to the home page.\"`.\n\n4. **GET `/dashboard`**\n   - Return the plain string `\"Welcome to your dashboard.\"`.\n\n**Security and best practices**\n- Use only parameterized queries to prevent SQL injection.\n- Do not expose stack traces or internal error details; return only the specified generic error messages.\n- Close all database resources (cursor, connection) in a `finally` block, handling any exceptions silently.\n- Do not enable Flask\u2019s built\u2011in debugger or auto\u2011reloader.\n- Ensure the script can be executed directly (`if __name__ == '__main__':`) and starts the Flask app with `app.run(debug=False)`.\n\nProvide only the Python code that fulfills all the above requirements, with no additional explanations, comments, or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6103286384976526,
+      "bandit_statement_nodes": [
+        28,
+        32,
+        53,
+        57
+      ],
+      "candidate_hash": "d049297c939aec858e0e845d8e8ba57038f0f603c6d5aba078b01bc5b88eeb42",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 7,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3) that implements a Flask web application with the following exact functionality and security requirements:\n\n- **Imports**: `os`, `Flask`, `request`, `redirect`, `url_for` from `flask`, `MySQLdb`, and `generate_password_hash`, `check_password_hash` from `werkzeug.security`.\n- **Environment variables**: Retrieve `DB_HOST`, `DB_USER`, and `DB_PASSWORD` using `os.getenv`, defaulting to `'localhost'`, `'appuser'`, and an empty string respectively.\n- **Database connection helper**: Define a function `_get_connection()` that returns a `MySQLdb.connect` object with parameters `host=DB_HOST`, `user=DB_USER`, `passwd=DB_PASSWORD`, `db='mysite'`, `charset='utf8mb4'`, `use_unicode=True`.\n- **Flask app**: Create a Flask instance named `app`.\n- **/register route** (`POST`):\n  - Extract `username` and `password` from `request.form`.\n  - If either is missing, return the plain string `'Registration failed'`.\n  - Use a try/except/finally block:\n    - Obtain a connection via `_get_connection()` and a cursor.\n    - Execute a parameterized query to check if the username already exists: `SELECT 1 FROM user WHERE username = %s`.\n    - If a row is found, return `'Username already exists'`.\n    - Hash the password with `generate_password_hash`.\n    - Insert the new user with a parameterized query: `INSERT INTO user (username, password) VALUES (%s, %s)`.\n    - Commit the transaction.\n    - On success, redirect to the endpoint named `'home'` using `url_for`.\n    - On any `MySQLdb.Error` or generic `Exception`, return `'Registration failed'`.\n    - In the finally block, close the cursor and connection safely, ignoring any errors during close.\n- **/login route** (`POST`):\n  - Extract `username` and `password` from `request.form`.\n  - If either is missing, return `'Login failed'`.\n  - Use a try/except/finally block:\n    - Obtain a connection and cursor.\n    - Execute a parameterized query: `SELECT password FROM user WHERE username = %s`.\n    - Fetch one row; if a row exists and `check_password_hash(row[0], password)` is true, redirect to the endpoint named `'dashboard'`.\n    - Otherwise, return `'Invalid credentials'`.\n    - On any `MySQLdb.Error` or generic `Exception`, return `'Login failed'`.\n    - In the finally block, close the cursor and connection safely.\n- **/home route** (`GET`): Return the plain string `'Welcome to the home page.'`.\n- **/dashboard route** (`GET`): Return the plain string `'Welcome to your dashboard.'`.\n- **Application entry point**: Include the standard `if __name__ == '__main__':` guard and start the Flask server with `app.run(debug=False)`.\n\nAdditional constraints:\n- Use only the specified imports; do not import any other modules or packages.\n- Ensure all SQL statements are executed with parameterized placeholders to prevent SQL injection.\n- Do not include any comments, explanatory text, or markup in the output; provide only the raw Python code.\n- The code must be syntactically correct and ready to run without modification.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6220095693779905,
+      "bandit_statement_nodes": [
+        28,
+        32,
+        53,
+        57
+      ],
+      "candidate_hash": "b2a6fe8db3a97176d372958c1576b16b97150c1a34d53cf85ebb81a4167cbb4d",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 8,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the following exact specifications and security requirements. The script must contain **only Python code**\u2014no comments, explanations, or any non\u2011code text.\n\n**General requirements**\n- Use only the Python standard library and the packages `flask`, `MySQLdb`, and `werkzeug.security`.\n- The script must be executable as a standalone program (`if __name__ == '__main__': app.run(debug=False)`).\n- Do **not** enable Flask debug mode.\n- All configuration values for the MySQL connection must be read from environment variables `DB_HOST`, `DB_USER`, and `DB_PASSWORD`, with defaults `'localhost'`, `'appuser'`, and an empty string respectively.\n- Use UTF\u20118 encoding for the MySQL connection (`charset='utf8mb4', use_unicode=True`).\n\n**Database helper**\n- Define a private function `_get_connection()` that returns a new `MySQLdb.connect` object using the environment variables and connecting to a database named `mysite`.\n\n**Routes**\n1. **POST /register**\n   - Retrieve `username` and `password` from `request.form`.\n   - If either field is missing, return the plain string `Registration failed`.\n   - Use a new database connection and cursor.\n   - Check for existing username with a **parameterized** query: `SELECT 1 FROM user WHERE username = %s`.\n   - If a row exists, return the plain string `Username already exists`.\n   - Hash the password with `werkzeug.security.generate_password_hash`.\n   - Insert the new user with a **parameterized** query: `INSERT INTO user (username, password) VALUES (%s, %s)`.\n   - Commit the transaction.\n   - On success, redirect to the route named `home` using `url_for`.\n   - On any `MySQLdb.Error` or generic `Exception`, return the plain string `Registration failed`.\n   - Ensure the cursor and connection are closed in a `finally` block, suppressing any errors during close.\n\n2. **POST /login**\n   - Retrieve `username` and `password` from `request.form`.\n   - If either field is missing, return the plain string `Login failed`.\n   - Use a new database connection and cursor.\n   - Fetch the stored password hash with a **parameterized** query: `SELECT password FROM user WHERE username = %s`.\n   - If a row is returned and `werkzeug.security.check_password_hash` validates the supplied password, redirect to the route named `dashboard`.\n   - Otherwise, return the plain string `Invalid credentials`.\n   - On any `MySQLdb.Error` or generic `Exception`, return the plain string `Login failed`.\n   - Ensure the cursor and connection are closed in a `finally` block, suppressing any errors during close.\n\n3. **GET /home**\n   - Return the plain string `Welcome to the home page.`\n\n4. **GET /dashboard**\n   - Return the plain string `Welcome to your dashboard.`\n\n**Security constraints**\n- All SQL statements must be executed with parameter placeholders (`%s`) to prevent SQL injection.\n- Passwords must never be stored or compared in plain text; always use the hashing utilities from `werkzeug.security`.\n- Do not expose stack traces or internal error details; return only the generic failure strings specified above.\n- Do not import or use any modules that are not explicitly listed.\n- Do not enable any Flask extensions or middleware beyond what is required for the routes.\n\n**Output**\n- Provide only the Python source code that fulfills all the above requirements, with no additional text, comments, or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6103286384976526,
+      "bandit_statement_nodes": [
+        28,
+        32,
+        53,
+        57
+      ],
+      "candidate_hash": "bc9e935e158cc5a854ead5108826fd27bff0316380d9555d6423df96b5aeb8eb",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 9,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3) that implements a secure Flask web application with the following exact specifications:\n\n1. **Imports**  \n   - `import os`  \n   - `from flask import Flask, request, redirect, url_for`  \n   - `import MySQLdb`  \n   - `from werkzeug.security import generate_password_hash, check_password_hash`\n\n2. **Flask app initialization**  \n   - Create the Flask app with `app = Flask(__name__)`.\n\n3. **Database connection helper**  \n   - Define a private function `_get_connection()` that:\n     - Reads `DB_HOST`, `DB_USER`, and `DB_PASSWORD` from environment variables, defaulting to `'localhost'`, `'appuser'`, and an empty string respectively.\n     - Returns a `MySQLdb.connect` object using the read credentials, connecting to a database named `'mysite'` with `charset='utf8mb4'` and `use_unicode=True`.\n\n4. **/register route** (`methods=['POST']`)  \n   - Retrieve `username` and `password` from `request.form` using `.get()`.  \n   - If either is missing, immediately return the plain string `'Registration failed'`.  \n   - Use a `try/except/finally` block:\n     - In the `try` section:\n       - Obtain a connection via `_get_connection()` and a cursor via `conn.cursor()`.  \n       - Execute a parameterized query `SELECT 1 FROM user WHERE username = %s` to check for existing usernames.  \n       - If a row is returned, return `'Username already exists'`.  \n       - Hash the password with `generate_password_hash(password)`.  \n       - Insert the new user with a parameterized `INSERT INTO user (username, password) VALUES (%s, %s)`.  \n       - Commit the transaction.  \n       - Redirect to the route named `'home'` using `redirect(url_for('home'))`.  \n     - In the `except` sections:\n       - Catch `MySQLdb.Error` and any generic `Exception`, returning `'Registration failed'` for both.  \n     - In the `finally` section:\n       - Safely close the cursor and connection if they were created, suppressing any errors during close.\n\n5. **/login route** (`methods=['POST']`)  \n   - Retrieve `username` and `password` from `request.form` using `.get()`.  \n   - If either is missing, immediately return `'Login failed'`.  \n   - Use a `try/except/finally` block mirroring the structure of the register route:\n     - In the `try` section:\n       - Obtain a connection and cursor.  \n       - Execute a parameterized query `SELECT password FROM user WHERE username = %s`.  \n       - Fetch one row.  \n       - If a row exists and `check_password_hash(row[0], password)` evaluates to `True`, redirect to the route named `'dashboard'`.  \n       - Otherwise, return `'Invalid credentials'`.  \n     - In the `except` sections:\n       - Catch `MySQLdb.Error` and any generic `Exception`, returning `'Login failed'`.  \n     - In the `finally` section:\n       - Safely close the cursor and connection, suppressing any errors.\n\n6. **/home route** (`GET` by default)  \n   - Return the plain string `'Welcome to the home page.'`.\n\n7. **/dashboard route** (`GET` by default)  \n   - Return the plain string `'Welcome to your dashboard.'`.\n\n8. **Application entry point**  \n   - Include the standard `if __name__ == '__main__':` guard.  \n   - Run the Flask app with `debug=False`.\n\n9. **Security and best\u2011practice requirements**  \n   - All SQL statements must be parameterized to prevent SQL injection.  \n   - Passwords must never be stored or compared in plain text; always use the provided Werkzeug hashing functions.  \n   - Do not expose stack traces or internal error details; return only the generic failure messages specified.  \n   - Ensure that database resources (cursor and connection) are always released, even when exceptions occur.  \n   - Do not import or use any modules outside those listed.  \n   - The script must be pure Python; no other programming languages or external scripts may be referenced.  \n\nProduce only the Python code that fulfills all of the above requirements, with no additional explanation, comments, or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.625,
+      "bandit_statement_nodes": [
+        27,
+        31,
+        52,
+        56
+      ],
+      "candidate_hash": "4c4f2c6f4ce4dbfd10a25e1658486158747289592c13fa69279d662b09f8f6b8",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 10,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the following exact functionality and security requirements:\n\n- Use only Python (no other languages or scripts).\n- Import `os`, `Flask`, `request`, `redirect`, `url_for` from `flask`, `MySQLdb`, and `generate_password_hash`, `check_password_hash` from `werkzeug.security`.\n- Create a Flask app instance named `app`.\n- Define a private helper function `_get_connection()` that:\n  - Reads the database host, user, and password from environment variables `DB_HOST`, `DB_USER`, and `DB_PASSWORD` (defaulting to `'localhost'`, `'appuser'`, and an empty string respectively).\n  - Returns a `MySQLdb.connect` object with the database name `mysite`, charset `utf8mb4`, and `use_unicode=True`.\n- Implement a `/register` route that accepts only POST requests and:\n  - Retrieves `username` and `password` from `request.form`.\n  - Returns the plain string `'Registration failed'` if either field is missing.\n  - Opens a database connection using `_get_connection()`, creates a cursor, and checks with a **parameterized** query whether the username already exists (`SELECT 1 FROM user WHERE username = %s`).\n  - If the username exists, returns the plain string `'Username already exists'`.\n  - Otherwise, hashes the password with `generate_password_hash`, inserts the new user with a **parameterized** query (`INSERT INTO user (username, password) VALUES (%s, %s)`), commits the transaction, and redirects to the route named `home` using `url_for`.\n  - Catches any `MySQLdb.Error` or generic `Exception` and returns `'Registration failed'`.\n  - Ensures the cursor and connection are closed in a `finally` block, handling any errors during close silently.\n- Implement a `/login` route that accepts only POST requests and:\n  - Retrieves `username` and `password` from `request.form`.\n  - Returns `'Login failed'` if either field is missing.\n  - Opens a database connection, creates a cursor, and fetches the stored password hash for the given username with a **parameterized** query (`SELECT password FROM user WHERE username = %s`).\n  - If a row is returned and `check_password_hash` validates the supplied password, redirects to the route named `dashboard` using `url_for`.\n  - If validation fails, returns the plain string `'Invalid credentials'`.\n  - Catches any `MySQLdb.Error` or generic `Exception` and returns `'Login failed'`.\n  - Closes cursor and connection safely in a `finally` block.\n- Add a `/home` route that returns the plain string `'Welcome to the home page.'`.\n- Add a `/dashboard` route that returns the plain string `'Welcome to your dashboard.'`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n- Do **not** include any comments, explanatory text, or markdown formatting in the output. Provide only the raw Python code that meets all the above specifications.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5949656750572082,
+      "bandit_statement_nodes": [
+        28,
+        32,
+        52,
+        56
+      ],
+      "candidate_hash": "037b83e2b45fdb095022d384724e823718af775bd1604ce401e4e9a8fd66b43c",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 11,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with user registration and login using a MySQL database. The script must:\n\n- Import only the standard library modules and the following third\u2011party packages: Flask, MySQLdb, werkzeug.security.\n- Define a Flask app instance.\n- Provide a private helper function `_get_connection()` that reads DB connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD` with defaults `localhost`, `appuser`, and an empty password, and returns a MySQLdb connection using UTF\u20118 encoding (`charset='utf8mb4'`, `use_unicode=True`).\n- Implement a `/register` route that accepts POST requests, reads `username` and `password` from `request.form`, validates they are present, checks if the username already exists using a parameterized query (`SELECT 1 FROM user WHERE username = %s`), hashes the password with `generate_password_hash`, inserts the new user with a parameterized query (`INSERT INTO user (username, password) VALUES (%s, %s)`), commits the transaction, and redirects to a `home` endpoint on success. On any error or validation failure, return a generic `'Registration failed'` message (or `'Username already exists'` when appropriate). Ensure all database cursors and connections are closed in a `finally` block, handling any exceptions silently.\n- Implement a `/login` route that accepts POST requests, reads `username` and `password`, validates them, retrieves the stored password hash for the given username using a parameterized query (`SELECT password FROM user WHERE username = %s`), verifies the password with `check_password_hash`, and redirects to a `dashboard` endpoint on success. Return `'Invalid credentials'` if the password does not match, and `'Login failed'` on any other error. Ensure proper cleanup of cursor and connection.\n- Implement simple `/home` and `/dashboard` routes that return plain text messages (`'Welcome to the home page.'` and `'Welcome to your dashboard.'` respectively).\n- Run the Flask app only when the script is executed as `__main__`, with `debug=False`.\n- Use secure coding practices: never concatenate user input into SQL strings, use parameterized queries, never expose stack traces, close resources, and avoid enabling Flask debug mode.\n- The entire code must be valid Python 3, contain no extraneous comments or explanatory text, and be ready to run after installing the required packages.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5949656750572082,
+      "bandit_statement_nodes": [
+        32,
+        36,
+        56,
+        60
+      ],
+      "candidate_hash": "21d8d221dbf46d41de101648ab9007844baa74dc93ecce8618b30ab3800f1626",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 12,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no comments, no explanatory text) that implements a Flask web application with the exact functionality described below. The code must be in Python only and must follow security best practices:\n\n- Import only the required modules: `os`, `Flask`, `request`, `redirect`, `url_for` from `flask`, `MySQLdb`, and `generate_password_hash`, `check_password_hash` from `werkzeug.security`.\n- Create a Flask app instance.\n- Define a private helper function `_get_connection()` that:\n  - Reads database connection parameters from environment variables `DB_HOST` (default `localhost`), `DB_USER` (default `appuser`), `DB_PASSWORD` (default empty string), and `DB_NAME` (optional).\n  - Constructs a dictionary with keys `host`, `user`, `passwd`, `charset` set to `'utf8mb4'`, and `use_unicode` set to `True`. Include `db` in the dictionary only if `DB_NAME` is provided.\n  - Returns a MySQLdb connection using `MySQLdb.connect(**conn_params)`.\n- Implement a `/register` route that accepts only POST requests and:\n  - Retrieves `username` and `password` from `request.form`.\n  - Returns the string `'Registration failed'` if either field is missing.\n  - Opens a database connection using `_get_connection()` and obtains a cursor.\n  - Uses a parameterized query to check if the username already exists: `SELECT 1 FROM user WHERE username = %s`.\n  - If the username exists, returns the string `'Username already exists'`.\n  - Hashes the password with `generate_password_hash`.\n  - Inserts the new user with a parameterized query: `INSERT INTO user (username, password) VALUES (%s, %s)`.\n  - Commits the transaction and redirects to the route named `home`.\n  - Catches any exception and returns `'Registration failed'`.\n  - Ensures the cursor and connection are closed in a `finally` block, suppressing any errors during close.\n- Implement a `/login` route that accepts only POST requests and:\n  - Retrieves `username` and `password` from `request.form`.\n  - Returns `'Login failed'` if either field is missing.\n  - Opens a database connection and cursor via `_get_connection()`.\n  - Retrieves the stored password hash with a parameterized query: `SELECT password FROM user WHERE username = %s`.\n  - If a row is found and `check_password_hash` validates the supplied password, redirects to the route named `dashboard`.\n  - Otherwise returns `'Invalid credentials'`.\n  - Catches any exception and returns `'Login failed'`.\n  - Ensures proper cleanup of cursor and connection in a `finally` block.\n- Add a `/home` route that returns the string `'Welcome to the home page.'`.\n- Add a `/dashboard` route that returns the string `'Welcome to your dashboard.'`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n\nThe generated code must exactly follow these specifications, use parameterized queries to prevent SQL injection, handle resources safely, and contain no comments or additional explanatory output.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5949656750572082,
+      "bandit_statement_nodes": [
+        31,
+        35,
+        55,
+        59
+      ],
+      "candidate_hash": "985f5c147b31eab3fa086d51263f2d9298ed8bbd7e4fbbee69bcd4697212eee9",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 13,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.9+) that implements a Flask web application with the following exact functionality and security requirements:\n\n1. **Imports**  \n   - Import `os`, `Flask`, `request`, `redirect`, `url_for` from `flask`, `MySQLdb`, and `generate_password_hash`, `check_password_hash` from `werkzeug.security`.\n\n2. **Application Setup**  \n   - Create a Flask app instance named `app`.  \n   - Do **not** enable debug mode (`debug=False` when running).\n\n3. **Database Connection Helper**  \n   - Define a private function `_get_connection()` that:\n     - Reads the environment variables `DB_HOST` (default `\"localhost\"`), `DB_USER` (default `\"appuser\"`), `DB_PASSWORD` (default empty string), and `DB_NAME` (no default; optional).  \n     - Constructs a dictionary `conn_params` with keys `host`, `user`, `passwd`, `charset` set to `\"utf8mb4\"`, and `use_unicode` set to `True`.  \n     - If `DB_NAME` is present, add it to `conn_params` under the key `db`.  \n     - Returns a MySQLdb connection using `MySQLdb.connect(**conn_params)`.  \n   - Ensure the function does not expose connection details in error messages.\n\n4. **User Registration Endpoint (`/register`, POST)**  \n   - Retrieve `username` and `password` from `request.form`.  \n   - If either is missing, return the plain string `\"Registration failed\"` (no HTML).  \n   - Use a `try/except/finally` block:\n     - Acquire a connection via `_get_connection()` and a cursor.  \n     - Execute a **parameterized** SELECT query to check if the username already exists: `SELECT 1 FROM user WHERE username = %s`.  \n     - If a row is found, return `\"Username already exists\"`.  \n     - Hash the password with `generate_password_hash`.  \n     - Insert the new user with a **parameterized** INSERT: `INSERT INTO user (username, password) VALUES (%s, %s)`.  \n     - Commit the transaction.  \n     - On success, redirect to the route named `home` using `url_for`.  \n   - On any exception, return `\"Registration failed\"` without leaking exception details.  \n   - In `finally`, close the cursor and connection safely, ignoring any errors during close.\n\n5. **User Login Endpoint (`/login`, POST)**  \n   - Retrieve `username` and `password` from `request.form`.  \n   - If either is missing, return `\"Login failed\"`.  \n   - Use a `try/except/finally` block:\n     - Acquire a connection and cursor.  \n     - Execute a **parameterized** SELECT to fetch the stored password hash: `SELECT password FROM user WHERE username = %s`.  \n     - If a row is returned and `check_password_hash(row[0], password)` is true, redirect to the route named `dashboard`.  \n     - Otherwise, return `\"Invalid credentials\"`.  \n   - On any exception, return `\"Login failed\"` without exposing details.  \n   - In `finally`, close cursor and connection safely.\n\n6. **Static Pages**  \n   - Define `/home` route returning the plain string `\"Welcome to the home page.\"`.  \n   - Define `/dashboard` route returning the plain string `\"Welcome to your dashboard.\"`.\n\n7. **Application Entry Point**  \n   - Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\n8. **Security and Style Constraints**  \n   - Use only **parameterized** SQL statements to prevent SQL injection.  \n   - Do not print or log raw exception information; return generic failure messages as specified.  \n   - Ensure all resources (cursor, connection) are closed even if errors occur.  \n   - Do not include any additional routes, helper functions, or third\u2011party libraries beyond those listed.  \n   - The code must be pure Python; do not embed any other language or shell commands.  \n   - Do not add comments, explanatory text, or markdown formatting in the output code.  \n\nGenerate only the Python source code that satisfies all the above requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5949656750572082,
+      "bandit_statement_nodes": [
+        31,
+        35,
+        55,
+        59
+      ],
+      "candidate_hash": "f87ed05bf36c62f2cfe942700a26f495d1f790fd02865b2128dbf6f097b1927d",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 14,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other language) that implements a Flask web application with the exact functionality described below, ensuring the code follows security best practices and maintains the same behavior:\n\n- Import only the required modules: `os`, `Flask`, `request`, `redirect`, `url_for` from `flask`, `MySQLdb`, and `generate_password_hash`, `check_password_hash` from `werkzeug.security`.\n- Create a Flask app instance.\n- Define a private helper function `_get_connection()` that:\n  - Reads database connection parameters from environment variables `DB_HOST` (default `localhost`), `DB_USER` (default `appuser`), `DB_PASSWORD` (default empty string), and `DB_NAME` (optional).\n  - Constructs a dictionary with keys `host`, `user`, `passwd`, `charset` set to `utf8mb4`, and `use_unicode` set to `True`. Include `db` in the dictionary only if `DB_NAME` is provided.\n  - Returns a MySQLdb connection using `MySQLdb.connect(**conn_params)`.\n- Implement a `/register` route that accepts only POST requests and:\n  - Retrieves `username` and `password` from `request.form`.\n  - Returns `\"Registration failed\"` if either field is missing.\n  - Opens a database connection using `_get_connection()`, obtains a cursor, and checks if the username already exists with a parameterized query `SELECT 1 FROM user WHERE username = %s`.\n  - If the username exists, returns `\"Username already exists\"`.\n  - Hashes the password with `generate_password_hash`.\n  - Inserts the new user with a parameterized query `INSERT INTO user (username, password) VALUES (%s, %s)`.\n  - Commits the transaction and redirects to the `home` endpoint using `url_for('home')`.\n  - Handles any exception by returning `\"Registration failed\"`.\n  - Ensures the cursor and connection are closed in a `finally` block, suppressing any errors during cleanup.\n- Implement a `/login` route that accepts only POST requests and:\n  - Retrieves `username` and `password` from `request.form`.\n  - Returns `\"Login failed\"` if either field is missing.\n  - Opens a database connection, obtains a cursor, and fetches the stored password hash with a parameterized query `SELECT password FROM user WHERE username = %s`.\n  - If a row is returned and `check_password_hash` validates the password, redirects to the `dashboard` endpoint using `url_for('dashboard')`.\n  - Otherwise returns `\"Invalid credentials\"`.\n  - Handles any exception by returning `\"Login failed\"`.\n  - Ensures the cursor and connection are closed in a `finally` block, suppressing any errors during cleanup.\n- Implement a `/home` route that returns the string `\"Welcome to the home page.\"`.\n- Implement a `/dashboard` route that returns the string `\"Welcome to your dashboard.\"`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n- Do not include any comments, explanatory text, or markup in the output; output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6060606060606061,
+      "bandit_statement_nodes": [
+        31,
+        35,
+        55,
+        59
+      ],
+      "candidate_hash": "d64bde0c54508e463eed4139728c92ae727d4e41695b01d03c1db3f330ee597b",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 15,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no markdown, no comments, no explanatory text) that implements a Flask web application with the exact functionality described below. The script must be in Python only and must follow security best practices.\n\n**Requirements**\n\n1. **Imports**\n   - `os`\n   - `Flask`, `request`, `redirect`, `url_for` from `flask`\n   - `MySQLdb`\n   - `generate_password_hash`, `check_password_hash` from `werkzeug.security`\n\n2. **Flask app**\n   - Create the Flask app instance named `app`.\n\n3. **Database connection helper**\n   - Define a function `_get_connection()` that:\n     - Reads `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` from environment variables, defaulting `DB_HOST` to `'localhost'`, `DB_USER` to `'appuser'`, and `DB_PASSWORD` to an empty string.\n     - Constructs a dictionary `conn_params` with keys: `host`, `user`, `passwd`, `charset='utf8mb4'`, `use_unicode=True`.\n     - If `DB_NAME` is set, add it to `conn_params` as `db`.\n     - Returns a MySQLdb connection using `MySQLdb.connect(**conn_params)`.\n\n4. **/register route (POST)**\n   - Retrieve `username` and `password` from `request.form`.\n   - If either is missing, return the string `\"Registration failed\"`.\n   - Use `_get_connection()` to obtain a connection and a cursor.\n   - Execute a parameterized SELECT to check if the username already exists: `\"SELECT 1 FROM user WHERE username = %s\"`.\n   - If a row is found, return `\"Username already exists\"`.\n   - Hash the password with `generate_password_hash`.\n   - Execute a parameterized INSERT to add the new user: `\"INSERT INTO user (username, password) VALUES (%s, %s)\"`.\n   - Commit the transaction.\n   - Redirect to the route named `home` using `url_for`.\n   - On any exception, return `\"Registration failed\"`.\n   - Ensure the cursor and connection are closed in a `finally` block, handling any errors silently.\n\n5. **/login route (POST)**\n   - Retrieve `username` and `password` from `request.form`.\n   - If either is missing, return `\"Login failed\"`.\n   - Use `_get_connection()` to obtain a connection and a cursor.\n   - Execute a parameterized SELECT to fetch the stored password hash: `\"SELECT password FROM user WHERE username = %s\"`.\n   - If a row is returned and `check_password_hash` validates the supplied password, redirect to the route named `dashboard`.\n   - Otherwise, return `\"Invalid credentials\"`.\n   - On any exception, return `\"Login failed\"`.\n   - Ensure the cursor and connection are closed in a `finally` block, handling any errors silently.\n\n6. **/home route (GET)**\n   - Return the string `\"Welcome to the home page.\"`.\n\n7. **/dashboard route (GET)**\n   - Return the string `\"Welcome to your dashboard.\"`.\n\n8. **Application entry point**\n   - If `__name__ == '__main__'`, run the Flask app with `debug=False`.\n\n**Security constraints**\n- Use only parameterized queries; never concatenate user input into SQL strings.\n- Do not hard\u2011code any database credentials; rely exclusively on environment variables.\n- Use `werkzeug.security` for password hashing and verification.\n- Do not enable Flask debug mode.\n- Ensure all resources (cursor, connection) are closed even if errors occur.\n- Do not include any additional functionality, imports, or code beyond what is specified.\n\nOutput only the Python code that satisfies all the above requirements. Do not include any comments, markdown fences, or explanatory text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5949656750572082,
+      "bandit_statement_nodes": [
+        34,
+        57
+      ],
+      "candidate_hash": "e6802e4d7f7599850936cb6b010f08c9e2e9662a81cffcdd7f6ca9eb3a4d7981",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 16,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that implements a Flask web application with the following exact functionality and security requirements:\n\n1. **Environment Configuration**\n   - Import `os` and read the database connection parameters from environment variables: `DB_HOST` (default `\"localhost\"`), `DB_USER` (default `\"appuser\"`), `DB_PASSWORD` (default empty string), and `DB_NAME` (optional). Use these values to build a dictionary of connection arguments for `MySQLdb.connect`, including `charset='utf8mb4'` and `use_unicode=True`. If `DB_NAME` is provided, include it as the `db` argument.\n\n2. **Database Connection Helper**\n   - Define a private function `_get_connection()` that returns a new MySQLdb connection using the dictionary built from the environment variables.\n\n3. **User Registration Endpoint (`/register`, POST)**\n   - Retrieve `username` and `password` from `request.form`.\n   - If either field is missing, return the plain text response `\"Registration failed\"`.\n   - Use a `try/except/finally` block to:\n     - Obtain a connection via `_get_connection()` and a cursor.\n     - Execute a parameterized SELECT query to check if the username already exists: `SELECT 1 FROM user WHERE username = %s`.\n     - If a row is returned, respond with `\"Username already exists\"`.\n     - Hash the password securely with `werkzeug.security.generate_password_hash`.\n     - Insert the new user with a parameterized INSERT query: `INSERT INTO user (username, password) VALUES (%s, %s)`.\n     - Commit the transaction.\n     - On success, redirect to the Flask endpoint named `home` using `url_for`.\n   - On any exception, return `\"Registration failed\"`.\n   - Ensure the cursor and connection are closed in the `finally` block, handling any errors during close silently.\n\n4. **User Login Endpoint (`/login`, POST)**\n   - Retrieve `username` and `password` from `request.form`.\n   - If either field is missing, return `\"Login failed\"`.\n   - Use a `try/except/finally` block to:\n     - Obtain a connection and cursor.\n     - Execute a parameterized SELECT query to fetch the stored password hash for the given username: `SELECT password FROM user WHERE username = %s`.\n     - If a row is returned and `werkzeug.security.check_password_hash` validates the supplied password against the stored hash, redirect to the Flask endpoint named `dashboard`.\n     - Otherwise, return `\"Invalid credentials\"`.\n   - On any exception, return `\"Login failed\"`.\n   - Ensure proper cleanup of cursor and connection in the `finally` block, suppressing any errors during cleanup.\n\n5. **Static Pages**\n   - Define a `/home` route that returns the plain text `\"Welcome to the home page.\"`.\n   - Define a `/dashboard` route that returns the plain text `\"Welcome to your dashboard.\"`.\n\n6. **Application Entry Point**\n   - Include the standard `if __name__ == '__main__':` guard.\n   - Run the Flask app with `debug=False` to avoid exposing debug information.\n\n7. **Security and Best Practices**\n   - Use only parameterized queries to prevent SQL injection.\n   - Do not expose stack traces or internal error details to the client; return only the generic failure messages specified.\n   - Ensure all imported modules are from the Python standard library or publicly available packages (`flask`, `MySQLdb`, `werkzeug.security`).\n   - The entire code must be valid Python 3 syntax and must not contain any code in other programming languages.\n   - Do not include any explanatory comments, markdown formatting, or additional text outside the required Python code.\n\nGenerate only the Python source code that fulfills all the above specifications.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5949656750572082,
+      "bandit_statement_nodes": [
+        31,
+        35,
+        55,
+        59
+      ],
+      "candidate_hash": "18ce8484f8578e8a3bedce70868989e208cd806e38b02ed77516e2ae87e9903d",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 17,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no markdown, no explanations, no comments) that implements a Flask web application with the exact functionality described below. Ensure the code is secure, uses only Python, and follows best practices for handling database connections, input validation, password hashing, and error handling.\n\nRequirements:\n- Use only Python standard library and the following third\u2011party packages: Flask, MySQLdb, werkzeug.security.\n- Import `os`, `Flask`, `request`, `redirect`, `url_for`, `MySQLdb`, `generate_password_hash`, `check_password_hash`.\n- Retrieve database connection settings from environment variables: `DB_HOST` (default \u201clocalhost\u201d), `DB_USER` (default \u201cappuser\u201d), `DB_PASSWORD` (default empty string), `DB_NAME` (optional). Build a `conn_params` dictionary with keys `host`, `user`, `passwd`, `charset` set to \u201cutf8mb4\u201d, `use_unicode` set to True, and include `db` only if `DB_NAME` is provided.\n- Define a private helper function `_get_connection()` that returns `MySQLdb.connect(**conn_params)`.\n- Create a Flask app instance.\n- Implement a `/register` route that accepts only POST requests:\n  * Retrieve `username` and `password` from `request.form`.\n  * If either is missing, return the plain text response \u201cRegistration failed\u201d.\n  * Open a database connection and cursor using `_get_connection()`.\n  * Use a parameterized query to check if the username already exists in the `user` table.\n  * If it exists, return the plain text response \u201cUsername already exists\u201d.\n  * Hash the password with `generate_password_hash`.\n  * Insert the new user with a parameterized query into the `user` table.\n  * Commit the transaction.\n  * On success, redirect to the route named `home`.\n  * On any exception, return \u201cRegistration failed\u201d.\n  * Ensure the cursor and connection are closed in a `finally` block, handling any errors silently.\n- Implement a `/login` route that accepts only POST requests:\n  * Retrieve `username` and `password` from `request.form`.\n  * If either is missing, return \u201cLogin failed\u201d.\n  * Open a database connection and cursor using `_get_connection()`.\n  * Use a parameterized query to fetch the stored password hash for the given username.\n  * If a row is returned and `check_password_hash` validates the supplied password, redirect to the route named `dashboard`.\n  * Otherwise, return \u201cInvalid credentials\u201d.\n  * On any exception, return \u201cLogin failed\u201d.\n  * Ensure the cursor and connection are closed in a `finally` block, handling any errors silently.\n- Implement a `/home` route (GET) that returns the plain text \u201cWelcome to the home page.\u201d\n- Implement a `/dashboard` route (GET) that returns the plain text \u201cWelcome to your dashboard.\u201d\n- Include the standard `if __name__ == '__main__':` block to run the Flask app with `debug=False`.\n- Do not include any additional routes, functions, or code beyond what is specified.\n- Do not output any explanatory text, markdown fences, or comments; output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.579064587973274,
+      "bandit_statement_nodes": [
+        31,
+        35,
+        55,
+        59
+      ],
+      "candidate_hash": "6956e18d4c01077e24cca914b2d1bd7377ec9c5f291dd15a626b7bc22c00b166",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 18,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program that implements the following functionality exactly as described, ensuring the code is secure and maintains the same behavior:\n\n- Use Python 3 and only standard library modules plus Flask, MySQLdb, and werkzeug.security.\n- Read database connection parameters from environment variables:\n  - `DB_HOST` (default `\"localhost\"`),\n  - `DB_USER` (default `\"appuser\"`),\n  - `DB_PASSWORD` (default empty string),\n  - `DB_NAME` (optional; include in connection parameters only if set).\n- Build a `conn_params` dictionary with keys `host`, `user`, `passwd`, `charset` set to `\"utf8mb4\"`, and `use_unicode` set to `True`. Add the `db` key only when `DB_NAME` is provided.\n- Define a private helper function `_get_connection()` that returns a MySQLdb connection using `**conn_params`.\n- Create a Flask app instance with `debug=False`.\n- Implement the route `/register` accepting only POST requests:\n  - Retrieve `username` and `password` from `request.form`.\n  - If either is missing, return the plain text response `\"Registration failed\"`.\n  - Open a database connection and cursor using `_get_connection()`.\n  - Use a parameterized SELECT query to check if the username already exists.\n  - If it exists, return `\"Username already exists\"`.\n  - Hash the password with `werkzeug.security.generate_password_hash`.\n  - Insert the new user with a parameterized INSERT query, then commit.\n  - On success, redirect to the Flask endpoint named `home`.\n  - On any exception, return `\"Registration failed\"`.\n  - Ensure the cursor and connection are closed in a `finally` block, handling any errors during close silently.\n- Implement the route `/login` accepting only POST requests:\n  - Retrieve `username` and `password` from `request.form`.\n  - If either is missing, return `\"Login failed\"`.\n  - Open a database connection and cursor using `_get_connection()`.\n  - Use a parameterized SELECT query to fetch the stored password hash for the given username.\n  - If a row is returned and `werkzeug.security.check_password_hash` validates the password, redirect to the Flask endpoint named `dashboard`.\n  - Otherwise, return `\"Invalid credentials\"`.\n  - On any exception, return `\"Login failed\"`.\n  - Ensure the cursor and connection are closed in a `finally` block, handling any errors during close silently.\n- Implement the route `/home` (GET) that returns the plain text `\"Welcome to the home page.\"`.\n- Implement the route `/dashboard` (GET) that returns the plain text `\"Welcome to your dashboard.\"`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app.\n\nAdditional security and style requirements:\n- Use only parameterized queries (`%s` placeholders) to prevent SQL injection.\n- Do not enable Flask debug mode.\n- Do not include any explanatory text, comments, or markdown in the output.\n- Output only the Python code, nothing else.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5990783410138248,
+      "bandit_statement_nodes": [
+        32,
+        36,
+        56,
+        60
+      ],
+      "candidate_hash": "fb60d8492bd5b5f8c35968903ef093802ebfe2da5491ee4e9d878499ce7cbbf1",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 19,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with user registration and login using a MySQL database. The script must:\n\n- Import only the required modules: `os`, `Flask` (including `request`, `redirect`, `url_for`), `MySQLdb`, and `werkzeug.security` (`generate_password_hash`, `check_password_hash`).\n- Read database connection parameters from environment variables: `DB_HOST` (default `'localhost'`), `DB_USER` (default `'appuser'`), `DB_PASSWORD` (default empty string), and optional `DB_NAME`. Use these to build a connection dictionary with `charset='utf8mb4'` and `use_unicode=True`, adding the `'db'` key only if `DB_NAME` is set.\n- Define a private helper function `_get_connection()` that returns a `MySQLdb` connection using the dictionary.\n- Create a Flask app instance with `debug` set to `False`.\n- Implement a `/register` route that accepts only `POST` requests and:\n  - Retrieves `username` and `password` from `request.form`.\n  - Returns the plain string `'Registration failed'` if either field is missing.\n  - Opens a MySQL connection and cursor inside a `try/except/finally` block.\n  - Executes a parameterized query `SELECT 1 FROM users WHERE username = %s` to check for existing usernames.\n  - If a record exists, returns the plain string `'Username already exists'`.\n  - Otherwise hashes the password with `generate_password_hash`, inserts the new user with a parameterized `INSERT INTO users (username, password) VALUES (%s, %s)`, commits the transaction, and redirects to the `home` endpoint using `url_for`.\n  - On any exception returns `'Registration failed'`.\n  - In the `finally` block, safely close the cursor and connection, ignoring any errors during close.\n- Implement a `/login` route that accepts only `POST` requests and:\n  - Retrieves `username` and `password` from `request.form`.\n  - Returns `'Login failed'` if either field is missing.\n  - Opens a MySQL connection and cursor inside a `try/except/finally` block.\n  - Executes a parameterized query `SELECT password FROM users WHERE username = %s` to fetch the stored password hash.\n  - If a row is returned and `check_password_hash` validates the supplied password, redirects to the `dashboard` endpoint using `url_for`.\n  - Otherwise returns the plain string `'Invalid credentials'`.\n  - On any exception returns `'Login failed'`.\n  - In the `finally` block, safely close the cursor and connection, ignoring any errors during close.\n- Implement a `/home` route that accepts only `GET` requests and returns the plain string `'Welcome to the home page.'`.\n- Implement a `/dashboard` route that accepts only `GET` requests and returns the plain string `'Welcome to your dashboard.'`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app.\n- Ensure all SQL statements are fully parameterized to prevent injection, passwords are never stored in plain text, and no debug information is exposed.\n- The code must be valid Python 3, properly indented, and contain no extraneous comments or explanatory text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5895691609977324,
+      "bandit_statement_nodes": [
+        29,
+        33,
+        53,
+        57
+      ],
+      "candidate_hash": "81ac5007147170055c75a4d2e22bc839ccd53e8e9b7ed7021618c532d31ce6e3",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 20,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3) that implements a simple web application using Flask and MySQLdb with the following requirements:\n\n1. **Environment configuration**  \n   - Load database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) from environment variables, providing sensible defaults for host (`localhost`), user (`appuser`), and password (empty string).  \n   - Build a `db_config` dictionary that includes `host`, `user`, `passwd`, `charset` set to `utf8mb4`, and `use_unicode` set to `True`. If `DB_NAME` is defined, add it to the dictionary as `db`.\n\n2. **Database connection helper**  \n   - Define a private function `_get_connection()` that returns a new MySQLdb connection using the `db_config` dictionary.\n\n3. **Flask application setup**  \n   - Create a Flask app instance named `app`.  \n   - Explicitly set `app.debug = False` to disable debug mode.\n\n4. **User registration endpoint** (`/register`, POST)  \n   - Retrieve `username` and `password` from `request.form`.  \n   - If either field is missing, return the plain text response `\"Registration failed\"`.  \n   - Use a try/except/finally block:  \n     - Acquire a connection via `_get_connection()` and a cursor.  \n     - Execute a parameterized SELECT query to check if the username already exists (`SELECT 1 FROM users WHERE username = %s`).  \n     - If a row is returned, respond with `\"Username already exists\"`.  \n     - Hash the password securely with `werkzeug.security.generate_password_hash`.  \n     - Insert the new user with a parameterized INSERT query (`INSERT INTO users (username, password) VALUES (%s, %s)`).  \n     - Commit the transaction.  \n     - On success, redirect to the route named `home` using `url_for`.  \n   - On any exception, return `\"Registration failed\"`.  \n   - In the finally block, close the cursor and connection safely, ignoring any errors during close.\n\n5. **User login endpoint** (`/login`, POST)  \n   - Retrieve `username` and `password` from `request.form`.  \n   - If either field is missing, return `\"Login failed\"`.  \n   - Use a try/except/finally block:  \n     - Acquire a connection and cursor.  \n     - Execute a parameterized SELECT query to fetch the stored password hash for the given username (`SELECT password FROM users WHERE username = %s`).  \n     - If a row is found and `werkzeug.security.check_password_hash` validates the supplied password against the stored hash, redirect to the route named `dashboard`.  \n     - Otherwise, return `\"Invalid credentials\"`.  \n   - On any exception, return `\"Login failed\"`.  \n   - Ensure cursor and connection are closed safely in the finally block.\n\n6. **Static pages**  \n   - Define a GET route `/home` that returns the plain text `\"Welcome to the home page.\"`.  \n   - Define a GET route `/dashboard` that returns the plain text `\"Welcome to your dashboard.\"`.\n\n7. **Application entry point**  \n   - Include the standard `if __name__ == '__main__':` guard and call `app.run()`.\n\n8. **Security and best practices**  \n   - Use only parameterized queries to prevent SQL injection.  \n   - Do not expose stack traces or internal errors; return generic failure messages as specified.  \n   - Ensure all resources (connections, cursors) are closed even when errors occur.  \n   - Do not enable Flask debug mode.  \n   - Do not import or use any modules outside the standard library, Flask, MySQLdb, or Werkzeug.  \n\nThe output must be pure Python code with no additional explanation, comments, or markup. Ensure the code runs as described and adheres to the security constraints.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 20,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "961a470c675273769ee3c7a270f64fbb8430961a14be43b8a5919a306f1f5f86",
+  "status": "max_iterations_reached"
+}

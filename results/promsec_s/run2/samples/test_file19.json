@@ -1,0 +1,93 @@
+{
+  "ast_similarity": 0.7866666666666666,
+  "candidate_hash": "c7fd4f91331ea4d749d2ae4b492b911e4b3205cec0bc1749282a8c91c2ca69eb",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file19.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9672131147540983,
+      "bandit_statement_nodes": [
+        4,
+        7,
+        13,
+        22
+      ],
+      "candidate_hash": "32db03ac447825133b6521c1b384d132cc1d6327ed478aff79b4512289d309c0",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9097,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9221,
+          "end_lineno": 12,
+          "lineno": 12,
+          "node": 7
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9743,
+          "end_lineno": 24,
+          "lineno": 24,
+          "node": 13
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program (no other languages) that implements a Flask web application with the following exact functionality and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `jsonify` from `flask`; `os`; `yaml`; `subprocess`.\n- Create a Flask app instance named `app`.\n- Retrieve the master password from an environment variable named `MASTER_PASSWORD` using `os.getenv`.\n- Define a route `/submit_feedback` that accepts only POST requests:\n  - Read the raw request body, decode it as UTF\u20118, and parse it with `yaml.safe_load`.\n  - Extract `user_id` and `feedback` from the parsed data.\n  - Return a JSON response containing `\"status\": \"Feedback received\"`, the received `\"user\"` and `\"feedback\"` values.\n- Define a route `/generate_report` that accepts only GET requests:\n  - Retrieve the query parameter `id` (default to an empty string if missing).\n  - Execute an external binary `./report_generator` with the `id` argument using `subprocess.run` **without** invoking a shell (`shell=False`), and set `check=False`.\n  - Return a JSON response with `\"status\": \"Report generation initiated\"`.\n- Define a route `/admin_login` that accepts only POST requests:\n  - Obtain the form field `password` (default to an empty string if missing).\n  - Compare the submitted password to the `MASTER_PASSWORD` value using a plain equality check.\n  - If they match, return a JSON response with `\"status\": \"Admin login successful\"`.\n  - If they do not match, return a JSON response with `\"status\": \"Login failed\"` and an HTTP status code of 401.\n- Define a route `/update_catalog` that accepts only POST requests:\n  - Read the raw request body, decode it as UTF\u20118, and parse it with `yaml.safe_load`.\n  - Return a JSON response containing `\"status\": \"Catalog updated\"` and `\"new_catalog\"` set to the parsed YAML data.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n- Do not include any comments, docstrings, explanatory text, or code in any language other than Python. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.7866666666666666,
+      "bandit_statement_nodes": [
+        3,
+        14
+      ],
+      "candidate_hash": "c7fd4f91331ea4d749d2ae4b492b911e4b3205cec0bc1749282a8c91c2ca69eb",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9928,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.8889,
+          "end_lineno": 20,
+          "lineno": 20,
+          "node": 14
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (Python 3) that implements a Flask web application with the exact functionality described below. The script must:\n\n- Import only the necessary modules: `Flask`, `request`, `jsonify` from `flask`; `os`; `yaml`; and `mimetypes`.\n- Create a Flask app instance named `app`.\n- Retrieve the environment variable `MASTER_PASSWORD` using `os.getenv`.\n- Define the following routes with the specified methods and behavior:\n\n1. **POST /submit_feedback**\n   - Read the raw request body as text.\n   - Parse the body with `yaml.safe_load`; if parsing returns `None`, treat it as an empty dict.\n   - Extract `user_id` and `feedback` keys from the parsed data.\n   - Return a JSON response: `{\"status\":\"Feedback received\",\"user\":user_id,\"feedback\":feedback}`.\n\n2. **GET /generate_report**\n   - Retrieve the query parameter `id` (default to empty string if missing).\n   - Call `mimetypes.guess_type` on the `id` value (ignore the result).\n   - Return a JSON response: `{\"status\":\"Report generation initiated\"}`.\n\n3. **POST /admin_login**\n   - Get the form field `password` (default to empty string if missing).\n   - Compare it to the `MASTER_PASSWORD` environment variable using a constant\u2011time comparison (e.g., `hmac.compare_digest`).\n   - If the password matches, return JSON `{\"status\":\"Admin login successful\"}` with HTTP 200.\n   - If it does not match, return JSON `{\"status\":\"Login failed\"}` with HTTP 401.\n\n4. **POST /update_catalog**\n   - Read the raw request body as text.\n   - Parse the body with `yaml.safe_load` (do not allow `None` to propagate; treat it as an empty dict if needed).\n   - Return a JSON response: `{\"status\":\"Catalog updated\",\"new_catalog\":data}` where `data` is the parsed YAML.\n\n- Include a `if __name__ == '__main__':` block that runs the app with `debug=False`.\n\nSecurity requirements:\n- Use `yaml.safe_load` exclusively for YAML parsing; never use `yaml.load` or any unsafe loader.\n- Validate that the request body is a string before parsing.\n- Use `hmac.compare_digest` for password comparison to mitigate timing attacks.\n- Do not enable Flask debug mode.\n- Do not expose any additional routes or functionality.\n- Do not import or use any modules that could execute arbitrary code.\n\nOutput **only** the Python code, with no explanatory text, comments, or markdown formatting. Ensure the code is syntactically correct and ready to run.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "f9b0e146383078e704acfde5a6976aceb335b0d502126348c4a493855f23bb1d",
+  "status": "secured"
+}

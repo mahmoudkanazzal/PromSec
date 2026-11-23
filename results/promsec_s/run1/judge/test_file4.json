@@ -1,0 +1,84 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "1dfcaea4e1e3dee7a621ddecfd4207bdb1482134e8cd1c574dee246ef16b97f1",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing required fields in any request leads to a 400 Bad Request with an error message.",
+      "Invalid YAML format in add_book, submit_review, or submit_event triggers a 400 error.",
+      "Providing a non\u2011integer year_published or rating outside 1\u20115 results in a 400 error.",
+      "Calling /admin/change_password with an incorrect old_password returns 401 Access Denied.",
+      "Calling /admin/login with wrong credentials returns 401 Access Denied.",
+      "Omitting isbn in endpoints that require it (book_info, remove_book, check_availability, etc.) returns a 400 error."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple library management HTTP API with endpoints for adding, removing, querying, and updating books, handling admin authentication, and submitting reviews, events, and book requests.",
+    "invariants": [
+      "All successful JSON responses contain a \"status\" field describing the outcome.",
+      "Required fields (e.g., title, author, isbn) must be non\u2011empty strings; otherwise a 400 error is returned.",
+      "year_published must be an integer; otherwise a 400 error is returned.",
+      "Rating in reviews must be an integer between 1 and 5 inclusive.",
+      "Admin login succeeds only if password matches the current LIBRARIAN_PASSWORD and secret_key equals the hard\u2011coded value.",
+      "YAML inputs are parsed with yaml.FullLoader; malformed YAML results in a 400 error."
+    ],
+    "io_behavior": [
+      "POST /library/add_book expects YAML body with title, author, isbn, publisher (optional), year_published (int) and returns JSON status or error.",
+      "POST /library/remove_book expects form field isbn and returns JSON confirming removal or error.",
+      "GET /inventory/check accepts query parameters section and location, triggers a subprocess call, and returns JSON acknowledgment.",
+      "POST /admin/login expects form fields password and secret_key and returns JSON granting or denying admin access.",
+      "POST /admin/change_password expects old_password and new_password; on success updates the in\u2011memory password and returns JSON.",
+      "GET /library/book_info requires isbn query param and returns static JSON book details."
+    ],
+    "public_api": {
+      "route:GET /api/check_availability": "",
+      "route:GET /inventory/check": "",
+      "route:GET /library/book_info": "",
+      "route:GET /library/list_books": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/login": "",
+      "route:POST /api/request_book": "",
+      "route:POST /api/return_book": "",
+      "route:POST /api/submit_event": "",
+      "route:POST /api/submit_review": "",
+      "route:POST /library/add_book": "",
+      "route:POST /library/remove_book": "",
+      "route:POST /library/update_book": ""
+    },
+    "side_effects": [
+      "Executes an external command via os.system in /inventory/check, potentially running a separate Python script.",
+      "Modifies the global LIBRARIAN_PASSWORD variable when /admin/change_password succeeds.",
+      "Runs the Flask development server (app.run) listening on the default host/port."
+    ],
+    "source_hash": "79f06a718f9233fb94588d4ef4a2c9ddacb133ad2041110188b3de4c6ce1c069"
+  },
+  "dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 1.0,
+    "invariants": 0.5,
+    "io_semantics": 0.7,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file4.py",
+  "gated_score": 0.5975,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.5975,
+  "original_hash": "79f06a718f9233fb94588d4ef4a2c9ddacb133ad2041110188b3de4c6ce1c069",
+  "rationale": "Most endpoints follow the contract, handling required fields, YAML parsing, and error codes correctly. However, the program uses yaml.safe_load instead of yaml.FullLoader, does not enforce non\u2011empty string validation, and the /inventory/check endpoint does not execute the required external command, breaking side\u2011effect and invariant expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.158,
+  "stability_dimensions": {
+    "behavior": 0.78,
+    "edge_cases": 0.83,
+    "invariants": 0.8,
+    "io_semantics": 0.83,
+    "side_effects": 0.67
+  },
+  "stability_score": 0.7555,
+  "weighted_mean": 0.63,
+  "worst_dimension": 0.5
+}

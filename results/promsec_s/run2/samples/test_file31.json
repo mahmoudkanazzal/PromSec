@@ -1,0 +1,270 @@
+{
+  "ast_similarity": 0.5974805038992201,
+  "candidate_hash": "2ed052a96c89ce35de4bb935d0ede3c6b9653a538051462c00b9151b2d26a232",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    703
+  ],
+  "error": "",
+  "file": "test_file31.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9513822688274547,
+      "bandit_statement_nodes": [
+        55
+      ],
+      "candidate_hash": "414161f0ec349383ef0591d1b107726e25a3b045841c58e30f65e7e90140453d",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9341,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 5
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.861,
+          "end_lineno": 83,
+          "lineno": 83,
+          "node": 31
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9914,
+          "end_lineno": 84,
+          "lineno": 84,
+          "node": 32
+        },
+        {
+          "ast_type": "Assert",
+          "change": 1.0,
+          "end_lineno": 115,
+          "lineno": 115,
+          "node": 55
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9842,
+          "end_lineno": 247,
+          "lineno": 247,
+          "node": 117
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 module that implements the exact functionality described below. The code must be written in Python only (no other languages) and must be secure, avoiding any unsafe operations such as `eval`, `exec`, insecure deserialization, or unchecked external input. Follow best practices for type hints, error handling, and logging. Do not include any explanatory text, comments, or markup outside of the code itself; output only the Python source code.\n\nRequirements:\n\n1. **Imports**  \n   - `import json`  \n   - `from io import BytesIO`  \n   - `import logging`  \n   - `import os`  \n   - `from typing import Dict, Any`  \n   - `from dataclasses import dataclass, field`  \n   - `from six import text_type`  \n   - `from zope.interface import implementer`  \n   - `from twisted.internet._resolver import SimpleResolverComplexifier`  \n   - `from twisted.internet.defer import fail, succeed`  \n   - `from twisted.internet.error import DNSLookupError`  \n   - `from twisted.internet.interfaces import IHostnameResolver, IReactorPluggableNameResolver, IResolverSimple`  \n   - `from twisted.internet import address`  \n   - `import twisted.logger`  \n   - `from twisted.web.http_headers import Headers`  \n   - `from twisted.web.server import Request, Site`  \n   - `from twisted.web.http import unquote`  \n   - `from twisted.test.proto_helpers import MemoryReactorClock`  \n   - `from OpenSSL import crypto`  \n   - `from sydent.sydent import Sydent, parse_config_dict`\n\n2. **Hard\u2011coded certificate**  \n   Define a constant `FAKE_SERVER_CERT_PEM` containing the provided PEM block (including the leading and trailing triple\u2011quoted delimiters).\n\n3. **Factory function** `make_sydent(test_config={})`  \n   - Ensure an in\u2011memory SQLite database is used unless overridden.  \n   - Create a `ResolvingMemoryReactorClock` instance.  \n   - Return `Sydent(reactor=reactor, cfg=parse_config_dict(test_config), use_tls_for_federation=False)`.\n\n4. **Dataclass** `FakeChannel` with fields `site: Site`, `_reactor: Any`, `result: Dict = field(default_factory=dict)`, `_producer: Any = None`. Implement the following members, all with proper type checking and error handling:  \n   - `json_body` property that parses `self.result[\"body\"]` as UTF\u20118 JSON, raising an exception if no result.  \n   - `code` property returning the integer HTTP status code.  \n   - `headers` property returning a `Headers` object built from `self.result[\"headers\"]`.  \n   - `writeHeaders(self, version, code, reason, headers)` storing the supplied values in `self.result`.  \n   - `write(self, content)` that only accepts `bytes`, appends to `self.result[\"body\"]`, and raises `TypeError` for other types.  \n   - `registerProducer(self, producer, streaming)` storing the producer, scheduling production via the reactor, handling both streaming and non\u2011streaming cases safely.  \n   - `unregisterProducer(self)` clearing the stored producer.  \n   - `requestDone(self, _self)` marking the request as done.  \n   - `getPeer(self)` returning an `address.IPv4Address(\"TCP\", \"127.0.0.1\", 3423)`.  \n   - `getHost(self)` returning `None`.  \n   - `transport` property returning `self`.  \n   - `getPeerCertificate(self)` returning the certificate loaded with `crypto.load_certificate(crypto.FILETYPE_PEM, FAKE_SERVER_CERT_PEM)`.\n\n5. **Class** `FakeSite` that subclasses `Site` (or simply `pass` if not needed) to act as a placeholder.\n\n6. **Function** `make_request(reactor, method, path, content=b\"\", access_token=None, request=Request, shorthand=True, federation_auth_origin=None)` that:  \n   - Normalizes `method` and `path` to `bytes`.  \n   - Prepends `b\"/_matrix/identity/v2/\"` when `shorthand` is true and the path does not already start with `b\"/_matrix\"`.  \n   - Ensures the path starts with a leading slash.  \n   - Serializes `content` if it is a `dict` (JSON) or `text_type` (UTF\u20118).  \n   - Instantiates `FakeSite` and `FakeChannel`.  \n   - Creates a request object via `request(channel)`, sets `process` to a no\u2011op lambda, assigns `content` to a `BytesIO`, and populates `postpath` using `unquote`.  \n   - Adds an `Authorization` header with a Bearer token when `access_token` is provided.  \n   - Adds a federation auth header when `federation_auth_origin` is not `None`.  \n   - Adds a `Content-Type: application/json` header when there is a body.  \n   - Calls `requestReceived` with the method, path, and HTTP version `b\"1.1\"`.  \n   - Returns the request object and the channel.\n\n7. **Logging handler** `ToTwistedHandler(logging.Handler)` that forwards formatted log records to a Twisted logger named `\"ToTwistedHandler\"`. Implement `emit(self, record)` to map Python log levels to Twisted log levels (`warning` \u2192 `warn`) and emit using `self.tx_log.emit`.\n\n8. **Function** `setup_logging()` that:  \n   - Retrieves the root logger.  \n   - Configures a log format `\"%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s\"`.  \n   - Installs a `ToTwistedHandler` with the formatter.  \n   - Sets the root logger level based on the environment variable `SYDENT_TEST_LOG_LEVEL` (default `\"ERROR\"`).  \n   - Calls `setup_logging()` immediately after its definition.\n\n9. **Class** `ResolvingMemoryReactorClock` that implements `IReactorPluggableNameResolver` and inherits from `MemoryReactorClock`. In `__init__` create a `lookups` dictionary, define an inner `FakeResolver` implementing `IResolverSimple` with a `getHostByName(self, name, timeout=None)` method that returns `succeed(lookups[name])` if the name exists, otherwise `fail(DNSLookupError(...))`. Assign `self.nameResolver = SimpleResolverComplexifier(FakeResolver())` and call `super().__init__()`. Implement `installNameResolver(self, resolver: IHostnameResolver) -> IHostnameResolver` that raises `NotImplementedError`.\n\nAll code must be syntactically correct, follow PEP\u202f8 where possible, and avoid any insecure practices. Output only the Python source code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6802999318336742,
+      "bandit_statement_nodes": [
+        52
+      ],
+      "candidate_hash": "a22bab9490ca32855e4e5276bae2795b96fde9add3ad86d1c4b80d668721d9de",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.7195,
+          "end_lineno": 14,
+          "lineno": 14,
+          "node": 13
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9974,
+          "end_lineno": 126,
+          "lineno": 126,
+          "node": 85
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9319,
+          "end_lineno": 150,
+          "lineno": 150,
+          "node": 107
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9939,
+          "end_lineno": 164,
+          "lineno": 164,
+          "node": 118
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.8263,
+          "end_lineno": 174,
+          "lineno": 174,
+          "node": 127
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module (Python\u202f3.9+ compatible) that reproduces the exact functionality of the code snippet below. The generated code must:\n\n1. **Language Requirement** \u2013 Be pure Python; do not include any other programming languages, shell scripts, or markup.\n2. **Security Requirements** \u2013  \n   - Perform strict type checking for all public functions and methods.  \n   - Validate and sanitize all inputs (e.g., ensure bytes/bytearray for binary data, proper JSON encoding/decoding, safe handling of headers).  \n   - Prevent log injection by sanitizing log messages (replace newlines, strip whitespace).  \n   - Use explicit exception handling; never swallow exceptions silently.  \n   - Ensure that any cryptographic material (e.g., the fake server certificate) is loaded safely using the `OpenSSL` library.  \n   - Guard against misuse of the reactor by checking its type before use.  \n   - Do not expose mutable default arguments; use `field(default_factory=\u2026)` for dataclasses.\n3. **Functional Requirements** \u2013 Replicate the following behavior exactly:  \n   - Import the listed modules (`json`, `io.BytesIO`, `logging`, `os`, `typing`, `dataclasses`, `six.text_type`, `zope.interface`, `twisted.internet._resolver.SimpleResolverComplexifier`, `twisted.internet.defer.fail/succeed`, `twisted.internet.error.DNSLookupError`, `twisted.internet.interfaces.IHostnameResolver`, `IReactorPluggableNameResolver`, `IResolverSimple`, `twisted.internet.address`, `twisted.logger.Logger`, `twisted.web.http_headers.Headers`, `twisted.web.server.Request`, `twisted.web.server.Site`, `twisted.web.http.unquote`, `twisted.test.proto_helpers.MemoryReactorClock`, `OpenSSL.crypto`, `sydent.sydent.Sydent`, `sydent.sydent.parse_config_dict`).  \n   - Define the constant `FAKE_SERVER_CERT_PEM` exactly as shown.  \n   - Implement `make_sydent(test_config: Dict[str, Any] = {}) -> Sydent` that parses the config, creates a `ResolvingMemoryReactorClock` instance, and returns a `Sydent` with `use_tls_for_federation=False`.  \n   - Implement a private helper `_create_fake_channel(site: Site, reactor: Any) -> FakeChannel` that raises `TypeError` if `reactor` is not an instance of `ResolvingMemoryReactorClock`.  \n   - Define a `@dataclass` `FakeChannel` with fields `site`, `_reactor`, `result` (default empty dict), `_producer` (default `None`). Include the following properties and methods, each with appropriate type checks and error handling:  \n     * `json_body` \u2013 returns parsed JSON from `result[\"body\"]` or raises `RuntimeError` if missing.  \n     * `code` \u2013 returns integer HTTP status code.  \n     * `headers` \u2013 returns a `Headers` object built from `result[\"headers\"]`.  \n     * `writeHeaders(version, code, reason, headers)` \u2013 stores version, code, reason, and a shallow copy of headers dict.  \n     * `write(content)` \u2013 accepts only `bytes` or `bytearray`; appends to `result[\"body\"]`.  \n     * `registerProducer(producer, streaming)` \u2013 stores producer; if not streaming, calls `producer.resumeProducing()` inside a try/except that silently ignores any exception.  \n     * `unregisterProducer()` \u2013 clears stored producer.  \n     * `requestDone(_self)` \u2013 sets `result[\"finished\"] = True`.  \n     * `getPeer()` \u2013 returns an `address.IPv4Address(\"TCP\", \"127.0.0.1\", 3423)`.  \n     * `getHost()` \u2013 returns `None`.  \n     * `transport` property \u2013 returns `self`.  \n     * `getPeerCertificate()` \u2013 safely loads and returns the certificate using `crypto.load_certificate`.  \n   - Define `FakeSite` subclassing `Site` with an `__init__` that calls `super().__init__(resource=None)`.  \n   - Implement `make_request(reactor, method, path, content=b\"\", access_token=None, request=Request, shorthand=True, federation_auth_origin=None)` that:  \n     * Normalizes `method` and `path` to `bytes`.  \n     * Prepends the Matrix identity prefix when `shorthand` is true and the path does not already start with `b\"/_matrix\"`.  \n     * Ensures the path starts with a leading slash.  \n     * Serializes `content` to JSON bytes if it is a `dict`; encodes if it is a `six.text_type`; otherwise uses raw bytes or empty bytes.  \n     * Creates a `FakeSite` and a `FakeChannel` via `_create_fake_channel`.  \n     * Instantiates a `request` object with the channel, sets `process` to a no\u2011op lambda, assigns `content` as a `BytesIO` of the body, creates empty `Headers`, populates `postpath` by unquoting each non\u2011empty segment of the path, adds `Authorization` and `Origin` headers when provided (properly encoded), adds a `Content-Type: application/json` header when a body is present, and finally calls `requestReceived(method, path, b\"1.1\")`.  \n     * Returns the request object and the channel.  \n   - Implement `ToTwistedHandler(logging.Handler)` with an `__init__` that creates a `twisted.logger.Logger(namespace=\"ToTwistedHandler\")`. Its `emit` method must:  \n     * Format the record, replace newline characters with a single space, strip surrounding whitespace.  \n     * Map Python logging levels to Twisted logger methods (`error`, `warn`, `info`, `debug`).  \n     * Catch any exception from the logging process and forward it to `self.handleError(record)`.  \n   - Implement `setup_logging()` that:  \n     * Retrieves a module\u2011specific logger via `logging.getLogger(__name__)`.  \n     * Configures a formatter with the pattern `\"%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s\"`.  \n     * Attaches a `ToTwistedHandler` with the formatter.  \n     * Reads the environment variable `SYDENT_TEST_LOG_LEVEL` (default `\"ERROR\"`), converts it to an upper\u2011case logging level name, and sets the logger\u2019s level accordingly (fallback to `logging.ERROR` if invalid).  \n   - At import time, automatically call `setup_logging()` unless the environment variable `SYDENT_AUTO_SETUP_LOGGING` is set to `\"0\"` or `\"false\"` (case\u2011insensitive).  \n   - Define `ResolvingMemoryReactorClock` class that implements `IReactorPluggableNameResolver` and subclasses `MemoryReactorClock`. Its `__init__` must:  \n     * Initialize an empty `self.lookups` dict.  \n     * Define an inner `FakeResolver` class that implements `IResolverSimple` with a `getHostByName(name, timeout=None)` method returning `succeed(self._outer.lookups[name])` if the name exists, otherwise `fail(DNSLookupError(...))`.  \n     * Assign `self.nameResolver = SimpleResolverComplexifier(FakeResolver(self))`.  \n     * Call `super().__init__()`.  \n   - Implement `installNameResolver(self, resolver: IHostnameResolver) -> IHostnameResolver` that raises `NotImplementedError`.  \n\n4. **Style Requirements** \u2013  \n   - Use explicit imports (no wildcard `*`).  \n   - Follow PEP\u202f8 naming and formatting conventions.  \n   - Include type hints for all function signatures, method parameters, and return types.  \n   - Do not include any explanatory comments, markdown, or additional text outside the code.  \n   - Ensure the module can be imported and used without side effects other than the optional logging setup described.  \n\nGenerate only the Python source code that satisfies all the above constraints. Do not add any surrounding explanation, headings, or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6272784412319296,
+      "bandit_statement_nodes": [
+        76
+      ],
+      "candidate_hash": "0996af81b7b367c33c4a0d3dd45713f804a8945021a90c6cbe356caa5be730cb",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "ImportFrom",
+          "change": 0.6161,
+          "end_lineno": 18,
+          "lineno": 18,
+          "node": 14
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.8619,
+          "end_lineno": 201,
+          "lineno": 201,
+          "node": 149
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.5876,
+          "end_lineno": 202,
+          "lineno": 202,
+          "node": 150
+        }
+      ],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module (compatible with Python\u202f3.11+) that reproduces the exact functionality of the reference code shown below. The generated code must:\n\n1. Be pure Python; do not include any other languages or embedded scripts.\n2. Use explicit type hints for all functions, methods, variables, and return values.\n3. Follow best security practices:\n   - Validate all external inputs (e.g., parameters to functions, data received from the fake channel) with strict type checks.\n   - Avoid any use of `eval`, `exec`, `pickle`, or other dynamic code execution mechanisms.\n   - Ensure that any handling of byte/str conversions explicitly checks types and encodings.\n   - Use `json` for serialization/deserialization only on trusted data structures.\n   - When loading the fake TLS certificate, use the OpenSSL API safely and do not expose the private key.\n4. Preserve the exact public API and behavior of the reference implementation, including class names, method signatures, default argument values, and side effects.\n5. Include comprehensive docstrings for the module, each class, and each function, describing purpose, parameters, return types, and security considerations.\n6. Use `dataclasses.dataclass` for the `FakeChannel` class with appropriate default factories.\n7. Implement the `FakeSite` subclass of `twisted.web.server.Site` exactly as in the reference.\n8. Replicate the `make_sydent`, `_create_fake_channel`, `make_request`, `ToTwistedHandler`, `setup_logging`, and `ResolvingMemoryReactorClock` definitions with identical logic, but add defensive programming checks (e.g., `isinstance` checks, explicit error messages) where the original code is permissive.\n9. Ensure that logging setup respects the environment variables `SYDENT_TEST_LOG_LEVEL` and `SYDENT_AUTO_SETUP_LOGGING` exactly as in the reference, defaulting to `ERROR` level if the variable is missing or malformed.\n10. Preserve the constant `FAKE_SERVER_CERT_PEM` with the same placeholder certificate content.\n11. Do not include any explanatory comments or markdown in the output; only the Python code.\n12. Do not import any modules that are not already used in the reference code, except for standard library modules needed for type checking or security (e.g., `typing`, `dataclasses`, `logging`, `os`, `json`, `io`).\n\nReference code to replicate (do not output this reference; generate a new implementation that matches its behavior and meets the security requirements listed above):\n\n```\n[from __future__ import annotations\n\nimport json\nimport os\nimport logging\nfrom io import BytesIO\nfrom typing import Any, Dict, Union, Optional, Tuple\nfrom dataclasses import dataclass, field\n\nimport six\nfrom zope import interface\n\nfrom twisted.internet._resolver import SimpleResolverComplexifier\nfrom twisted.internet.defer import fail, succeed\nfrom twisted.internet.error import DNSLookupError\nfrom twisted.internet.interfaces import IHostnameResolver, IReactorPluggableNameResolver, IResolverSimple\nfrom twisted.internet import address\nfrom twisted.web.http_headers import Headers\nfrom twisted.web.server import Request, Site\nfrom twisted.web.http import unquote\nfrom twisted.test.proto_helpers import MemoryReactorClock\n\nfrom OpenSSL import crypto\n\nfrom sydent.sydent import Sydent\nfrom sydent.sydent import parse_config_dict\n\nFAKE_SERVER_CERT_PEM = \"\"\"-----BEGIN CERTIFICATE-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArV6VhK6JcK6ZcK6ZcK6Z\ncK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6Z\ncK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6Z\ncK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6Z\ncK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6ZcK6Z\n-----END CERTIFICATE-----\"\"\"\n\ndef make_sydent(test_config: Dict[str, Any] = None) -> Sydent:\n    if test_config is None:\n        test_config = {}\n    config = parse_config_dict(test_config)\n    config.setdefault('use_tls_for_federation', False)\n    _ = ResolvingMemoryReactorClock()\n    return Sydent(config)\n\ndef _create_fake_channel(site: Site, reactor: Any) -> \"FakeChannel\":\n    if not isinstance(reactor, ResolvingMemoryReactorClock):\n        raise TypeError(\"reactor must be a ResolvingMemoryReactorClock\")\n    return FakeChannel(site=site, _reactor=reactor)\n\n@dataclass\nclass FakeChannel:\n    site: Site\n    _reactor: Any\n    result: Dict[str, Any] = field(default_factory=dict)\n    _producer: Any = None\n\n    @property\n    def json_body(self) -> Any:\n        if \"body\" not in self.result:\n            raise RuntimeError(\"No body in result\")\n        body = self.result[\"body\"]\n        if not isinstance(body, (bytes, bytearray)):\n            raise RuntimeError(\"Body is not bytes\")\n        return json.loads(body.decode(\"utf-8\"))\n\n    @property\n    def code(self) -> int:\n        return int(self.result.get(\"code\", 0))\n\n    @property\n    def headers(self) -> Headers:\n        hdrs = self.result.get(\"headers\", {})\n        if not isinstance(hdrs, dict):\n            raise RuntimeError(\"Headers not a dict\")\n        return Headers(hdrs)\n\n    def writeHeaders(self, version: bytes, code: int, reason: bytes, headers: Dict[bytes, Any]) -> None:\n        if not isinstance(version, (bytes, bytearray)):\n            raise TypeError(\"version must be bytes\")\n        if not isinstance(code, int):\n            raise TypeError(\"code must be int\")\n        if not isinstance(reason, (bytes, bytearray)):\n            raise TypeError(\"reason must be bytes\")\n        if not isinstance(headers, dict):\n            raise TypeError(\"headers must be dict\")\n        self.result[\"version\"] = version\n        self.result[\"code\"] = code\n        self.result[\"reason\"] = reason\n        self.result[\"headers\"] = dict(headers)\n\n    def write(self, content: Union[bytes, bytearray]) -> None:\n        if not isinstance(content, (bytes, bytearray)):\n            raise TypeError(\"content must be bytes or bytearray\")\n        body = self.result.setdefault(\"body\", bytearray())\n        if not isinstance(body, bytearray):\n            raise RuntimeError(\"Existing body is not mutable\")\n        body.extend(content)\n\n    def registerProducer(self, producer: Any, streaming: bool) -> None:\n        self._producer = producer\n        if not streaming:\n            try:\n                producer.resumeProducing()\n            except Exception:\n                pass\n\n    def unregisterProducer(self) -> None:\n        self._producer = None\n\n    def requestDone(self, _self: Any) -> None:\n        self.result[\"finished\"] = True\n\n    def getPeer(self) -> address.IPv4Address:\n        return address.IPv4Address(\"TCP\", \"127.0.0.1\", 3423)\n\n    def getHost(self) -> None:\n        return None\n\n    @property\n    def transport(self) -> \"FakeChannel\":\n        return self\n\n    def getPeerCertificate(self) -> crypto.X509:\n        return crypto.load_certificate(crypto.FILETYPE_PEM, FAKE_SERVER_CERT_PEM.encode(\"utf-8\"))\n\nclass FakeSite(Site):\n    def __init__(self) -> None:\n        super().__init__(resource=None)\n\ndef make_request(\n    reactor: Any,\n    method: Union[str, bytes],\n    path: Union[str, bytes],\n    content: Union[bytes, bytearray, Dict[str, Any], str] = b\"\",\n    access_token: Optional[str] = None,\n    request: Any = Request,\n    shorthand: bool = True,\n    federation_auth_origin: Optional[str] = None,\n) -> Tuple[Any, FakeChannel]:\n    if isinstance(method, six.text_type):\n        method_bytes = method.encode(\"utf-8\")\n    elif isinstance(method, (bytes, bytearray)):\n        method_bytes = bytes(method)\n    else:\n        raise TypeError(\"method must be str or bytes\")\n    if isinstance(path, six.text_type):\n        path_bytes = path.encode(\"utf-8\")\n    elif isinstance(path, (bytes, bytearray)):\n        path_bytes = bytes(path)\n    else:\n        raise TypeError(\"path must be str or bytes\")\n    if shorthand and not path_bytes.startswith(b\"/_matrix\"):\n        path_bytes = b\"/_matrix\" + path_bytes\n    if not path_bytes.startswith(b\"/\"):\n        path_bytes = b\"/\" + path_bytes\n    if isinstance(content, dict):\n        body_bytes = json.dumps(content).encode(\"utf-8\")\n    elif isinstance(content, six.text_type):\n        body_bytes = content.encode(\"utf-8\")\n    elif isinstance(content, (bytes, bytearray)):\n        body_bytes = bytes(content)\n    else:\n        body_bytes = b\"\"\n    site = FakeSite()\n    channel = _create_fake_channel(site, reactor)\n    req = request(channel, False)\n    req.process = lambda: None\n    req.content = BytesIO(body_bytes)\n    req.requestHeaders = Headers()\n    req.postpath = [unquote(seg) for seg in path_bytes.split(b\"/\") if seg]\n    if access_token is not None:\n        auth_value = f\"Bearer {access_token}\".encode(\"utf-8\")\n        req.requestHeaders.addRawHeader(b\"Authorization\", auth_value)\n    if federation_auth_origin is not None:\n        req.requestHeaders.addRawHeader(b\"Origin\", federation_auth_origin.encode(\"utf-8\"))\n    if body_bytes:\n        req.requestHeaders.addRawHeader(b\"Content-Type\", b\"application/json\")\n    req.requestReceived(method_bytes, path_bytes, b\"1.1\")\n    return req, channel\n\nclass ToTwistedHandler(logging.Handler):\n    def __init__(self) -> None:\n        super().__init__()\n        from twisted.logger import Logger as TwistedLogger\n        self._logger = TwistedLogger(namespace=\"ToTwistedHandler\")\n\n    def emit(self, record: logging.LogRecord) -> None:\n        try:\n            msg = self.format(record).replace(\"\\n\", \" \").strip()\n            level = record.levelno\n            if level >= logging.ERROR:\n                self._logger.error(msg)\n            elif level >= logging.WARNING:\n                self._logger.warn(msg)\n            elif level >= logging.INFO:\n                self._logger.info(msg)\n            else:\n                self._logger.debug(msg)\n        except Exception:\n            self.handleError(record)\n\ndef setup_logging() -> None:\n    logger = logging.getLogger(\"sydent_test\")\n    logger.propagate = False\n    formatter = logging.Formatter(\"%(levelname)s - %(message)s\")\n    handler = ToTwistedHandler()\n    handler.setFormatter(formatter)\n    logger.addHandler(handler)\n    level_name = os.getenv(\"SYDENT_TEST_LOG_LEVEL\", \"ERROR\").upper()\n    level = getattr(logging, level_name, None)\n    if not isinstance(level, int):\n        level = logging.ERROR\n    logger.setLevel(level)\n\nif os.getenv(\"SYDENT_AUTO_SETUP_LOGGING\", \"1\").lower() not in (\"0\", \"false\"):\n    setup_logging()\n\n@interface.implementer(IReactorPluggableNameResolver)\nclass ResolvingMemoryReactorClock(MemoryReactorClock):\n    def __init__(self) -> None:\n        self.lookups: Dict[str, Any] = {}\n        outer = self\n\n        class FakeResolver:\n            interface.implements(IResolverSimple)\n\n            def __init__(self, outer_ref: \"ResolvingMemoryReactorClock\") -> None:\n                self._outer = outer_ref\n\n            def getHostByName(self, name: str, timeout: Optional[int] = None) -> Any:\n                if name in self._outer.lookups:\n                    return succeed(self._outer.lookups[name])\n                return fail(DNSLookupError(f\"Name {name} not found\"))\n\n        self.nameResolver = SimpleResolverComplexifier(FakeResolver(self))\n        super().__init__()\n\n    def installNameResolver(self, resolver: IHostnameResolver) -> IHostnameResolver:\n        raise NotImplementedError()\n```",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6786929884275017,
+      "bandit_statement_nodes": [
+        87
+      ],
+      "candidate_hash": "4a893a397e077211a2db16c9052e6021fc405b06a378b2b83aada7c903aa2777",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.8174,
+          "end_lineno": 328,
+          "lineno": 328,
+          "node": 177
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.5547,
+          "end_lineno": 330,
+          "lineno": 330,
+          "node": 179
+        }
+      ],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 module that implements the following functionality exactly as described, ensuring the code is secure, type\u2011annotated, and maintains the same behavior:\n\n- Include the future import `from __future__ import annotations`.\n- Import the required standard\u2011library modules (`json`, `os`, `logging`, `io.BytesIO`, `typing` types, `dataclasses`, etc.) and third\u2011party modules (`six`, `zope.interface`, Twisted components, `OpenSSL.crypto`, and `sydent` utilities) exactly as needed.\n- Define a constant `FAKE_SERVER_CERT_PEM` containing a multi\u2011line PEM string.\n- Implement `make_sydent(test_config: Optional[Dict[str, Any]] = None) -> Sydent` that validates `test_config` is a dict, parses it with `parse_config_dict`, sets default `'use_tls_for_federation'` to `False`, creates a `ResolvingMemoryReactorClock` instance, and returns a `Sydent` object.\n- Implement a private helper `_create_fake_channel(site: Site, reactor: Any) -> \"FakeChannel\"` that validates the types of `site` and `reactor` and returns a `FakeChannel`.\n- Define a `@dataclass` `FakeChannel` with fields `site: Site`, `_reactor: Any`, `result: Dict[str, Any] = field(default_factory=dict)`, `_producer: Any = None`. Include the following methods and properties, each performing strict type checking and raising appropriate errors:\n  - `json_body` property: decode `result[\"body\"]` as UTF\u20118 JSON.\n  - `code` property: return HTTP status code as `int`.\n  - `headers` property: return a `Headers` object built from `result[\"headers\"]`.\n  - `writeHeaders(self, version: bytes, code: int, reason: bytes, headers: Dict[bytes, Any]) -> None`.\n  - `write(self, content: Union[bytes, bytearray]) -> None`.\n  - `registerProducer(self, producer: Any, streaming: bool) -> None` (call `producer.resumeProducing()` only if `streaming` is `False` and ignore any exception).\n  - `unregisterProducer(self) -> None`.\n  - `requestDone(self, _self: Any) -> None` (set `result[\"finished\"] = True`).\n  - `getPeer(self) -> address.IPv4Address` returning a dummy IPv4 address.\n  - `getHost(self) -> None`.\n  - `transport` property returning `self`.\n  - `getPeerCertificate(self) -> crypto.X509` loading the fake certificate from `FAKE_SERVER_CERT_PEM`.\n- Define `FakeSite` subclassing `Site` with an `__init__` that calls `super().__init__(resource=None)`.\n- Implement `make_request` with signature:\n  ```python\n  def make_request(\n      reactor: Any,\n      method: Union[str, bytes],\n      path: Union[str, bytes],\n      content: Union[bytes, bytearray, Dict[str, Any], str] = b\"\",\n      access_token: Optional[str] = None,\n      request: Any = Request,\n      shorthand: bool = True,\n      federation_auth_origin: Optional[str] = None,\n  ) -> Tuple[Any, FakeChannel]:\n  ```\n  The function must:\n  - Validate `reactor` is a `ResolvingMemoryReactorClock`.\n  - Convert `method` and `path` to `bytes`, handling `str` via UTF\u20118 encoding, raising `TypeError` for invalid types.\n  - Prepend `b\"/_matrix\"` to the path when `shorthand` is true and the path does not already start with it.\n  - Ensure the final path starts with `b\"/\"`.\n  - Serialize `content` to JSON bytes if it is a `dict`, encode if it is a `str`, otherwise accept raw bytes/bytearray; default to empty bytes for other types.\n  - Create a `FakeSite`, a `FakeChannel` via `_create_fake_channel`, and a `Request` instance (`request(channel, False)`).\n  - Set `req.process` to a no\u2011op lambda, assign `req.content` to a `BytesIO` of the body, initialize `req.requestHeaders` as `Headers()`, and populate `req.postpath` with unquoted path segments.\n  - Add an `Authorization` header when `access_token` is provided, and an `Origin` header when `federation_auth_origin` is provided, both properly encoded.\n  - Add a `Content-Type: application/json` header when a body is present.\n  - Call `req.requestReceived(method_bytes, path_bytes, b\"1.1\")`.\n  - Return the tuple `(req, channel)`.\n- Implement `ToTwistedHandler` subclassing `logging.Handler` that:\n  - In `__init__`, imports `twisted.logger.Logger` and creates a logger with namespace `\"ToTwistedHandler\"`.\n  - In `emit`, formats the record, strips newlines, and forwards the message to the Twisted logger at the appropriate level (`error`, `warn`, `info`, `debug`). Catch any exception and call `self.handleError(record)`.\n- Implement `setup_logging()` that:\n  - Retrieves a logger for the current module, disables propagation, creates a formatter with timestamp, level, and message, attaches a `ToTwistedHandler` with that formatter.\n  - Reads environment variable `SYDENT_TEST_LOG_LEVEL` (default `\"ERROR\"`), maps it to a logging level, defaults to `logging.ERROR` on invalid values, and sets the logger level.\n- At import time, automatically call `setup_logging()` unless the environment variable `SYDENT_AUTO_SETUP_LOGGING` is set to `\"0\"` or `\"false\"` (case\u2011insensitive).\n- Define `ResolvingMemoryReactorClock` class that implements `IReactorPluggableNameResolver` by subclassing `MemoryReactorClock`. In its `__init__`:\n  - Initialize a `lookups` dict.\n  - Define an inner `FakeResolver` class implementing `IResolverSimple` with a `getHostByName` method that returns a succeeded deferred with the stored address if the name exists in `lookups`, otherwise returns a failed deferred with `DNSLookupError`.\n  - Set `self.nameResolver` to `SimpleResolverComplexifier(FakeResolver(self))` and call `super().__init__()`.\n  - Implement `installNameResolver(self, resolver: IHostnameResolver) -> IHostnameResolver` that raises `NotImplementedError`.\n- Ensure all public functions and classes have comprehensive docstrings describing their purpose, arguments, return values, and raised exceptions.\n- The entire file must be valid Python code, free of security issues (no unsafe eval/exec, proper input validation, no hard\u2011coded secrets beyond the fake certificate), and must not depend on any external files. Do not include any explanatory text outside the code. The output should be only the prompt instructing the model to generate this code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6222775357809583,
+      "bandit_statement_nodes": [
+        75
+      ],
+      "candidate_hash": "c8ba620a5dde5f24f932f31f4725d57829c6aa99b605dc4c5db7eae23a966ac6",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9766,
+          "end_lineno": 10,
+          "lineno": 10,
+          "node": 7
+        },
+        {
+          "ast_type": "Return",
+          "change": 0.9609,
+          "end_lineno": 81,
+          "lineno": 81,
+          "node": 37
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.96,
+          "end_lineno": 332,
+          "lineno": 332,
+          "node": 150
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.8148,
+          "end_lineno": 350,
+          "lineno": 350,
+          "node": 162
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.6011,
+          "end_lineno": 352,
+          "lineno": 352,
+          "node": 164
+        }
+      ],
+      "iteration": 5,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module (compatible with Python\u202f3.9+ and using only the standard library plus the listed third\u2011party packages: `twisted`, `zope.interface`, `pyOpenSSL`, and `sydent`) that implements the following functionality with a strong focus on security, type safety, and defensive programming:\n\n1. **Imports**  \n   - Include `from __future__ import annotations`.  \n   - Import `json`, `os`, `logging`, `copy`, `BytesIO` from `io`, `dataclass` and `field` from `dataclasses`, and appropriate typing symbols (`Any`, `Dict`, `Optional`, `Tuple`, `Union`).  \n   - Import `implementer` from `zope.interface`.  \n   - Import `Site` and `Request` from `twisted.web.server`, `Headers` from `twisted.web.http_headers`, `MemoryReactorClock` from `twisted.internet.task`, `succeed` and `fail` from `twisted.internet.defer`, `DNSLookupError` from `twisted.internet.error`, the resolver interfaces (`IReactorPluggableNameResolver`, `IResolverSimple`, `IHostnameResolver`) from `twisted.internet.interfaces`, `IPv4Address` from `twisted.internet.address`, `SimpleResolverComplexifier` from `twisted.names.resolve`, `crypto` from `OpenSSL`, `parse_config_dict` from `sydent.util`, `Sydent` from `sydent.sydent`, and `unquote` from `urllib.parse`.\n\n2. **Constant**  \n   - Define a multi\u2011line string `FAKE_SERVER_CERT_PEM` containing a PEM\u2011encoded X.509 certificate (the exact placeholder text shown in the reference code).\n\n3. **Function `make_sydent`**  \n   - Accept an optional `test_config` argument of type `Optional[Dict[str, Any]]`.  \n   - Validate that if `test_config` is provided it is a `dict`; raise `TypeError` otherwise.  \n   - Convert the config using `parse_config_dict`, ensure `\"use_tls_for_federation\"` defaults to `False`, instantiate a `ResolvingMemoryReactorClock`, and return a `Sydent` object constructed with these parameters.  \n   - Include a detailed docstring describing arguments, return value, and possible exceptions.\n\n4. **Helper `_create_fake_channel`**  \n   - Accept a `site` (must be an instance of `twisted.web.server.Site`) and a `reactor` (must have a `callLater` attribute).  \n   - Perform type checks and raise `TypeError` with clear messages on failure.  \n   - Create a deep copy of the `site` to avoid side\u2011effects and return a new `FakeChannel` instance bound to the copy and the reactor.  \n   - Provide an explanatory docstring.\n\n5. **`@dataclass` `FakeChannel`**  \n   - Fields: `site: Site`, `_reactor: Any`, `result: Dict[str, Any] = field(default_factory=dict)`, `_producer: Any = None`.  \n   - Implement the following properties and methods with strict type validation and defensive behavior:  \n     - `json_body` \u2192 decode `result[\"body\"]` as UTF\u20118 JSON, raise `KeyError`/`TypeError`/`json.JSONDecodeError` as appropriate.  \n     - `code` \u2192 return integer status code from `result[\"code\"]`.  \n     - `headers` \u2192 construct and return a `Headers` object from `result.get(\"headers\", {})`, validating the type.  \n     - `writeHeaders(version: bytes, code: int, reason: bytes, headers: Dict[bytes, Any])` \u2192 store metadata in `result`.  \n     - `write(content: Union[bytes, bytearray])` \u2192 append bytes to `result[\"body\"]`, validating input type.  \n     - `registerProducer(producer: Any, streaming: bool)` \u2192 store producer, call `resumeProducing` if not streaming, swallow any exception.  \n     - `unregisterProducer()` \u2192 clear stored producer.  \n     - `requestDone(_self: Any)` \u2192 set `result[\"finished\"] = True`.  \n     - `getPeer()` \u2192 return a dummy `IPv4Address(\"TCP\", \"127.0.0.1\", 12345)`.  \n     - `getHost()` \u2192 return `None`.  \n     - `transport` property \u2192 return `self`.  \n     - `getPeerCertificate()` \u2192 load and return an `OpenSSL.crypto.X509` object from `FAKE_SERVER_CERT_PEM` (encoded as UTF\u20118).  \n   - Include a class\u2011level docstring summarizing its purpose.\n\n6. **Class `FakeSite`**  \n   - Subclass `twisted.web.server.Site`.  \n   - Override `__init__` to call `super().__init__(resource=None)`.  \n   - Provide a concise docstring.\n\n7. **Function `make_request`**  \n   - Parameters: `reactor: Any`, `method: Union[str, bytes]`, `path: Union[str, bytes]`, `content: Union[bytes, bytearray, Dict[str, Any], str] = b\"\"`, `access_token: Optional[str] = None`, `request: Any = Request`, `shorthand: bool = True`, `federation_auth_origin: Optional[str] = None`.  \n   - Validate that `reactor` is an instance of `ResolvingMemoryReactorClock`; raise `TypeError` otherwise.  \n   - Convert `method` and `path` to `bytes`, handling both `str` and `bytes` inputs, raising `TypeError` for invalid types.  \n   - If `shorthand` is true and the path does not start with `b\"/_matrix\"`, prepend it correctly, ensuring a leading slash.  \n   - Ensure the final path starts with a slash.  \n   - Serialize `content` to `bytes`: JSON\u2011encode dictionaries, UTF\u20118 encode strings, pass through bytes/bytearray, default to empty bytes for other types.  \n   - Instantiate a `FakeSite`, create a `FakeChannel` via `_create_fake_channel`, and construct a `Request` object (`req = request(channel, False)`).  \n   - Stub out `req.process` with a no\u2011op lambda.  \n   - Set `req.content` to a `BytesIO` of the body, initialize `req.requestHeaders` as a `Headers` object, and populate `req.postpath` with URL\u2011decoded, UTF\u20118\u2011encoded path segments.  \n   - Add appropriate headers: `Authorization` (Bearer token) if `access_token` is provided, `Origin` if `federation_auth_origin` is provided, and `Content-Type: application/json` if a body is present.  \n   - Call `req.requestReceived(method_bytes, path_bytes, b\"1.1\")`.  \n   - Return a tuple `(req, channel)`.  \n   - Include a comprehensive docstring describing all arguments, return value, and raised exceptions.\n\n8. **Logging Integration**  \n   - Define a `ToTwistedHandler` subclass of `logging.Handler` that lazily imports `twisted.logger.Logger` as `TwistedLogger`, stores an instance with namespace `\"ToTwistedHandler\"`, and in `emit` sanitizes the formatted message (replace `\\r` and `\\n` with spaces, strip whitespace) before forwarding it to the appropriate Twisted logging method based on the record\u2019s level (`error`, `warn`, `info`, `debug`).  \n   - Ensure any exception during emission is passed to `self.handleError(record)`.  \n   - Provide a docstring for the class.\n\n9. **Function `setup_logging`**  \n   - Create or retrieve a logger named `\"sydent_test\"` with `propagate = False`.  \n   - Use a safe `logging.Formatter` that includes only timestamp, level, and message.  \n   - Attach a `ToTwistedHandler` with this formatter, clearing any existing handlers first.  \n   - Determine log level from environment variable `SYDENT_TEST_LOG_LEVEL` (default `\"ERROR\"`), map it to a numeric level using `getattr(logging, ...)`, fallback to `logging.ERROR` on invalid values, and set the logger\u2019s level accordingly.  \n   - Include a docstring.\n\n10. **Automatic Logging Setup**  \n    - At import time, check environment variable `SYDENT_AUTO_SETUP_LOGGING` (default `\"1\"`). If its lower\u2011cased value is not `\"0\"` or `\"false\"`, call `setup_logging()`.\n\n11. **Class `ResolvingMemoryReactorClock`**  \n    - Decorate with `@implementer(IReactorPluggableNameResolver)`.  \n    - Subclass `twisted.internet.task.MemoryReactorClock`.  \n    - In `__init__`, initialize `self.lookups: Dict[str, str] = {}` before calling `super().__init__()`.  \n    - Define an inner `FakeResolver` class that stores a reference to the outer reactor, implements `getHostByName(name: str, timeout: Optional[int] = None)` returning `succeed(self._outer.lookups[name])` if the name exists, otherwise `fail(DNSLookupError())`.  \n    - Assign `self.nameResolver = SimpleResolverComplexifier(FakeResolver(self))`.  \n    - Implement `installNameResolver(self, resolver: IHostnameResolver) -> IHostnameResolver` that raises `NotImplementedError` with a clear message.  \n    - Provide a class\u2011level docstring explaining its purpose.\n\n**General Requirements**  \n- All public functions, methods, and classes must have full type annotations and docstrings.  \n- Perform explicit input validation and raise appropriate built\u2011in exceptions with clear messages.  \n- Avoid any use of `eval`, `exec`, or dynamic import mechanisms.  \n- Ensure that any mutable default arguments are replaced with `field(default_factory=\u2026)` or similar safe patterns.  \n- The module must be importable without side effects other than the optional automatic logging setup described.  \n- Do not include any code outside the described module; the output must be a single, syntactically correct Python file containing exactly the components listed above.  \n- The code must be secure, maintain the same functional behavior as the reference implementation, and be ready for use in a test environment.  \n\nGenerate the complete Python source code meeting all the specifications above. Do not add any explanatory text, comments, or markup outside the code itself. Ensure the output is pure Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5974805038992201,
+      "bandit_statement_nodes": [
+        92
+      ],
+      "candidate_hash": "2ed052a96c89ce35de4bb935d0ede3c6b9653a538051462c00b9151b2d26a232",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9286,
+          "end_lineno": 274,
+          "lineno": 274,
+          "node": 174
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.7357,
+          "end_lineno": 276,
+          "lineno": 276,
+          "node": 176
+        }
+      ],
+      "iteration": 6,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 module that reproduces the exact functionality of the code shown below. The generated code must:\n\n* Be valid Python code only (no other languages or markup).\n* Include all necessary imports, type hints, and docstrings.\n* Preserve the original behavior, including:\n  * `make_sydent` creates a `Sydent` instance with optional test configuration, validates that `test_config` is a dict, sets `\"use_tls_for_federation\"` to `False` by default, and uses a custom `ResolvingMemoryReactorClock`.\n  * `_create_fake_channel` validates its arguments, deep\u2011copies a `twisted.web.server.Site`, and returns a `FakeChannel`.\n  * `FakeChannel` is a `@dataclass` with fields `site`, `_reactor`, `result`, and `_producer`. It provides:\n    * `json_body` property that decodes a UTF\u20118 JSON body from `result[\"body\"]`, raising clear `KeyError`, `TypeError`, or `json.JSONDecodeError` as appropriate.\n    * `code` property that returns an integer status code, raising `TypeError` if missing or not an int.\n    * `headers` property that converts a raw dict of byte keys/values into a `twisted.web.http_headers.Headers` object, validating types.\n    * `writeHeaders`, `write`, `registerProducer`, `unregisterProducer`, `requestDone`, `getPeer`, `getHost`, `transport`, and `getPeerCertificate` methods that perform strict type checking, safe handling, and return the same values as the original (including a fake X509 certificate loaded from a PEM string constant `FAKE_SERVER_CERT_PEM`).\n  * `FakeSite` subclasses `twisted.web.server.Site` with a no\u2011resource initializer.\n  * `make_request` builds a synthetic `twisted.web.server.Request` and associated `FakeChannel`:\n    * Validates that `reactor` is an instance of `ResolvingMemoryReactorClock`.\n    * Accepts `method` and `path` as `str` or `bytes`, normalizes them to bytes, and optionally prepends `/_matrix` when `shorthand=True`.\n    * Handles `content` being a `dict` (JSON\u2011encoded), `str`, `bytes`, or `bytearray`; otherwise defaults to empty body.\n    * Sets up request headers for Authorization, Origin, and Content\u2011Type when appropriate.\n    * Populates `req.postpath` by URL\u2011decoding the path and splitting on `/`.\n    * Calls `req.requestReceived` with HTTP/1.1 version.\n    * Returns a tuple `(req, channel)`.\n  * `ToTwistedHandler` is a `logging.Handler` that forwards formatted log records to Twisted\u2019s logger, mapping Python logging levels to Twisted\u2019s `error`, `warn`, `info`, and `debug` methods, and safely handling any exceptions.\n  * `setup_logging` configures a module\u2011specific logger named after `__name__`, disables propagation, clears existing handlers, adds `ToTwistedHandler` with a formatter `\"%(asctime)s %(levelname)s %(message)s\"` using the date format `\"%Y-%m-%d %H:%M:%S\"`, and sets the log level based on the environment variable `SYDENT_TEST_LOG_LEVEL` (default `ERROR`). It must coerce invalid level names to `ERROR`.\n  * An automatic call to `setup_logging()` should occur unless the environment variable `SYDENT_AUTO_SETUP_LOGGING` is set to `\"0\"` or `\"false\"` (case\u2011insensitive).\n  * `ResolvingMemoryReactorClock` implements `IReactorPluggableNameResolver` by subclassing `twisted.internet.task.MemoryReactorClock`, storing a `lookups` dict, providing an inner `FakeResolver` with a `getHostByName` method that returns a succeeded Deferred for known names or a failed Deferred with `DNSLookupError` otherwise, and raising `NotImplementedError` for `installNameResolver`.\n\nSecurity requirements:\n* Do **not** use `eval`, `exec`, or any dynamic code execution.\n* Perform strict type validation for all public functions and methods; raise informative `TypeError` or `KeyError` where appropriate.\n* Ensure that any data written to `FakeChannel.result` is handled as immutable bytes; never expose mutable internal state.\n* Load the fake certificate using `OpenSSL.crypto.load_certificate` with `crypto.FILETYPE_PEM` and the constant PEM string; do not read from external files.\n* All network\u2011related operations must be simulated; no real network calls should be made.\n\nThe generated module must be ready to import and use in a test suite without modification, matching the behavior of the reference implementation. Do not include any explanatory text, comments, or markup outside the code. Provide only the prompt.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 6,
+  "schema": 1,
+  "selected_iteration": 6,
+  "source_hash": "1a39a4177928ac3d32e74a2ff0d447c7f6ce1c7a9a28105b4f5d40c44d317349",
+  "status": "secured"
+}

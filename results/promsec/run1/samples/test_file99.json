@@ -1,0 +1,53 @@
+{
+  "ast_similarity": 0.5342019543973942,
+  "candidate_hash": "7ab75c94e22d4634fbaec6441718801cb6fa7b7df17e18c593aaca01efc5e805",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file99.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5342019543973942,
+      "bandit_statement_nodes": [
+        10,
+        14,
+        25,
+        34
+      ],
+      "candidate_hash": "7ab75c94e22d4634fbaec6441718801cb6fa7b7df17e18c593aaca01efc5e805",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.177,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1236,
+          "end_lineno": 22,
+          "lineno": 22,
+          "node": 14
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the following requirements, and output only the Python code (no explanations, comments, or additional text):\n\n1. **Language**: The code must be written in Python and must not contain any other programming languages.\n\n2. **Imports**: Import `Flask`, `request`, and `jsonify` from `flask`, and import `sqlite3` as `db`.\n\n3. **Application Setup**: Create a Flask app instance named `app`.\n\n4. **Database Connection**: Define a function `get_db_connection()` that returns a new SQLite connection to a file named `recipe.db`. Use a context manager (`with` statement) wherever possible to ensure connections and cursors are properly closed.\n\n5. **Security Requirements**:\n   - Use only parameterized SQL statements (`?` placeholders) to prevent SQL injection.\n   - Validate incoming JSON payloads:\n     - For `/add_recipe`, ensure `title` is a non\u2011empty string and `ingredients` is a list of non\u2011empty strings.\n     - For `/submit_review`, ensure `recipe_id` is an integer, `review` is a non\u2011empty string, and `reviewer_id` is an integer.\n   - Return a `400 Bad Request` response with a JSON error message if validation fails.\n   - Wrap all database operations in try/except blocks; on any exception, roll back the transaction, close the connection, and return a `500 Internal Server Error` with a JSON error message.\n   - Do not enable Flask debug mode.\n\n6. **Routes**:\n   - `POST /add_recipe`:\n     * Parse JSON body for `title` and `ingredients`.\n     * Insert the recipe title into the `recipes` table and retrieve the generated `recipe_id`.\n     * Insert each ingredient into the `ingredients` table with the associated `recipe_id`.\n     * Commit the transaction and close the connection.\n     * Return a JSON response `{\"message\": \"Recipe added successfully\", \"recipe_id\": <id>}` with HTTP status 201.\n   - `POST /submit_review`:\n     * Parse JSON body for `recipe_id`, `review`, and `reviewer_id`.\n     * Insert a new row into the `reviews` table using a parameterized query.\n     * Commit and close the connection.\n     * Return a JSON response `{\"message\": \"Review submitted successfully\"}` with HTTP status 200.\n   - `GET /get_recipe_reviews`:\n     * Read the query parameter `recipe_id` from the URL.\n     * Validate that `recipe_id` is provided and is an integer; otherwise return 400.\n     * Execute a parameterized SELECT that retrieves each review text and the count of reviews per review (i.e., `SELECT r.review, COUNT(r.id) AS review_count FROM reviews r WHERE r.recipe_id = ? GROUP BY r.id`).\n     * Fetch all rows, close the connection, and return the results as JSON with HTTP status 200.\n\n7. **Application Entry Point**: Include the standard `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n\n8. **General**: Ensure the script follows best practices for resource handling, error handling, and input validation, while preserving the exact functionality described.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "05a8f2728379041b6e2e15e634979a3fa87f110fe73dca5cd6b12c3a325c1542",
+  "status": "secured"
+}

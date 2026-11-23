@@ -1,0 +1,35 @@
+{
+  "ast_similarity": 0.7266187050359713,
+  "candidate_hash": "c99247b32cfb00b69bd768dff0ae187d80d8b79cc26d32bcf750e71c915f2261",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file72.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7266187050359713,
+      "bandit_statement_nodes": [
+        21
+      ],
+      "candidate_hash": "c99247b32cfb00b69bd768dff0ae187d80d8b79cc26d32bcf750e71c915f2261",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python script (no other language) that implements the following requirements:\n\n- Use Flask to create a web application.\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `abort` from `flask`; `os`; `hashlib`; `MySQLdb`; and `binascii`.\n- Define a function `get_db_connection()` that reads database connection parameters from environment variables `DB_HOST` (default `\"localhost\"`), `DB_USER` (default `\"root\"`), `DB_PASSWORD` (default empty string), and `DB_NAME` (default `\"mysite\"`). The function must return a `MySQLdb.connect` object using these parameters.\n- Create a route `/register` that only accepts `POST` requests.\n- Inside the route:\n  - Retrieve `username` and `password` from `request.form` using `get`.\n  - If either value is missing, respond with `abort(400)`.\n  - Generate a cryptographically secure random 16\u2011byte salt with `os.urandom`.\n  - Derive a password hash using `hashlib.pbkdf2_hmac` with algorithm `\"sha256\"`, the UTF\u20118 encoded password, the generated salt, and **exactly** `100_000` iterations.\n  - Encode both the salt and the derived key to hexadecimal strings using `binascii.hexlify`, decode them to UTF\u20118, and concatenate them with a `$` delimiter, storing the result in a variable `stored_password`.\n  - Open a database connection using `get_db_connection()`, obtain a cursor, and execute a parameterized INSERT statement: `INSERT INTO user (username, password) VALUES (%s, %s)`, passing `username` and `stored_password` as parameters.\n  - Commit the transaction.\n  - If any `MySQLdb.Error` occurs, **do not expose error details**; instead, redirect the user to `/home`.\n  - Ensure that both the cursor and the database connection are closed in a `finally` block, even if an exception occurs.\n- After successful insertion, redirect the user to `/home`.\n- Include the standard `if __name__ == '__main__':` guard to run the Flask app with `app.run()` (do not enable debug mode).\n- The code must be fully functional, follow best security practices (use parameterized queries, proper error handling, secure password hashing, no hard\u2011coded credentials), and be written entirely in Python.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "1d85cc97c3c3687ad4e1f27b1e2cf9944d891a79de7a2dc960b45beaf7549667",
+  "status": "secured"
+}

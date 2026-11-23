@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "630677246bfaaba0fdbd818d806332d7e7daa72006b2e06b5b578ff09c2cfcbc",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed YAML in /submit_feedback or /update_catalog results in a server error.",
+      "Omitting 'user_id' or 'feedback' keys leads to a KeyError and a 500 response.",
+      "Providing an empty or missing 'id' query parameter still invokes the report generator with an empty argument.",
+      "Submitting a non\u2011string password or omitting the password field causes login to fail with 401.",
+      "Large payloads may exceed request size limits and cause request rejection."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a web API for submitting user feedback, initiating report generation, authenticating admin access, and updating a catalog via HTTP requests.",
+    "invariants": [
+      "All responses are JSON objects containing a 'status' key.",
+      "The admin login endpoint only succeeds when the exact master password is provided.",
+      "YAML payloads are parsed with yaml.FullLoader and must contain the expected keys.",
+      "The report generation endpoint always returns a status message regardless of command success."
+    ],
+    "io_behavior": [
+      "POST /submit_feedback with a YAML body containing 'user_id' and 'feedback' returns JSON echoing those fields.",
+      "GET /generate_report?id=<report_id> triggers a system command and returns a JSON status message.",
+      "POST /admin_login with form field 'password' returns a success JSON on correct password or a 401 error on mismatch.",
+      "POST /update_catalog with a YAML body returns JSON confirming the update and echoing the parsed catalog data."
+    ],
+    "public_api": {
+      "route:GET /generate_report": "",
+      "route:POST /admin_login": "",
+      "route:POST /submit_feedback": "",
+      "route:POST /update_catalog": ""
+    },
+    "side_effects": [
+      "Execution of an external './report_generator' command with the supplied report ID.",
+      "Potential logging or network activity performed by the Flask framework (e.g., request handling)."
+    ],
+    "source_hash": "f9b0e146383078e704acfde5a6976aceb335b0d502126348c4a493855f23bb1d"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.3,
+    "invariants": 0.6,
+    "io_semantics": 0.4,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file19.py",
+  "gated_score": 0.405,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.405,
+  "original_hash": "f9b0e146383078e704acfde5a6976aceb335b0d502126348c4a493855f23bb1d",
+  "rationale": "Program deviates on key error handling, report id validation, uses safe_load instead of FullLoader, and mismatches response fields, though it preserves JSON status responses and side\u2011effects.",
+  "schema": 1,
+  "stability_abs_difference": 0.17875,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.4,
+    "invariants": 0.5,
+    "io_semantics": 0.75,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.58375,
+  "weighted_mean": 0.44,
+  "worst_dimension": 0.3
+}

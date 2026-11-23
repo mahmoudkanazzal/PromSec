@@ -1,0 +1,67 @@
+{
+  "ast_similarity": 0.9946949602122016,
+  "candidate_hash": "13cb50aa0e6a881201fe3a6ea86254cf710dfb09c045c83536247dd8875616ef",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file76.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9946949602122016,
+      "bandit_statement_nodes": [
+        16,
+        19,
+        23,
+        25
+      ],
+      "candidate_hash": "13cb50aa0e6a881201fe3a6ea86254cf710dfb09c045c83536247dd8875616ef",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1433,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1157,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 3
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1792,
+          "end_lineno": 35,
+          "lineno": 35,
+          "node": 19
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2161,
+          "end_lineno": 40,
+          "lineno": 40,
+          "node": 23
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/register` route handling only POST requests. The script must:\n\n- Import exactly the following modules: `Flask`, `request`, `redirect` from `flask`; `re`; `os`; `bcrypt`; `MySQLdb`; `random`; `string`.\n- Create a Flask app instance named `app`.\n- Define a function `register()` decorated with `@app.route('/register', methods=['POST'])`.\n- Inside `register()`:\n  - Retrieve the form fields `username`, `password`, `name`, `cweid`, and `email` from `request.form`.\n  - Hash the password using `bcrypt.hashpw` with a generated salt (`bcrypt.gensalt()`), encoding the password as UTF\u20118, and store the result as a UTF\u20118 string.\n  - Connect to a MySQL database using `MySQLdb.connect` with the connection parameters taken from the environment variables `DATABASE_URL`, `DATABASE_USER`, `DATABASE_PASSWORD`, and `DATABASE_NAME`.\n  - Use a cursor to execute a **parameterized** SELECT query that checks whether the supplied `username` already exists in the `users` table.\n  - If the username does not exist:\n    - Insert a new row into the `users` table with the fields `username`, `password`, `name`, `email`, and `cweid` using a **parameterized** INSERT query. Commit the transaction.\n    - Retrieve the newly inserted user\u2019s ID via `cursor.lastrowid`.\n    - Generate a secure 16\u2011character session identifier using `random.SystemRandom().choice` over the character set `string.ascii_uppercase + string.digits`.\n    - Insert a new row into the `sessions` table with the fields `username`, `user_id`, and `session_id` using a **parameterized** INSERT query. Commit the transaction.\n    - Retrieve the session record (including `session_id` and `stake`) for the newly created session using a **parameterized** SELECT query.\n    - Redirect the client to `/login` with query parameters `username`, `session_id`, and `stake` populated from the retrieved session data, using an f\u2011string.\n  - If the username already exists, return the plain text response `'Username is already taken'`.\n- Ensure that all SQL statements use parameter placeholders (`%s`) and pass parameters as a tuple to prevent SQL injection.\n- Do not include any additional routes, functions, or code beyond what is required for the described functionality.\n- Do not add any explanatory comments, print statements, or logging.\n- The script must be valid Python code and must not contain any syntax errors.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "a00a27b7d592b11e9682a9850db8e3599255cdbc72ac01f2d99d62959b572c63",
+  "status": "secured"
+}

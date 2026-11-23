@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "ac6fd4f559e2cfcffbd237ebed2a3dc387e8af1d978556e32b4b93a18e7e26ea",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields cause a server error (e.g., KeyError) because the code accesses them directly.",
+      "Adding a book with a title that already exists results in a redirect back to the add page without insertion.",
+      "Login with incorrect credentials returns \"Invalid credentials\" even if the username exists.",
+      "Updating or deleting a non\u2011existent title still returns a success message, as no existence check is performed.",
+      "Searching with an empty term returns all books (the LIKE pattern matches everything).",
+      "SQL injection strings are interpolated directly into queries, potentially altering behavior."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for basic library management: adding, viewing, searching, updating, and deleting books, plus member login.",
+    "invariants": [
+      "Each request opens a fresh MySQL connection and closes it before responding.",
+      "Only the HTTP methods defined for each route are accepted.",
+      "Book titles are treated as unique identifiers for duplicate checks.",
+      "Responses are plain text or redirects; no JSON payloads are produced.",
+      "Database commits occur only after successful write queries.",
+      "The server runs continuously as a Flask application."
+    ],
+    "io_behavior": [
+      "POST /add_book with title and author redirects to ./add_book if the title already exists, otherwise redirects to ./view_books.",
+      "POST /login_member with username and password returns plain text \"Login successful\" or \"Invalid credentials\".",
+      "POST /update_book_author with title and new_author returns \"Author updated successfully\".",
+      "POST /delete_book with title returns \"Book deleted successfully\".",
+      "GET /search_books?term=... returns a stringified list of books whose title or author contains the term.",
+      "GET /view_books returns a stringified list of all books in the database."
+    ],
+    "public_api": {
+      "route:GET /search_books": "",
+      "route:GET /view_books": "",
+      "route:POST /add_book": "",
+      "route:POST /delete_book": "",
+      "route:POST /login_member": "",
+      "route:POST /update_book_author": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the Books table on successful add_book.",
+      "Updates the Author field of a Books row on update_book_author.",
+      "Deletes a Books row on delete_book.",
+      "Commits each write operation to the MySQL database.",
+      "Issues HTTP redirects for add_book outcomes.",
+      "Closes the database connection after each request."
+    ],
+    "source_hash": "cb06a60bd3c87cb816d5f35e1b33a8e48b64e66f77d2ece4ac8da06b6fb415c7"
+  },
+  "dimensions": {
+    "behavior": 0.45,
+    "edge_cases": 0.5,
+    "invariants": 0.7,
+    "io_semantics": 0.5,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file91.py",
+  "gated_score": 0.55313,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.55313,
+  "original_hash": "cb06a60bd3c87cb816d5f35e1b33a8e48b64e66f77d2ece4ac8da06b6fb415c7",
+  "rationale": "Core routes and side\u2011effects are implemented, but error handling, response formats, and SQL\u2011injection behavior diverge from the contract; missing fields are handled gracefully instead of raising errors, and search/view return JSON rather than plain\u2011text lists, breaking several edge\u2011case and invariant expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.20349,
+  "stability_dimensions": {
+    "behavior": 0.79,
+    "edge_cases": 0.67,
+    "invariants": 0.83,
+    "io_semantics": 0.67,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.75662,
+  "weighted_mean": 0.5875,
+  "worst_dimension": 0.45
+}

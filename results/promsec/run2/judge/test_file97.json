@@ -1,0 +1,77 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "f0d73a52b7d8e87790817c2bcbc96a344935dee9b4264dd932a78385cea7b239",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing required fields in the POST /add_book JSON payload.",
+      "Providing a non\u2011existent book_id to update or delete endpoints.",
+      "Empty or absent keyword/genre query parameters resulting in all rows or none.",
+      "Invalid JSON body causing a 400 error from Flask.",
+      "SQL errors due to special characters in input (e.g., quotes) leading to request failure."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a RESTful HTTP API that lets clients add, search, update, delete, and list books stored in a SQLite database.",
+    "invariants": [
+      "Each book record contains id, title, author, and genre columns.",
+      "All endpoints return JSON payloads with appropriate HTTP status codes.",
+      "Database connections are opened, used, committed (if needed), and closed per request.",
+      "The API does not perform authentication or authorization.",
+      "Responses for list endpoints are always JSON arrays (empty if no rows match)."
+    ],
+    "io_behavior": [
+      "POST /add_book with JSON {title, author, genre} \u2192 201 and JSON confirmation.",
+      "GET /search_books?keyword=\u2026 \u2192 200 and JSON array of matching books.",
+      "PUT /update_book/<book_id> with JSON {title?, author?, genre?} \u2192 200 and JSON confirmation.",
+      "DELETE /delete_book/<book_id> \u2192 200 and JSON confirmation.",
+      "GET /get_books_by_genre?genre=\u2026 \u2192 200 and JSON array of books in that genre."
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:DELETE /delete_book/<int:book_id>": "",
+      "route:GET /get_books_by_genre": "",
+      "route:GET /search_books": "",
+      "route:POST /add_book": "",
+      "route:PUT /update_book/<int:book_id>": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the books table.",
+      "Updates fields of an existing row identified by id.",
+      "Deletes a row identified by id.",
+      "Creates or modifies the SQLite file 'library.db' on disk.",
+      "Commits each transaction before closing the connection."
+    ],
+    "source_hash": "e727b4fbbe3a2102e26d9a19664f53e0d8c919dc3e865b7edb34c9710b4466e1"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 1.0,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file97.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.94875,
+  "original_hash": "e727b4fbbe3a2102e26d9a19664f53e0d8c919dc3e865b7edb34c9710b4466e1",
+  "rationale": "All required endpoints, status codes, JSON responses, and edge\u2011case handling are present and conform to the contract, but the public function get_db_connection is missing, slightly reducing overall behavioral compliance.",
+  "schema": 1,
+  "stability_abs_difference": 0.05125,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 1.0,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 1.0,
+  "weighted_mean": 0.965,
+  "worst_dimension": 0.9
+}

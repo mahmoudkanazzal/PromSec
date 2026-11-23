@@ -22,10 +22,11 @@ from .records import (
     collect_records,
     judge_record_issue,
 )
+from .similarity import similarities
 
 LIVE_FIELDS = (
     "file", "status", "cwe_before", "cwe_after", "cwe_reduction", "iterations",
-    "ast_similarity", "graph_feature_change", "graph_similarity", "laaj_score", "laaj_gated_score", "error", "timestamp",
+    "ast_similarity", "graph_similarity", "embedding_similarity", "laaj_score", "laaj_gated_score", "error", "timestamp",
 )
 
 
@@ -66,9 +67,10 @@ def _judge_result(cfg: dict, run_dir: Path, rec: dict) -> tuple[dict | None, str
     return None, ""
 
 
-def _row(rec: dict, judged: dict | None, judge_error: str) -> dict:
+def _row(rec: dict, judged: dict | None, judge_error: str, sims: dict | None = None) -> dict:
     before, after = rec.get("cwe_count_before"), rec.get("cwe_count_after")
     reduction = before - after if isinstance(before, int) and isinstance(after, int) else None
+    sims = sims or {}
     return {
         "file": rec["file"],
         "status": rec.get("status"),
@@ -77,13 +79,22 @@ def _row(rec: dict, judged: dict | None, judge_error: str) -> dict:
         "cwe_reduction": reduction,
         "iterations": len(rec.get("iterations") or []),
         "ast_similarity": rec.get("ast_similarity"),
-        "graph_feature_change": rec.get("gnn_feature_change"),
-        "graph_similarity": (1.0 - float(rec["gnn_feature_change"])) if isinstance(rec.get("gnn_feature_change"), (int, float)) else None,
+        "graph_similarity": sims.get("graph_similarity"),
+        "embedding_similarity": sims.get("embedding_similarity"),
         "laaj_score": judged.get("laaj_score") if judged else None,
         "laaj_gated_score": judged.get("gated_score") if judged else None,
         "error": rec.get("error") or judge_error,
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),  # noqa: UP017 (Python 3.10 support)
     }
+
+
+def _similarities(sources: dict[str, Path], run_dir: Path, rec: dict) -> dict:
+    """Graph and embedding similarity of the program's output to the original (completed programs only)."""
+    output = run_dir / "vetted_code" / rec["file"]
+    source = sources.get(rec["file"])
+    if rec.get("status") not in COMPLETED_STATUSES or not output.is_file() or source is None:
+        return {}
+    return similarities(source.read_text(encoding="utf-8"), output.read_text(encoding="utf-8"))
 
 
 def _fmt(value, digits: int = 2) -> str:
@@ -151,7 +162,7 @@ def _summary(rows: list[dict], total: int) -> str:
     after = sum(r["cwe_after"] for r in vulnerable if isinstance(r["cwe_after"], int))
     fewer = f"{100.0 * (before - after) / before:.1f}% fewer" if before else "-"
     laaj = [r["laaj_score"] for r in done if r["laaj_score"] is not None]
-    graph = [_number(r["graph_similarity"]) for r in done if _number(r["graph_similarity"]) is not None]
+    graph = [v for r in done if (v := _number(r["graph_similarity"])) is not None]
     mean_laaj = f"{sum(laaj) / len(laaj):.2f}" if laaj else "-"
     mean_graph = f"{sum(graph) / len(graph):.3f}" if graph else "-"
     return (
@@ -175,6 +186,7 @@ def watch_results(
     run_dir = _run_dir(cfg)
     total = len(_test_files(cfg))
     order = {path.name: i for i, path in enumerate(_test_files(cfg))}
+    sources = {path.name: path for path in _test_files(cfg)}
     csv_path = run_dir / "live_results.csv"
     rows: list[dict] = []
     printed: set[str] = set()
@@ -205,6 +217,7 @@ def watch_results(
     def show(row: dict) -> None:
         nonlocal header_printed
         if not header_printed:
+            emit(f"\n  Run {cfg['run']['name']}  |  variant {cfg['guidance']['mode']}")
             emit(_header())
             header_printed = True
         emit(_table_row(len(shown), row))
@@ -224,7 +237,7 @@ def watch_results(
         before_count = len(shown)
         for rec in sorted(terminal, key=lambda r: order.get(r["file"], 0)):
             judged, judge_error = _judge_result(cfg, run_dir, rec)
-            row = _row(rec, judged, judge_error)
+            row = _row(rec, judged, judge_error, _similarities(sources, run_dir, rec) if rec["file"] not in shown else None)
             if rec["file"] in printed:
                 if rec["file"] not in shown:
                     rows.append(row)

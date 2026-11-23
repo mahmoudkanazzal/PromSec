@@ -1,0 +1,67 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "ab9e46d989e2d35ff7cdb5a773cbaec6794d4b8c81ba700c576efa8bdfe5f6fe",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError before DB access.",
+      "If the username does not exist, the query returns no rows and the comparison defaults to false.",
+      "Empty password stored in DB is treated as a failure unless the supplied password is also empty.",
+      "Database connection failure results in a false response and an error printed.",
+      "SQL injection is possible because the username is interpolated directly into the query."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by checking supplied credentials against a stored password in a MySQL database and indicate success or failure.",
+    "invariants": [
+      "Response is always the literal string \"true\" or \"false\".",
+      "Database connection is closed in the finally block.",
+      "No modification of database state occurs (read\u2011only query).",
+      "The route only handles POST requests."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /login with form fields 'username' and 'password'.",
+      "Queries the database for the password associated with the given username.",
+      "Compares the retrieved password with the supplied password.",
+      "Returns a plain\u2011text response body containing either \"true\" or \"false\".",
+      "Writes error messages to standard output if a database error occurs."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to the local MySQL server.",
+      "Executes a SELECT statement on the users table.",
+      "Closes the database connection after handling the request.",
+      "Potentially logs error details to the server console."
+    ],
+    "source_hash": "55839422c7e82b0affceca53de499b8c424c0256b63e5d5cec1b9eb6abce93b4"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.75,
+    "io_semantics": 0.3,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file57.py",
+  "gated_score": 0.36688,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.36688,
+  "original_hash": "55839422c7e82b0affceca53de499b8c424c0256b63e5d5cec1b9eb6abce93b4",
+  "rationale": "KeyError missing, response format wrong, hash comparison deviates, injection mitigated, but DB handling and side effects follow contract.",
+  "schema": 1,
+  "stability_abs_difference": 0.19687,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.5,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.56375,
+  "weighted_mean": 0.4225,
+  "worst_dimension": 0.2
+}

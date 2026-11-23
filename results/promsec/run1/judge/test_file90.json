@@ -1,0 +1,79 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "087bd4cffd8340cbed77a421974fe55f05c2ef9a794f587d6b895d3cbe051799",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields cause a 400 error from Flask.",
+      "Attempting to add a product with a duplicate name results in a redirect without insertion.",
+      "Non\u2011numeric price values are stored verbatim as strings.",
+      "An empty search term returns all products.",
+      "Unsanitized inputs allow SQL injection attacks.",
+      "Failure to connect to the database results in a 500 internal server error."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for creating, updating, deleting, viewing, and searching products stored in a MySQL database.",
+    "invariants": [
+      "Product names are unique; add_product checks for existing names before inserting.",
+      "Each product record contains exactly Name and Price columns.",
+      "All write operations are committed before the response is returned.",
+      "Responses are plain strings or HTTP redirects, not JSON.",
+      "Database credentials (host, user, password, database) are hard\u2011coded and constant.",
+      "The Flask app runs as a single\u2011process HTTP server on the default port."
+    ],
+    "io_behavior": [
+      "POST /add_product with form fields name and price redirects to /add_product if the name already exists, otherwise redirects to /view_products after insertion.",
+      "POST /update_price with form fields name and price returns the plain text \"Price updated successfully\" after updating the row.",
+      "POST /delete_product with form field name returns the plain text \"Product deleted successfully\" after removing the row.",
+      "GET /search_products?term=... returns a string representation of rows whose Name contains the term.",
+      "GET /view_products returns a string representation of all rows in the Products table."
+    ],
+    "public_api": {
+      "route:GET /search_products": "",
+      "route:GET /view_products": "",
+      "route:POST /add_product": "",
+      "route:POST /delete_product": "",
+      "route:POST /update_price": ""
+    },
+    "side_effects": [
+      "Inserts a new product row into the Products table.",
+      "Updates the Price column of an existing product.",
+      "Deletes a product row from the table.",
+      "Opens and closes a MySQL connection for each request.",
+      "Commits the transaction before sending the response.",
+      "Issues HTTP redirects for the add_product endpoint."
+    ],
+    "source_hash": "27601feea594ef545b4981973fd012496ae91f0e9386b9bf28a423c58eae2c4d"
+  },
+  "dimensions": {
+    "behavior": 0.83,
+    "edge_cases": 0.67,
+    "invariants": 0.8,
+    "io_semantics": 0.85,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file90.py",
+  "gated_score": 0.79075,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.79075,
+  "original_hash": "27601feea594ef545b4981973fd012496ae91f0e9386b9bf28a423c58eae2c4d",
+  "rationale": "The program implements all required routes and most I/O behavior, commits writes, and uses redirects as specified. It fails to return a 400 error for missing add_product fields, uses environment variables instead of hard\u2011coded DB credentials, and safely parameterizes queries, preventing the intended SQL\u2011injection edge case. Most invariants hold, but the credential invariant is violated.",
+  "schema": 1,
+  "stability_abs_difference": 0.04425,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.67,
+    "invariants": 0.83,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.835,
+  "weighted_mean": 0.831,
+  "worst_dimension": 0.67
+}

@@ -1,0 +1,79 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "55457090ef37967a15d78540fe729b44d18494d08a581b5c504271fdcff40197",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Passing a non\u2011bytes method or path triggers automatic ASCII encoding.",
+      "Providing a dict as content causes JSON serialization; non\u2011dict non\u2011bytes content must be pre\u2011encoded.",
+      "If a DNS name is not present in the reactor's lookups, getHostByName returns a failed Deferred with DNSLookupError.",
+      "Calling json_body or code before any result is written raises an Exception.",
+      "When access_token is None, no Authorization header is added; malformed tokens are not validated.",
+      "If federation_auth_origin is supplied, an Authorization header with a placeholder signature is added regardless of actual key material."
+    ],
+    "entrypoints": [],
+    "intent": "Provide testing utilities for the Sydent identity server, including functions to create an in\u2011memory Sydent instance, fabricate Twisted HTTP requests and channels, and a memory\u2011based reactor with fake DNS resolution, while configuring logging for test output.",
+    "invariants": [
+      "All request bodies are stored as raw bytes; json_body property decodes them as UTF\u20118 JSON.",
+      "FakeChannel.result always contains at least a 'code' and 'headers' entry after writeHeaders is called.",
+      "The reactor's lookups dictionary is the single source of truth for DNS name resolution.",
+      "The hard\u2011coded TLS certificate never changes during execution.",
+      "Logging format and level remain constant after setup_logging() runs.",
+      "make_request() always ensures the path begins with '/_matrix/identity/v2/' when shorthand is true."
+    ],
+    "io_behavior": [
+      "make_sydent() returns a Sydent object configured with an in\u2011memory SQLite DB and a custom reactor.",
+      "make_request() builds a Twisted Request and a FakeChannel, populating request headers, body, and path based on supplied arguments.",
+      "FakeChannel.write() accumulates byte content into an internal result dictionary.",
+      "FakeChannel.writeHeaders() records HTTP version, status code, reason phrase, and response headers.",
+      "FakeChannel.getPeerCertificate() returns a hard\u2011coded X.509 certificate object.",
+      "setup_logging() adds a custom logging handler to the root logger and sets its level from an environment variable."
+    ],
+    "public_api": {
+      "class:FakeChannel": "code(self);getHost(self);getPeer(self);getPeerCertificate(self);headers(self);json_body(self);registerProducer(self, producer, streaming);requestDone(self, _self);transport(self);unregisterProducer(self);write(self, content);writeHeaders(self, version, code, reason, headers)",
+      "class:FakeSite": "",
+      "class:ResolvingMemoryReactorClock": "installNameResolver(self, resolver: IHostnameResolver)",
+      "class:ToTwistedHandler": "emit(self, record)",
+      "func:make_request": "(reactor, method, path, content=b'', access_token=None, request=Request, shorthand=True, federation_auth_origin=None)",
+      "func:make_sydent": "(test_config={})",
+      "func:setup_logging": "()"
+    },
+    "side_effects": [
+      "Modifies the global Python logging configuration by adding a ToTwistedHandler to the root logger.",
+      "Sets the root logger's level based on the SYDENT_TEST_LOG_LEVEL environment variable.",
+      "Instantiates OpenSSL crypto objects when a channel's peer certificate is accessed.",
+      "Creates in\u2011memory SQLite databases that persist for the lifetime of the process.",
+      "Registers a nameResolver on the custom reactor that may affect subsequent DNS lookups in the same process.",
+      "Potentially mutates the provided test_config dictionary when make_sydent() is called."
+    ],
+    "source_hash": "1a39a4177928ac3d32e74a2ff0d447c7f6ce1c7a9a28105b4f5d40c44d317349"
+  },
+  "dimensions": {
+    "behavior": 0.1,
+    "edge_cases": 0.0,
+    "invariants": 0.1,
+    "io_semantics": 0.1,
+    "side_effects": 0.2
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file33.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.075,
+  "original_hash": "1a39a4177928ac3d32e74a2ff0d447c7f6ce1c7a9a28105b4f5d40c44d317349",
+  "rationale": "The implementation diverges from the contract on most key points: it does not handle None access_token, does not prepend the required '/_matrix/identity/v2/' path, lacks json_body decoding, does not raise on premature json_body/code access, writes headers incorrectly, returns no TLS certificate, and modifies a module logger instead of the root logger. Only the DNS lookup behavior and basic byte accumulation match the specification.",
+  "schema": 1,
+  "stability_abs_difference": 0.1,
+  "stability_dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.3,
+    "io_semantics": 0.2,
+    "side_effects": 0.1
+  },
+  "stability_score": 0.175,
+  "weighted_mean": 0.1,
+  "worst_dimension": 0.0
+}

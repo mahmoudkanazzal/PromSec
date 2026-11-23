@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "2c0757096373b91a8931692a4ea322c926fcfb15de14b4e006b48aa80f6625c8",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML in /config/add returns a 400 error.",
+      "Empty or missing config_id/config_value in /config/add returns a 400 error.",
+      "Incorrect password for login, password update, or settings update returns 401.",
+      "Missing job_name or parameter in /job/execute still triggers the script with empty arguments.",
+      "Unsupported export format defaults to \"json\" but still runs the script.",
+      "Providing empty strings for required query/form fields yields error responses."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple HTTP API for managing configurations, executing jobs, handling authentication, and retrieving data, responding with JSON messages.",
+    "invariants": [
+      "ADMIN_PASSWORD must match the stored value for any privileged operation.",
+      "All endpoints require required parameters; missing ones result in a 400 error JSON.",
+      "Responses are always JSON objects with a \"status\" field.",
+      "Password updates affect only the running process (in\u2011memory), not persistent storage."
+    ],
+    "io_behavior": [
+      "POST /config/add accepts raw YAML, returns JSON with config_id and config_value or error on bad format/missing fields.",
+      "GET /job/execute takes job_name and parameter query strings, starts a shell script, returns JSON status.",
+      "POST /auth/login validates a password form field, returns success or 401 failure JSON.",
+      "POST /auth/update_password changes the in\u2011memory admin password after verifying the current one, returns JSON status.",
+      "GET /config/get returns a sample configuration JSON for a given config_id query parameter.",
+      "GET /user/info returns static user details for a provided user_id query parameter."
+    ],
+    "public_api": {
+      "route:GET /config/get": "",
+      "route:GET /data/export": "",
+      "route:GET /job/execute": "",
+      "route:GET /job/logs": "",
+      "route:GET /job/status": "",
+      "route:GET /user/info": "",
+      "route:POST /auth/login": "",
+      "route:POST /auth/settings": "",
+      "route:POST /auth/update_password": "",
+      "route:POST /config/add": "",
+      "route:POST /config/remove": ""
+    },
+    "side_effects": [
+      "Executes external shell script execute_job.sh with supplied arguments via os.system.",
+      "Runs export_data.py with a format argument via os.system when /data/export is called.",
+      "Mutates the global ADMIN_PASSWORD variable when password is updated.",
+      "Potentially logs or triggers external processes through the executed scripts."
+    ],
+    "source_hash": "0525122ed53928fa8d282c5f392bfd0ac67a247d4fac9a62a54c08b0630bd854"
+  },
+  "dimensions": {
+    "behavior": 0.45,
+    "edge_cases": 0.5,
+    "invariants": 0.5,
+    "io_semantics": 0.5,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file9.py",
+  "gated_score": 0.30562,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.30562,
+  "original_hash": "0525122ed53928fa8d282c5f392bfd0ac67a247d4fac9a62a54c08b0630bd854",
+  "rationale": "Core endpoints exist but many responses lack the required \"status\" field, missing script execution side\u2011effects, and job execution does not run on empty parameters, violating key contract invariants and edge\u2011case behavior.",
+  "schema": 1,
+  "stability_abs_difference": 0.07688,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.5,
+    "invariants": 0.4,
+    "io_semantics": 0.45,
+    "side_effects": 0.3
+  },
+  "stability_score": 0.3825,
+  "weighted_mean": 0.4075,
+  "worst_dimension": 0.0
+}

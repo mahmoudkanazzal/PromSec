@@ -1,0 +1,78 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "ec5f812b97aa49608c0e698f1a1de770c9846226f0406d25366e3e8a05bc59bf",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed YAML in /add_book causes a server error (e.g., 500).",
+      "Absent title/author/isbn keys in the YAML payload leads to a KeyError and a 500 response.",
+      "Omitting the password field in /librarian_access results in access denied (401).",
+      "Providing an empty or unknown section to /run_inventory still triggers the script with an empty argument.",
+      "Extremely large request bodies may exhaust memory or trigger Flask limits.",
+      "Using HTTP methods other than those specified (e.g., GET on /add_book) yields a 405 Method Not Allowed."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple library management web API with endpoints to add a book, trigger an inventory script, and verify librarian credentials.",
+    "invariants": [
+      "The librarian password is fixed to the literal string \"library_admin_2023\".",
+      "Each endpoint always returns a JSON object with a \"status\" field.",
+      "Successful /add_book always echoes back the supplied title unchanged.",
+      "Successful /run_inventory always returns the same status message regardless of script outcome.",
+      "Successful /librarian_access returns HTTP 200; failure returns HTTP 401.",
+      "The server runs with debug mode disabled (debug=False)."
+    ],
+    "io_behavior": [
+      "POST /add_book with a YAML body containing title, author, and isbn returns JSON {\"status\":\"Book added\",\"title\":<title>}.",
+      "GET /run_inventory?section=<name> returns JSON {\"status\":\"Inventory check initiated\"}.",
+      "POST /librarian_access with form field password returns JSON {\"status\":\"Librarian access granted\"} on success or {\"status\":\"Access denied\"} with HTTP 401 on failure.",
+      "All responses are sent with Content-Type: application/json.",
+      "Requests with unsupported HTTP methods receive Flask's default 405 response.",
+      "Invalid or missing request data results in Flask error responses (e.g., 400 Bad Request)."
+    ],
+    "public_api": {
+      "route:GET /run_inventory": "",
+      "route:POST /add_book": "",
+      "route:POST /librarian_access": ""
+    },
+    "side_effects": [
+      "The /run_inventory endpoint executes the external command `python inventory_script.py <section>` via the operating system.",
+      "The command may produce console output, create files, or modify external state depending on the script's implementation.",
+      "The server reads request bodies and form data, which may affect memory usage.",
+      "No persistent storage is modified by the /add_book or /librarian_access endpoints.",
+      "Potential command injection if an attacker supplies a crafted section value (depends on the underlying OS shell).",
+      "The Flask application starts a listening socket when run as __main__."
+    ],
+    "source_hash": "628bfae4caf2338a54a5f8ef7dc7334f333bb812ca122d3afea75a2734f26efc"
+  },
+  "dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.8,
+    "side_effects": 0.4
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file22.py",
+  "gated_score": 0.355,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.355,
+  "original_hash": "628bfae4caf2338a54a5f8ef7dc7334f333bb812ca122d3afea75a2734f26efc",
+  "rationale": "Responses mostly match JSON format but error handling, fixed password, and external command execution deviate from contract; many edge\u2011case expectations are not met.",
+  "schema": 1,
+  "stability_abs_difference": 0.1775,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.33,
+    "invariants": 0.67,
+    "io_semantics": 1.0,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.5325,
+  "weighted_mean": 0.44,
+  "worst_dimension": 0.1
+}

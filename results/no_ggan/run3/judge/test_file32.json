@@ -1,0 +1,78 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "daaf1f95d33d000f33363120cc23ff268f68b52b7abeed9bba4cc53babc5bf25",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "method or path supplied as Unicode strings are encoded to ASCII bytes.",
+      "Empty or missing content results in no 'Content-Type' header being added.",
+      "When access_token is None, no Authorization header is added.",
+      "If federation_auth_origin is provided, a custom X\u2011Matrix Authorization header is added.",
+      "Providing a path that already starts with '/_matrix' bypasses the shorthand prefixing.",
+      "Calling FakeChannel.json_body before any response is written raises an exception."
+    ],
+    "entrypoints": [],
+    "intent": "Provide test utilities for the Sydent identity server, enabling creation of an in\u2011memory Sydent instance, construction of synthetic HTTP requests, capture of Twisted Web responses, and configuration of logging for test environments.",
+    "invariants": [
+      "If 'db' is not supplied in test_config, make_sydent always uses ':memory:' as the SQLite file.",
+      "FakeChannel.result always contains keys 'code', 'headers', and optionally 'body' after a request.",
+      "make_request always prefixes the path with '/_matrix/identity/v2/' when shorthand=True and the path lacks that prefix.",
+      "Content passed to make_request is JSON\u2011encoded when a dict, and always sent as UTF\u20118 bytes.",
+      "The logging handler remains attached for the lifetime of the process.",
+      "FakeChannel.getPeer() always returns a fixed IPv4 address, ensuring a non\u2011null client IP."
+    ],
+    "io_behavior": [
+      "make_sydent(test_config) \u2192 returns a Sydent object configured with an in\u2011memory SQLite DB (unless overridden).",
+      "make_request(reactor, method, path, content, access_token, ...) \u2192 returns a (Request, FakeChannel) pair; the channel records HTTP status, headers, and body after the request is processed.",
+      "FakeChannel.json_body, .code, .headers properties \u2192 expose the recorded response as JSON, integer status code, and Headers object.",
+      "setup_logging() runs at import time, reading SYDENT_TEST_LOG_LEVEL env var and configuring the root logger.",
+      "FakeChannel.getPeerCertificate() \u2192 returns a hard\u2011coded X.509 certificate object.",
+      "The module produces no console output unless logging is emitted by the Twisted logger."
+    ],
+    "public_api": {
+      "class:FakeChannel": "code(self);getHost(self);getPeer(self);getPeerCertificate(self);headers(self);json_body(self);registerProducer(self, producer, streaming);requestDone(self, _self);transport(self);unregisterProducer(self);write(self, content);writeHeaders(self, version, code, reason, headers)",
+      "class:FakeSite": "",
+      "class:ToTwistedHandler": "emit(self, record)",
+      "func:make_request": "(reactor, method, path, content=b'', access_token=None, request=Request, shorthand=True, federation_auth_origin=None)",
+      "func:make_sydent": "(test_config={})",
+      "func:setup_logging": "()"
+    },
+    "side_effects": [
+      "Adds a ToTwistedHandler instance to the root Python logger.",
+      "Sets the root logger's level based on the SYDENT_TEST_LOG_LEVEL environment variable.",
+      "Registers the handler that forwards formatted log records to Twisted's logging system.",
+      "Loads a PEM\u2011encoded certificate into an OpenSSL crypto object when getPeerCertificate() is called.",
+      "Creates a MemoryReactorClock instance for each make_sydent call (in\u2011memory reactor).",
+      "Modifies global logging configuration on module import."
+    ],
+    "source_hash": "fd29062fb5da351e7ce1cb83718776fe9a07e90f399c3bc40f4bb17f4e310c47"
+  },
+  "dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.85,
+    "invariants": 0.7,
+    "io_semantics": 0.85,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file32.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.79937,
+  "original_hash": "fd29062fb5da351e7ce1cb83718776fe9a07e90f399c3bc40f4bb17f4e310c47",
+  "rationale": "Most contract points are met: Unicode encoding, content-type handling, token omission, path prefixing, json_body exception, logging side\u2011effects, and in\u2011memory DB. The custom X\u2011Matrix header is added under the wrong name (Authorization) and FakeChannel may not always populate 'code'/'headers' without a real request cycle, breaking some invariants.",
+  "schema": 1,
+  "stability_abs_difference": 0.06213,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.83,
+    "invariants": 1.0,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.8615,
+  "weighted_mean": 0.8325,
+  "worst_dimension": 0.7
+}

@@ -1,0 +1,69 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "1347a462bb3b7ccd3db99620f64bc030ef357a4000125fc5630a5663da2b2fe0",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a request error.",
+      "SQL injection via crafted username can alter query results.",
+      "Multiple rows for the same username are iterated but only the first matching hash yields success.",
+      "Empty password results in MD5 hash of an empty string being compared.",
+      "Database connection failure raises an exception and aborts the request.",
+      "Non\u2011ASCII characters in username or password may affect hashing or query execution."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via an HTTP POST to /login by verifying the supplied username and password against entries in a MySQL 'user' table.",
+    "invariants": [
+      "Both 'username' and 'password' form fields must be present.",
+      "Password comparison uses MD5 hash of the supplied password.",
+      "Response is always one of the three fixed strings.",
+      "Database connection is closed after each request.",
+      "No modification of database state occurs."
+    ],
+    "io_behavior": [
+      "Accepts a POST request with form fields 'username' and 'password'.",
+      "Queries the MySQL database for the password hash of the given username.",
+      "Compares the MD5 hash of the supplied password to the stored hash.",
+      "Returns a plain\u2011text response: \"Login Success\", \"Wrong Password\", or \"Wrong Username\".",
+      "Prints the stored password hash to the server's standard output."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection on each request.",
+      "Executes a SELECT statement (potentially vulnerable to SQL injection).",
+      "Closes the MySQL connection before responding.",
+      "Writes the matched password hash to stdout."
+    ],
+    "source_hash": "09aca3c6166bdcc516a66d879bb0aac9df98b471667b05821c3cd7ebdf79fde0"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.4,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file50.py",
+  "gated_score": 0.30875,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.30875,
+  "original_hash": "09aca3c6166bdcc516a66d879bb0aac9df98b471667b05821c3cd7ebdf79fde0",
+  "rationale": "Uses Werkzeug password check instead of MD5, does not print stored hash, employs parameterized query (no SQL injection), and returns \"Wrong Username\" for missing fields rather than a request error, deviating from several contract specifications.",
+  "schema": 1,
+  "stability_abs_difference": 0.12437,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.3,
+    "invariants": 0.4,
+    "io_semantics": 0.6,
+    "side_effects": 0.75
+  },
+  "stability_score": 0.43312,
+  "weighted_mean": 0.345,
+  "worst_dimension": 0.2
+}

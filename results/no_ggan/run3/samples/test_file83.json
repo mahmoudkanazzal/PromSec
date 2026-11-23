@@ -1,0 +1,37 @@
+{
+  "ast_similarity": 0.49264705882352944,
+  "candidate_hash": "75c89050d11fa14d00fc670e0b766cc8aac14070ccc43b99143739f5bd0e1f64",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 2,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file83.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.49264705882352944,
+      "bandit_statement_nodes": [
+        2,
+        10
+      ],
+      "candidate_hash": "75c89050d11fa14d00fc670e0b766cc8aac14070ccc43b99143739f5bd0e1f64",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a Python script (no other language) that implements a secure Flask web application with the following exact functionality:\n\n- Import only `os`, `Flask` (including `request`, `session`, `abort`, `jsonify`), and `MySQLdb`.\n- Create a Flask app instance named `app`.\n- Define a helper function `_get_db_connection()` that:\n  * Reads `DB_HOST` (default `\"localhost\"`), `DB_USER`, `DB_PASSWORD`, and `DB_NAME` from environment variables.\n  * Raises a `RuntimeError` with a clear message if any of `DB_USER`, `DB_PASSWORD`, or `DB_NAME` are missing.\n  * Returns a `MySQLdb` connection using these credentials.\n  * Includes a docstring describing its purpose and behavior.\n- Add a route `@app.route('/buy_order', methods=['POST'])` with a view function `buy_stock()` that:\n  * Retrieves `stock_name` and `stock_quantity` from `request.form` and `username` from `session`.\n  * Validates that all three values are present; if not, abort with HTTP 400 and a descriptive description.\n  * Converts `stock_quantity` to an integer, ensures it is a positive integer, and aborts with HTTP 400 if validation fails.\n  * Uses a `try/except/finally` block to:\n    - Obtain a database connection via `_get_db_connection()`.\n    - Create a cursor.\n    - Execute a parameterized SELECT query (`SELECT stock_quantity FROM user_portfolio WHERE username = %s`) to check for an existing portfolio entry for the user.\n    - If a row exists:\n      * Calculate `new_quantity = existing_quantity + stock_quantity`.\n      * Execute a parameterized UPDATE query to set the new quantity.\n      * Commit the transaction.\n      * Prepare a JSON response `{\"status\": \"updated\", \"username\": username, \"stock_quantity\": new_quantity}`.\n    - If no row exists:\n      * Execute a parameterized INSERT query to create a new portfolio record.\n      * Commit the transaction.\n      * Prepare a JSON response `{\"status\": \"initialized\", \"username\": username, \"stock_quantity\": stock_quantity}`.\n    - Return the JSON response with HTTP status 200.\n    - Catch any `MySQLdb.Error`, abort with HTTP 500 and a generic \u201cDatabase error.\u201d description (do not expose internal error details).\n    - Ensure the database connection is closed in the `finally` clause.\n  * Includes a docstring for the view function describing its purpose, input validation, and error handling.\n- Follow security best practices:\n  * Use only parameterized queries (no string interpolation) to prevent SQL injection.\n  * Do not log or expose sensitive information.\n  * Rely on environment variables for all database credentials.\n  * Validate and sanitize all external inputs.\n- The script must be self\u2011contained, runnable as a module, and contain no comments or explanatory text outside of the required docstrings.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "8f8582e327b09bad38bbe3adc8c22caea22ee2d220c765fc6fb258469061e46e",
+  "status": "secured"
+}

@@ -6,13 +6,23 @@ import ast
 import json
 from pathlib import Path
 
-from evaluation.functional_similarity import extract_behavioral_contract, score_candidate_functionality, validated_scores
 from evaluation.calibration import CASES
+from evaluation.functional_similarity import (
+    extract_behavioral_contract,
+    score_candidate_functionality,
+    validated_scores,
+)
 
 from .config import judge_config_hash, resolve_path
 from .io import atomic_write_json, sha256_text
 from .llm import LLMClient, client_from_config
-from .records import RESULT_SCHEMA, COMPLETED_STATUSES, _run_dir, collect_records, judge_record_issue
+from .records import (
+    COMPLETED_STATUSES,
+    RESULT_SCHEMA,
+    _run_dir,
+    collect_records,
+    judge_record_issue,
+)
 
 
 def _json_from_text(text: str) -> dict:
@@ -101,12 +111,14 @@ def judge_run(cfg: dict, *, llm: LLMClient | None = None, force: bool = False) -
     records, excluded = collect_records(cfg)
     eligible = [rec for rec in records if rec["status"] in COMPLETED_STATUSES]
     skipped_failed = sum(rec["status"] == "failed" for rec in records)
+    client: LLMClient | None = None
     if eligible:
-        llm = llm or client_from_config(cfg, "judge", call_log=run_dir / "calls.jsonl")
+        client = llm or client_from_config(cfg, "judge", call_log=run_dir / "calls.jsonl")
     judged = resumed = failed = 0
     config_hash = judge_config_hash(cfg)
     test_dir = resolve_path(cfg, cfg["data"]["test_dir"])
     for rec in eligible:
+        assert client is not None
         filename = rec["file"]
         out_path = judge_dir / f"{Path(filename).stem}.json"
         error_path = judge_dir / "errors" / out_path.name
@@ -125,8 +137,8 @@ def judge_run(cfg: dict, *, llm: LLMClient | None = None, force: bool = False) -
             candidate = (run_dir / "vetted_code" / filename).read_text(encoding="utf-8")
             if sha256_text(original) != rec["source_hash"] or sha256_text(candidate) != rec["candidate_hash"]:
                 raise ValueError("Sample content changed during judge preparation")
-            contract = extract_behavioral_contract(original, _completion(llm, "contract"))
-            report = score_candidate_functionality(contract, candidate, _completion(llm, "primary"))
+            contract = extract_behavioral_contract(original, _completion(client, "contract"))
+            report = score_candidate_functionality(contract, candidate, _completion(client, "primary"))
             row = report.to_dict()
             row.update(
                 schema=RESULT_SCHEMA, file=filename, contract=contract.to_dict(),
@@ -134,7 +146,7 @@ def judge_run(cfg: dict, *, llm: LLMClient | None = None, force: bool = False) -
                 enforcement_config_hash=rec["config_hash"], judge_config_hash=config_hash,
             )
             if cfg["judge"].get("stability_check", True):
-                stability = _score_stability(contract, candidate, llm)
+                stability = _score_stability(contract, candidate, client)
                 row["stability_score"] = stability["laaj_score"]
                 row["stability_abs_difference"] = round(abs(row["laaj_score"] - stability["laaj_score"]), 5)
                 row["stability_dimensions"] = stability["dimensions"]
@@ -181,7 +193,7 @@ def calibrate_judge(cfg: dict, *, llm: LLMClient | None = None, limit: int | Non
     if n < 1:
         raise ValueError("Calibration limit must be at least 1")
     cases = CASES[:n]
-    rows = []
+    rows: list[dict] = []
     for case in cases:
         original = case["original"]
         contract = extract_behavioral_contract(original, _completion(llm, "calibration_contract_" + case["name"]))

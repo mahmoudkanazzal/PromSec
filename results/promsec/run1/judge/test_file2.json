@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "eb03ce574ece94eb44a1ccaa540a266e42cc3c7092419f42cf275a835012dcb4",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML in /config/upload triggers a 400 response with an \"Invalid YAML format\" message.",
+      "Missing or empty token in admin endpoints results in a 401 \"Verification failed\" or \"Access denied\" response.",
+      "Providing an empty new_token to /admin/update_token yields a 400 \"Invalid new token\" error.",
+      "Calling /task/execute without task or param still runs the shell script with empty arguments, which may cause script errors.",
+      "Requesting /task/status or /task/logs without a task_id returns a 400 error indicating the missing identifier.",
+      "Unsupported backup format values are still passed to backup_data.py; the endpoint does not validate the format."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple HTTP API for uploading/retrieving/deleting configuration entries, executing tasks, managing admin authentication tokens, and accessing user/profile and backup functionality.",
+    "invariants": [
+      "All admin\u2011protected endpoints require the request token to equal the current SECRET_TOKEN.",
+      "Endpoints that require a parameter (e.g., config_name, task, user_id) return a 400 error if the parameter is missing or empty.",
+      "upload_config validates that the YAML can be parsed and contains both config_name and config_value.",
+      "The API always responds with JSON payloads and appropriate HTTP status codes (200 for success, 400 for client errors, 401 for unauthorized).",
+      "The secret token is stored only in memory; it is not persisted across server restarts."
+    ],
+    "io_behavior": [
+      "POST /config/upload accepts raw YAML, returns JSON with config_name and config_value or error on bad YAML/missing fields.",
+      "GET /task/execute runs a shell script with task and param query parameters and returns a JSON acknowledgement.",
+      "POST /admin/verify checks a form token against the secret token and returns success or 401 failure JSON.",
+      "POST /admin/update_token validates the current token, updates the in\u2011memory secret token, and returns a JSON confirmation.",
+      "GET /config/retrieve returns a placeholder config JSON for a given config_name query parameter.",
+      "GET /user/profile returns a static user profile JSON for a supplied user_id query parameter."
+    ],
+    "public_api": {
+      "route:GET /backup/data": "",
+      "route:GET /config/retrieve": "",
+      "route:GET /task/execute": "",
+      "route:GET /task/logs": "",
+      "route:GET /task/status": "",
+      "route:GET /user/profile": "",
+      "route:POST /admin/settings": "",
+      "route:POST /admin/update_token": "",
+      "route:POST /admin/verify": "",
+      "route:POST /config/delete": "",
+      "route:POST /config/upload": ""
+    },
+    "side_effects": [
+      "os.system call to execute_task.sh with supplied task and param.",
+      "os.system call to run backup_data.py with the requested format.",
+      "Modification of the global SECRET_TOKEN variable when /admin/update_token succeeds."
+    ],
+    "source_hash": "7d880d6e183f6046022b31df25f287bd639a6d249de095d83cc40451caa8ff19"
+  },
+  "dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.6,
+    "invariants": 0.9,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file2.py",
+  "gated_score": 0.79125,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.79125,
+  "original_hash": "7d880d6e183f6046022b31df25f287bd639a6d249de095d83cc40451caa8ff19",
+  "rationale": "All required routes exist, JSON responses and status codes match, and side\u2011effects are performed. However, /task/execute rejects missing parameters instead of running the script with empty args, and /backup/data validates format rather than passing unsupported values through, violating two listed edge cases and a specific invariant.",
+  "schema": 1,
+  "stability_abs_difference": 0.06288,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.67,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.85413,
+  "weighted_mean": 0.855,
+  "worst_dimension": 0.6
+}

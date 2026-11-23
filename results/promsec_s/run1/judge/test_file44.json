@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "9508fc1497f7d0c660931d2fb60fef55a903d90f9f613b53a5b0dd3850c6e9d4",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields or query parameters cause a generic failure message.",
+      "Database connection failures or SQL errors trigger generic error responses (e.g., \"Registration failed\").",
+      "Attempting to register an already\u2011existing username returns \"Username already exists\".",
+      "Login with incorrect credentials returns \"Invalid credentials\".",
+      "Adding a task for a non\u2011existent user returns \"User not found\".",
+      "Providing an invalid task_id for delete or update still returns a success message if the SQL executes without error."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple web API for user registration, authentication, and basic task management (add, view, delete, update) using HTTP requests.",
+    "invariants": [
+      "Usernames must be unique; duplicate registration attempts are rejected.",
+      "Task operations (add, view, delete, update) are only performed for existing usernames.",
+      "Each task is associated with exactly one username via the tasks.username column.",
+      "Successful operations always result in an HTTP 302 redirect or a plain\u2011text success message.",
+      "Database connections are always closed before the response is returned.",
+      "All responses are either plain\u2011text strings, HTTP redirects, or JSON (for view_tasks)."
+    ],
+    "io_behavior": [
+      "POST /register with form fields username and password returns a redirect to /home on success or a plain text error message.",
+      "POST /login with form fields username and password returns a redirect to /dashboard on success or a plain text error message.",
+      "POST /add_task with form fields username, task_name, task_description returns a plain text confirmation or error message.",
+      "GET /view_tasks with query parameter username returns a JSON array of the user's tasks or a plain text error message.",
+      "POST /delete_task with form fields username and task_id returns a plain text confirmation or error message.",
+      "POST /update_task with form fields username, task_id, new_task_name, new_task_description returns a plain text confirmation or error message."
+    ],
+    "public_api": {
+      "route:GET /view_tasks": "",
+      "route:POST /add_task": "",
+      "route:POST /delete_task": "",
+      "route:POST /login": "",
+      "route:POST /register": "",
+      "route:POST /update_task": ""
+    },
+    "side_effects": [
+      "Creates a new row in the users table on successful registration.",
+      "Inserts a new row in the tasks table on successful add_task.",
+      "Deletes a row from the tasks table on successful delete_task.",
+      "Updates a row in the tasks table on successful update_task.",
+      "Commits database transactions for each modifying operation.",
+      "Opens and closes a MySQL database connection for every request."
+    ],
+    "source_hash": "fd8d3f80dfea0f7dacbff0e4f889261b1c0df6f0eae8c3c6b8814d368e3b41ef"
+  },
+  "dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 1.0,
+    "invariants": 0.5,
+    "io_semantics": 1.0,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file44.py",
+  "gated_score": 0.72125,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.72125,
+  "original_hash": "fd8d3f80dfea0f7dacbff0e4f889261b1c0df6f0eae8c3c6b8814d368e3b41ef",
+  "rationale": "All routes, redirects, and error messages match the contract and edge\u2011case handling is correct; however the task table uses a user_id column instead of tasks.username and connections are not explicitly closed, breaking some invariants and side\u2011effect guarantees.",
+  "schema": 1,
+  "stability_abs_difference": 0.10062,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 1.0,
+    "invariants": 0.67,
+    "io_semantics": 1.0,
+    "side_effects": 0.83
+  },
+  "stability_score": 0.82187,
+  "weighted_mean": 0.795,
+  "worst_dimension": 0.5
+}

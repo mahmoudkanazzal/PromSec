@@ -1,0 +1,80 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "b08fee12a3ca6db51367e06b91ff9b846fac8cb1c3ce5c6b3f29592cbf221c2a",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Submitting an empty or missing 'title' may cause SQL errors or unintended matches.",
+      "Adding an event with a title that already exists triggers a redirect back to the add page without insertion.",
+      "Providing a non\u2011existent title to update_event_date or delete_event results in a successful response but no rows are changed.",
+      "Search term containing special characters may affect the LIKE pattern or cause malformed SQL.",
+      "Large result sets from view_events or search_events are returned as a single string, which may be truncated by the client.",
+      "Database connection failures raise exceptions that are not caught, leading to a 500 Internal Server Error."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple web API for managing events stored in a MySQL database, allowing clients to add, update, delete, search, and list events via HTTP requests.",
+    "invariants": [
+      "Each request opens a MySQL connection, creates a cursor, and closes both before returning.",
+      "The Events table schema is assumed to contain at least Title and Date columns.",
+      "Responses are always either a redirect, a plain\u2011text success message, or a stringified Python list of rows.",
+      "The application runs with Flask's built\u2011in server and does not enable debug mode.",
+      "All SQL statements are executed synchronously; commits are performed after write operations.",
+      "If a required form field is missing, Flask will raise a 400 Bad Request before reaching the database logic."
+    ],
+    "io_behavior": [
+      "POST /add_event with form fields 'title' and 'date' redirects to './add_event' if the title already exists, otherwise redirects to './view_events' after inserting the new event.",
+      "POST /update_event_date with form fields 'title' and 'new_date' returns the plain text message \"Event date updated successfully\" after updating the matching record.",
+      "POST /delete_event with form field 'title' returns the plain text message \"Event deleted successfully\" after removing the matching record.",
+      "GET /search_events?term=XYZ returns a string representation of a list of rows whose titles contain the supplied term.",
+      "GET /view_events returns a string representation of a list of all rows in the Events table.",
+      "All endpoints establish a new MySQL connection for each request and close it before responding."
+    ],
+    "public_api": {
+      "route:GET /search_events": "",
+      "route:GET /view_events": "",
+      "route:POST /add_event": "",
+      "route:POST /delete_event": "",
+      "route:POST /update_event_date": ""
+    },
+    "side_effects": [
+      "Insertion of a new row into the Events table (add_event).",
+      "Modification of the Date column for an existing row (update_event_date).",
+      "Deletion of a row from the Events table (delete_event).",
+      "Potential redirection responses that cause the client to issue additional HTTP requests (add_event).",
+      "Database connection establishment and termination for each request.",
+      "No file system or external service interactions beyond the MySQL database."
+    ],
+    "source_hash": "d84a9609bbb8f855b34f74858f98b2d52127ee7a0edd954cac0ab277af3ac497"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.5,
+    "invariants": 1.0,
+    "io_semantics": 0.4,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file92.py",
+  "gated_score": 0.6775,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.6775,
+  "original_hash": "d84a9609bbb8f855b34f74858f98b2d52127ee7a0edd954cac0ab277af3ac497",
+  "rationale": "The program implements all required routes, redirects, and database side\u2011effects, and respects connection handling invariants. However it returns JSON via jsonify instead of the contract's plain stringified Python list for view/search, and it catches DB errors rather than letting them propagate, deviating from the specified I/O semantics and some edge\u2011case handling.",
+  "schema": 1,
+  "stability_abs_difference": 0.04437,
+  "stability_dimensions": {
+    "behavior": 0.75,
+    "edge_cases": 0.6,
+    "invariants": 0.8,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.72187,
+  "weighted_mean": 0.77,
+  "worst_dimension": 0.4
+}

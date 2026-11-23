@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "845f5d144efaeb33ddd1bba9415e5b3c245a87cd81479942346a2a6ae099c645",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payload in /event/add triggers a 400 error with \"Invalid YAML format\".",
+      "Missing required fields in any endpoint results in a 400 error with a specific message.",
+      "Incorrect admin password on login or privileged actions returns HTTP 401.",
+      "Calling /event/start without event_id or task still runs the shell script with empty arguments.",
+      "Providing an unsupported export format to /data/export still runs the script with the given string.",
+      "Updating the password to an empty string is rejected with a 400 error."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a Flask\u2011based HTTP API for managing events and related tasks, with simple password\u2011based admin authentication and limited side\u2011effects such as invoking shell scripts.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" key.",
+      "Protected endpoints (/auth/*, /event/start, /event/remove, /auth/settings) require the current ADMIN_PASSWORD to match the supplied password.",
+      "Required parameters (event_id, event_name, event_date, task_id, etc.) must be non\u2011empty; otherwise a 400 error is returned.",
+      "The ADMIN_PASSWORD is stored only in process memory and persists for the lifetime of the server.",
+      "The server never writes to files or databases; state is limited to the password variable."
+    ],
+    "io_behavior": [
+      "POST /event/add \u2013 accepts raw YAML in the request body, returns JSON with event_id, event_name, event_date on success or error messages on bad YAML or missing fields.",
+      "GET /event/start \u2013 reads query parameters event_id and task, runs a shell script and returns JSON status.",
+      "POST /auth/login \u2013 reads form field password, returns JSON indicating success or HTTP 401 on failure.",
+      "POST /auth/update_password \u2013 requires current admin password and new_password form fields, updates in\u2011memory password and returns JSON confirmation.",
+      "GET /event/get \u2013 requires event_id query parameter, returns a static sample event JSON or error if missing.",
+      "POST /event/remove \u2013 requires event_id form field, returns JSON confirming removal."
+    ],
+    "public_api": {
+      "route:GET /data/export": "",
+      "route:GET /event/get": "",
+      "route:GET /event/start": "",
+      "route:GET /task/logs": "",
+      "route:GET /task/status": "",
+      "route:GET /user/info": "",
+      "route:POST /auth/login": "",
+      "route:POST /auth/settings": "",
+      "route:POST /auth/update_password": "",
+      "route:POST /event/add": "",
+      "route:POST /event/remove": ""
+    },
+    "side_effects": [
+      "os.system(\"sh start_event.sh {event_id} {task}\") is executed when /event/start is called.",
+      "os.system(\"python export_event_data.py {format}\") is executed when /data/export is called.",
+      "In\u2011memory ADMIN_PASSWORD variable is mutated by /auth/update_password."
+    ],
+    "source_hash": "1fe10c3a94b4f4ce46d789133eb8a4d34fc953a85d1d3497c79fad96d5cb565b"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.33,
+    "invariants": 0.8,
+    "io_semantics": 0.5,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file10.py",
+  "gated_score": 0.50213,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.50213,
+  "original_hash": "1fe10c3a94b4f4ce46d789133eb8a4d34fc953a85d1d3497c79fad96d5cb565b",
+  "rationale": "Core endpoints exist and return JSON with a status key, and script side\u2011effects are executed, but key contract edge cases (running start_event with missing args, running export with unsupported format, and proper 400 on malformed YAML) are not honored, leading to partial preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.28849,
+  "stability_dimensions": {
+    "behavior": 0.95,
+    "edge_cases": 0.5,
+    "invariants": 1.0,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.79062,
+  "weighted_mean": 0.5595,
+  "worst_dimension": 0.33
+}

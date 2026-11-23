@@ -1,0 +1,79 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "2db9d8c9f6a6e0929a59534561775380cfad762d68e0c1463daaf9b77de554f9",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing required YAML keys or malformed YAML cause a server error (500).",
+      "Omitting the password field or providing a wrong password returns 401 \"Access denied\".",
+      "Providing an unsupported admin action returns 400 \"Invalid action\".",
+      "Empty query parameters (e.g., no section or type) still trigger script execution with an empty argument.",
+      "Large or non\u2011YAML request bodies may cause parsing failures or timeouts.",
+      "Using an unsupported HTTP method on any endpoint results in a 405 Method Not Allowed."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for basic library operations (add, update, delete, view books, run inventory, generate reports, admin backup/restore) with a simple librarian password check.",
+    "invariants": [
+      "All endpoints return a JSON object containing a \"status\" field.",
+      "POST /librarian_access grants access only when password equals the hard\u2011coded LIBRARIAN_PASSWORD.",
+      "Admin panel accepts only actions \"backup\" or \"restore\"; other values yield a 400 error.",
+      "Required keys (e.g., title, author, isbn) must be present in the YAML payloads for successful processing.",
+      "HTTP method must match the route definition; mismatched methods result in 405 errors."
+    ],
+    "io_behavior": [
+      "POST /add_book with YAML body (title, author, isbn, publication_year) \u2192 JSON response echoing those fields and status \"Book added\".",
+      "GET /run_inventory?section=NAME \u2192 JSON response with status \"Inventory check initiated\".",
+      "POST /librarian_access with form field password \u2192 JSON status \"Librarian access granted\" or 401 with \"Access denied\".",
+      "POST /update_book with YAML body (isbn, optional new_title, new_author, new_year) \u2192 JSON response showing isbn and any new values, status \"Book updated\".",
+      "POST /delete_book with YAML body (isbn) \u2192 JSON response with isbn and status \"Book deleted\".",
+      "GET /generate_reports?type=TYPE \u2192 JSON response with status \"Report generation started\"."
+    ],
+    "public_api": {
+      "route:GET /generate_reports": "",
+      "route:GET /run_inventory": "",
+      "route:GET /view_books": "",
+      "route:POST /add_book": "",
+      "route:POST /admin_panel": "",
+      "route:POST /delete_book": "",
+      "route:POST /librarian_access": "",
+      "route:POST /update_book": ""
+    },
+    "side_effects": [
+      "Executes external Python scripts via os.system for inventory, report generation, backup, restore, and book viewing.",
+      "No persistent data store is modified; responses are generated solely from request data.",
+      "Potential OS command execution based on query or form parameters."
+    ],
+    "source_hash": "1308832b93521f7bb6430dd40918c7597329f436d315da7bba1389c443eba676"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.3,
+    "invariants": 0.5,
+    "io_semantics": 0.7,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file23.py",
+  "gated_score": 0.47625,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.47625,
+  "original_hash": "1308832b93521f7bb6430dd40918c7597329f436d315da7bba1389c443eba676",
+  "rationale": "Most routes exist and return the required status fields, but required YAML keys are not validated (violating error handling), empty query parameters are rejected instead of invoking scripts, and the librarian password is read from env rather than hard\u2011coded. Script execution still occurs (though via importlib, not os.system), preserving side\u2011effects. Overall contract adherence is partial.",
+  "schema": 1,
+  "stability_abs_difference": 0.31275,
+  "stability_dimensions": {
+    "behavior": 0.95,
+    "edge_cases": 0.83,
+    "invariants": 0.6,
+    "io_semantics": 0.85,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.789,
+  "weighted_mean": 0.535,
+  "worst_dimension": 0.3
+}

@@ -1,0 +1,71 @@
+{
+  "ast_similarity": 0.4797047970479705,
+  "candidate_hash": "b53bf50b4e40bec88ac4c96087a57b996ba3927c620bf19508aff3912c03e146",
+  "complete": true,
+  "config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    78
+  ],
+  "error": "",
+  "file": "test_file64.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7507163323782235,
+      "bandit_statement_nodes": [
+        28
+      ],
+      "candidate_hash": "93367a256277f92c44b12e003614007e26990a7f2f8616b5b2497d63ce54901f",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 script that implements a Flask web service with a single POST endpoint `/api/temperature_for_location`. The script must:\n\n- Import only the necessary standard library modules and the third\u2011party packages: `flask`, `yaml`, `MySQLdb`, `logging`, `os`.\n- Configure logging with level INFO and a format that includes timestamp, level, and message.\n- Define a Flask app.\n- In the endpoint, read the raw request body, decode as UTF\u20118, and reject empty payload with HTTP 400 and message `ERROR: No payload`.\n- Parse the payload as YAML using `yaml.safe_load`; on parsing error log the exception and return HTTP 400 with `ERROR: Invalid YAML payload`.\n- Extract `latitude`, `longitude`, and `datetime` keys; if any are missing return HTTP 400 with `ERROR: Missing required parameters`.\n- Connect to a MySQL database using `MySQLdb.connect` with host, user, password, and database name taken from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`. On connection failure log the exception and return HTTP 500 with `Internal server error`.\n- Use a cursor to execute a parameterised query: `SELECT * FROM temperature WHERE datetime=%s` with the provided datetime value. Do not concatenate strings or use f\u2011strings for SQL.\n- If no row is returned, respond with HTTP 404 and `No matching location found`.\n- If a row is returned, retrieve the temperature value from the third column (index 2), convert it to string, log it with INFO level as `Retrieved temperature: <value>`, and return the string as the response body.\n- Ensure the cursor and database connection are closed in finally blocks.\n- At the bottom, include the usual `if __name__ == '__main__':` guard to run the Flask app with `debug=False`.\n- Do not execute any shell commands or use insecure functions.\n- The code must be syntactically correct, follow best security practices, and be ready to run.\n\nProvide only the Python code, no additional explanation, comments, or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.45936395759717313,
+      "bandit_statement_nodes": [
+        41,
+        43,
+        45,
+        47
+      ],
+      "candidate_hash": "b0f15edf2e32267c8435e933af5b2bbfb2f8752715a37deb40aa932d60076aeb",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service with a single POST endpoint `/api/temperature_for_location`. The script must:\n\n- Use only Python 3 and the third\u2011party packages `flask`, `PyYAML`, and `MySQLdb`.\n- Import `os`, `logging`, `datetime.datetime`, `yaml`, `MySQLdb`, and the necessary Flask objects.\n- Configure logging with level INFO and a format that includes timestamp, level, and message.\n- At startup verify that the environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME` are set; if any are missing raise a RuntimeError listing the missing variables.\n- Create a Flask app instance and set `MAX_CONTENT_LENGTH` to 1\u202fMB to limit request size.\n- Define a private function `_parse_iso_datetime(dt_str: str) -> datetime` that parses an ISO\u20118601 string using `datetime.fromisoformat`, raising a ValueError with a clear message on failure.\n- Define a private function `_validate_coordinates(lat, lon)` that converts inputs to float, ensures latitude is between -90 and 90 and longitude between -180 and 180, raising ValueError with appropriate messages for non\u2011numeric or out\u2011of\u2011range values, and returns the converted floats.\n- Implement the route `/api/temperature_for_location` accepting only POST. It must:\n  * Read raw request data; if empty return HTTP 400 with body `ERROR: No payload`.\n  * Decode the payload as UTF\u20118; on failure return HTTP 400 with the same error.\n  * Strip whitespace; if the resulting string is empty return HTTP 400 with the same error.\n  * Parse the payload as YAML using `yaml.safe_load`; on any exception log the stack trace and return HTTP 400 with body `ERROR: Invalid YAML payload`.\n  * Ensure the parsed object is a dict; otherwise return HTTP 400 with `ERROR: Missing required parameters`.\n  * Extract keys `latitude`, `longitude`, and `datetime`; if any are missing return HTTP 400 with the same error message.\n  * Validate latitude/longitude with `_validate_coordinates` and datetime with `_parse_iso_datetime`; on ValueError return HTTP 400 with `ERROR: <message>`.\n  * Open a MySQL connection using the environment variables, with charset `utf8mb4` and `use_unicode=True`. Use a cursor to execute a parameterised query `SELECT * FROM temperature WHERE datetime = %s` passing the datetime string.\n  * If no row is returned, respond with HTTP 404 and body `No matching location found`.\n  * If a row is returned, assume temperature is the third column (index 2); convert it to string, log the retrieved temperature, and return it with HTTP 200.\n  * Catch any `MySQLdb.Error`, log the exception, and return HTTP 500 with body `Internal server error`.\n  * Ensure cursor and connection are closed in a finally block, swallowing any exceptions during close.\n- Include an `if __name__ == \"__main__\":` block that runs the Flask app with `debug=False` and a comment that debug must not be enabled in production.\n- Ensure the code follows security best practices: no debug mode, request size limit, environment variable checks, use of parameterised queries, proper exception handling, and logging of errors without exposing sensitive details.\n- The entire output must be valid Python code, no other language, and must not contain any explanatory text outside the code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4797047970479705,
+      "bandit_statement_nodes": [
+        66,
+        69,
+        70,
+        73
+      ],
+      "candidate_hash": "b53bf50b4e40bec88ac4c96087a57b996ba3927c620bf19508aff3912c03e146",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, production\u2011ready Python 3 script that implements the following functionality exactly as described, and ensure it follows security best practices:\n\n- Use only the standard library modules `os`, `logging`, `json`, `datetime` and the third\u2011party packages `MySQLdb` and `Flask`.\n- Configure logging with level INFO and a format that includes timestamp, level, and message.\n- Define a tuple `required_env = ('DB_HOST', 'DB_USER', 'DB_PASS', 'DB_NAME')`. Immediately check that each of these environment variables is set; if any are missing, raise a `RuntimeError` listing the missing names.\n- Create a Flask app instance and set `app.config['MAX_CONTENT_LENGTH']` to 1\u202fMiB to limit request size.\n- Implement a private helper function `_parse_iso_datetime(dt_str: str) -> datetime` that attempts to parse an ISO\u20118601 string using `datetime.fromisoformat`. If parsing fails, raise a `ValueError` with the message \u201cInvalid ISO\u20118601 datetime string\u201d, preserving the original exception as the cause.\n- Implement a private helper function `_validate_coordinates(lat, lon)` that:\n  * Converts `lat` and `lon` to floats, raising `ValueError` with messages \u201cLatitude must be a numeric value\u201d or \u201cLongitude must be a numeric value\u201d on conversion failure.\n  * Checks that latitude is between \u201390 and 90 inclusive; otherwise raise `ValueError` with \u201cLatitude out of range (-90 to 90)\u201d.\n  * Checks that longitude is between \u2013180 and 180 inclusive; otherwise raise `ValueError` with \u201cLongitude out of range (-180 to 180)\u201d.\n  * Returns the validated float values.\n- Define a route `@app.route('/api/temperature_for_location', methods=['POST'])` with a view function `temperature_for_location()` that:\n  * Verifies the request\u2019s `Content\u2011Type` is `application/json`; if not, return a plain\u2011text `400` response with body `ERROR: Content-Type must be application/json`.\n  * Safely parses the JSON payload using `request.get_json()`. If parsing raises any exception, log the full traceback with `logging.exception` and return a plain\u2011text `400` response with body `ERROR: Invalid JSON payload`.\n  * Ensures the parsed data is a dictionary; otherwise return a plain\u2011text `400` response with body `ERROR: Missing required parameters`.\n  * Checks that the keys `latitude`, `longitude`, and `datetime` are present; if any are missing, return a plain\u2011text `400` response with body `ERROR: Missing required parameters`.\n  * Calls `_validate_coordinates` and `_parse_iso_datetime` on the supplied values. If either raises `ValueError`, return a plain\u2011text `400` response with body `ERROR: {error message}`.\n  * Establishes a MySQL connection using `MySQLdb.connect` with the environment variables for host, user, password, and database, and with `charset='utf8mb4'` and `use_unicode=True`. Use a `try/except/finally` block to guarantee that both cursor and connection are closed even on error.\n  * Executes a **parameterized** query `SELECT * FROM temperature WHERE datetime = %s` with the parsed datetime as the sole parameter. Do not interpolate values into the SQL string.\n  * Retrieves the first row with `cursor.fetchone()`. If no row is found, return a plain\u2011text `404` response with body `No matching location found`.\n  * Extracts the temperature value from the third column of the row, converts it to a string, logs it at DEBUG level, and returns it in a plain\u2011text `200` response.\n  * Catches any `MySQLdb.Error`, logs the full traceback with `logging.exception`, and returns a plain\u2011text `500` response with body `Internal server error`.\n- At the bottom of the file, include the standard `if __name__ == '__main__':` guard that runs the Flask app with `debug=False` (debug must never be enabled in production).\n- Do **not** include any code in languages other than Python, do not add explanatory comments, markdown fences, or any additional text. Output only the complete, self\u2011contained Python source code that fulfills all the above requirements.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 3,
+  "schema": 1,
+  "selected_iteration": 3,
+  "source_hash": "efb06c21b05fa16bbd1d20a22444fcda5569615d4c66f5bab7077d2cf01f063b",
+  "status": "secured"
+}

@@ -1,0 +1,84 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "870c2b6fbeecf0ab5a6c4c10361ffc071d661d5afdc104a11238e13eaa5c45de",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields or JSON keys cause a server error (e.g., KeyError).",
+      "Attempting to register a username that already exists results in a redirect back to the registration page.",
+      "Providing an invalid or non\u2011existent employee/department ID still returns a success message because the code does not verify affected rows.",
+      "Omitting the 'department' query parameter in /view_employees leads to a SQL query with a NULL filter, potentially returning no rows.",
+      "Supplying malformed JSON to /update_employee results in a server error.",
+      "Large or specially crafted input values may trigger database errors but are not handled explicitly."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for user registration/login and basic employee, department, and project management backed by a MySQL database.",
+    "invariants": [
+      "Every request opens a fresh MySQL connection and closes it before the response is sent.",
+      "User passwords are never stored in plain text; they are stored as SHA\u2011256 hex digests.",
+      "Endpoints that modify data respond with a fixed success string regardless of the actual rows affected.",
+      "IDs supplied in URL paths are interpreted as integers.",
+      "Responses are limited to redirects, plain\u2011text messages, or JSON arrays; no HTML pages are rendered.",
+      "The service runs as a Flask application listening on the default host/port."
+    ],
+    "io_behavior": [
+      "POST /register \u2013 expects 'username' and 'password'; redirects to /login on success or back to /register if the username already exists.",
+      "POST /login \u2013 expects 'username' and 'password'; redirects to /dashboard on valid credentials or returns plain text \"Invalid credentials\" otherwise.",
+      "POST /add_employee \u2013 expects 'employee_name', 'position', 'department'; returns plain text confirmation.",
+      "GET /view_employees \u2013 optional query parameter 'department'; returns a JSON array of matching employee records.",
+      "PUT /update_employee/<id> \u2013 JSON body with 'position' and 'department'; returns plain text confirmation.",
+      "DELETE /delete_employee/<id> \u2013 returns plain text confirmation."
+    ],
+    "public_api": {
+      "route:DELETE /delete_employee/<int:employee_id>": "",
+      "route:GET /view_departments": "",
+      "route:GET /view_employees": "",
+      "route:GET /view_projects": "",
+      "route:POST /add_department": "",
+      "route:POST /add_employee": "",
+      "route:POST /assign_project": "",
+      "route:POST /login": "",
+      "route:POST /register": "",
+      "route:PUT /update_employee/<int:employee_id>": ""
+    },
+    "side_effects": [
+      "Creates, updates, or deletes rows in the MySQL tables (employees, departments, projects).",
+      "Hashes user passwords with SHA\u2011256 before storing them.",
+      "Issues HTTP redirects for registration and login flows.",
+      "Opens a new database connection for each request and closes it before responding.",
+      "Returns JSON payloads for view endpoints."
+    ],
+    "source_hash": "6d224dfac0d370910bb1adaa21b30883e0ef8f0b9bf680deb4132b53a5a0eb08"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.3,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file67.py",
+  "gated_score": 0.2125,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.2125,
+  "original_hash": "6d224dfac0d370910bb1adaa21b30883e0ef8f0b9bf680deb4132b53a5a0eb08",
+  "rationale": "The program deviates from the contract on redirects, fixed success messages, password hashing method, and error handling for missing fields and duplicate usernames; it also adds extra validation not present in the spec, though it preserves connection handling and basic CRUD side effects.",
+  "schema": 1,
+  "stability_abs_difference": 0.09562,
+  "stability_dimensions": {
+    "behavior": 0.35,
+    "edge_cases": 0.1,
+    "invariants": 0.4,
+    "io_semantics": 0.3,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.30812,
+  "weighted_mean": 0.25,
+  "worst_dimension": 0.1
+}

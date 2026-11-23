@@ -1,0 +1,68 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "1afbf8575bcbeb3ec47c89726e1d48f0846725a0344c34f786bb919132403fb3",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed YAML in /upload_readings may cause a server error (500).",
+      "Absent or empty \"type\" query parameter results in the external tool being invoked with an empty argument.",
+      "Incorrect or missing token in /station_login yields a 401 response.",
+      "Extremely large request bodies could exhaust server resources.",
+      "If the external report tool is unavailable, the /generate_report endpoint still returns success JSON but the command fails silently."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a web API for weather stations to authenticate, upload sensor readings, and trigger generation of weather reports.",
+    "invariants": [
+      "The authentication token is fixed to the constant value \"weather_station_token_2023\".",
+      "Responses are always JSON objects with a \"status\" field.",
+      "Only the three defined routes are accessible; other paths return 404.",
+      "HTTP method restrictions are enforced (POST for upload and login, GET for report)."
+    ],
+    "io_behavior": [
+      "POST /upload_readings with a YAML body containing station_id, temperature, and humidity returns JSON {\"status\":\"Readings uploaded\",\"station\":<station_id>}.",
+      "GET /generate_report?type=<report_type> returns JSON {\"status\":\"Report generation started\"}.",
+      "POST /station_login with form field token returns JSON {\"status\":\"Station authenticated\"} on success or {\"status\":\"Authentication failed\"} with HTTP 401 on failure."
+    ],
+    "public_api": {
+      "route:GET /generate_report": "",
+      "route:POST /station_login": "",
+      "route:POST /upload_readings": ""
+    },
+    "side_effects": [
+      "Executes an external command \"./weather_report_tool <report_type>\" when /generate_report is called.",
+      "Flask server logs each request (standard server logging)."
+    ],
+    "source_hash": "84b5fd0ba12110f538cec75a93c53872e6e27f6ee431bb39b626d0fbb5af98d0"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.5,
+    "side_effects": 0.2
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file21.py",
+  "gated_score": 0.31375,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.31375,
+  "original_hash": "84b5fd0ba12110f538cec75a93c53872e6e27f6ee431bb39b626d0fbb5af98d0",
+  "rationale": "Routes and entrypoint exist, but error responses lack required \"status\" field, token can be overridden via env, external command is never run, and many listed edge cases (malformed YAML, missing type, tool unavailability, large bodies) are handled differently or not at all.",
+  "schema": 1,
+  "stability_abs_difference": 0.18075,
+  "stability_dimensions": {
+    "behavior": 0.52,
+    "edge_cases": 0.4,
+    "invariants": 0.5,
+    "io_semantics": 0.67,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.4945,
+  "weighted_mean": 0.385,
+  "worst_dimension": 0.1
+}

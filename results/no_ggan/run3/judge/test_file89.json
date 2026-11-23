@@ -1,0 +1,75 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "e2315bc0baea71a0f33abacf6bd582909a32262c7d59341b1cbd6a52497ceb33",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields raise a server error (KeyError) because the code accesses request.form directly",
+      "Registering a username that already exists triggers a redirect back to the registration page",
+      "An empty search term returns all rows from the User table",
+      "Very long or specially crafted input can trigger SQL injection, altering query results or database state",
+      "Providing an empty password is accepted and stored as an empty string"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a basic user\u2011management HTTP API that can register, authenticate, update, delete, and search user records in a MySQL database.",
+    "invariants": [
+      "All routes use the same database host, user, password, and database name",
+      "Every request creates a fresh DB cursor and closes both cursor and connection before returning",
+      "Only the HTTP methods defined for each route are accepted (POST for register, login, update_profile, delete_user; GET for search_users)",
+      "Usernames are treated as unique identifiers in the logic",
+      "Passwords are stored and compared as plain text"
+    ],
+    "io_behavior": [
+      "POST /register with 'username' and 'password' redirects to ./register if the username exists, otherwise redirects to ./login",
+      "POST /login with 'username' and 'password' returns the plain text \"Login successful\" or \"Invalid credentials\"",
+      "POST /update_profile with 'username' and 'email' returns the plain text \"Profile updated successfully\"",
+      "POST /delete_user with 'username' returns the plain text \"User deleted successfully\"",
+      "GET /search_users?term= returns a string representation of the list of matching user rows"
+    ],
+    "public_api": {
+      "route:GET /search_users": "",
+      "route:POST /delete_user": "",
+      "route:POST /login": "",
+      "route:POST /register": "",
+      "route:POST /update_profile": ""
+    },
+    "side_effects": [
+      "Each request opens a new MySQL connection using fixed credentials and closes it before responding",
+      "INSERT, UPDATE, DELETE statements modify the User table",
+      "SELECT statements read from the User table",
+      "Redirect responses cause the client to issue a follow\u2011up request to another endpoint"
+    ],
+    "source_hash": "fdcfb580cb033ecb594cc18d05c20a28b63c8fa9fcd5f471a8049ce5015b5728"
+  },
+  "dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.4,
+    "invariants": 0.8,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file89.py",
+  "gated_score": 0.66062,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.66062,
+  "original_hash": "fdcfb580cb033ecb594cc18d05c20a28b63c8fa9fcd5f471a8049ce5015b5728",
+  "rationale": "Core routes and responses match the contract, connections and cleanup are correct, but missing-field handling, password storage, and SQL\u2011injection behavior diverge, reducing edge\u2011case and invariant scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.07812,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.8,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.5825,
+  "weighted_mean": 0.7475,
+  "worst_dimension": 0.4
+}

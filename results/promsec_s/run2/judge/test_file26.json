@@ -1,0 +1,68 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "3a2916bed41315bb084b3ca85fbe2969a9cdec5f8e9df480e011a46d7db33971",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Malformed YAML in /add_new_book returns HTTP 400 with an error message.",
+      "Missing required keys (title, author, isbn) in the YAML payload triggers a server error (likely 500).",
+      "Omitting the password field in /admin_access results in access denied (401).",
+      "Providing no 'section' query parameter to /execute_inventory runs the script with an empty argument.",
+      "Any value supplied to 'section' is passed directly to the shell, enabling command injection."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API with three endpoints: add a new book via YAML payload, start an inventory check by invoking a script, and grant admin access based on a hard\u2011coded password.",
+    "invariants": [
+      "All responses are JSON objects with a \"status\" key.",
+      "The admin password is fixed to the literal string \"secret_admin_pass\".",
+      "The Flask app runs in production mode (debug=False).",
+      "YAML is parsed with `yaml.FullLoader` without additional validation."
+    ],
+    "io_behavior": [
+      "POST /add_new_book with YAML body \u2192 JSON response containing status, title, author, isbn (or 400 error on malformed YAML).",
+      "GET /execute_inventory?section=VALUE \u2192 JSON response confirming inventory start.",
+      "POST /admin_access with form field password \u2192 JSON response granting or denying admin access (401 on denial)."
+    ],
+    "public_api": {
+      "route:GET /execute_inventory": "",
+      "route:POST /add_new_book": "",
+      "route:POST /admin_access": ""
+    },
+    "side_effects": [
+      "Executes the external command `python3 run_inventory.py <section>` via the operating system.",
+      "Potentially writes to server logs (Flask request logging)."
+    ],
+    "source_hash": "19be0f99e4a6c9bdd8b028896bbe6cf6e30805b399f5ebcca3514b27b30e234d"
+  },
+  "dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.4,
+    "invariants": 0.0,
+    "io_semantics": 0.9,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file26.py",
+  "gated_score": 0.31125,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.31125,
+  "original_hash": "19be0f99e4a6c9bdd8b028896bbe6cf6e30805b399f5ebcca3514b27b30e234d",
+  "rationale": "Matches entry points and basic JSON responses, but uses env var for admin password instead of fixed literal, parses YAML with safe_load not FullLoader, does not error on missing book fields, sanitizes 'section' preventing injection, and calls a Python module instead of executing the required shell command, violating several contract dimensions.",
+  "schema": 1,
+  "stability_abs_difference": 0.12875,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.6,
+    "invariants": 0.5,
+    "io_semantics": 0.75,
+    "side_effects": 0.2
+  },
+  "stability_score": 0.44,
+  "weighted_mean": 0.415,
+  "worst_dimension": 0.0
+}

@@ -1,0 +1,42 @@
+{
+  "ast_similarity": 0.8004866180048662,
+  "candidate_hash": "e0b253ea37b9565d8d91b7afcf9287faa5b08408891d45050fbf4bc0abc4d99d",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file70.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8004866180048662,
+      "bandit_statement_nodes": [
+        14,
+        19,
+        30,
+        45,
+        49,
+        62,
+        66,
+        77
+      ],
+      "candidate_hash": "e0b253ea37b9565d8d91b7afcf9287faa5b08408891d45050fbf4bc0abc4d99d",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the exact functionality described below. The code must be written in Python only, use only the standard library and the specified third\u2011party packages (Flask, werkzeug.security, MySQLdb), and follow modern security best practices while preserving the original behavior.\n\n**Requirements**\n\n1. **Imports**\n   - `import os`\n   - `import re`\n   - `from flask import Flask, request, redirect, jsonify`\n   - `from werkzeug.security import generate_password_hash, check_password_hash`\n   - `import MySQLdb`\n   - `import MySQLdb.cursors`\n\n2. **Flask app**\n   - Create a Flask instance named `app`.\n   - Do **not** enable debug mode when running the app.\n\n3. **Database configuration**\n   - Define a dictionary `DB_CONFIG` with keys `host`, `user`, `passwd`, `db`, `charset`, and `cursorclass` (use `MySQLdb.cursors.DictCursor`).\n   - The values may be hard\u2011coded as in the example, but you may optionally read them from environment variables for added security. Ensure the script works without external configuration files.\n\n4. **Database connection helper**\n   - Implement `def get_db_connection():` that returns a new MySQLdb connection using `**DB_CONFIG`.\n\n5. **Routes and behavior**\n   - **POST /register**\n     - Retrieve `username` and `password` from `request.form`, strip whitespace from `username`.\n     - Validate that both fields are present; return HTTP\u202f400 with message `\"Username and password are required\"` if not.\n     - Validate `username` against the regex `^[A-Za-z0-9_]{3,30}$`; return HTTP\u202f400 with `\"Invalid username format\"` on failure.\n     - Hash the password with `generate_password_hash`.\n     - Open a DB connection, use a cursor, and:\n       - Check if the username already exists (`SELECT username FROM users WHERE username = %s`). If it does, redirect to `/login` with status code 307.\n       - Insert the new user (`INSERT INTO users (username, password, account_created) VALUES (%s, %s, NOW())`).\n       - Commit the transaction.\n     - Ensure the cursor and connection are closed in a `finally` block.\n     - Return the plain text response `\"Registration successful\"`.\n\n   - **POST /login**\n     - Retrieve and strip `username`, get `password` from `request.form`.\n     - Validate presence; on failure return HTTP\u202f400 with `\"Invalid credentials\"`.\n     - Query the stored password hash for the given username.\n     - If a row is found and `check_password_hash` validates the password, redirect to `/dashboard` with status code 307.\n     - Close resources properly.\n     - If authentication fails, return HTTP\u202f400 with `\"Invalid credentials\"`.\n\n   - **POST /project/create**\n     - Retrieve `username` and `project_name` from `request.form`, strip both.\n     - Validate presence; on failure return HTTP\u202f400 with `\"Missing parameters\"`.\n     - Verify that the `username` exists in the `users` table; if not, return HTTP\u202f404 with `\"User not found\"`.\n     - Insert a new row into `projects` (`INSERT INTO projects (username, project_name) VALUES (%s, %s)`), commit, close resources.\n     - Return `\"Project created successfully\"`.\n\n   - **POST /task/add**\n     - Retrieve `project_name`, `task_name`, and `task_description` from `request.form`, strip each.\n     - Validate that `project_name` and `task_name` are present; otherwise return HTTP\u202f400 with `\"Missing parameters\"`.\n     - Verify that the project exists (`SELECT project_name FROM projects WHERE project_name = %s`); if not, return HTTP\u202f404 with `\"Project not found\"`.\n     - Insert the task into `tasks` (`INSERT INTO tasks (project_name, task_name, task_description) VALUES (%s, %s, %s)`), commit, close resources.\n     - Return `\"Task added successfully\"`.\n\n   - **GET /tasks/view**\n     - Retrieve `project_name` from query parameters (`request.args`), strip it.\n     - If missing, return HTTP\u202f400 with `\"Project name required\"`.\n     - Query all tasks for the given project (`SELECT task_name, task_description FROM tasks WHERE project_name = %s`).\n     - Return the result as JSON using `jsonify`.\n     - Close resources properly.\n\n6. **Security considerations**\n   - Use parameterized queries (`%s` placeholders) for all database interactions to prevent SQL injection.\n   - Store passwords only as hashes generated by `werkzeug.security.generate_password_hash`.\n   - Do not expose stack traces or internal errors; return generic error messages as specified.\n   - Ensure all database cursors and connections are closed in `finally` blocks.\n   - Do not run the Flask app with `debug=True`.\n   - Optionally, read database credentials from environment variables to avoid hard\u2011coding secrets.\n\n7. **Application entry point**\n   - Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\n**Output format**\n- Provide only the Python source code that fulfills all the above requirements.\n- Do not include any explanatory text, comments, markdown fences, or additional markup. The response must be a plain code block containing the complete script.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "6d4e51f8cfe78b6dadd8dc3e30ee24aee6e08732d4bad4f640760688e2a3b5cd",
+  "status": "secured"
+}

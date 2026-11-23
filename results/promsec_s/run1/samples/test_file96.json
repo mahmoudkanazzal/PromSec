@@ -1,0 +1,39 @@
+{
+  "ast_similarity": 0.7741407528641571,
+  "candidate_hash": "bed4907c184435f7e53cf94be72079f1c550316ce451bde7a4eac87aeb1997df",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file96.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7741407528641571,
+      "bandit_statement_nodes": [
+        11,
+        20,
+        31,
+        39,
+        48
+      ],
+      "candidate_hash": "bed4907c184435f7e53cf94be72079f1c550316ce451bde7a4eac87aeb1997df",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that implements a Flask web service with the exact functionality described below. The code must be written in Python only, contain no explanatory text, comments, or markup, and must follow security best practices (use parameterized SQL queries, validate required fields, handle database errors, and avoid any potential injection or unsafe behavior). The script should:\n\n1. Import `Flask`, `request`, `jsonify` from `flask` and `sqlite3`.\n2. Create a Flask app instance named `app`.\n3. Define a function `get_db_connection()` that:\n   - Connects to an SQLite database file named `events.db`.\n   - Sets `row_factory` to `sqlite3.Row`.\n   - Returns the connection object.\n4. Implement the following routes with the specified HTTP methods, request handling, validation, database interactions, and JSON responses:\n\n   - **POST `/add_event`**\n     - Parse JSON payload (use `request.get_json(silent=True) or {}`).\n     - Extract `name`, `date`, and `location`.\n     - If any of these fields are missing, return `{\"error\": \"Missing required fields\"}` with status 400.\n     - Insert a new row into the `events` table using a parameterized query: `INSERT INTO events (name, date, location) VALUES (?, ?, ?)`.\n     - Commit the transaction.\n     - On any `sqlite3.Error`, return `{\"error\": <error message>}` with status 500.\n     - On success, return `{\"message\": \"Event added successfully\"}` with status 201.\n\n   - **GET `/search_events`**\n     - Retrieve query parameter `keyword` (default empty string).\n     - Construct a LIKE pattern `%<keyword>%`.\n     - Select rows from `events` where `name` or `location` matches the pattern using a parameterized query.\n     - Fetch all rows, convert each `sqlite3.Row` to a dictionary, and return the list as JSON with status 200.\n     - On any `sqlite3.Error`, return `{\"error\": <error message>}` with status 500.\n\n   - **PUT `/update_event/<int:event_id>`**\n     - Parse JSON payload (use `request.get_json(silent=True) or {}`).\n     - Extract `name`, `date`, and `location` as `new_name`, `new_date`, `new_location`.\n     - If any of these fields are missing, return `{\"error\": \"Missing required fields\"}` with status 400.\n     - Update the row with the given `event_id` using a parameterized query: `UPDATE events SET name = ?, date = ?, location = ? WHERE id = ?`.\n     - Commit the transaction.\n     - On any `sqlite3.Error`, return `{\"error\": <error message>}` with status 500.\n     - On success, return `{\"message\": \"Event updated successfully\"}` with status 200.\n\n   - **DELETE `/delete_event/<int:event_id>`**\n     - Delete the row with the given `event_id` using a parameterized query: `DELETE FROM events WHERE id = ?`.\n     - Commit the transaction.\n     - On any `sqlite3.Error`, return `{\"error\": <error message>}` with status 500.\n     - On success, return `{\"message\": \"Event deleted successfully\"}` with status 200.\n\n   - **GET `/get_events_by_date`**\n     - Retrieve query parameter `date`.\n     - If `date` is missing or empty, return `{\"error\": \"Date parameter is required\"}` with status 400.\n     - Select rows from `events` where `date` equals the provided value using a parameterized query.\n     - Fetch all rows, convert each to a dictionary, and return the list as JSON with status 200.\n     - On any `sqlite3.Error`, return `{\"error\": <error message>}` with status 500.\n\n5. Include a main guard that runs the Flask app with `debug=False`.\n\nAll database interactions must use context managers (`with get_db_connection() as conn:`) to ensure proper resource cleanup. Use only parameter placeholders (`?`) for SQLite queries. Ensure the script runs without requiring any external files beyond the SQLite database `events.db`. Do not include any additional text, comments, or code outside the described functionality.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "4189069f0188b9e33c40ddff4df303aaabf6130acd7b039dbf0f45a279f5a4c5",
+  "status": "secured"
+}

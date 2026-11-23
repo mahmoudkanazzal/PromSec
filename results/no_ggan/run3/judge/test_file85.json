@@ -1,0 +1,66 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "73db2a6ade03462d298c57d1ec0f54a9ab0af0eb632f2ef3a645af59f002983e",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields or missing session username raises a KeyError before the database operation.",
+      "Database connection or execution errors cause the function to return \"failure\".",
+      "SQL injection is possible because values are interpolated directly into the query string.",
+      "If the request method is not POST, Flask returns a 405 Method Not Allowed.",
+      "Empty or non\u2011numeric `stock_quantity` is not validated and may cause database errors.",
+      "Hard\u2011coded DB credentials may prevent connection in environments where they differ."
+    ],
+    "entrypoints": [],
+    "intent": "Record a buy order submitted via HTTP POST and store it in the MySQL `my_stocks` table.",
+    "invariants": [
+      "The route only handles POST requests.",
+      "Both `stock_name` and `stock_quantity` must be present in the form data.",
+      "A `username` must exist in the session for the query to be built.",
+      "The response is always either the string \"successfull\" or \"failure\"."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to the /buy_order endpoint with form fields `stock_name` and `stock_quantity`.",
+      "Reads the current user's username from the Flask session.",
+      "Executes an INSERT statement into the `my_stocks` table.",
+      "Returns the plain\u2011text response \"successfull\" on commit, otherwise returns \"failure\"."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection using hard\u2011coded credentials.",
+      "Inserts a new row into the `my_stocks` table.",
+      "Commits the transaction, persisting the new record."
+    ],
+    "source_hash": "7e999ded708c14fff95eb91a5e678da1e20c0b73b18025c94bab835c02c3767e"
+  },
+  "dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.2,
+    "invariants": 0.2,
+    "io_semantics": 0.4,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file85.py",
+  "gated_score": 0.3875,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.3875,
+  "original_hash": "7e999ded708c14fff95eb91a5e678da1e20c0b73b18025c94bab835c02c3767e",
+  "rationale": "Core intent (recording a buy order) is kept, but response format, error handling, input validation, and SQL construction differ from the contract; many edge\u2011case expectations (KeyError, lack of validation, SQL injection risk, hard\u2011coded credentials) are not met.",
+  "schema": 1,
+  "stability_abs_difference": 0.04875,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.4,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.43625,
+  "weighted_mean": 0.45,
+  "worst_dimension": 0.2
+}

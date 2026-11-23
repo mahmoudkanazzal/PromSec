@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "cc00146d94a962beaf97be292832331f86207d40c72809ef1798093cb5b413af",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML in /data/upload triggers a 400 error with \"Invalid YAML format\".",
+      "Missing required fields (e.g., data_id, data_value, task, parameter) result in 400 errors.",
+      "Providing an incorrect admin password returns 401 Access denied.",
+      "Calling /admin/change_password with an empty new_password will set ADMIN_PASSWORD to an empty string.",
+      "Running /task/execute or /data/export with malicious arguments could execute arbitrary shell commands.",
+      "Requests without required query/form parameters (e.g., data_id, task_id) return 400 errors."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple HTTP API for uploading, retrieving, deleting data, managing admin settings, and triggering tasks, with JSON responses indicating success or error.",
+    "invariants": [
+      "All admin\u2011protected routes require the current ADMIN_PASSWORD in the form field \"password\".",
+      "Each endpoint validates required parameters and returns HTTP 400 on missing or malformed input.",
+      "Responses are always JSON objects with a \"status\" field and optional additional data.",
+      "The ADMIN_PASSWORD is initially \"admin1234\" and can be changed only via /admin/change_password with the correct old password."
+    ],
+    "io_behavior": [
+      "POST /data/upload accepts raw YAML, returns JSON with data_id and data_value or error on bad format/missing fields.",
+      "GET /task/execute runs a shell script with task and parameter query values, returns JSON status.",
+      "POST /admin/login validates a password form field, returns access granted or denied.",
+      "POST /admin/configure updates configuration after password check, returns updated config or error.",
+      "GET /data/retrieve returns a sample data_value for a given data_id query parameter.",
+      "POST /data/delete deletes a record identified by form data data_id, returns confirmation."
+    ],
+    "public_api": {
+      "route:GET /data/export": "",
+      "route:GET /data/retrieve": "",
+      "route:GET /task/execute": "",
+      "route:GET /task/logs": "",
+      "route:GET /task/status": "",
+      "route:GET /user/profile": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/configure": "",
+      "route:POST /admin/login": "",
+      "route:POST /admin/settings": "",
+      "route:POST /data/delete": "",
+      "route:POST /data/upload": ""
+    },
+    "side_effects": [
+      "execute_task.sh is invoked via os.system with supplied task and parameter.",
+      "export_data.py is invoked via os.system with the requested format.",
+      "Changing ADMIN_PASSWORD modifies an in\u2011memory global variable for the running process."
+    ],
+    "source_hash": "73fa8e5aa324bbefbd09ed0fda2f8e6d2de9d64d7f1dfabaca1771a27fae81db"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.7,
+    "invariants": 0.5,
+    "io_semantics": 0.6,
+    "side_effects": 0.33
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file5.py",
+  "gated_score": 0.44962,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.44962,
+  "original_hash": "73fa8e5aa324bbefbd09ed0fda2f8e6d2de9d64d7f1dfabaca1771a27fae81db",
+  "rationale": "Program implements most endpoints and JSON responses, but omits required shell execution, fails some parameter checks, and admin change password does not use the required password field, reducing overall preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.15563,
+  "stability_dimensions": {
+    "behavior": 0.69,
+    "edge_cases": 0.7,
+    "invariants": 0.9,
+    "io_semantics": 0.83,
+    "side_effects": 0.33
+  },
+  "stability_score": 0.60525,
+  "weighted_mean": 0.4895,
+  "worst_dimension": 0.33
+}

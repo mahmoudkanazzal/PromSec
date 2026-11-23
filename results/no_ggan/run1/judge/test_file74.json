@@ -1,0 +1,65 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "8dc799e6b861fb0f68df614298664e70c3c66e9240db4b24f521d16460d2774f",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields cause a request error (KeyError/BadRequest).",
+      "SQL injection is possible because the SELECT query concatenates the username directly.",
+      "Database connection failures trigger an exception and result in a rollback.",
+      "If the INSERT fails (e.g., constraint violation), the user receives \"Registration Failed\".",
+      "The confirm_password field is ignored, so mismatched passwords are not detected."
+    ],
+    "entrypoints": [],
+    "intent": "Register a new user via an HTTP POST request to /register, storing a bcrypt\u2011hashed password in a MySQL database if the username does not already exist.",
+    "invariants": [
+      "Each stored username is intended to be unique.",
+      "Passwords are stored only as bcrypt hashes, never in plain text.",
+      "Database connection is closed after each request.",
+      "The response is always a short string message."
+    ],
+    "io_behavior": [
+      "Accepts POST form fields: username, password, confirm_password.",
+      "Returns a plain\u2011text response: success, failure, or \"Username already exists\".",
+      "Reads from the MySQL \"users\" table to check for existing usernames.",
+      "Writes a new row to the \"users\" table on successful registration."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Creates or updates records in the MySQL database.",
+      "Commits or rolls back a transaction depending on success.",
+      "Potentially logs errors via the Flask runtime (implicit)."
+    ],
+    "source_hash": "06e708a7b4ad639efd4a0d86556d5374fa58ed79501c414b2611df3f8bd5c195"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 1.0,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file74.py",
+  "gated_score": 0.455,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.455,
+  "original_hash": "06e708a7b4ad639efd4a0d86556d5374fa58ed79501c414b2611df3f8bd5c195",
+  "rationale": "The program deviates from key contract edge cases (SQL injection is prevented and confirm_password is validated) and thus fails core behavior, though it preserves I/O format, side effects, and invariants.",
+  "schema": 1,
+  "stability_abs_difference": 0.2825,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.4,
+    "invariants": 1.0,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.7375,
+  "weighted_mean": 0.54,
+  "worst_dimension": 0.2
+}

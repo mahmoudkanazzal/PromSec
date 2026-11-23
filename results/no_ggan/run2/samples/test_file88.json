@@ -1,0 +1,40 @@
+{
+  "ast_similarity": 0.6341145833333334,
+  "candidate_hash": "fc1110c33e762836a060af3a9cd19ed3a4b42220652d866387b117cab03c1ce0",
+  "complete": true,
+  "config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file88.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6341145833333334,
+      "bandit_statement_nodes": [
+        8,
+        12,
+        26,
+        38,
+        47,
+        56
+      ],
+      "candidate_hash": "fc1110c33e762836a060af3a9cd19ed3a4b42220652d866387b117cab03c1ce0",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a **secure** Python program (no other language) that implements a Flask web service with the following exact functionality:\n\n- **Imports**: `os`, `Flask`, `request`, `jsonify` from `flask`, and `MySQLdb`.\n- **App initialization**: `app = Flask(__name__)`.\n- **Database connection helper**: Define `get_db_connection()` that returns a `MySQLdb.connect` using environment variables `DB_HOST` (default `127.0.0.1`), `DB_USER` (default `root`), `DB_PASSWORD` (default `password`), and `DB_NAME` (default `community_db`). Use these variables directly in the connection call.\n- **Endpoint `/add_member` (POST)**:\n  - Retrieve `name` and `email` from `request.form`, strip whitespace.\n  - If either is missing or empty, return JSON `{'error': 'Name and email are required'}` with status 400.\n  - Open a DB connection, create a cursor, and **use parameterized queries** only.\n  - Check if a member with the given name exists: `SELECT 1 FROM members WHERE name = %s`.\n  - If not exists, attempt to insert the member with `INSERT INTO members (name, email) VALUES (%s, %s)`.\n    - On success, commit and return JSON `{'message': 'Member added successfully'}` with status 201.\n    - On any `MySQLdb.Error`, rollback and return JSON `{'error': 'Failed to add member'}` with status 500.\n  - If the member already exists, return JSON `{'message': 'Member already exists'}` with status 200.\n  - Ensure the cursor and connection are closed in a `finally` block.\n\n- **Endpoint `/login_member` (POST)**:\n  - Retrieve and strip `name` and `email` from `request.form`.\n  - Validate presence; if missing, return JSON error with status 400.\n  - Query `SELECT 1 FROM members WHERE name = %s AND email = %s` using parameters.\n  - If a row is returned, respond with JSON `{'message': 'Login successful'}` status 200; otherwise, JSON `{'error': 'Invalid credentials'}` status 401.\n  - Close cursor and connection properly.\n\n- **Endpoint `/update_member_profile` (POST)**:\n  - Retrieve and strip `name` and `new_email` from `request.form`.\n  - Validate presence; if missing, return JSON error with status 400.\n  - Execute `UPDATE members SET email = %s WHERE name = %s` with parameters.\n  - Commit on success and return JSON `{'message': 'Profile updated successfully'}` status 200.\n  - On any `MySQLdb.Error`, rollback and return JSON `{'error': 'Failed to update profile'}` status 500.\n  - Ensure resources are closed.\n\n- **Endpoint `/search_members` (GET)**:\n  - Retrieve `term` from `request.args`, strip whitespace.\n  - Build a LIKE pattern `%{term}%`.\n  - Execute `SELECT name FROM members WHERE name LIKE %s` with the pattern as a parameter.\n  - Return JSON `{'members': [list of names]}` status 200.\n  - Close cursor and connection.\n\n- **Endpoint `/remove_member` (POST)**:\n  - Retrieve and strip `name` from `request.form`.\n  - Validate presence; if missing, return JSON error with status 400.\n  - Execute `DELETE FROM members WHERE name = %s` with parameter.\n  - Commit on success and return JSON `{'message': 'Member removed successfully'}` status 200.\n  - On any `MySQLdb.Error`, rollback and return JSON `{'error': 'Failed to remove member'}` status 500.\n  - Ensure proper cleanup.\n\n- **Application entry point**: Include `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\nAdditional security and quality requirements:\n- **Never** use string interpolation or concatenation to build SQL; always use parameter placeholders (`%s`) with a tuple of values.\n- Perform **input sanitization** by stripping whitespace and checking for empty strings before any database operation.\n- Use **try/except/finally** blocks to guarantee that cursors and connections are closed even if an exception occurs.\n- Use **explicit commit/rollback** handling for any write operation.\n- Do **not** include any code in languages other than Python.\n- Do **not** add explanatory comments, markdown, or any non\u2011code text in the output. The output must be a single, complete, runnable Python script that meets the specifications above.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "2f00a8a0eeaa9a8317ae9d6ebfc23b6a24b31f8a7b3914bd4807a398fd0ad8ff",
+  "status": "secured"
+}

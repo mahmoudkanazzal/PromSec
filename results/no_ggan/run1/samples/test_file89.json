@@ -1,0 +1,40 @@
+{
+  "ast_similarity": 0.7029411764705882,
+  "candidate_hash": "603b3f7ce7e53e7ef8999cb48b521c6f2256b2c1fecf993743cb5d6ae9cc90a8",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file89.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7029411764705882,
+      "bandit_statement_nodes": [
+        8,
+        13,
+        23,
+        35,
+        44,
+        53
+      ],
+      "candidate_hash": "603b3f7ce7e53e7ef8999cb48b521c6f2256b2c1fecf993743cb5d6ae9cc90a8",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with the following exact functionality and security requirements:\n\n- Use **Flask** for routing and request handling.\n- Use **MySQLdb** to connect to a MySQL database. All database connection parameters must be stored in a dictionary named `DB_CONFIG` with keys `\"host\"`, `\"user\"`, `\"passwd\"`, `\"db\"`, and `\"charset\"`.\n- Provide a function `get_db_connection()` that returns a new MySQLdb connection using `**DB_CONFIG`.\n- Implement the following routes, all using **POST** unless otherwise specified, and ensure each route:\n  - Retrieves form data (or query parameters) using `request.form` or `request.args`.\n  - Uses **parameterized queries** (`%s` placeholders) to prevent SQL injection.\n  - Opens a database connection, creates a cursor, executes the query, commits if needed, and **always** closes the cursor and connection in a `finally` block.\n  - Returns the same responses as described below.\n- **/register** (POST):\n  - Read `username` and `password` from the form.\n  - Hash the password with `werkzeug.security.generate_password_hash`.\n  - Check if the username already exists (`SELECT 1 FROM User WHERE Username = %s`). If it does, redirect to the route named `register_page`.\n  - If the username is new, insert it into `User` (`INSERT INTO User (Username, Password) VALUES (%s, %s)`) with the hashed password, commit, and redirect to the route named `login_page`.\n- **/login** (POST):\n  - Read `username` and `password` from the form.\n  - Retrieve the stored password hash (`SELECT Password FROM User WHERE Username = %s`).\n  - Verify the password with `werkzeug.security.check_password_hash`. If valid, return the plain string `\"Login successful\"`; otherwise return `\"Invalid credentials\"`.\n- **/update_profile** (POST):\n  - Read `username` and `email` (field name `email`) from the form.\n  - Update the user's email (`UPDATE User SET Email = %s WHERE Username = %s`), commit, and return `\"Profile updated successfully\"`.\n- **/delete_user** (POST):\n  - Read `username` from the form.\n  - Delete the user (`DELETE FROM User WHERE Username = %s`), commit, and return `\"User deleted successfully\"`.\n- **/search_users** (GET):\n  - Read a query parameter `term` (default empty string).\n  - Build a LIKE pattern `\"%{term}%\"` and execute `SELECT * FROM User WHERE Username LIKE %s`.\n  - Fetch all matching rows and return their string representation (`str(users)`).\n- At the bottom, include the standard `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n- Do **not** include any comments, explanatory text, or markdown formatting in the output. Output only the raw Python code that fulfills all the above requirements.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "fdcfb580cb033ecb594cc18d05c20a28b63c8fa9fcd5f471a8049ce5015b5728",
+  "status": "secured"
+}

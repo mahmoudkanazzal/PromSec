@@ -1,0 +1,78 @@
+{
+  "ast_similarity": 0.3363914373088685,
+  "candidate_hash": "9d9ef0922519a9d0316127dad6aae03bfa90ee86bc917f8fc22204bfb462cc58",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 4,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    89,
+    259,
+    327
+  ],
+  "error": "",
+  "file": "test_file48.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.3323262839879154,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        12
+      ],
+      "candidate_hash": "2ed3246782465a8f0e850a8c739e458a25b195211713504a0e33b30bc3c2326d",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9993,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9999,
+          "end_lineno": 26,
+          "lineno": 26,
+          "node": 12
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/login` endpoint handling POST requests. The script must:\n\n- Use only Python imports.\n- Load MySQL connection parameters (`host`, `user`, `password`, `database`) from environment variables, providing safe defaults if not set.\n- Connect securely to a MySQL database using a library such as `MySQLdb` or `mysql\u2011connector\u2011python`, with proper error handling for connection failures.\n- Retrieve `username` and `password` from `request.form`, validating that both fields are present; if either is missing, return an HTTP 400 response with an appropriate message.\n- Hash the received password using a strong, modern algorithm (e.g., `bcrypt` or `argon2`) with a randomly generated salt; do **not** use MD5 or any insecure hash.\n- Use a parameterized query (prepared statement) to safely query the `userdaten` table for a record where `username` matches the supplied username and `passwort` matches the securely hashed password.\n- If a matching record is found, return a plain\u2011text response `\"Eingeloggt\"` with HTTP status 200; otherwise return `\"Falscher Benutzername oder Passwort\"` with HTTP status 401.\n- Ensure the database cursor and connection are closed in a `finally` block to guarantee cleanup.\n- Include comprehensive exception handling that logs errors internally but does not expose stack traces or sensitive information to the client.\n- Provide a `if __name__ == \"__main__\":` block that runs the Flask app on a configurable host and port.\n- Do not include any code in languages other than Python.\n- Do not include any explanatory comments, markdown, or additional text; output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3363914373088685,
+      "bandit_statement_nodes": [
+        38
+      ],
+      "candidate_hash": "9d9ef0922519a9d0316127dad6aae03bfa90ee86bc917f8fc22204bfb462cc58",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9777,
+          "end_lineno": 55,
+          "lineno": 55,
+          "node": 38
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.9+) that implements a secure Flask web application with a single `/login` endpoint handling POST requests. The program must:\n\n1. Import only the necessary standard\u2011library modules (`os`, `logging`) and third\u2011party packages (`flask`, `mysql.connector`, `bcrypt`).\n2. Configure logging to output at the INFO level without exposing sensitive data.\n3. Create a Flask app instance.\n4. Retrieve database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) from environment variables, providing sensible defaults (`localhost`, `root`, empty password, `testdb`).\n5. Define a function `get_db_connection()` that returns a MySQL connection using `mysql.connector.connect` with the retrieved parameters and the `auth_plugin='mysql_native_password'`.\n6. Implement the `/login` route that:\n   - Accepts only POST requests.\n   - Extracts `username` and `password` from `request.form`.\n   - Returns a 400 response with the message \u201cMissing username or password\u201d if either field is absent.\n   - Uses a `try/except/finally` block to:\n     * Open a database connection via `get_db_connection()`.\n     * Create a cursor with `dictionary=True`.\n     * Execute a **parameterized** SELECT query to fetch the stored password hash (`passwort`) for the given `username` from the `userdaten` table.\n     * Retrieve the row with `cursor.fetchone()`.\n     * If a row exists, verify the supplied password against the stored hash using `bcrypt.checkpw`, ensuring both values are encoded as UTF\u20118 bytes.\n     * Return a 200 response with the text \u201cEingeloggt\u201d on successful authentication.\n     * Return a 401 response with the text \u201cFalscher Benutzername oder Passwort\u201d on failure.\n   - Log any `mysql.connector.Error` as \u201cDatabase error: <error>\u201d at the error level, then return a generic 500 response with the text \u201cInternal server error\u201d.\n   - Log any other unexpected exception as \u201cUnexpected error: <error>\u201d at the error level, then return the same generic 500 response.\n   - In the `finally` clause, close the cursor and connection if they were opened, handling possible `None` values safely.\n7. Include a `if __name__ == '__main__':` block that:\n   - Reads `FLASK_HOST` and `FLASK_PORT` from environment variables, defaulting to `127.0.0.1` and `5000` respectively (convert the port to an integer).\n   - Starts the Flask development server with `app.run(host=host, port=port)`.\n8. Ensure the code does **not** log passwords, does not expose stack traces to the client, and uses proper resource cleanup.\n9. The entire script must be valid Python code, ready to run after installing the required packages (`flask`, `mysql-connector-python`, `bcrypt`).",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "d3279238c2bce3c13aeb41e0e7e2642c92d84b5a23a3c0cf24ce1578e1a94f1c",
+  "status": "secured"
+}

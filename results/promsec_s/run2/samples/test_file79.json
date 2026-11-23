@@ -1,0 +1,107 @@
+{
+  "ast_similarity": 0.6467065868263473,
+  "candidate_hash": "964c2e4b7d8a4b1f717a7346f0fbe2121d70a32099c138bbb9d7902d45caec1b",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    89,
+    259
+  ],
+  "error": "",
+  "file": "test_file79.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8185328185328186,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        12,
+        26
+      ],
+      "candidate_hash": "fbbc8a780dcdd0387cb3cc480143acbe03e59642a53ba3d55481d221b6b7fc43",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9748,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.8415,
+          "end_lineno": 27,
+          "lineno": 27,
+          "node": 10
+        },
+        {
+          "ast_type": "AugAssign",
+          "change": 0.9991,
+          "end_lineno": 41,
+          "lineno": 41,
+          "node": 21
+        },
+        {
+          "ast_type": "AugAssign",
+          "change": 0.8269,
+          "end_lineno": 45,
+          "lineno": 45,
+          "node": 25
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9997,
+          "end_lineno": 48,
+          "lineno": 48,
+          "node": 26
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python script that implements the following functionality:\n\n- Use Flask to create a web application.\n- Define a POST route at `/buy_order`.\n- In the route handler, retrieve `stock_name` and `stock_quantity` from `request.form` and `username` from `session['username']`.\n- Connect to a MySQL database using `MySQLdb.connect`, obtaining the connection parameters (`host`, `user`, `passwd`, `db`) from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME` with sensible defaults.\n- Use a parameterized SQL statement to insert a new record into `db_table.order_table` with columns `username`, `stock_name`, and `stock_quantity`. Execute the statement with a cursor, commit the transaction, and handle any exception by rolling back, closing the connection, and returning a generic error message.\n- After a successful insert, close the database connection.\n- Build an absolute path to a script named `algorithm.py` located in the parent directory of the current file.\n- Construct a command list: `['python3', <script_path>, 'buy', username, stock_name, stock_quantity]`.\n- Execute this command using `subprocess.run` with `shell=False`, capturing `stdout` and `stderr`, and ensuring text output.\n- Return the captured `stdout` as the HTTP response.\n- Ensure the code follows security best practices: use environment variables for credentials, parameterized queries to prevent SQL injection, avoid shell invocation, handle all resources (database connections, cursors) properly, and include necessary imports.\n- The entire code must be written in Python, with no other languages or explanatory comments. Provide only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6467065868263473,
+      "bandit_statement_nodes": [
+        1,
+        22
+      ],
+      "candidate_hash": "964c2e4b7d8a4b1f717a7346f0fbe2121d70a32099c138bbb9d7902d45caec1b",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9986,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9998,
+          "end_lineno": 33,
+          "lineno": 33,
+          "node": 22
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, secure Python 3 program that implements the following functionality exactly as described, without any additional explanation or comments:\n\n- Use only the standard library and the third\u2011party packages `Flask`, `MySQLdb`, and any other packages explicitly imported in the code.\n- Import `os`, `MySQLdb`, `runpy`, `sys`, `io`, `contextlib`, and from `flask` import `Flask`, `request`, `session`, `Response`.\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if the variable is not set, default to the string `'supersecret'`.\n- Define a private helper function `_run_algorithm(script_path, action, username, stock_name, stock_quantity)` that:\n  * Temporarily replaces `sys.argv` with a list containing `script_path`, `action`, `username`, `stock_name`, and `stock_quantity`.\n  * Executes the script at `script_path` in\u2011process using `runpy.run_path` with `run_name=\"__main__\"`.\n  * Captures all standard output produced by the script using `io.StringIO` and `contextlib.redirect_stdout`.\n  * Restores the original `sys.argv` after execution.\n  * Returns the captured output as a string.\n- Define a route `/buy_order` that accepts only POST requests and implements the following steps:\n  * Retrieve `stock_name` and `stock_quantity` from `request.form`.\n  * Retrieve the current `username` from the Flask session.\n  * Establish a MySQL connection using `MySQLdb.connect` with the following parameters, each read from environment variables with the given defaults if not set:\n    - `host` from `DB_HOST` (default `'localhost'`)\n    - `user` from `DB_USER` (default `'root'`)\n    - `passwd` from `DB_PASS` (default empty string)\n    - `db` from `DB_NAME` (default `'test'`)\n  * Use a cursor to execute a parameterized INSERT statement that adds a row to `db_table.order_table` with columns `username`, `stock_name`, and `stock_quantity`. Use `%s` placeholders and pass the values as a tuple to prevent SQL injection.\n  * Commit the transaction if the INSERT succeeds.\n  * If any exception occurs during the database operation, roll back the transaction and return an HTTP 500 response with the body `'An error occurred'`.\n  * Ensure the cursor and connection are closed in a `finally` block.\n  * Compute the absolute path to a sibling script named `algorithm.py` located one directory level above the current file (`__file__`). Use `os.path.abspath` and `os.path.join` with `os.path.dirname(__file__)` to build the path safely.\n  * Call `_run_algorithm` with the computed script path, the action string `'buy'`, and the retrieved `username`, `stock_name`, and `stock_quantity`.\n  * Return the output from `_run_algorithm` as a plain\u2011text HTTP response (`mimetype='text/plain'`).\n- Include the standard `if __name__ == '__main__':` block that runs the Flask development server with `app.run()`.\n- Ensure the code contains no extraneous output, no explanatory comments, and no non\u2011Python code. The entire response must be valid Python code only.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "af64aaef30e33624fe62fe243029377344aebc3fb5040c046582ee15c2712898",
+  "status": "secured"
+}

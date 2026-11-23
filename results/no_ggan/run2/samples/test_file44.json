@@ -1,0 +1,42 @@
+{
+  "ast_similarity": 0.6936585365853658,
+  "candidate_hash": "ff3520a79ebebc486ff6c46c3bb1952b6b3ba18012e17b8fe38116f92d298056",
+  "complete": true,
+  "config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file44.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6936585365853658,
+      "bandit_statement_nodes": [
+        9,
+        15,
+        28,
+        45,
+        48,
+        62,
+        75,
+        90
+      ],
+      "candidate_hash": "ff3520a79ebebc486ff6c46c3bb1952b6b3ba18012e17b8fe38116f92d298056",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Flask web application in **Python** (no other language) that provides the following functionality:\n\n- **Database configuration**: Use `os.getenv` to read `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` environment variables, with sensible defaults. Connect to a MySQL database using `MySQLdb`, setting `charset='utf8mb4'` and `use_unicode=True`.\n\n- **Helper function**: Implement `get_db_connection()` that returns a new MySQLdb connection using the configuration above.\n\n- **User registration endpoint** (`/register`, POST):\n  - Accept `username` and `password` from `request.form`.\n  - Validate that both fields are present; return HTTP\u202f400 with an error message if not.\n  - Hash the password with `werkzeug.security.generate_password_hash`.\n  - Use a parameterized query to check if the username already exists; if it does, return HTTP\u202f409.\n  - Insert the new user with the hashed password using a parameterized query, commit the transaction, and redirect to `/home`.\n  - Handle any `MySQLdb.Error` by returning HTTP\u202f500 with a generic error message.\n  - Ensure the cursor and connection are closed in a `finally` block.\n\n- **User login endpoint** (`/login`, POST):\n  - Accept `username` and `password` from `request.form`.\n  - Validate presence of both fields; return HTTP\u202f400 if missing.\n  - Retrieve the stored password hash for the given username using a parameterized query.\n  - Verify the password with `werkzeug.security.check_password_hash`; on success, redirect to `/dashboard`, otherwise return HTTP\u202f401.\n  - Handle database errors with HTTP\u202f500 and close resources properly.\n\n- **Add task endpoint** (`/add_task`, POST):\n  - Accept `username`, `task_name`, and optional `task_description` from `request.form`.\n  - Validate that `username` and `task_name` are present; return HTTP\u202f400 if not.\n  - Verify the user exists with a parameterized query; return HTTP\u202f404 if not found.\n  - Insert the task into a `tasks` table (`username`, `task_name`, `task_description`) using a parameterized query, commit, and return HTTP\u202f201 with a success message.\n  - Handle database errors with HTTP\u202f500 and ensure cleanup.\n\n- **View tasks endpoint** (`/view_tasks`, GET):\n  - Accept `username` as a query parameter.\n  - Validate presence; return HTTP\u202f400 if missing.\n  - Retrieve `task_id`, `task_name`, and `task_description` for the given username using a parameterized query and a `DictCursor`.\n  - Return the result as JSON with HTTP\u202f200.\n  - Handle database errors with HTTP\u202f500 and ensure cleanup.\n\n- **Delete task endpoint** (`/delete_task`, POST):\n  - Accept `username` and `task_id` from `request.form`.\n  - Validate both are present; return HTTP\u202f400 if missing.\n  - Convert `task_id` to an integer, returning HTTP\u202f400 on conversion failure.\n  - Delete the task where `username` and `task_id` match using a parameterized query.\n  - If no rows are affected, return HTTP\u202f404; otherwise commit and return HTTP\u202f200 with a success message.\n  - Handle database errors with HTTP\u202f500 and ensure cleanup.\n\n- **Update task endpoint** (`/update_task`, POST):\n  - Accept `username`, `task_id`, `new_task_name`, and optional `new_task_description` from `request.form`.\n  - Validate that `username`, `task_id`, and `new_task_name` are present; return HTTP\u202f400 if missing.\n  - Convert `task_id` to an integer, returning HTTP\u202f400 on failure.\n  - Update the task\u2019s `task_name` and `task_description` using a parameterized query.\n  - If no rows are affected, return HTTP\u202f404; otherwise commit and return HTTP\u202f200 with a success message.\n  - Handle database errors with HTTP\u202f500 and ensure cleanup.\n\n- **Application entry point**: Include the standard `if __name__ == '__main__':` block to run the Flask app with `debug=False`.\n\nAdditional requirements:\n- Use only **parameterized queries** to prevent SQL injection.\n- Perform **input validation** and return appropriate HTTP status codes and plain\u2011text messages as specified.\n- Ensure **all database cursors and connections are closed** in `finally` blocks.\n- Do **not** include any explanatory text, comments, or markup outside of the Python code.\n- Output **only** the complete Python source code that fulfills the above specifications.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "fd8d3f80dfea0f7dacbff0e4f889261b1c0df6f0eae8c3c6b8814d368e3b41ef",
+  "status": "secured"
+}

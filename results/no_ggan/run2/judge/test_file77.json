@@ -1,0 +1,78 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "b4f64c9f9b77e3a5e1fdbd5fb3a12bda6b2a64e11c3d7234bdc97a71af22b5b5",
+  "compile_ok": true,
+  "confidence": 0.93,
+  "contract": {
+    "edge_cases": [
+      "Missing required JSON fields in /add_task or /update_task may cause a server error",
+      "Providing a non\u2011existent task_id to update or delete still returns a success message but affects zero rows",
+      "Empty or absent keyword returns all tasks in /search_tasks",
+      "Empty due_date parameter returns an empty list in /get_tasks_by_due_date",
+      "Malformed JSON or wrong content\u2011type results in a 400 Bad Request",
+      "Unsanitized input can lead to SQL injection, affecting query results or database integrity"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a RESTful API that lets clients create, search, update, delete, and list tasks stored in a SQLite database.",
+    "invariants": [
+      "The tasks table must exist with columns id (primary key), task_name, description, due_date",
+      "Each request opens a DB connection, executes a single query, commits (if needed), and closes the connection",
+      "All responses are JSON-encoded and include an appropriate HTTP status code",
+      "Task IDs are integers and uniquely identify rows",
+      "Successful write operations return a success message JSON"
+    ],
+    "io_behavior": [
+      "POST /add_task with JSON {task_name, description, due_date} \u2192 201 and JSON {\"message\":\"Task added successfully\"}",
+      "GET /search_tasks?keyword=\u2026 \u2192 200 and JSON array of tasks whose name or description contains the keyword",
+      "PUT /update_task/<task_id> with JSON (optional task_name, description, due_date) \u2192 200 and JSON {\"message\":\"Task updated successfully\"}",
+      "DELETE /delete_task/<task_id> \u2192 200 and JSON {\"message\":\"Task deleted successfully\"}",
+      "GET /get_tasks_by_due_date?due_date=\u2026 \u2192 200 and JSON array of tasks whose due_date matches the value"
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:DELETE /delete_task/<int:task_id>": "",
+      "route:GET /get_tasks_by_due_date": "",
+      "route:GET /search_tasks": "",
+      "route:POST /add_task": "",
+      "route:PUT /update_task/<int:task_id>": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the tasks table",
+      "Updates existing rows in the tasks table",
+      "Deletes rows from the tasks table",
+      "Creates or modifies the SQLite file 'task_manager.db'",
+      "Sends HTTP responses over the network"
+    ],
+    "source_hash": "795d93bf579a8c14974e279424ca6d201fd72a7e5c8b65af52c440e93c0d941e"
+  },
+  "dimensions": {
+    "behavior": 0.95,
+    "edge_cases": 0.8,
+    "invariants": 0.95,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file77.py",
+  "gated_score": 0.89375,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.89375,
+  "original_hash": "795d93bf579a8c14974e279424ca6d201fd72a7e5c8b65af52c440e93c0d941e",
+  "rationale": "The program implements all required routes, returns correct status codes and JSON, respects most invariants, and handles most edge cases, but deviates on the empty due_date case (returns 400 instead of an empty list) and uses a connection context that may not explicitly close the DB.",
+  "schema": 1,
+  "stability_abs_difference": 0.03688,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.85,
+    "invariants": 1.0,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.93063,
+  "weighted_mean": 0.925,
+  "worst_dimension": 0.8
+}

@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "c8468b0452fd3dd56214a97e13ee0241f3ade9c104e6d22cb8dd8f56d96120b0",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields cause a Bad Request error before any database action",
+      "Attempting to register a username that already exists may raise a database error",
+      "Login with an incorrect password returns \"Invalid credentials\" without revealing which part failed",
+      "Database connection failures result in redirects (register/login) or plain\u2011text error messages for other endpoints",
+      "Providing special characters in form values can lead to SQL syntax errors or injection vulnerabilities",
+      "Checking out a book for a non\u2011existent user returns \"User not found\""
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for a library system that lets users register, log in, add books, view the catalog, check out books, and return them.",
+    "invariants": [
+      "Each stored password consists of a SHA\u2011256 hash followed by the 16\u2011byte salt used at registration",
+      "A checkout record is created only if the username exists in the users table",
+      "A return operation removes a checkout record only if a matching record exists",
+      "The view_books endpoint always returns the current contents of the books table",
+      "Database connections are opened and closed for every request",
+      "Responses are always plain\u2011text strings (or JSON for view_books) and never expose raw SQL"
+    ],
+    "io_behavior": [
+      "POST /register with 'username' and 'password' \u2192 redirects to /home on success or failure",
+      "POST /login with 'username' and 'password' \u2192 redirects to /dashboard on valid credentials, otherwise returns a plain\u2011text error message",
+      "POST /add_book with 'book_id', 'title', 'author' \u2192 returns a plain\u2011text success or failure message",
+      "POST /checkout with 'username' and 'book_id' \u2192 returns a plain\u2011text message indicating success, user not found, or failure",
+      "POST /return with 'username' and 'book_id' \u2192 returns a plain\u2011text message indicating success, record not found, or failure",
+      "GET /view_books \u2192 returns a JSON array of all rows in the books table or a plain\u2011text error"
+    ],
+    "public_api": {
+      "route:GET /view_books": "",
+      "route:POST /add_book": "",
+      "route:POST /checkout": "",
+      "route:POST /login": "",
+      "route:POST /register": "",
+      "route:POST /return": ""
+    },
+    "side_effects": [
+      "Inserts new rows into the users, books, and checkouts tables in the MySQL database",
+      "Updates existing rows (e.g., inserts checkout records, deletes them on return)",
+      "Commits transactions to persist changes",
+      "Prints exception tracebacks to the server console",
+      "Issues HTTP redirects to /home or /dashboard",
+      "Closes database connections after each request"
+    ],
+    "source_hash": "a4a023812d8d87d69ca6b7c153a086fae31bb10841e6483047d43e29bb8d72c9"
+  },
+  "dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.3,
+    "invariants": 1.0,
+    "io_semantics": 0.85,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file73.py",
+  "gated_score": 0.6375,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.6375,
+  "original_hash": "a4a023812d8d87d69ca6b7c153a086fae31bb10841e6483047d43e29bb8d72c9",
+  "rationale": "Core endpoints and responses match the contract, password handling and DB lifecycle are correct, but missing Bad Request handling for absent form fields, duplicate\u2011username errors are swallowed, and special\u2011character edge cases are not exposed as described.",
+  "schema": 1,
+  "stability_abs_difference": 0.159,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.6,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 0.83
+  },
+  "stability_score": 0.7965,
+  "weighted_mean": 0.75,
+  "worst_dimension": 0.3
+}

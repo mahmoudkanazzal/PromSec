@@ -30,13 +30,8 @@ RUN_DIR="$RUN_ROOT/$RUN_NAME"
 STOP_FILE="$RUN_DIR/STOP"
 LOG_FILE="$RUN_DIR/logs/supervisor.log"
 RETRY_SECONDS="${PROMSEC_RETRY_SECONDS:-$(read_cfg supervisor.retry_seconds)}"
-MAX_TRAINING_PASSES="${PROMSEC_MAX_TRAINING_PASSES:-$(read_cfg supervisor.max_training_passes)}"
 MAX_ENFORCEMENT_PASSES="${PROMSEC_MAX_ENFORCEMENT_PASSES:-$(read_cfg supervisor.max_enforcement_passes)}"
 MAX_JUDGE_PASSES="${PROMSEC_MAX_JUDGE_PASSES:-$(read_cfg supervisor.max_judge_passes)}"
-TRAIN_FROM_SCRATCH="$(read_cfg training.train_from_scratch)"
-GENERATOR_PATH="$(read_cfg models.generator)"
-DISCRIMINATOR_PATH="$(read_cfg models.discriminator)"
-
 mkdir -p "$RUN_DIR/logs"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
@@ -69,18 +64,6 @@ cfg=load_config(os.environ['PROMSEC_CONFIG'])
 s=status(cfg)
 print({k:s[k] for k in ('samples_done','samples_successful','samples_failed','samples_total','status_counts','in_progress')})
 raise SystemExit(0 if s['samples_done'] == s['samples_total'] else 1)
-PY
-}
-
-training_complete() {
-  python - <<'PY'
-import os
-from promsec.config import load_config
-from promsec.train import training_status
-cfg=load_config(os.environ['PROMSEC_CONFIG'])
-s=training_status(cfg)
-print(s)
-raise SystemExit(0 if s.get('complete') else 1)
 PY
 }
 
@@ -119,37 +102,15 @@ fail_stage() {
 }
 
 echo "============================================================"
-echo "PromSec unattended GPU supervisor"
+echo "PromSec unattended run"
 echo "started: $(date -Is)"
 echo "config:  $PROMSEC_CONFIG"
 echo "run:     $RUN_DIR"
 echo "model:   $PROMSEC_LLM_MODEL"
 echo "endpoint:$PROMSEC_LLM_BASE_URL"
-if [[ "$TRAIN_FROM_SCRATCH" == "1" ]]; then
-  echo "gGAN mode: TRAIN FROM SCRATCH"
-else
-  echo "gGAN mode: PRETRAINED"
-fi
-echo "generator:     $GENERATOR_PATH"
-echo "discriminator: $DISCRIMINATOR_PATH"
+echo "variant: $(read_cfg guidance.mode)"
 echo "============================================================"
-bash "$ROOT/scripts/gpu_preflight.sh"
-
-if [[ "$TRAIN_FROM_SCRATCH" == "1" ]]; then
-  pass=1
-  while ! training_complete; do
-    stop_requested && { echo "STOP requested before training completion."; exit 0; }
-    (( pass > MAX_TRAINING_PASSES )) && fail_stage "training"
-    echo "[$(date -Is)] Running/resuming fresh gGAN training (pass $pass/$MAX_TRAINING_PASSES)..."
-    python -m promsec train --config "$PROMSEC_CONFIG" || true
-    training_complete && break
-    pass=$((pass + 1))
-    sleep_or_stop || exit 0
-  done
-  echo "[$(date -Is)] Fresh gGAN training complete."
-else
-  echo "[$(date -Is)] Using packaged pretrained gGAN checkpoints."
-fi
+bash "$ROOT/scripts/preflight.sh"
 
 start_results_monitor() {
   command -v tmux >/dev/null 2>&1 || return 0

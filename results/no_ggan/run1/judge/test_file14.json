@@ -1,0 +1,82 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "72c5d5f7cd48fb25b1bbe39f56aa328892b92271629bffc2aa84a29b5f049a51",
+  "compile_ok": true,
+  "confidence": 0.93,
+  "contract": {
+    "edge_cases": [
+      "Missing required query or form parameters result in HTTP 400 or 401 responses.",
+      "Invalid or unparsable YAML in /config/upload leads to a 400 error.",
+      "Empty or whitespace\u2011only command parameters are still passed to the shell, potentially causing script errors.",
+      "Changing the secret to an empty string is prevented; new_secret must be non\u2011empty.",
+      "If subprocess.run fails (e.g., script not found), the API still returns success because the return code is not checked."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a Flask web API for uploading/retrieving/deleting configurations, executing system scripts, managing admin secret, checking job status, retrieving logs, performing data backup, and fetching user details.",
+    "invariants": [
+      "All endpoints return JSON responses with a \"status\" field.",
+      "Required parameters (e.g., config_name, job_id, secret) must be present; otherwise a 400 or 401 error is returned.",
+      "Admin actions succeed only if the provided secret matches the current SECRET_KEY.",
+      "Configuration upload succeeds only if the YAML parses and contains both \"config_name\" and \"config_value\" keys."
+    ],
+    "io_behavior": [
+      "POST /config/upload accepts raw YAML, returns JSON with config_name and config_value on success or error on invalid data.",
+      "GET /system/execute runs ./execute_script.sh with provided command and param query parameters and returns a JSON acknowledgement.",
+      "POST /admin/verify checks a form\u2011field secret and returns verification success or 401 failure.",
+      "POST /admin/change_secret validates current secret and updates the in\u2011memory secret, responding with success or 401.",
+      "GET /config/get requires config_name query and returns a placeholder config JSON or 400 error.",
+      "GET /system/status requires job_id query and returns JSON with job_id and status \"Running\" or 400 error."
+    ],
+    "public_api": {
+      "class:AdminManager": "check_secret(secret);update_secret(new_secret)",
+      "class:ConfigManager": "load_config(yaml_data);validate_config(config)",
+      "route:GET /config/get": "",
+      "route:GET /data/backup": "",
+      "route:GET /system/execute": "",
+      "route:GET /system/logs": "",
+      "route:GET /system/status": "",
+      "route:GET /user/details": "",
+      "route:POST /admin/change_secret": "",
+      "route:POST /admin/settings": "",
+      "route:POST /admin/verify": "",
+      "route:POST /config/delete": "",
+      "route:POST /config/upload": ""
+    },
+    "side_effects": [
+      "Invokes external shell commands via subprocess.run for execute_script.sh and backup_data.py.",
+      "Modifies the global SECRET_KEY variable when /admin/change_secret is called with a valid current secret.",
+      "Potentially triggers any side effects of the executed scripts (e.g., file creation, network calls).",
+      "No persistent storage; all state is kept in memory for the duration of the process."
+    ],
+    "source_hash": "d2a45383f48e5bb90e5fcbef12ed0fee4780907eb0698a4a431aa0e4938d041c"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.8,
+    "invariants": 1.0,
+    "io_semantics": 0.95,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file14.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.89375,
+  "original_hash": "d2a45383f48e5bb90e5fcbef12ed0fee4780907eb0698a4a431aa0e4938d041c",
+  "rationale": "The program implements all required endpoints, returns JSON with a status field, validates parameters, handles secret management, and invokes external scripts as specified. It correctly rejects empty new secrets and returns errors for missing parameters and invalid YAML. However, it checks subprocess return codes and returns an error on failure, contrary to the contract\u2019s edge case where failures should still be reported as success, and the system/status response uses a different field name for ",
+  "schema": 1,
+  "stability_abs_difference": 0.01538,
+  "stability_dimensions": {
+    "behavior": 0.91,
+    "edge_cases": 0.8,
+    "invariants": 1.0,
+    "io_semantics": 0.83,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.87837,
+  "weighted_mean": 0.925,
+  "worst_dimension": 0.8
+}

@@ -1,0 +1,66 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "010ad10d8c624b69dbb254ee9e24ffa564f3857eb486e64c0072f8ba8d963bc5",
+  "compile_ok": true,
+  "confidence": 0.94,
+  "contract": {
+    "edge_cases": [
+      "Missing 'stock_name' or 'stock_quantity' in the form data triggers a KeyError.",
+      "Absent or invalid 'username' in the session triggers a KeyError.",
+      "Database connection failures or SQL errors produce a 500 response.",
+      "Non\u2011numeric or excessively large 'stock_quantity' values are accepted but may cause downstream issues.",
+      "SQL injection via crafted form values could cause unexpected database errors."
+    ],
+    "entrypoints": [],
+    "intent": "Record a stock purchase order in the MySQL database and redirect the client to the home page.",
+    "invariants": [
+      "The route only responds to POST requests.",
+      "The inserted order always uses a fixed buy_price of 10000.",
+      "A successful call always ends with a redirect to '/'.",
+      "The SQL statement is constructed using string formatting without additional validation."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to the path /buy_order with form fields 'stock_name' and 'stock_quantity'.",
+      "Reads the current user's username from the Flask session.",
+      "On successful processing, returns an HTTP 302 redirect response pointing to '/'.",
+      "If required form data or session data is missing, the request raises an exception and results in a 500 error.",
+      "If the database operation fails, the request also results in a 500 error."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the MySQL table `orders` containing username, stock_name, stock_quantity, and a constant buy_price of 10000.",
+      "Commits the transaction to persist the new order.",
+      "Potentially modifies the database state on each successful call."
+    ],
+    "source_hash": "6ca5dce3846d66a0ca34449b586d247a9a6e95704655cf0a2225ea0c8965d335"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.7,
+    "io_semantics": 0.5,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file80.py",
+  "gated_score": 0.49625,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.49625,
+  "original_hash": "6ca5dce3846d66a0ca34449b586d247a9a6e95704655cf0a2225ea0c8965d335",
+  "rationale": "Core intent (record order and redirect) is kept, but error handling, input validation, and SQL construction differ from contract, breaking several edge\u2011case and invariant expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.00187,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.2,
+    "invariants": 0.25,
+    "io_semantics": 0.5,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.49812,
+  "weighted_mean": 0.595,
+  "worst_dimension": 0.2
+}

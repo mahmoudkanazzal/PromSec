@@ -1,0 +1,64 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "13cb50aa0e6a881201fe3a6ea86254cf710dfb09c045c83536247dd8875616ef",
+  "compile_ok": true,
+  "confidence": 0.94,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty form fields may cause a server error or unexpected behavior.",
+      "Database connection failures or query errors will abort the request without a defined response.",
+      "SQL injection is possible because user input is concatenated directly into SQL statements.",
+      "If the generated session_id collides with an existing one, the insert may fail.",
+      "Very large input values could exceed database column limits or cause performance issues."
+    ],
+    "entrypoints": [],
+    "intent": "Register a new user account via a POST request and create a session for the user.",
+    "invariants": [
+      "A username must be unique; duplicate usernames are rejected.",
+      "The password is always stored as a bcrypt hash, never in plain text.",
+      "All required environment variables for database connection must be present.",
+      "A session_id of exactly 16 alphanumeric characters is generated for each new registration."
+    ],
+    "io_behavior": [
+      "Accepts a POST request to /register with form fields: username, password, name, email, cweid.",
+      "On success, responds with an HTTP redirect to /login including username, session_id, and stake as query parameters.",
+      "On failure due to an existing username, responds with the plain text message \"Username is already taken\"."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the users table with the supplied data and a bcrypt\u2011hashed password.",
+      "Creates a new session record in the sessions table containing a generated session_id.",
+      "Commits the above inserts to the MySQL database."
+    ],
+    "source_hash": "a00a27b7d592b11e9682a9850db8e3599255cdbc72ac01f2d99d62959b572c63"
+  },
+  "dimensions": {
+    "behavior": 0.95,
+    "edge_cases": 0.8,
+    "invariants": 0.9,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file76.py",
+  "gated_score": 0.90312,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.90312,
+  "original_hash": "a00a27b7d592b11e9682a9850db8e3599255cdbc72ac01f2d99d62959b572c63",
+  "rationale": "Main registration flow, bcrypt hashing, 16\u2011char session_id, redirect and duplicate message match the contract, but the code uses parameterized queries eliminating the expected SQL\u2011injection vulnerability and does not explicitly validate required environment variables, reducing edge\u2011case and invariant scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.25187,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.1,
+    "invariants": 0.8,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.65125,
+  "weighted_mean": 0.9375,
+  "worst_dimension": 0.8
+}

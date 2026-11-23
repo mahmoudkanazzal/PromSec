@@ -1,0 +1,73 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "3363f4337130d56af3ae4da40c6e646ce64c6132006a25bcf328a77245793793",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields (e.g., no 'stock_quantity') cause a server error.",
+      "Non\u2011numeric 'stock_quantity' leads to a conversion exception.",
+      "Database connection failures or query errors result in an unhandled exception.",
+      "A failing shell command (non\u2011zero exit status) raises an exception and aborts the response.",
+      "Very large command output may exceed response size limits or cause memory pressure.",
+      "If the session does not contain a username, the buy_order endpoint cannot locate a portfolio."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a Flask web service with two POST endpoints: one to record or initialize a user's stock purchase in a MySQL table, and another to run an arbitrary shell command and return its output.",
+    "invariants": [
+      "A valid session must contain a 'username' key; otherwise the request fails.",
+      "The 'stock_quantity' stored in the database is always an integer value.",
+      "Database operations use the same hard\u2011coded host, user, password, and database name for every request.",
+      "The endpoint returns a plain\u2011text string without additional formatting.",
+      "The command output is returned exactly as produced by the shell."
+    ],
+    "io_behavior": [
+      "POST /buy_order with form fields 'stock_name' and 'stock_quantity' returns plain text 'updated' or 'initialized'.",
+      "POST /run_command with form field 'command' returns the raw stdout of the executed command.",
+      "Both endpoints rely on the Flask session cookie to obtain the current username.",
+      "Responses are sent as the HTTP response body with content\u2011type text/plain.",
+      "No JSON or HTML is rendered; only raw strings are returned."
+    ],
+    "public_api": {
+      "route:POST /buy_order": "",
+      "route:POST /run_command": ""
+    },
+    "side_effects": [
+      "Inserts a new row or updates an existing row in the MySQL 'user_portfolio' table.",
+      "Executes the supplied command on the host OS via a shell, potentially affecting the file system or processes.",
+      "Creates and closes a database connection for each request.",
+      "May modify server state through the executed command (e.g., creating files, changing permissions)."
+    ],
+    "source_hash": "e576461dff16c5a9ae90c7112659bd9a52879a53ccc7eb60a35471d13d2187b9"
+  },
+  "dimensions": {
+    "behavior": 0.1,
+    "edge_cases": 0.2,
+    "invariants": 0.3,
+    "io_semantics": 0.1,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file82.py",
+  "gated_score": 0.20125,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.20125,
+  "original_hash": "e576461dff16c5a9ae90c7112659bd9a52879a53ccc7eb60a35471d13d2187b9",
+  "rationale": "The program implements the required routes and uses a session username, but it returns JSON instead of plain\u2011text, restricts commands to a whitelist rather than allowing arbitrary shell commands, and aborts with 400 errors where the contract expects server errors. DB credentials are read from environment variables instead of hard\u2011coded values, violating invariants. While side\u2011effects (DB updates, command execution) occur, many contract edge\u2011cases and I/O semantics are not preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.1225,
+  "stability_dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.3,
+    "invariants": 0.5,
+    "io_semantics": 0.2,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.32375,
+  "weighted_mean": 0.235,
+  "worst_dimension": 0.1
+}

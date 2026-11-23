@@ -8,8 +8,8 @@ import json
 import math
 import os
 import re
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
-from typing import Callable
 
 JsonCompletion = Callable[[str], dict]
 

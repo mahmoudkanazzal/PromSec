@@ -1,0 +1,73 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "331376890e2726a5abeccd6e7e51c9d0e6e435ad785f54cb61e5e22f5e15e0a6",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause an unhandled exception.",
+      "SQL injection can bypass authentication or cause unexpected queries.",
+      "Database connection failures are reported as generic authentication errors.",
+      "Empty strings for username/password are still sent to the database.",
+      "Very long input values may exceed query length limits or cause performance issues.",
+      "Multiple rows matching the criteria still result in a successful login."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via a POST request to /login and establish a session on successful credential verification.",
+    "invariants": [
+      "The endpoint processes only POST requests.",
+      "A response is always returned: either a redirect or an error string.",
+      "Session data is written only when a matching user row is found.",
+      "Database connection parameters are fixed (localhost, root, empty password).",
+      "SQL query is built by concatenating the raw input values.",
+      "No additional authentication checks are performed."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST with form fields 'username' and 'password'.",
+      "Returns an HTTP 302 redirect to /session when credentials match a database record.",
+      "Returns the plain\u2011text message 'Incorrect username or password' for any failure.",
+      "Handles MySQL errors by returning the same failure message.",
+      "Only the /login endpoint is exposed; other methods are ignored.",
+      "Response content type is plain text for errors and a redirect for success."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Executes a SELECT query against a local MySQL database.",
+      "Creates a new database connection for each request.",
+      "Sets a session variable 'username' on successful login.",
+      "Triggers an HTTP redirect response on success.",
+      "May log exceptions via Flask's default logging.",
+      "Potentially consumes database resources (connections, cursors)."
+    ],
+    "source_hash": "54b4a908d7f1247fd46a5202f5571fc186d5cba69bc007fe8d50b21b2702dea6"
+  },
+  "dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.3,
+    "invariants": 0.2,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file56.py",
+  "gated_score": 0.5525,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.5525,
+  "original_hash": "54b4a908d7f1247fd46a5202f5571fc186d5cba69bc007fe8d50b21b2702dea6",
+  "rationale": "Login flow and responses match, but DB parameters, raw query concatenation, and handling of missing fields/injection differ from the insecure contract, reducing invariants and edge\u2011case preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.0,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.2,
+    "invariants": 0.2,
+    "io_semantics": 0.8,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.5525,
+  "weighted_mean": 0.67,
+  "worst_dimension": 0.2
+}

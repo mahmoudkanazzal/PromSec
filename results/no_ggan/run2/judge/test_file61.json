@@ -1,0 +1,71 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "47f6967fbb44aea65ef851b980ae90a710e8e6ac8b5082ebbf39c67b7caa3c84",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing payload parameter results in a specific error message.",
+      "Malformed YAML or missing keys cause a server error (exception from yaml.load).",
+      "Non\u2011numeric lat/lon/date values cause a ValueError when casting to int.",
+      "Database returns no matching row, leading to a TypeError when accessing row[0].",
+      "Database connection failure raises an exception and returns HTTP 500.",
+      "Large or malicious YAML content could trigger unsafe yaml.load behavior."
+    ],
+    "entrypoints": [],
+    "intent": "Provide the temperature for a given latitude, longitude, and date supplied via a YAML payload in a GET request.",
+    "invariants": [
+      "The endpoint always uses the GET method and reads only the 'payload' query parameter.",
+      "The database query uses parameterised placeholders, preventing SQL injection via the extracted values.",
+      "Returned temperature is always a string representation of the first column of the first row returned.",
+      "The service does not modify any database rows or files.",
+      "YAML parsing expects the top\u2011level keys 'lat', 'lon', and 'date' to exist.",
+      "All extracted values are cast to int before being used in the query."
+    ],
+    "io_behavior": [
+      "Accepts HTTP GET requests at /api/temperature_for_location with a query parameter named payload.",
+      "Parses the payload as YAML and extracts integer fields lat, lon, and date.",
+      "Queries a local MySQL database for a temperature matching those coordinates and date.",
+      "Returns the temperature value as a plain\u2011text string in the HTTP response body.",
+      "If the payload parameter is missing, returns the text \"YAML payload missing from request\".",
+      "If the query yields no result, the response will raise an exception (unhandled) or return None."
+    ],
+    "public_api": {
+      "route:GET /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to a MySQL server on localhost.",
+      "Executes a SELECT statement against the temperature table.",
+      "Potentially logs errors via the Flask framework's default logging.",
+      "May raise exceptions that propagate to the client as HTTP 500 errors."
+    ],
+    "source_hash": "b360cf04d2e65eae8542baff1da7038fcf535b689d5b42c3e5e53d93e0fc91e5"
+  },
+  "dimensions": {
+    "behavior": 0.0,
+    "edge_cases": 0.2,
+    "invariants": 0.1,
+    "io_semantics": 0.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file61.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.14625,
+  "original_hash": "b360cf04d2e65eae8542baff1da7038fcf535b689d5b42c3e5e53d93e0fc91e5",
+  "rationale": "The implementation uses POST with JSON payload and returns JSON, contrary to the GET/YAML/plain\u2011text contract, breaking most invariants and edge\u2011case handling, though it still opens a DB connection and executes a SELECT as specified.",
+  "schema": 1,
+  "stability_abs_difference": 0.14875,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.2,
+    "invariants": 0.1,
+    "io_semantics": 0.1,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.295,
+  "weighted_mean": 0.195,
+  "worst_dimension": 0.0
+}

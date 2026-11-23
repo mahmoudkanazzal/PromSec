@@ -1,0 +1,73 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "bf8a11ed0efdbc6b6d3c82647d85e423b0602ab7df3e2e2b47c0d684baf52d41",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a BadRequest exception (KeyError) before any DB query.",
+      "Empty strings for username or password are still sent to the query and may match an empty record.",
+      "SQL injection is possible because the query concatenates raw input without escaping.",
+      "Database connection failures raise an exception and result in a 500 Internal Server Error.",
+      "If multiple rows match the credentials, only the first row is considered (fetchone).",
+      "Non\u2011ASCII or unusually long input values may trigger encoding errors or exceed query length limits."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by checking supplied credentials against a MySQL users table and redirect them based on the result.",
+    "invariants": [
+      "A redirect response is always returned; the endpoint never returns a non\u2011redirect payload.",
+      "The redirect location is either '/' or '/dashboard' and never changes.",
+      "The SQL query always selects from the 'users' table using the supplied username and password values.",
+      "The endpoint only responds to POST requests; other methods result in a 405 Method Not Allowed.",
+      "Database connection parameters (host, user, password, db) are fixed constants.",
+      "The function does not modify any server\u2011side state beyond reading from the database."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST requests to the path /login with form fields 'username' and 'password'.",
+      "Returns an HTTP 302 redirect response with Location '/' when credentials are not found.",
+      "Returns an HTTP 302 redirect response with Location '/dashboard' when credentials match a record.",
+      "Relies on the Flask request object to read form data.",
+      "Uses the MySQLdb library to query the database.",
+      "Produces no response body beyond the redirect headers."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to a local MySQL server using hard\u2011coded root credentials.",
+      "Executes a SELECT query that reads data from the 'users' table.",
+      "Creates a new database cursor for each request.",
+      "Closes the database connection when the request ends (implicit by process termination).",
+      "May log errors or exceptions via Flask's default error handling.",
+      "Triggers Flask's request handling lifecycle (routing, response generation)."
+    ],
+    "source_hash": "b30096ed0fe299fe2d327a65ed18c147d00dd4e7971f82a42eb6bdc3e9f8de1d"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.6,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file49.py",
+  "gated_score": 0.30625,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.30625,
+  "original_hash": "b30096ed0fe299fe2d327a65ed18c147d00dd4e7971f82a42eb6bdc3e9f8de1d",
+  "rationale": "The program authenticates via a SELECT and bcrypt check and returns the required redirects, but it deviates from the contract on error handling, query construction, use of session state, and DB credential handling, breaking most invariants and edge\u2011case expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.27812,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.17,
+    "invariants": 0.5,
+    "io_semantics": 1.0,
+    "side_effects": 0.83
+  },
+  "stability_score": 0.58437,
+  "weighted_mean": 0.375,
+  "worst_dimension": 0.1
+}

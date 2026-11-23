@@ -1,0 +1,872 @@
+{
+  "ast_similarity": 0.9664921465968587,
+  "candidate_hash": "71db5d8099af827534488d9a8c224f2bb39d7dc48a28bf7ccc3543eb67c10620",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 1,
+  "cwe_count_before": 3,
+  "cwes_after": [
+    78
+  ],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file8.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9664921465968587,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        18,
+        73,
+        84
+      ],
+      "candidate_hash": "71db5d8099af827534488d9a8c224f2bb39d7dc48a28bf7ccc3543eb67c10620",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.2654,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1667,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2077,
+          "end_lineno": 29,
+          "lineno": 29,
+          "node": 18
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2798,
+          "end_lineno": 121,
+          "lineno": 121,
+          "node": 73
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2077,
+          "end_lineno": 142,
+          "lineno": 142,
+          "node": 84
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 script that implements a Flask web server with the exact functionality described below. The script must:\n\n- Import only the standard library modules and the third\u2011party packages `flask` and `pyyaml`.\n- Load a secret key from the environment variable `SECRET_KEY`; if the variable is not set, fall back to a safe default string.\n- Use `yaml.safe_load` for any YAML parsing.\n- Validate and sanitize all incoming request data; return JSON error responses with appropriate HTTP status codes for missing or malformed parameters.\n- When invoking external commands with `subprocess.run`, pass the command and its arguments as a list, never use `shell=True`, and set `check=False` to avoid raising exceptions.\n- Return JSON responses for every endpoint, matching the structure and field names shown in the specification.\n- Include the standard `if __name__ == \"__main__\": app.run(debug=False)` guard at the end.\n- Contain no explanatory comments, markdown, or any text outside the Python code.\n\nEndpoints to implement:\n\n1. **POST /user/add**\n   - Read raw request body, decode as UTF\u20118, parse as YAML with `yaml.safe_load`.\n   - Expect keys `id` and `name`. If parsing fails or keys are missing, respond with `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` (400) or `{\"status\":\"Error\",\"message\":\"Missing user information\"}` (400).\n   - On success, respond with `{\"status\":\"User added\",\"id\":<id>,\"name\":<name>}`.\n\n2. **GET /system/start_task**\n   - Query parameters `task` and `argument`.\n   - Execute `bash start_task.sh <task> <argument>` via `subprocess.run` (list form, `check=False`).\n   - Respond with `{\"status\":\"Task started\"}`.\n\n3. **POST /admin/authenticate**\n   - Form field `key`.\n   - If `key` equals the loaded secret key, respond with `{\"status\":\"Authentication successful\"}`; otherwise respond with `{\"status\":\"Authentication failed\"}` and status 401.\n\n4. **POST /admin/update_config**\n   - Form fields `key` and `new_config`.\n   - Authenticate with `key` as above; on failure respond 401.\n   - If `new_config` is missing or empty, respond with `{\"status\":\"Error\",\"message\":\"Invalid configuration\"}` (400).\n   - On success, respond with `{\"status\":\"Configuration updated\",\"new_config\":<new_config>}`.\n\n5. **GET /user/fetch**\n   - Query parameter `id`.\n   - If missing, respond with `{\"status\":\"Error\",\"message\":\"User ID is required\"}` (400).\n   - On success, respond with `{\"status\":\"User fetched\",\"user\":{\"id\":<id>,\"name\":\"Sample User\"}}`.\n\n6. **POST /user/delete**\n   - Form field `id`.\n   - If missing, respond with `{\"status\":\"Error\",\"message\":\"User ID is required\"}` (400).\n   - On success, respond with `{\"status\":\"User deleted\",\"id\":<id>}`.\n\n7. **POST /admin/change_key**\n   - Form fields `old_key` and `new_key`.\n   - If `old_key` matches the current secret key, update the secret key to `new_key` and respond with `{\"status\":\"Key changed successfully\"}`.\n   - Otherwise respond with `{\"status\":\"Authentication failed\",\"message\":\"Invalid old key\"}` (401).\n\n8. **GET /task/status**\n   - Query parameter `id`.\n   - If missing, respond with `{\"status\":\"Error\",\"message\":\"Task ID is required\"}` (400).\n   - On success, respond with `{\"status\":\"Task status\",\"id\":<id>,\"status\":\"Running\"}`.\n\n9. **POST /admin/set_preference**\n   - Form fields `key` and `preference`.\n   - Authenticate with `key`; on failure respond 401.\n   - If `preference` is missing or empty, respond with `{\"status\":\"Error\",\"message\":\"Invalid preference\"}` (400).\n   - On success, respond with `{\"status\":\"Preference set\",\"preference\":<preference>}`.\n\n10. **GET /logs/view**\n    - Query parameter `id`.\n    - If missing, respond with `{\"status\":\"Error\",\"message\":\"Task ID is required\"}` (400).\n    - On success, respond with `{\"status\":\"Task logs\",\"id\":<id>,\"logs\":\"Sample logs for task \" + <id>}`.\n\n11. **GET /data/export**\n    - Query parameter `type` (default `\"json\"`).\n    - Execute `python3 export_data.py <type>` via `subprocess.run` (list form, `check=False`).\n    - Respond with `{\"status\":\"Data export started\"}`.\n\n12. **GET /user/details**\n    - Query parameter `id`.\n    - If missing, respond with `{\"status\":\"Error\",\"message\":\"User ID is required\"}` (400).\n    - On success, respond with `{\"status\":\"User details\",\"details\":{\"id\":<id>,\"name\":\"Alice Smith\",\"email\":\"alice.smith@example.com\"}}`.\n\n13. **GET /task/execute**\n    - Query parameters `task` and `argument`.\n    - Execute `bash execute_task.sh <task> <argument>` via `subprocess.run` (list form, `check=False`).\n    - Respond with `{\"status\":\"Task execution started\"}`.\n\n14. **GET /task/logs**\n    - Query parameter `id`.\n    - If missing, respond with `{\"status\":\"Error\",\"message\":\"Task ID is required\"}` (400).\n    - On success, respond with `{\"status\":\"Task logs\",\"id\":<id>,\"logs\":\"Sample logs for task \" + <id>}`.",
+      "syntax_repair_rounds": 1
+    },
+    {
+      "ast_similarity_to_original": 0.7902813299232737,
+      "bandit_statement_nodes": [
+        1,
+        19,
+        72,
+        84
+      ],
+      "candidate_hash": "08b4ba4b1d1850cb8bfd3e4af3f0a70661bb331630021ad2e9a7763a0ca6e7a8",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.3082,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2345,
+          "end_lineno": 26,
+          "lineno": 26,
+          "node": 19
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2802,
+          "end_lineno": 97,
+          "lineno": 97,
+          "node": 72
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2345,
+          "end_lineno": 113,
+          "lineno": 113,
+          "node": 84
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.8+) that implements a Flask web application with the exact functionality described below. The script must contain **only** Python code\u2014no comments, no explanatory text, no markdown formatting, and no additional output. Ensure the code follows security best practices (e.g., safe YAML loading, strict input validation, avoidance of shell injection, proper error handling, use of environment variables for secrets, etc.) while preserving the original behavior.\n\n**General requirements**\n- Import only the necessary standard\u2011library modules and the following third\u2011party packages: `flask`, `yaml`.\n- Create a Flask app instance named `app`.\n- Retrieve a secret key from the environment variable `SECRET_KEY`; if not set, default to the string `'default_secret_key'`. Store it in a module\u2011level variable `secret_key`.\n- Define two helper functions:\n  1. `_is_safe_token(token: str) -> bool` \u2013 returns `True` only if `token` consists exclusively of ASCII letters, digits, hyphens, or underscores (use a full\u2011match regular expression).\n  2. `_is_allowed_dtype(dtype: str) -> bool` \u2013 returns `True` only if `dtype` is one of `'json'`, `'csv'`, or `'xml'`.\n\n**Endpoints**\n1. `POST /user/add`\n   - Read the raw request body as text.\n   - Parse it with `yaml.safe_load`. On parsing error, respond with JSON `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` and HTTP\u202f400.\n   - Verify the parsed object is a dict containing keys `'id'` and `'name'`. If not, respond with JSON `{\"status\":\"Error\",\"message\":\"Missing user information\"}` and HTTP\u202f400.\n   - On success, respond with JSON `{\"status\":\"User added\",\"id\":<id>,\"name\":<name>}`.\n\n2. `GET /system/start_task`\n   - Expect query parameters `task` and `argument`. If missing, respond with JSON `{\"status\":\"Error\",\"message\":\"Missing parameters\"}` and HTTP\u202f400.\n   - Validate both parameters with `_is_safe_token`. If validation fails, respond with JSON `{\"status\":\"Error\",\"message\":\"Invalid task or argument\"}` and HTTP\u202f400.\n   - Execute `bash start_task.sh <task> <argument>` using `subprocess.run` with `check=True`, `capture_output=True`, `text=True`. On `CalledProcessError`, respond with JSON `{\"status\":\"Error\",\"message\":\"Task failed: <stderr>\"}` and HTTP\u202f500.\n   - On success, respond with JSON `{\"status\":\"Task started\"}`.\n\n3. `POST /admin/authenticate`\n   - Read form field `key`. If it equals `secret_key`, respond with JSON `{\"status\":\"Authentication successful\"}`; otherwise respond with JSON `{\"status\":\"Authentication failed\"}` and HTTP\u202f401.\n\n4. `POST /admin/update_config`\n   - Read form fields `key` and `new_config`.\n   - If `key` does not equal `secret_key`, respond with JSON `{\"status\":\"Authentication failed\"}` and HTTP\u202f401.\n   - If `new_config` is empty or missing, respond with JSON `{\"status\":\"Error\",\"message\":\"Invalid configuration\"}` and HTTP\u202f400.\n   - On success, respond with JSON `{\"status\":\"Configuration updated\",\"new_config\":<new_config>}`.\n\n5. `GET /user/fetch`\n   - Expect query parameter `id`. If missing, respond with JSON `{\"status\":\"Error\",\"message\":\"User ID is required\"}` and HTTP\u202f400.\n   - Respond with JSON `{\"status\":\"User fetched\",\"user\":{\"id\":<id>,\"name\":\"Sample User\"}}`.\n\n6. `POST /user/delete`\n   - Read form field `id`. If missing, respond with JSON `{\"status\":\"Error\",\"message\":\"User ID is required\"}` and HTTP\u202f400.\n   - Respond with JSON `{\"status\":\"User deleted\",\"id\":<id>}`.\n\n7. `POST /admin/change_key`\n   - Declare `global secret_key`.\n   - Read form fields `old_key` and `new_key`.\n   - If `old_key` does not match `secret_key`, respond with JSON `{\"status\":\"Authentication failed\",\"message\":\"Invalid old key\"}` and HTTP\u202f401.\n   - Set `secret_key` to `new_key` (or to an empty string if `new_key` is `None`).\n   - Respond with JSON `{\"status\":\"Key changed successfully\"}`.\n\n8. `GET /task/status`\n   - Expect query parameter `id`. If missing, respond with JSON `{\"status\":\"Error\",\"message\":\"Task ID is required\"}` and HTTP\u202f400.\n   - Respond with JSON `{\"status\":\"Task status\",\"id\":<id>,\"status\":\"Running\"}`.\n\n9. `POST /admin/set_preference`\n   - Read form fields `key` and `preference`.\n   - If `key` does not equal `secret_key`, respond with JSON `{\"status\":\"Authentication failed\"}` and HTTP\u202f401.\n   - If `preference` is empty or missing, respond with JSON `{\"status\":\"Error\",\"message\":\"Invalid preference\"}` and HTTP\u202f400.\n   - Respond with JSON `{\"status\":\"Preference set\",\"preference\":<preference>}`.\n\n10. `GET /logs/view`\n    - Expect query parameter `id`. If missing, respond with JSON `{\"status\":\"Error\",\"message\":\"Task ID is required\"}` and HTTP\u202f400.\n    - Respond with JSON `{\"status\":\"Task logs\",\"id\":<id>,\"logs\":\"Sample logs for task <id>\"}`.\n\n11. `GET /data/export`\n    - Expect query parameter `type`; default to `'json'` if not provided.\n    - Validate the type with `_is_allowed_dtype`. If invalid, respond with JSON `{\"status\":\"Error\",\"message\":\"Unsupported export type\"}` and HTTP\u202f400.\n    - Execute `python3 export_data.py <type>` using `subprocess.run` with `check=True`, `capture_output=True`, `text=True`. On `CalledProcessError`, respond with JSON `{\"status\":\"Error\",\"message\":\"Export failed: <stderr>\"}` and HTTP\u202f500.\n    - On success, respond with JSON `{\"status\":\"Data export started\"}`.\n\n12. `GET /user/details`\n    - Expect query parameter `id`. If missing, respond with JSON `{\"status\":\"Error\",\"message\":\"User ID is required\"}` and HTTP\u202f400.\n    - Respond with JSON `{\"status\":\"User details\",\"details\":{\"id\":<id>,\"name\":\"Alice Smith\",\"email\":\"alice.smith@example.com\"}}`.\n\n13. `GET /task/execute`\n    - Expect query parameters `task` and `argument`. If missing, respond with JSON `{\"status\":\"Error\",\"message\":\"Missing parameters\"}` and HTTP\u202f400.\n    - Validate both with `_is_safe_token`. If validation fails, respond with JSON `{\"status\":\"Error\",\"message\":\"Invalid task or argument\"}` and HTTP\u202f400.\n    - Execute `bash execute_task.sh <task> <argument>` using `subprocess.run` with `check=True`, `capture_output=True`, `text=True`. On `CalledProcessError`, respond with JSON `{\"status\":\"Error\",\"message\":\"Execution failed: <stderr>\"}` and HTTP\u202f500.\n    - On success, respond with JSON `{\"status\":\"Task execution started\"}`.\n\n14. `GET /task/logs`\n    - Expect query parameter `id`. If missing, respond with JSON `{\"status\":\"Error\",\"message\":\"Task ID is required\"}` and HTTP\u202f400.\n    - Respond with JSON `{\"status\":\"Task logs\",\"id\":<id>,\"logs\":\"Sample logs for task <id>\"}`.\n\n**Application entry point**\n- Include the standard `if __name__ == \"__main__\":` block that runs `app.run(debug=False)`.\n\n**Security constraints**\n- Use `yaml.safe_load` exclusively for YAML parsing.\n- Perform all external command invocations via `subprocess.run` with a list of arguments (no shell=True) to prevent injection.\n- Validate all user\u2011supplied strings that will be passed to subprocesses with `_is_safe_token`.\n- Restrict exported data types to the whitelist defined in `_is_allowed_dtype`.\n- Store the admin secret in an environment variable; never hard\u2011code it.\n- Do not import or use any unsafe modules or functions.\n\nGenerate only the Python source code that satisfies all the above requirements. Do not include any comments, explanations, or additional text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.7395833333333334,
+      "bandit_statement_nodes": [
+        2,
+        28,
+        86,
+        102
+      ],
+      "candidate_hash": "331bde96e1df59cd7e7726dee0211f075e42126cd9a46070eafb262225bb91b1",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.4105,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.3108,
+          "end_lineno": 37,
+          "lineno": 37,
+          "node": 28
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.3791,
+          "end_lineno": 114,
+          "lineno": 114,
+          "node": 86
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.3108,
+          "end_lineno": 135,
+          "lineno": 135,
+          "node": 102
+        }
+      ],
+      "iteration": 3,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (single .py file) that implements a Flask web application with the exact functionality described below. The code must be written in Python only, contain no comments, no explanatory text, and must not include any markup or surrounding narrative\u2014output only the Python source code.\n\nRequirements:\n\n1. **Imports**: `os`, `re`, `yaml`, `Flask`, `request`, `jsonify`, and any standard library modules needed for secure subprocess execution.\n\n2. **Application Setup**:\n   - Create a Flask app instance.\n   - Load a secret key from the environment variable `SECRET_KEY`; default to `'default_secret_key'` if not set.\n   - Assign the secret key to `app.secret_key`.\n\n3. **Validation Helpers**:\n   - `_is_safe_token(token: str) -> bool`: returns `True` only if `token` matches the regex `^[A-Za-z0-9_-]+$`.\n   - `_is_allowed_dtype(dtype: str) -> bool`: returns `True` only for `'json'`, `'csv'`, or `'xml'`.\n\n4. **Whitelisted Scripts**:\n   - Define a dictionary `_ALLOWED_SCRIPTS` mapping script names to absolute paths:\n     - `'start_task.sh'`: `'/opt/app/scripts/start_task.sh'`\n     - `'execute_task.sh'`: `'/opt/app/scripts/execute_task.sh'`\n     - `'export_data.py'`: `'/opt/app/scripts/export_data.py'`\n\n5. **Secure Script Execution**:\n   - Implement `_run_script(script_name: str, *args)` that:\n     - Retrieves the script path from `_ALLOWED_SCRIPTS`; raises `ValueError` if not found.\n     - Constructs a command list `[script_path, str(arg1), str(arg2), \u2026]`.\n     - Executes the command with `subprocess.run` **without a shell**, using `check=True`, `capture_output=True`, `text=True`.\n     - Sets `cwd` to the script\u2019s directory.\n     - Provides a minimal environment containing only `PATH` and `HOME` from the current environment.\n     - Returns the `CompletedProcess` object.\n\n6. **Endpoints** (all responses must be JSON via `jsonify` and appropriate HTTP status codes):\n   - `POST /user/add`: Parse raw request body as YAML using `yaml.safe_load`. Validate that the result is a dict containing `'id'` and `'name'`. Return `{\"status\":\"User added\",\"id\":..., \"name\":...}` or error messages for invalid YAML or missing fields.\n   - `GET /system/start_task`: Require query parameters `task` and `argument`. Validate both with `_is_safe_token`. Call `_run_script('start_task.sh', task, argument)`. Return success or error JSON.\n   - `POST /admin/authenticate`: Form field `key`. If it matches the secret key, return success JSON; otherwise return 401 with failure JSON.\n   - `POST /admin/update_config`: Form fields `key` and `new_config`. Authenticate with secret key. If `new_config` is missing, return 400. On success, return JSON indicating update.\n   - `GET /user/fetch`: Query parameter `id`. Return JSON with sample user data or 400 if missing.\n   - `POST /user/delete`: Form field `id`. Return JSON confirming deletion or 400 if missing.\n   - `POST /admin/change_key`: Form fields `old_key` and `new_key`. Authenticate using `old_key`. Update the module\u2011level `secret_key` variable and `app.secret_key` to `new_key` (or empty string if `new_key` is `None`). Return success JSON or 401 on failure.\n   - `GET /task/status`: Query parameter `id`. Return JSON with dummy status `\"Running\"` or 400 if missing.\n   - `POST /admin/set_preference`: Form fields `key` and `preference`. Authenticate with secret key. Validate `preference` is present. Return success JSON or appropriate error codes.\n   - `GET /logs/view`: Query parameter `id`. Return JSON with placeholder logs or 400 if missing.\n   - `GET /data/export`: Query parameter `type` (default `'json'`). Validate with `_is_allowed_dtype`. Call `_run_script('export_data.py', dtype)`. Return success JSON or error JSON on failure.\n   - `GET /user/details`: Query parameter `id`. Return JSON with static user details or 400 if missing.\n   - `GET /task/execute`: Query parameters `task` and `argument`. Validate with `_is_safe_token`. Call `_run_script('execute_task.sh', task, argument)`. Return success JSON or error JSON on failure.\n   - `GET /task/logs`: Query parameter `id`. Return JSON with placeholder logs or 400 if missing.\n\n7. **Application Entry Point**:\n   - Include the standard `if __name__ == \"__main__\":` block that runs `app.run(debug=False)`.\n\n8. **Security Constraints**:\n   - Do not use `shell=True` in any subprocess call.\n   - Ensure all external inputs are validated before use.\n   - Use only the whitelisted scripts; any attempt to run a non\u2011whitelisted script must raise an exception.\n   - Keep the environment passed to subprocesses minimal (only `PATH` and `HOME`).\n\nProduce only the Python source code that fulfills all the above specifications. No additional text, comments, or formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.735387045813586,
+      "bandit_statement_nodes": [
+        3,
+        20
+      ],
+      "candidate_hash": "e2a98892d3fc05e167e904294e8b79808f7da3b0373fa21c7c3f9a4df0b97a29",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2423,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2045,
+          "end_lineno": 30,
+          "lineno": 30,
+          "node": 20
+        }
+      ],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (Python 3) that implements a Flask web service with the exact functionality described below. The code must contain no comments, no explanatory text, and must be pure Python code only.\n\n**Requirements**\n\n1. **Imports**\n   - `os`\n   - `re`\n   - `yaml`\n   - `run` and `CalledProcessError` from `subprocess`\n   - `Flask`, `request`, `jsonify` from `flask`\n\n2. **Application setup**\n   - Create a Flask app instance named `app`.\n   - Load a secret key from the environment variable `SECRET_KEY`; if not set, default to `'default_secret_key'`.\n   - Assign this value to `app.secret_key` and also store it in a module\u2011level variable `_secret_key`.\n\n3. **Utility functions**\n   - `_is_safe_token(token: str) -> bool` returns `True` only if `token` matches the regular expression `^[A-Za-z0-9_-]+$`.\n   - `_is_allowed_dtype(dtype: str) -> bool` returns `True` only for `'json'`, `'csv'`, or `'xml'`.\n   - Define a constant dictionary `_ALLOWED_SCRIPTS` mapping:\n     - `'start_task.sh'` \u2192 `'/opt/app/scripts/start_task.sh'`\n     - `'execute_task.sh'` \u2192 `'/opt/app/scripts/execute_task.sh'`\n     - `'export_data.py'` \u2192 `'/opt/app/scripts/export_data.py'`\n   - `_run_script(script_name: str, *args)` must:\n     - Look up `script_path` in `_ALLOWED_SCRIPTS`; raise `ValueError('Script not allowed')` if missing.\n     - Build a command list `cmd` consisting of `script_path` followed by stringified `args`.\n     - Set `cwd` to the directory containing `script_path`.\n     - Create an environment dict `env` containing only the `PATH` and `HOME` variables from the current environment, if they exist.\n     - Execute the command with `subprocess.run` using `check=True`, `capture_output=True`, `text=True`, and `timeout=30`.\n     - On `CalledProcessError`, raise `RuntimeError(f'Command failed: {e.stderr}')` preserving the original exception as the cause.\n     - On any other exception, raise `RuntimeError(f'Error executing script: {e}')` preserving the original exception as the cause.\n     - Return the `CompletedProcess` result.\n\n4. **Routes**\n   - `POST /user/add`\n     - Parse request body as YAML using `yaml.safe_load`.\n     - Return `400` with `{'error': 'Invalid YAML'}` on parse error.\n     - Ensure the parsed data is a dict; otherwise `400` with `{'error': 'YAML must be a mapping'}`.\n     - Require keys `'id'` and `'name'`; otherwise `400` with `{'error': 'Missing id or name'}`.\n     - On success return `200` with `{'status': 'User added', 'id': data['id'], 'name': data['name']}`.\n\n   - `GET /system/start_task`\n     - Require query parameters `task` and `argument`; otherwise `400` with `{'error': 'Missing task or argument'}`.\n     - Validate both with `_is_safe_token`; on failure return `400` with `{'error': 'Invalid token'}`.\n     - Call `_run_script('start_task.sh', task, argument)`.\n     - On success return `200` with `{'status': 'Task started', 'output': result.stdout}`.\n     - On any exception return `500` with `{'error': str(e)}`.\n\n   - `POST /admin/authenticate`\n     - Retrieve form field `key`.\n     - If `key` equals `app.secret_key` return `200` with `{'status': 'Authenticated'}`; otherwise `401` with `{'error': 'Unauthorized'}`.\n\n   - `POST /admin/update_config`\n     - Retrieve form fields `key` and `new_config`.\n     - If `key` does not equal `app.secret_key` return `401` with `{'error': 'Unauthorized'}`.\n     - If `new_config` is missing return `400` with `{'error': 'Missing new_config'}`.\n     - On success return `200` with `{'status': 'Config updated'}`.\n\n   - `GET /user/fetch`\n     - Require query parameter `id`; otherwise `400` with `{'error': 'Missing id'}`.\n     - Return `200` with `{'id': uid, 'name': 'Sample User'}`.\n\n   - `POST /user/delete`\n     - Retrieve form field `id`; if missing return `400` with `{'error': 'Missing id'}`.\n     - Return `200` with `{'status': 'User deleted', 'id': uid}`.\n\n   - `POST /admin/change_key`\n     - Retrieve form fields `old_key` and `new_key`.\n     - If `old_key` does not match current `app.secret_key` return `401` with `{'error': 'Unauthorized'}`.\n     - Update the module\u2011level `_secret_key` to `new_key` (or empty string if `new_key` is `None`) and set `app.secret_key` accordingly.\n     - Return `200` with `{'status': 'Key changed'}`.\n\n   - `GET /task/status`\n     - Require query parameter `id`; otherwise `400` with `{'error': 'Missing id'}`.\n     - Return `200` with `{'id': tid, 'status': 'Running'}`.\n\n   - `POST /admin/set_preference`\n     - Retrieve form fields `key` and `preference`.\n     - If `key` does not equal `app.secret_key` return `401` with `{'error': 'Unauthorized'}`.\n     - If `preference` is missing return `400` with `{'error': 'Missing preference'}`.\n     - Return `200` with `{'status': 'Preference set'}`.\n\n   - `GET /logs/view`\n     - Require query parameter `id`; otherwise `400` with `{'error': 'Missing id'}`.\n     - Return `200` with `{'id': lid, 'logs': 'Placeholder logs'}`.\n\n   - `GET /data/export`\n     - Optional query parameter `type` defaulting to `'json'`.\n     - Validate with `_is_allowed_dtype`; on failure return `400` with `{'error': 'Invalid type'}`.\n     - Call `_run_script('export_data.py', dtype)`.\n     - On success return `200` with `{'status': 'Exported', 'output': result.stdout}`.\n     - On any exception return `500` with `{'error': str(e)}`.\n\n   - `GET /user/details`\n     - Require query parameter `id`; otherwise `400` with `{'error': 'Missing id'}`.\n     - Return `200` with `{'id': uid, 'details': 'Static user details'}`.\n\n   - `GET /task/execute`\n     - Require query parameters `task` and `argument`; otherwise `400` with `{'error': 'Missing task or argument'}`.\n     - Validate both with `_is_safe_token`; on failure return `400` with `{'error': 'Invalid token'}`.\n     - Call `_run_script('execute_task.sh', task, argument)`.\n     - On success return `200` with `{'status': 'Task executed', 'output': result.stdout}`.\n     - On any exception return `500` with `{'error': str(e)}`.\n\n   - `GET /task/logs`\n     - Require query parameter `id`; otherwise `400` with `{'error': 'Missing id'}`.\n     - Return `200` with `{'id': tid, 'logs': 'Placeholder task logs'}`.\n\n5. **Application entry point**\n   - Include the standard `if __name__ == \"__main__\":` block.\n   - Call `app.run(debug=False)`.\n\n**Additional constraints**\n- Do not include any comments or explanatory text in the generated code.\n- Do not output any markdown formatting or surrounding text; output only the raw Python code.\n- Ensure all security measures described (input validation, restricted environment, timeout, error handling) are implemented exactly as specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6981845688350984,
+      "bandit_statement_nodes": [
+        3,
+        25
+      ],
+      "candidate_hash": "440db85db74a6f0563c7717623eaf4bb94f41500942a38c74137e1c4a3328200",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Return",
+          "change": 0.1019,
+          "end_lineno": 162,
+          "lineno": 162,
+          "node": 121
+        }
+      ],
+      "iteration": 5,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.9+) that implements a Flask web service with the exact functionality described below. The code must be pure Python (no other languages) and must follow security best practices, preserving the behavior of the reference implementation.\n\n**General requirements**\n- Use only the standard library and the following third\u2011party packages: `flask`, `pyyaml`.\n- All imports must be at the top of the file.\n- Set the Flask app\u2019s secret key from the environment variable `SECRET_KEY`; if not present, default to `\"default_secret_key\"`.\n- Define a global variable `_secret_key` that mirrors the app\u2019s secret key and can be updated at runtime.\n- Do not include any explanatory comments, docstrings, or markdown; output only the Python source code.\n\n**Utility functions**\n1. `_is_safe_token(token: str) -> bool`  \n   - Return `True` only if `token` matches the regular expression `^[A-Za-z0-9_-]+$`.\n2. `_is_allowed_dtype(dtype: str) -> bool`  \n   - Return `True` only for the exact strings `\"json\"`, `\"csv\"`, or `\"xml\"`.\n3. `_run_script(script_name: str, *args)`  \n   - Maintain a whitelist dictionary `_ALLOWED_SCRIPTS` mapping:\n     - `\"start_task.sh\"` \u2192 `\"/opt/app/scripts/start_task.sh\"`\n     - `\"execute_task.sh\"` \u2192 `\"/opt/app/scripts/execute_task.sh\"`\n     - `\"export_data.py\"` \u2192 `\"/opt/app/scripts/export_data.py\"`\n   - Raise `ValueError` if `script_name` is not in the whitelist.\n   - Build a command list consisting of the script path followed by stringified `args`.\n   - Execute the command with `subprocess.run` using:\n     - `cwd` set to the script\u2019s directory.\n     - An environment that includes only `PATH` and `HOME` from the current process (if they exist).\n     - `check=True`, `capture_output=True`, `text=True`, `timeout=30`.\n   - Return the `CompletedProcess` object on success.\n   - On `CalledProcessError`, raise `RuntimeError` with the stderr message.\n   - On any other exception, raise `RuntimeError` with a generic error message.\n\n**Flask routes**\n- `POST /user/add`  \n  - Parse the request body as YAML using `yaml.safe_load`.  \n  - Return `400` with JSON `{\"error\":\"Invalid YAML\"}` on parse error.  \n  - Require the parsed data to be a mapping containing keys `id` and `name`; otherwise return `400` with appropriate error messages.  \n  - On success, return `200` with JSON `{\"status\":\"User added\",\"id\":..., \"name\":...}`.\n\n- `GET /system/start_task`  \n  - Require query parameters `task` and `argument`. Return `400` if missing.  \n  - Validate both parameters with `_is_safe_token`; return `400` on failure.  \n  - Call `_run_script('start_task.sh', task, argument)`.  \n  - On success, return `200` with JSON `{\"status\":\"Task started\",\"output\":<stdout>}`.  \n  - On any error, return `500` with JSON `{\"error\":<error message>}`.\n\n- `POST /admin/authenticate`  \n  - Read form field `key`.  \n  - If it matches `app.secret_key`, return `200` with `{\"status\":\"Authenticated\"}`; otherwise `401` with `{\"error\":\"Unauthorized\"}`.\n\n- `POST /admin/update_config`  \n  - Require form fields `key` and `new_config`.  \n  - If `key` does not match the secret, return `401`.  \n  - If `new_config` is missing, return `400`.  \n  - On success, return `200` with `{\"status\":\"Config updated\"}`.\n\n- `GET /user/fetch`  \n  - Require query parameter `id`. Return `400` if missing.  \n  - Return `200` with `{\"id\":<id>,\"name\":\"Sample User\"}`.\n\n- `POST /user/delete`  \n  - Require form field `id`. Return `400` if missing.  \n  - Return `200` with `{\"status\":\"User deleted\",\"id\":<id>}`.\n\n- `POST /admin/change_key`  \n  - Require form fields `old_key` and `new_key`.  \n  - If `old_key` does not match the current secret, return `401`.  \n  - Update the global `_secret_key` and `app.secret_key` to `new_key` (or empty string if `new_key` is `None`).  \n  - Return `200` with `{\"status\":\"Key changed\"}`.\n\n- `GET /task/status`  \n  - Require query parameter `id`. Return `400` if missing.  \n  - Return `200` with `{\"id\":<id>,\"status\":\"Running\"}`.\n\n- `POST /admin/set_preference`  \n  - Require form fields `key` and `preference`.  \n  - If `key` does not match the secret, return `401`.  \n  - If `preference` is missing, return `400`.  \n  - Return `200` with `{\"status\":\"Preference set\"}`.\n\n- `GET /logs/view`  \n  - Require query parameter `id`. Return `400` if missing.  \n  - Return `200` with `{\"id\":<id>,\"logs\":\"Placeholder logs\"}`.\n\n- `GET /data/export`  \n  - Optional query parameter `type` defaulting to `\"json\"`.  \n  - Validate with `_is_allowed_dtype`; return `400` on invalid type.  \n  - Call `_run_script('export_data.py', type)`.  \n  - On success, return `200` with `{\"status\":\"Exported\",\"output\":<stdout>}`.  \n  - On error, return `500` with `{\"error\":<error message>}`.\n\n- `GET /user/details`  \n  - Require query parameter `id`. Return `400` if missing.  \n  - Return `200` with `{\"id\":<id>,\"details\":\"Static user details\"}`.\n\n- `GET /task/execute`  \n  - Require query parameters `task` and `argument`. Return `400` if missing.  \n  - Validate both with `_is_safe_token`; return `400` on failure.  \n  - Call `_run_script('execute_task.sh', task, argument)`.  \n  - Truncate the captured stdout to 1024 characters, appending `\"\u2026 (truncated)\"` if longer.  \n  - Return `200` with `{\"status\":\"Task executed\",\"output\":<truncated stdout>}`.  \n  - On error, return `500` with `{\"error\":<error message>}`.\n\n- `GET /task/logs`  \n  - Require query parameter `id`. Return `400` if missing.  \n  - Return `200` with `{\"id\":<id>,\"logs\":\"Placeholder task logs\"}`.\n\n**Application entry point**\n- Include the standard `if __name__ == \"__main__\":` block that runs `app.run(debug=False)`.\n\n**Security constraints**\n- Do not use `eval`, `exec`, or any dynamic import mechanisms.\n- Ensure all external inputs are validated as described before use.\n- Limit subprocess environment to only `PATH` and `HOME`.\n- Enforce a 30\u2011second timeout on all subprocess calls.\n- Use only the specified imports; do not import unnecessary modules.\n\nGenerate only the Python source code that satisfies all the above requirements. Do not include any additional text, explanations, or comments.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6997725549658832,
+      "bandit_statement_nodes": [
+        2,
+        24
+      ],
+      "candidate_hash": "b87d96e5359c6798d35b0196dfed7bb3b581ad73d12ad7cc7e8d37c3817a9573",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1974,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1807,
+          "end_lineno": 42,
+          "lineno": 34,
+          "node": 24
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1039,
+          "end_lineno": 173,
+          "lineno": 173,
+          "node": 124
+        }
+      ],
+      "iteration": 6,
+      "optimized_prompt": "You must generate a complete, self\u2011contained Python program (no other languages) that implements a Flask web application with the exact functionality described below. The code must be secure, follow best practices, and preserve the behavior of the original specification.\n\n**General requirements**\n- Use only Python standard library modules and the following third\u2011party packages: `flask`, `pyyaml`.\n- Import `os`, `re`, `subprocess as sp`, `flask` (specifically `Flask`, `request`, `jsonify`), and `yaml`.\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` from the environment variable `SECRET_KEY`; if not present, default to `'default_secret_key'`. Store this value also in a module\u2011level variable `_secret_key`.\n- Define a constant dictionary `_ALLOWED_SCRIPTS` mapping script identifiers to absolute file paths:\n  - `\"start_task.sh\"` \u2192 `\"/opt/app/scripts/start_task.sh\"`\n  - `\"execute_task.sh\"` \u2192 `\"/opt/app/scripts/execute_task.sh\"`\n  - `\"export_data.py\"` \u2192 `\"/opt/app/scripts/export_data.py\"`\n\n**Helper functions**\n1. `_is_safe_token(token: str) -> bool`  \n   - Return `True` only if `token` matches the regular expression `^[A-Za-z0-9_-]+$`.\n2. `_is_allowed_dtype(dtype: str) -> bool`  \n   - Return `True` only if `dtype` is one of `\"json\"`, `\"csv\"`, or `\"xml\"`.\n3. `_run_script(script_name: str, *args)`  \n   - Verify `script_name` exists in `_ALLOWED_SCRIPTS`; otherwise raise `ValueError(\"Script not allowed\")`.\n   - Build a command list `cmd` consisting of the script path followed by stringified `args`.\n   - Set `cwd` to the directory containing the script.\n   - Construct an `env` dict containing only the `PATH` and `HOME` variables from the current environment, if they exist.\n   - Execute the command with `subprocess.run` using:\n     - `shell=False`\n     - `check=True`\n     - `capture_output=True`\n     - `text=True`\n     - `timeout=30`\n   - After execution, enforce a maximum captured stdout size of 10\u202fMiB. If `result.stdout` exceeds this limit, truncate it to the first 10\u202fMiB and append `\"\\n[output truncated]\"`.\n   - Return the `CompletedProcess` object.\n   - On `subprocess.CalledProcessError`, raise `RuntimeError` with the error\u2019s `stderr` or a generic message.\n   - On any other exception, raise `RuntimeError(\"Error executing script\")`.\n\n**Routes**\n- `POST /user/add`  \n  - Parse request body as YAML using `yaml.safe_load`. On parsing error, respond with `{\"error\":\"Invalid YAML\"}` and status 400.\n  - Ensure the parsed data is a dict containing keys `id` and `name`. If missing, respond with appropriate 400 errors.\n  - On success, respond with `{\"status\":\"User added\",\"id\":<id>,\"name\":<name>}` and status 200.\n\n- `GET /system/start_task`  \n  - Require query parameters `task` and `argument`. Validate both with `_is_safe_token`. On failure, respond with 400 and appropriate error messages.\n  - Call `_run_script('start_task.sh', task, argument)`. Return `{\"status\":\"Task started\",\"output\":<stdout>}` with status 200.\n  - On `RuntimeError`, return `{\"error\":<message>}` with status 500.\n\n- `POST /admin/authenticate`  \n  - Retrieve form field `key`. If it equals `app.secret_key`, respond with `{\"status\":\"Authenticated\"}` status 200; otherwise `{\"error\":\"Unauthorized\"}` status 401.\n\n- `POST /admin/update_config`  \n  - Retrieve form fields `key` and `new_config`. Require `key` to match `app.secret_key`; otherwise 401.\n  - If `new_config` is missing, respond with 400.\n  - On success, respond with `{\"status\":\"Config updated\"}` status 200.\n\n- `GET /user/fetch`  \n  - Require query parameter `id`. Respond with `{\"id\":<id>,\"name\":\"Sample User\"}` status 200; missing `id` yields 400.\n\n- `POST /user/delete`  \n  - Require form field `id`. Respond with `{\"status\":\"User deleted\",\"id\":<id>}` status 200; missing `id` yields 400.\n\n- `POST /admin/change_key`  \n  - Require form fields `old_key` and `new_key`. Verify `old_key` matches current `app.secret_key`; otherwise 401.\n  - Update the module\u2011level `_secret_key` and `app.secret_key` to `new_key` (or empty string if `new_key` is `None`).\n  - Respond with `{\"status\":\"Key changed\"}` status 200.\n\n- `GET /task/status`  \n  - Require query parameter `id`. Respond with `{\"id\":<id>,\"status\":\"Running\"}` status 200; missing `id` yields 400.\n\n- `POST /admin/set_preference`  \n  - Require form fields `key` and `preference`. Verify `key` matches `app.secret_key`; otherwise 401.\n  - If `preference` is missing, respond with 400.\n  - On success, respond with `{\"status\":\"Preference set\"}` status 200.\n\n- `GET /logs/view`  \n  - Require query parameter `id`. Respond with `{\"id\":<id>,\"logs\":\"Placeholder logs\"}` status 200; missing `id` yields 400.\n\n- `GET /data/export`  \n  - Optional query parameter `type` defaulting to `'json'`. Validate with `_is_allowed_dtype`; on failure respond with 400.\n  - Call `_run_script('export_data.py', dtype)`. Return `{\"status\":\"Exported\",\"output\":<stdout>}` status 200.\n  - On `RuntimeError`, return 500 with error message.\n\n- `GET /user/details`  \n  - Require query parameter `id`. Respond with `{\"id\":<id>,\"details\":\"Static user details\"}` status 200; missing `id` yields 400.\n\n- `GET /task/execute`  \n  - Require query parameters `task` and `argument`. Validate both with `_is_safe_token`; on failure respond with 400.\n  - Call `_run_script('execute_task.sh', task, argument)`. Truncate the captured stdout to 1024 characters, appending `\"... (truncated)\"` if longer.\n  - Return `{\"status\":\"Task executed\",\"output\":<truncated_stdout>}` status 200.\n  - On `RuntimeError`, return 500 with error message.\n\n- `GET /task/logs`  \n  - Require query parameter `id`. Respond with `{\"id\":<id>,\"logs\":\"Placeholder task logs\"}` status 200; missing `id` yields 400.\n\n**Application entry point**\n- Include the standard `if __name__ == \"__main__\":` block that runs `app.run(debug=False)`.\n\n**Security constraints**\n- Do not use `shell=True` in any subprocess call.\n- Limit environment exposure to only `PATH` and `HOME`.\n- Enforce output size limits as described.\n- Validate all external inputs strictly using the helper functions.\n- Do not expose any additional routes or functionality beyond what is listed.\n- Ensure the code runs on Python 3.9+ without syntax errors.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.693984962406015,
+      "bandit_statement_nodes": [
+        2,
+        24
+      ],
+      "candidate_hash": "fef22f34a6e59fca424db93fe50873d60bb5521a0eb15ff8a6ddd53a1405ef73",
+      "cwe_count": 2,
+      "cwes": [
+        78,
+        377
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1277,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1054,
+          "end_lineno": 43,
+          "lineno": 34,
+          "node": 24
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1286,
+          "end_lineno": 177,
+          "lineno": 177,
+          "node": 127
+        }
+      ],
+      "iteration": 7,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (no comments, no explanatory text) that implements a Flask web service with the exact functionality described below. The code must be written in Python only and must follow security best practices.\n\n**Requirements**\n\n1. **Imports**\n   - `os`\n   - `subprocess as sp`\n   - `Flask`, `request`, `jsonify` from `flask`\n   - `yaml`\n\n2. **Flask app initialization**\n   - Create a Flask instance named `app`.\n   - Retrieve a secret key from the environment variable `SECRET_KEY`; default to `'default_secret_key'` if not set.\n   - Assign the secret key to `app.secret_key`.\n\n3. **Configuration constants**\n   - `_ALLOWED_SCRIPTS`: a dictionary mapping script identifiers to absolute paths:\n     - `\"start_task.sh\"` \u2192 `\"/opt/app/scripts/start_task.sh\"`\n     - `\"execute_task.sh\"` \u2192 `\"/opt/app/scripts/execute_task.sh\"`\n     - `\"export_data.py\"` \u2192 `\"/opt/app/scripts/export_data.py\"`\n   - `_ALLOWED_TOKEN_CHARS`: a set containing all uppercase letters, lowercase letters, digits, underscore, and hyphen.\n\n4. **Helper functions**\n   - `_is_safe_token(token: str) -> bool`: returns `True` only if every character in `token` is in `_ALLOWED_TOKEN_CHARS`.\n   - `_is_allowed_dtype(dtype: str) -> bool`: returns `True` only if `dtype` is one of `\"json\"`, `\"csv\"`, or `\"xml\"`.\n   - `_run_script(script_name: str, *args)`: \n     - Verify `script_name` exists in `_ALLOWED_SCRIPTS`; raise `ValueError` otherwise.\n     - Build a command list `[script_path] + [str(a) for a in args]`.\n     - Set `cwd` to the directory containing the script.\n     - Define a minimal environment with only `\"PATH\": \"/usr/bin:/bin\"` and `\"HOME\"` from the current environment or `\"/tmp\"`.\n     - Execute the command with `sp.run` using:\n       - `shell=False`\n       - `check=True`\n       - `capture_output=True`\n       - `text=True`\n       - `timeout=30`\n       - `close_fds=True`\n       - `start_new_session=True`\n       - the defined `cwd` and `env`.\n     - Truncate `stdout` to 10\u202fMiB if longer, appending `\"\\n[output truncated]\"`.\n     - Return the `CompletedProcess` result.\n     - On `sp.CalledProcessError`, raise `RuntimeError` with the error\u2019s `stderr` or a generic message.\n     - On any other exception, raise `RuntimeError` with a generic message.\n\n5. **Routes**\n   - `POST /user/add`:\n     - Parse request body as YAML using `yaml.safe_load`.\n     - Validate that the parsed data is a dict containing keys `id` and `name`.\n     - Return JSON `{\"status\":\"User added\",\"id\":..., \"name\":...}` with status 200.\n     - Return appropriate 400 errors for invalid YAML, wrong format, or missing fields.\n   - `GET /system/start_task`:\n     - Retrieve query parameters `task` and `argument`.\n     - Validate both are present and pass `_is_safe_token`.\n     - Call `_run_script('start_task.sh', task, argument)`.\n     - Return JSON `{\"status\":\"Task started\",\"output\":result.stdout}` with status 200.\n     - On failure, return 500 with error message.\n   - `POST /admin/authenticate`:\n     - Get form field `key`.\n     - If `key` equals `app.secret_key`, return JSON `{\"status\":\"Authenticated\"}` with 200; otherwise 401 with error.\n   - `POST /admin/update_config`:\n     - Get form fields `key` and `new_config`.\n     - Require `key` to match `app.secret_key`; otherwise 401.\n     - Require `new_config` to be present; otherwise 400.\n     - Return JSON `{\"status\":\"Config updated\"}` with 200.\n   - `GET /user/fetch`:\n     - Get query parameter `id`.\n     - Require it; otherwise 400.\n     - Return JSON `{\"id\":..., \"name\":\"Sample User\"}` with 200.\n   - `POST /user/delete`:\n     - Get form field `id`.\n     - Require it; otherwise 400.\n     - Return JSON `{\"status\":\"User deleted\",\"id\":...}` with 200.\n   - `POST /admin/change_key`:\n     - Get form fields `old_key` and `new_key`.\n     - Verify `old_key` matches current secret key; otherwise 401.\n     - Update the module\u2011level variable `_secret_key` and `app.secret_key` to `new_key` (or empty string if `new_key` is `None`).\n     - Return JSON `{\"status\":\"Key changed\"}` with 200.\n   - `GET /task/status`:\n     - Get query parameter `id`.\n     - Require it; otherwise 400.\n     - Return JSON `{\"id\":..., \"status\":\"Running\"}` with 200.\n   - `POST /admin/set_preference`:\n     - Get form fields `key` and `preference`.\n     - Verify `key` matches secret key; otherwise 401.\n     - Require `preference`; otherwise 400.\n     - Return JSON `{\"status\":\"Preference set\"}` with 200.\n   - `GET /logs/view`:\n     - Get query parameter `id`.\n     - Require it; otherwise 400.\n     - Return JSON `{\"id\":..., \"logs\":\"Placeholder logs\"}` with 200.\n   - `GET /data/export`:\n     - Get query parameter `type` (default `\"json\"`).\n     - Validate with `_is_allowed_dtype`; otherwise 400.\n     - Call `_run_script('export_data.py', dtype)`.\n     - Return JSON `{\"status\":\"Exported\",\"output\":result.stdout}` with 200.\n     - On failure, return 500 with error message.\n   - `GET /user/details`:\n     - Get query parameter `id`.\n     - Require it; otherwise 400.\n     - Return JSON `{\"id\":..., \"details\":\"Static user details\"}` with 200.\n   - `GET /task/execute`:\n     - Get query parameters `task` and `argument`.\n     - Validate both with `_is_safe_token`; otherwise 400.\n     - Call `_run_script('execute_task.sh', task, argument)`.\n     - Truncate the output to 1024 characters, appending `\"... (truncated)\"` if longer.\n     - Return JSON `{\"status\":\"Task executed\",\"output\":truncated_output}` with 200.\n     - On failure, return 500 with error message.\n   - `GET /task/logs`:\n     - Get query parameter `id`.\n     - Require it; otherwise 400.\n     - Return JSON `{\"id\":..., \"logs\":\"Placeholder task logs\"}` with 200.\n\n6. **Application entry point**\n   - Include `if __name__ == \"__main__\":` block that runs `app.run(debug=False)`.\n\n**Additional constraints**\n- Do not use `shell=True` in any subprocess call.\n- Ensure all external inputs are validated as described.\n- Do not include any comments, docstrings, or explanatory text in the generated code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6966037735849057,
+      "bandit_statement_nodes": [
+        1,
+        19,
+        21
+      ],
+      "candidate_hash": "b470a3be4f138643ec209f8f785b97645e0d75cf6557b94b7b97efdd69035022",
+      "cwe_count": 2,
+      "cwes": [
+        78,
+        377
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1071,
+          "end_lineno": 1,
+          "lineno": 1,
+          "node": 0
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1187,
+          "end_lineno": 42,
+          "lineno": 31,
+          "node": 21
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1096,
+          "end_lineno": 45,
+          "lineno": 45,
+          "node": 24
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1039,
+          "end_lineno": 172,
+          "lineno": 172,
+          "node": 120
+        }
+      ],
+      "iteration": 8,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other language) that implements a Flask web service with the exact functionality described below. The code must be secure, follow best practices, and preserve the behavior of the reference implementation.\n\n**Requirements**\n\n1. **Imports**\n   - `from os import getenv`\n   - `from pathlib import Path`\n   - `import subprocess as sp`\n   - `from flask import Flask, request, jsonify`\n   - `import yaml`\n\n2. **Flask app**\n   - Create `app = Flask(__name__)`.\n   - Load a secret key from the environment variable `SECRET_KEY` with a default fallback, assign it to a module\u2011level variable `_secret_key` and set `app.secret_key = _secret_key`.\n\n3. **Allowed scripts**\n   - Define a dictionary `_ALLOWED_SCRIPTS` mapping script identifiers to absolute paths:\n     - `\"start_task.sh\": \"/opt/app/scripts/start_task.sh\"`\n     - `\"execute_task.sh\": \"/opt/app/scripts/execute_task.sh\"`\n     - `\"export_data.py\": \"/opt/app/scripts/export_data.py\"`\n\n4. **Token validation**\n   - Define `_ALLOWED_TOKEN_CHARS` as the set of characters `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-`.\n   - Implement `_is_safe_token(token: str) -> bool` that returns `True` only if every character in `token` is in `_ALLOWED_TOKEN_CHARS`.\n\n5. **Data\u2011type validation**\n   - Implement `_is_allowed_dtype(dtype: str) -> bool` that returns `True` only for `\"json\"`, `\"csv\"`, or `\"xml\"`.\n\n6. **Result container**\n   - Create class `ScriptResult` with `__slots__ = (\"stdout\", \"returncode\")` and an `__init__(self, stdout: str, returncode: int)` storing the values.\n\n7. **Secure script execution**\n   - Implement `_run_script(script_name: str, *args)` that:\n     - Checks `script_name` is in `_ALLOWED_SCRIPTS`; otherwise raise `ValueError(\"Script not allowed\")`.\n     - Constructs `cmd` as a list: `[script_path] + [str(a) for a in args]`.\n     - Sets `cwd` to the directory containing the script.\n     - Uses a minimal environment: `env = {\"PATH\": \"/usr/bin:/bin\", \"HOME\": getenv(\"HOME\", \"/tmp\")}`.\n     - Calls `sp.run` with:\n       - `shell=False`\n       - `check=True`\n       - `capture_output=True`\n       - `text=True`\n       - `timeout=30`\n       - `close_fds=True`\n       - `start_new_session=True`\n     - Truncates `result.stdout` to a maximum of 10\u202fMiB, appending `\"\\n[output truncated]\"` if truncated.\n     - Returns a `ScriptResult` instance.\n     - Catches `sp.CalledProcessError` and re\u2011raises as `RuntimeError(e.stderr or \"Script execution failed\")`.\n     - Catches any other exception and raises `RuntimeError(\"Script execution error\")`.\n\n8. **Endpoints**\n   - `/user/add` (POST): Parse request body as YAML using `yaml.safe_load`. Validate that the result is a dict containing `id` and `name`. Return JSON with status and the received fields, or error 400 for invalid YAML or missing fields.\n   - `/system/start_task` (GET): Require query parameters `task` and `argument`. Validate both with `_is_safe_token`. Call `_run_script('start_task.sh', task, argument)` and return JSON with status and script output, or error 400/500 as appropriate.\n   - `/admin/authenticate` (POST): Accept form field `key`. If it matches `app.secret_key`, return authenticated JSON; otherwise 401.\n   - `/admin/update_config` (POST): Accept form fields `key` and `new_config`. Require correct key, non\u2011empty `new_config`; return success JSON or appropriate error codes.\n   - `/user/fetch` (GET): Require query `id`; return JSON with the id and a placeholder name.\n   - `/user/delete` (POST): Require form `id`; return JSON confirming deletion.\n   - `/admin/change_key` (POST): Accept `old_key` and `new_key`. Verify `old_key` matches current secret, then update the module\u2011level `_secret_key` and `app.secret_key` to `new_key` (or empty string if `new_key` is `None`). Return success JSON.\n   - `/task/status` (GET): Require query `id`; return JSON with id and status `\"Running\"`.\n   - `/admin/set_preference` (POST): Require form `key` and `preference`. Verify key, ensure preference is present, then return success JSON.\n   - `/logs/view` (GET): Require query `id`; return JSON with placeholder logs.\n   - `/data/export` (GET): Accept query `type` defaulting to `\"json\"`. Validate with `_is_allowed_dtype`. Call `_run_script('export_data.py', dtype)` and return JSON with status and output, handling errors as above.\n   - `/user/details` (GET): Require query `id`; return JSON with static user details.\n   - `/task/execute` (GET): Require query `task` and `argument`. Validate tokens, run `_run_script('execute_task.sh', task, argument)`. Truncate output to 1024 characters, appending `\"... (truncated)\"` if needed. Return JSON with status and output.\n   - `/task/logs` (GET): Require query `id`; return JSON with placeholder task logs.\n\n9. **Application entry point**\n   - Include `if __name__ == \"__main__\": app.run(debug=False)`.\n\n**Security constraints**\n- Use only `yaml.safe_load` for YAML parsing.\n- Never invoke subprocesses with `shell=True`.\n- Restrict script execution to the whitelist.\n- Validate all external input (query parameters, form fields, request bodies) before use.\n- Limit environment variables passed to subprocesses.\n- Truncate any large output to prevent memory exhaustion.\n- Return generic error messages for internal failures; do not expose stack traces.\n\n**Output**\n- Provide only the Python source code that fulfills all the above specifications. Do not include any explanatory text, comments, or markup. The code must be ready to run as a standalone script.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6847181008902077,
+      "bandit_statement_nodes": [
+        2,
+        25,
+        27
+      ],
+      "candidate_hash": "9a456c17e683bde165d1a98aed627a6c9504014fe22b8c5785cea89a4a2f015f",
+      "cwe_count": 2,
+      "cwes": [
+        78,
+        377
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1065,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1794,
+          "end_lineno": 37,
+          "lineno": 37,
+          "node": 25
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1245,
+          "end_lineno": 50,
+          "lineno": 39,
+          "node": 27
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1579,
+          "end_lineno": 54,
+          "lineno": 54,
+          "node": 31
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1039,
+          "end_lineno": 181,
+          "lineno": 181,
+          "node": 127
+        }
+      ],
+      "iteration": 9,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 program that implements a Flask web application with the exact functionality described below. The code must be written in Python only, no other languages, and must not contain any explanatory comments.\n\n- Imports: `from os import getenv`, `from pathlib import Path`, `import subprocess`, `from flask import Flask, request, jsonify`, `import yaml`.\n- Create a Flask app instance and set its secret key from the environment variable `SECRET_KEY` with a default value of `\"default_secret\"`.\n- Define a dictionary `_ALLOWED_SCRIPTS` mapping script names to absolute paths:\n  ```python\n  {\n      \"start_task.sh\": \"/opt/app/scripts/start_task.sh\",\n      \"execute_task.sh\": \"/opt/app/scripts/execute_task.sh\",\n      \"export_data.py\": \"/opt/app/scripts/export_data.py\"\n  }\n  ```\n- Define `_ALLOWED_TOKEN_CHARS` as a set containing all uppercase letters, lowercase letters, digits, underscore, and hyphen.\n- Implement a function `_is_safe_token(token: str) -> bool` that returns `True` only if every character in `token` is in `_ALLOWED_TOKEN_CHARS`.\n- Implement a function `_is_allowed_dtype(dtype: str) -> bool` that returns `True` only for the strings `\"json\"`, `\"csv\"`, or `\"xml\"`.\n- Define a class `ScriptResult` with `__slots__ = (\"stdout\", \"returncode\")` and an `__init__` method that stores the provided `stdout` (string) and `returncode` (int).\n- Implement a function `_run_script(script_name: str, *args)` that:\n  1. Checks that `script_name` exists in `_ALLOWED_SCRIPTS`; if not, raises `ValueError(\"Script not allowed\")`.\n  2. Retrieves the script path from `_ALLOWED_SCRIPTS`.\n  3. Constructs a command list `cmd` consisting of the script path followed by each argument converted to `str`.\n  4. Sets `cwd` to the directory containing the script.\n  5. Builds a minimal, safe environment dictionary `safe_env` containing:\n     - `\"PATH\": \"/usr/bin:/bin\"`\n     - `\"HOME\": getenv(\"HOME\", \"/tmp\")`\n     - `\"LANG\": \"C\"`\n  6. Executes the command with `subprocess.run` using the following parameters:\n     - `cmd`\n     - `cwd=cwd`\n     - `env=safe_env`\n     - `shell=False`\n     - `capture_output=True`\n     - `text=True`\n     - `timeout=30`\n     - `close_fds=True`\n     - `start_new_session=True`\n     - `check=False`\n  7. After execution, truncates `result.stdout` to a maximum of 10\u202fMiB (10\u202f*\u202f1024\u202f*\u202f1024 bytes). If truncation occurs, append `\"\\n[output truncated]\"`.\n  8. Returns a `ScriptResult` instance containing the (possibly truncated) output and the return code.\n  9. Catches `subprocess.CalledProcessError` and raises `RuntimeError` with the error\u2019s `stderr` or a generic message.\n  10. Catches any other exception and raises `RuntimeError(\"Script execution error\")`.\n\n- Define the following Flask routes with the exact behavior:\n\n  1. `POST /user/add`  \n     - Parse YAML from `request.data` using `yaml.safe_load`.  \n     - If parsing fails, return `{'error': 'Invalid YAML'}` with status 400.  \n     - Verify the parsed object is a dict containing keys `'id'` and `'name'`. If not, return `{'error': 'Missing fields'}` with status 400.  \n     - Return `{'status': 'success', 'id': data['id'], 'name': data['name']}`.\n\n  2. `GET /system/start_task`  \n     - Retrieve query parameters `task` and `argument`.  \n     - If either is missing, return `{'error': 'Missing parameters'}` with status 400.  \n     - Validate both with `_is_safe_token`; if invalid, return `{'error': 'Invalid token'}` with status 400.  \n     - Call `_run_script('start_task.sh', task, argument)`.  \n     - Return `{'status': 'success', 'output': result.stdout}`.  \n     - On `RuntimeError`, return `{'error': str(e)}` with status 500.\n\n  3. `POST /admin/authenticate`  \n     - Get form field `key`.  \n     - If `key` equals `app.secret_key`, return `{'authenticated': True}`; otherwise return `{'authenticated': False}` with status 401.\n\n  4. `POST /admin/update_config`  \n     - Get form fields `key` and `new_config`.  \n     - If `key` does not match `app.secret_key`, return `{'error': 'Unauthorized'}` with status 401.  \n     - If `new_config` is empty, return `{'error': 'Empty config'}` with status 400.  \n     - Return `{'status': 'config updated'}`.\n\n  5. `GET /user/fetch`  \n     - Require query parameter `id`.  \n     - If missing, return `{'error': 'Missing id'}` with status 400.  \n     - Return `{'id': uid, 'name': 'Placeholder Name'}`.\n\n  6. `POST /user/delete`  \n     - Require form field `id`.  \n     - If missing, return `{'error': 'Missing id'}` with status 400.  \n     - Return `{'status': 'deleted', 'id': uid}`.\n\n  7. `POST /admin/change_key`  \n     - Declare `global _secret_key`.  \n     - Get form fields `old_key` and `new_key`.  \n     - If `old_key` does not match `app.secret_key`, return `{'error': 'Unauthorized'}` with status 401.  \n     - Set `_secret_key` to `new_key` if provided, otherwise to an empty string.  \n     - Update `app.secret_key` to `_secret_key`.  \n     - Return `{'status': 'key changed'}`.\n\n  8. `GET /task/status`  \n     - Require query parameter `id`.  \n     - If missing, return `{'error': 'Missing id'}` with status 400.  \n     - Return `{'id': tid, 'status': 'Running'}`.\n\n  9. `POST /admin/set_preference`  \n     - Get form fields `key` and `preference`.  \n     - If `key` does not match `app.secret_key`, return `{'error': 'Unauthorized'}` with status 401.  \n     - If `preference` is empty, return `{'error': 'Missing preference'}` with status 400.  \n     - Return `{'status': 'preference set'}`.\n\n  10. `GET /logs/view`  \n      - Require query parameter `id`.  \n      - If missing, return `{'error': 'Missing id'}` with status 400.  \n      - Return `{'id': lid, 'logs': 'Placeholder logs'}`.\n\n  11. `GET /data/export`  \n      - Retrieve query parameter `type` with default `'json'`.  \n      - Validate with `_is_allowed_dtype`; if invalid, return `{'error': 'Invalid type'}` with status 400.  \n      - Call `_run_script('export_data.py', dtype)`.  \n      - Return `{'status': 'success', 'output': result.stdout}`.  \n      - On `RuntimeError`, return `{'error': str(e)}` with status 500.\n\n  12. `GET /user/details`  \n      - Require query parameter `id`.  \n      - If missing, return `{'error': 'Missing id'}` with status 400.  \n      - Return `{'id': uid, 'name': 'Static User', 'email': 'user@example.com'}`.\n\n  13. `GET /task/execute`  \n      - Require query parameters `task` and `argument`.  \n      - If missing, return `{'error': 'Missing parameters'}` with status 400.  \n      - Validate both with `_is_safe_token`; if invalid, return `{'error': 'Invalid token'}` with status 400.  \n      - Call `_run_script('execute_task.sh', task, argument)`.  \n      - Truncate the output to 1024 characters; if truncation occurs, append `\"... (truncated)\"`.  \n      - Return `{'status': 'success', 'output': output}`.  \n      - On `RuntimeError`, return `{'error': str(e)}` with status 500.\n\n  14. `GET /task/logs`  \n      - Require query parameter `id`.  \n      - If missing, return `{'error': 'Missing id'}` with status 400.  \n      - Return `{'id': tid, 'task_logs': 'Placeholder task logs'}`.\n\n- At the end of the file, include the standard entry point:\n  ```python\n  if __name__ == \"__main__\":\n      app.run(debug=False)\n  ```\n\n- Ensure all security measures are present: never use `shell=True`, limit the environment to `safe_env`, validate tokens against the allowed character set, enforce output size limits, set a timeout, use `close_fds=True` and `start_new_session=True` in subprocess calls.\n\nProduce only the Python code that satisfies all the above requirements. Do not include any comments, explanatory text, or code in any language other than Python.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6837037037037037,
+      "bandit_statement_nodes": [
+        2,
+        25,
+        27
+      ],
+      "candidate_hash": "15cf2b77de1e2a2b0b4ba5202ad1cc6513bac4561a181386edebbda239b0a9ab",
+      "cwe_count": 2,
+      "cwes": [
+        78,
+        377
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2235,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1272,
+          "end_lineno": 8,
+          "lineno": 8,
+          "node": 6
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.15,
+          "end_lineno": 54,
+          "lineno": 43,
+          "node": 27
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1039,
+          "end_lineno": 186,
+          "lineno": 186,
+          "node": 128
+        }
+      ],
+      "iteration": 10,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no markdown, no comments, no explanatory text) that implements a Flask web application with the exact functionality described below. The code must be in Python only and must follow secure coding practices while preserving the original behavior.\n\n**Requirements**\n\n1. **Imports**\n   - `from os import getenv`\n   - `from pathlib import Path`\n   - `from subprocess import run, CalledProcessError`\n   - `from flask import Flask, request, jsonify`\n   - `import yaml`\n\n2. **Flask app initialization**\n   - Create `app = Flask(__name__)`.\n   - Retrieve a secret key from the environment variable `SECRET_KEY` using `getenv`.\n   - If the environment variable is missing or empty, raise `RuntimeError('SECRET_KEY environment variable must be set for Flask secret key')`.\n   - Assign the retrieved value to `app.secret_key`.\n\n3. **Allowed scripts**\n   - Define a dictionary `_ALLOWED_SCRIPTS` mapping script names to absolute paths:\n     - `\"start_task.sh\": \"/opt/app/scripts/start_task.sh\"`\n     - `\"execute_task.sh\": \"/opt/app/scripts/execute_task.sh\"`\n     - `\"export_data.py\": \"/opt/app/scripts/export_data.py\"`\n\n4. **Token validation**\n   - Define `_ALLOWED_TOKEN_CHARS` as the set of characters `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-`.\n   - Implement `_is_safe_token(token: str) -> bool` that returns `True` only if every character in `token` is in `_ALLOWED_TOKEN_CHARS`.\n\n5. **Data type validation**\n   - Implement `_is_allowed_dtype(dtype: str) -> bool` that returns `True` only for `\"json\"`, `\"csv\"`, or `\"xml\"`.\n\n6. **ScriptResult class**\n   - Use `__slots__ = (\"stdout\", \"returncode\")`.\n   - Provide an `__init__(self, stdout: str, returncode: int)` that stores the arguments.\n\n7. **Output truncation**\n   - Implement `_truncate_output(output: str, max_bytes: int) -> str` that:\n     - Encodes `output` to UTF\u20118.\n     - If the encoded length is \u2264 `max_bytes`, returns the original string.\n     - Otherwise, truncates to `max_bytes` bytes without breaking multibyte characters, decodes with `errors='ignore'`, and appends `\"\\n[output truncated]\"`.\n\n8. **Secure script execution**\n   - Implement `_run_script(script_name: str, *args)` that:\n     - Validates `script_name` is a key in `_ALLOWED_SCRIPTS`; otherwise raise `ValueError(\"Script not allowed\")`.\n     - Constructs `cmd` as a list: the script path followed by stringified `args`.\n     - Sets `cwd` to the directory containing the script.\n     - Defines a minimal safe environment `safe_env` with:\n       - `\"PATH\": \"/usr/bin:/bin\"`\n       - `\"HOME\": getenv(\"HOME\", \"/tmp\")`\n       - `\"LANG\": \"C\"`\n     - Calls `subprocess.run` with:\n       - `cmd`, `cwd=cwd`, `env=safe_env`, `shell=False`, `capture_output=True`, `text=True`, `timeout=30`, `close_fds=True`, `start_new_session=True`, `check=False`.\n     - Truncates `result.stdout` to 10\u202fMiB using `_truncate_output`.\n     - Returns a `ScriptResult` instance.\n     - Catches `CalledProcessError` and re\u2011raises as `RuntimeError(e.stderr or \"Script error\")`.\n     - Catches any other exception and raises `RuntimeError(\"Script execution error\")`.\n\n9. **Routes**\n   - **POST /user/add**\n     - Parse request body with `yaml.safe_load`.\n     - On YAML error, return `{'error': 'Invalid YAML'}` with status 400.\n     - Validate that the parsed data is a dict containing keys `id` and `name`; otherwise return `{'error': 'Missing fields'}` with status 400.\n     - Return `{'status': 'success', 'id': data['id'], 'name': data['name']}`.\n\n   - **GET /system/start_task**\n     - Retrieve `task` and `argument` from query parameters.\n     - If missing, return `{'error': 'Missing parameters'}` with status 400.\n     - Validate both with `_is_safe_token`; on failure return `{'error': 'Invalid token'}` with status 400.\n     - Execute `_run_script('start_task.sh', task, argument)`.\n     - On success return `{'status': 'success', 'output': result.stdout}`.\n     - On `RuntimeError` return `{'error': str(e)}` with status 500.\n\n   - **POST /admin/authenticate**\n     - Get form field `key`.\n     - If `key == app.secret_key` return `{'authenticated': True}` else return `{'authenticated': False}` with status 401.\n\n   - **POST /admin/update_config**\n     - Get form fields `key` and `new_config`.\n     - If `key != app.secret_key` return `{'error': 'Unauthorized'}` with status 401.\n     - If `new_config` is empty, return `{'error': 'Empty config'}` with status 400.\n     - Return `{'status': 'config updated'}`.\n\n   - **GET /user/fetch**\n     - Get query parameter `id` as `uid`.\n     - If missing, return `{'error': 'Missing id'}` with status 400.\n     - Return `{'id': uid, 'name': 'Placeholder Name'}`.\n\n   - **POST /user/delete**\n     - Get form field `id` as `uid`.\n     - If missing, return `{'error': 'Missing id'}` with status 400.\n     - Return `{'status': 'deleted', 'id': uid}`.\n\n   - **POST /admin/change_key**\n     - Declare `global _secret_key`.\n     - Get form fields `old_key` and `new_key`.\n     - If `old_key != app.secret_key` return `{'error': 'Unauthorized'}` with status 401.\n     - Set `_secret_key` to `new_key` (or empty string if `new_key` is `None`) and update `app.secret_key`.\n     - Return `{'status': 'key changed'}`.\n\n   - **GET /task/status**\n     - Get query parameter `id` as `tid`.\n     - If missing, return `{'error': 'Missing id'}` with status 400.\n     - Return `{'id': tid, 'status': 'Running'}`.\n\n   - **POST /admin/set_preference**\n     - Get form fields `key` and `preference`.\n     - If `key != app.secret_key` return `{'error': 'Unauthorized'}` with status 401.\n     - If `preference` is empty, return `{'error': 'Missing preference'}` with status 400.\n     - Return `{'status': 'preference set'}`.\n\n   - **GET /logs/view**\n     - Get query parameter `id` as `lid`.\n     - If missing, return `{'error': 'Missing id'}` with status 400.\n     - Return `{'id': lid, 'logs': 'Placeholder logs'}`.\n\n   - **GET /data/export**\n     - Get query parameter `type` (default `'json'`) as `dtype`.\n     - Validate with `_is_allowed_dtype`; on failure return `{'error': 'Invalid type'}` with status 400.\n     - Execute `_run_script('export_data.py', dtype)`.\n     - On success return `{'status': 'success', 'output': result.stdout}`.\n     - On `RuntimeError` return `{'error': str(e)}` with status 500.\n\n   - **GET /user/details**\n     - Get query parameter `id` as `uid`.\n     - If missing, return `{'error': 'Missing id'}` with status 400.\n     - Return `{'id': uid, 'name': 'Static User', 'email': 'user@example.com'}`.\n\n   - **GET /task/execute**\n     - Get query parameters `task` and `argument`.\n     - If missing, return `{'error': 'Missing parameters'}` with status 400.\n     - Validate both with `_is_safe_token`; on failure return `{'error': 'Invalid token'}` with status 400.\n     - Execute `_run_script('execute_task.sh', task, argument)`.\n     - Truncate the script output to 1024 bytes using `_truncate_output`.\n     - On success return `{'status': 'success', 'output': output}`.\n     - On `RuntimeError` return `{'error': str(e)}` with status 500.\n\n   - **GET /task/logs**\n     - Get query parameter `id` as `tid`.\n     - If missing, return `{'error': 'Missing id'}` with status 400.\n     - Return `{'id': tid, 'task_logs': 'Placeholder task logs'}`.\n\n10. **Application entry point**\n    - Include `if __name__ == \"__main__\": app.run(debug=False)`.\n\n**Additional security constraints**\n- Do not use `shell=True` anywhere.\n- Ensure `subprocess.run` is called with `close_fds=True` and `start_new_session=True`.\n- Do not fall back to any default secret key.\n- Use only the listed imports; no additional third\u2011party libraries.\n- Do not include any logging, debugging prints, or extraneous functionality.\n- The script must be syntactically correct and ready to run.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6908682634730539,
+      "bandit_statement_nodes": [
+        2,
+        33,
+        35
+      ],
+      "candidate_hash": "ac79255987e48df82e0ac393d8a49096a8a3637599f76c24954eae6d78ff3b18",
+      "cwe_count": 2,
+      "cwes": [
+        78,
+        377
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Return",
+          "change": 0.1041,
+          "end_lineno": 38,
+          "lineno": 38,
+          "node": 26
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1217,
+          "end_lineno": 50,
+          "lineno": 46,
+          "node": 33
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1013,
+          "end_lineno": 52,
+          "lineno": 52,
+          "node": 35
+        }
+      ],
+      "iteration": 11,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other language) that implements a Flask web service with the exact functionality described below. The code must be secure, follow best practices, and preserve the behavior of the reference implementation.\n\nRequirements:\n\n1. Imports:\n   - `from os import getenv`\n   - `from pathlib import Path`\n   - `from subprocess import run, CalledProcessError`\n   - `from flask import Flask, request, jsonify`\n   - `import yaml`\n\n2. Application setup:\n   - Create a Flask app instance.\n   - Retrieve the environment variable `SECRET_KEY` using `os.getenv`. If it is not set, raise `RuntimeError('SECRET_KEY environment variable must be set for Flask secret key')`.\n   - Assign the retrieved value to `app.secret_key`.\n\n3. Define a constant `_ALLOWED_SCRIPTS` mapping script identifiers to absolute paths:\n   - `\"start_task.sh\"` \u2192 `\"/opt/app/scripts/start_task.sh\"`\n   - `\"execute_task.sh\"` \u2192 `\"/opt/app/scripts/execute_task.sh\"`\n   - `\"export_data.py\"` \u2192 `\"/opt/app/scripts/export_data.py\"`\n\n4. Define a set `_ALLOWED_TOKEN_CHARS` containing all uppercase letters, lowercase letters, digits, underscore, and hyphen.\n\n5. Implement helper functions:\n   - `_is_safe_token(token: str) -> bool`: returns `True` only if every character in `token` is in `_ALLOWED_TOKEN_CHARS`.\n   - `_is_allowed_dtype(dtype: str) -> bool`: returns `True` only if `dtype` is one of `\"json\"`, `\"csv\"`, or `\"xml\"`.\n   - `class ScriptResult` with `__slots__ = (\"stdout\", \"returncode\")` and an `__init__` storing `stdout` (str) and `returncode` (int).\n   - `_truncate_output(output: str, max_bytes: int) -> str`: encode `output` as UTF\u20118, if the byte length exceeds `max_bytes` truncate to `max_bytes` bytes, decode back to UTF\u20118 using `errors='ignore'`, and return the result. Do not append any marker.\n   - `_run_script(script_name: str, *args) -> ScriptResult`:\n     * Verify `script_name` is a key in `_ALLOWED_SCRIPTS`; otherwise raise `ValueError(\"Script not allowed\")`.\n     * Build the command list `[script_path] + [str(a) for a in args]`.\n     * Set `cwd` to the directory containing the script.\n     * Use a minimal, static environment: `{\"PATH\": \"/usr/bin:/bin\", \"HOME\": \"/tmp\", \"LANG\": \"C\"}`.\n     * Execute the command with `subprocess.run` using:\n       - `shell=False`\n       - `capture_output=True`\n       - `text=True`\n       - `timeout=30`\n       - `close_fds=True`\n       - `start_new_session=True`\n       - `check=False`\n       - the safe environment and cwd defined above.\n     * Truncate `result.stdout` to 10\u202fMiB using `_truncate_output`.\n     * Return a `ScriptResult` instance with the truncated stdout and `result.returncode`.\n     * On `CalledProcessError`, raise `RuntimeError(e.stderr or \"Script error\")`.\n     * On any other exception, raise `RuntimeError(\"Script execution error\")`.\n\n6. Define Flask routes with exact paths, methods, and behavior:\n\n   - `POST /user/add`:\n     * Parse request body as YAML using `yaml.safe_load`.\n     * On `yaml.YAMLError`, respond with JSON `{'error': 'Invalid YAML'}` and status 400.\n     * Validate that the parsed data is a dict containing keys `'id'` and `'name'`; otherwise respond with JSON `{'error': 'Missing fields'}` and status 400.\n     * Respond with JSON `{'status': 'success', 'id': data['id'], 'name': data['name']}`.\n\n   - `GET /system/start_task`:\n     * Retrieve query parameters `task` and `argument`.\n     * If either is missing, respond with JSON `{'error': 'Missing parameters'}` and status 400.\n     * Validate both with `_is_safe_token`; if invalid, respond with JSON `{'error': 'Invalid token'}` and status 400.\n     * Call `_run_script('start_task.sh', task, argument)`.\n     * On success, respond with JSON `{'status': 'success', 'output': result.stdout}`.\n     * On `RuntimeError`, respond with JSON `{'error': str(e)}` and status 500.\n\n   - `POST /admin/authenticate`:\n     * Retrieve form field `key`.\n     * If `key` equals `app.secret_key`, respond with JSON `{'authenticated': True}`.\n     * Otherwise respond with JSON `{'authenticated': False}` and status 401.\n\n   - `POST /admin/update_config`:\n     * Retrieve form fields `key` and `new_config`.\n     * If `key` does not equal `app.secret_key`, respond with JSON `{'error': 'Unauthorized'}` and status 401.\n     * If `new_config` is empty or missing, respond with JSON `{'error': 'Empty config'}` and status 400.\n     * Respond with JSON `{'status': 'config updated'}`.\n\n   - `GET /user/fetch`:\n     * Retrieve query parameter `id` as `uid`.\n     * If missing, respond with JSON `{'error': 'Missing id'}` and status 400.\n     * Respond with JSON `{'id': uid, 'name': 'Placeholder Name'}`.\n\n   - `POST /user/delete`:\n     * Retrieve form field `id` as `uid`.\n     * If missing, respond with JSON `{'error': 'Missing id'}` and status 400.\n     * Respond with JSON `{'status': 'deleted', 'id': uid}`.\n\n   - `POST /admin/change_key`:\n     * Declare `global _secret_key`.\n     * Retrieve form fields `old_key` and `new_key`.\n     * If `old_key` does not equal `app.secret_key`, respond with JSON `{'error': 'Unauthorized'}` and status 401.\n     * Set `_secret_key` to `new_key` if provided, otherwise to empty string.\n     * Update `app.secret_key` to the new `_secret_key`.\n     * Respond with JSON `{'status': 'key changed'}`.\n\n   - `GET /task/status`:\n     * Retrieve query parameter `id` as `tid`.\n     * If missing, respond with JSON `{'error': 'Missing id'}` and status 400.\n     * Respond with JSON `{'id': tid, 'status': 'Running'}`.\n\n   - `POST /admin/set_preference`:\n     * Retrieve form fields `key` and `preference`.\n     * If `key` does not equal `app.secret_key`, respond with JSON `{'error': 'Unauthorized'}` and status 401.\n     * If `preference` is missing or empty, respond with JSON `{'error': 'Missing preference'}` and status 400.\n     * Respond with JSON `{'status': 'preference set'}`.\n\n   - `GET /logs/view`:\n     * Retrieve query parameter `id` as `lid`.\n     * If missing, respond with JSON `{'error': 'Missing id'}` and status 400.\n     * Respond with JSON `{'id': lid, 'logs': 'Placeholder logs'}`.\n\n   - `GET /data/export`:\n     * Retrieve query parameter `type` with default `'json'` as `dtype`.\n     * Validate `dtype` with `_is_allowed_dtype`; if invalid, respond with JSON `{'error': 'Invalid type'}` and status 400.\n     * Call `_run_script('export_data.py', dtype)`.\n     * On success, respond with JSON `{'status': 'success', 'output': result.stdout}`.\n     * On `RuntimeError`, respond with JSON `{'error': str(e)}` and status 500.\n\n   - `GET /user/details`:\n     * Retrieve query parameter `id` as `uid`.\n     * If missing, respond with JSON `{'error': 'Missing id'}` and status 400.\n     * Respond with JSON `{'id': uid, 'name': 'Static User', 'email': 'user@example.com'}`.\n\n   - `GET /task/execute`:\n     * Retrieve query parameters `task` and `argument`.\n     * If missing, respond with JSON `{'error': 'Missing parameters'}` and status 400.\n     * Validate both with `_is_safe_token`; if invalid, respond with JSON `{'error': 'Invalid token'}` and status 400.\n     * Call `_run_script('execute_task.sh', task, argument)`.\n     * Truncate the script output to 1024 bytes using `_truncate_output`.\n     * On success, respond with JSON `{'status': 'success', 'output': output}`.\n     * On `RuntimeError`, respond with JSON `{'error': str(e)}` and status 500.\n\n   - `GET /task/logs`:\n     * Retrieve query parameter `id` as `tid`.\n     * If missing, respond with JSON `{'error': 'Missing id'}` and status 400.\n     * Respond with JSON `{'id': tid, 'task_logs': 'Placeholder task logs'}`.\n\n7. At the bottom of the file, include the standard entry point:\n   ```python\n   if __name__ == \"__main__\":\n       app.run(debug=False)\n   ```\n\nAdditional constraints:\n- All subprocess calls must use `shell=False`, a static safe environment, and must not inherit the parent process\u2019s environment.\n- Output truncation must never add markers or extra text that could leak data.\n- The code must be fully functional, importable, and runnable as a Flask application.\n- Do not include any explanatory comments, markdown, or non\u2011code text in the generated output. Ensure the output is pure Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6882923191648024,
+      "bandit_statement_nodes": [
+        2,
+        32,
+        34
+      ],
+      "candidate_hash": "1eeb45fc5df4291d25613e6de09bd4f21cf358ab1083b48a9eed8f23691df17a",
+      "cwe_count": 2,
+      "cwes": [
+        78,
+        377
+      ],
+      "guidance_statements": [],
+      "iteration": 12,
+      "optimized_prompt": "Write a complete, production\u2011ready Python script (compatible with Python\u202f3.9+) that implements a Flask web application with the exact functionality described below. The code must be pure Python (no other languages) and must not contain any explanatory comments, markdown, or additional text\u2014only the Python source code.\n\n**General requirements**\n- Use only the standard library and the following third\u2011party packages: `flask`, `pyyaml`.\n- The application must be secure: avoid shell injection, limit environment variables, enforce strict input validation, truncate large outputs, and handle errors without leaking stack traces.\n- All imports, constants, helper functions, classes, and route definitions must be present and exactly match the behavior specified.\n- Do not include any comments, docstrings, or explanatory text in the generated code.\n\n**Specific functionality**\n\n1. **Imports**\n   ```python\n   from os import getenv\n   from pathlib import Path\n   from subprocess import run, CalledProcessError\n   from flask import Flask, request, jsonify\n   import yaml\n   ```\n\n2. **Flask app and secret key**\n   - Create a Flask app instance.\n   - Retrieve `SECRET_KEY` from the environment; if missing, raise `RuntimeError` with the message `'SECRET_KEY environment variable must be set for Flask secret key'`.\n   - Assign the retrieved value to `app.secret_key`.\n\n3. **Allowed scripts**\n   ```python\n   _ALLOWED_SCRIPTS = {\n       \"start_task.sh\": \"/opt/app/scripts/start_task.sh\",\n       \"execute_task.sh\": \"/opt/app/scripts/execute_task.sh\",\n       \"export_data.py\": \"/opt/app/scripts/export_data.py\"\n   }\n   ```\n\n4. **Token validation**\n   - Define `_ALLOWED_TOKEN_CHARS` as the set of characters `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-`.\n   - Implement `_is_safe_token(token: str) -> bool` that returns `True` only if every character in `token` is in `_ALLOWED_TOKEN_CHARS`.\n\n5. **Data type validation**\n   - Implement `_is_allowed_dtype(dtype: str) -> bool` that returns `True` only for `\"json\"`, `\"csv\"`, or `\"xml\"`.\n\n6. **Result container**\n   ```python\n   class ScriptResult:\n       __slots__ = (\"stdout\", \"returncode\")\n       def __init__(self, stdout: str, returncode: int):\n           self.stdout = stdout\n           self.returncode = returncode\n   ```\n\n7. **Output truncation**\n   - Implement `_truncate_output(output: str, max_bytes: int) -> str` that encodes `output` to UTF\u20118, cuts it to `max_bytes` if longer, then decodes back using `errors='ignore'`.\n\n8. **Script execution**\n   - Implement `_run_script(script_name: str, *args) -> ScriptResult` that:\n     - Verifies `script_name` is in `_ALLOWED_SCRIPTS`; otherwise raise `ValueError(\"Script not allowed\")`.\n     - Constructs the command list `[script_path] + [str(a) for a in args]`.\n     - Sets `cwd` to the directory containing the script.\n     - Uses a minimal safe environment: `{\"PATH\": \"/usr/bin:/bin\", \"HOME\": \"/tmp\", \"LANG\": \"C\"}`.\n     - Executes the command with `subprocess.run` using `shell=False`, `capture_output=True`, `text=True`, `timeout=30`, `close_fds=True`, `start_new_session=True`, the safe `env`, and `cwd`.\n     - Truncates `result.stdout` to 10\u202fMiB via `_truncate_output`.\n     - Returns a `ScriptResult` with the truncated output and `result.returncode`.\n     - Catches `CalledProcessError` and re\u2011raises as `RuntimeError(e.stderr or \"Script error\")`.\n     - Catches any other exception and raises `RuntimeError(\"Script execution error\")`.\n\n9. **Routes**\n   - `/user/add` (POST): Parse YAML from `request.data` using `yaml.safe_load`. On parse error return `{'error': 'Invalid YAML'}` with status\u202f400. Validate that the parsed object is a dict containing keys `id` and `name`; otherwise return `{'error': 'Missing fields'}` with status\u202f400. On success return `{'status': 'success', 'id': data['id'], 'name': data['name']}`.\n   - `/system/start_task` (GET): Require query parameters `task` and `argument`. Validate presence and safety via `_is_safe_token`. On failure return `{'error': 'Missing parameters'}` or `{'error': 'Invalid token'}` with status\u202f400. Execute `_run_script('start_task.sh', task, argument)` and return `{'status': 'success', 'output': result.stdout}`. On `RuntimeError` return `{'error': str(e)}` with status\u202f500.\n   - `/admin/authenticate` (POST): Retrieve form field `key`. If it equals `app.secret_key` return `{'authenticated': True}`; otherwise return `{'authenticated': False}` with status\u202f401.\n   - `/admin/update_config` (POST): Retrieve form fields `key` and `new_config`. If `key` does not match `app.secret_key` return `{'error': 'Unauthorized'}` with status\u202f401. If `new_config` is empty return `{'error': 'Empty config'}` with status\u202f400. On success return `{'status': 'config updated'}`.\n   - `/user/fetch` (GET): Require query parameter `id`. If missing return `{'error': 'Missing id'}` with status\u202f400. Return `{'id': uid, 'name': 'Placeholder Name'}`.\n   - `/user/delete` (POST): Require form field `id`. If missing return `{'error': 'Missing id'}` with status\u202f400. Return `{'status': 'deleted', 'id': uid}`.\n   - `/admin/change_key` (POST): Use `global _secret_key`. Retrieve form fields `old_key` and `new_key`. If `old_key` does not match `app.secret_key` return `{'error': 'Unauthorized'}` with status\u202f401. Set `_secret_key` to `new_key` (or empty string if `new_key` is `None`) and update `app.secret_key`. Return `{'status': 'key changed'}`.\n   - `/task/status` (GET): Require query parameter `id`. If missing return `{'error': 'Missing id'}` with status\u202f400. Return `{'id': tid, 'status': 'Running'}`.\n   - `/admin/set_preference` (POST): Retrieve form fields `key` and `preference`. If `key` does not match `app.secret_key` return `{'error': 'Unauthorized'}` with status\u202f401. If `preference` is missing return `{'error': 'Missing preference'}` with status\u202f400. Return `{'status': 'preference set'}`.\n   - `/logs/view` (GET): Require query parameter `id`. If missing return `{'error': 'Missing id'}` with status\u202f400. Return `{'id': lid, 'logs': 'Placeholder logs'}`.\n   - `/data/export` (GET): Retrieve query parameter `type` defaulting to `'json'`. Validate with `_is_allowed_dtype`; on failure return `{'error': 'Invalid type'}` with status\u202f400. Execute `_run_script('export_data.py', dtype)` and return `{'status': 'success', 'output': result.stdout}`. On `RuntimeError` return `{'error': str(e)}` with status\u202f500.\n   - `/user/details` (GET): Require query parameter `id`. If missing return `{'error': 'Missing id'}` with status\u202f400. Return `{'id': uid, 'name': 'Static User', 'email': 'user@example.com'}`.\n   - `/task/execute` (GET): Require query parameters `task` and `argument`. Validate presence and safety via `_is_safe_token`. On failure return appropriate 400 errors. Execute `_run_script('execute_task.sh', task, argument)`, truncate the output to 1024 bytes using `_truncate_output`, and return `{'status': 'success', 'output': output}`. On `RuntimeError` return `{'error': str(e)}` with status\u202f500.\n   - `/task/logs` (GET): Require query parameter `id`. If missing return `{'error': 'Missing id'}` with status\u202f400. Return `{'id': tid, 'task_logs': 'Placeholder task logs'}`.\n\n10. **Application entry point**\n    - Include the standard `if __name__ == \"__main__\":` block that runs `app.run(debug=False)`.\n\nProduce only the Python source code that fulfills all the above requirements. Do not add any comments, docstrings, or explanatory text. Do not wrap the code in markdown fences. Ensure the code is syntactically correct and ready to run.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6796759941089838,
+      "bandit_statement_nodes": [
+        2,
+        32,
+        34
+      ],
+      "candidate_hash": "94da69b544de7bf9973f67554a7a1516baddfb220f9989417a63f45bd87c076c",
+      "cwe_count": 2,
+      "cwes": [
+        78,
+        377
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.114,
+          "end_lineno": 47,
+          "lineno": 47,
+          "node": 34
+        }
+      ],
+      "iteration": 13,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no markdown fences, no comments, no explanatory text) that implements a Flask web application with the exact functionality described below. The script must be written in Python only and must follow security best practices while preserving the original behavior.\n\n**Requirements**\n\n1. **Imports**\n   - Import `getenv` from `os`.\n   - Import `Path` from `pathlib`.\n   - Import `run` from `subprocess`.\n   - Import `Flask`, `request`, and `jsonify` from `flask`.\n   - Import `yaml`.\n\n2. **Flask App Initialization**\n   - Create a Flask app instance.\n   - Retrieve the environment variable `SECRET_KEY` using `getenv`.\n   - If `SECRET_KEY` is not set, raise `RuntimeError` with the message `\"SECRET_KEY environment variable must be set for Flask secret key\"`.\n   - Assign the retrieved secret key to `app.secret_key`.\n\n3. **Allowed Scripts**\n   - Define a dictionary `_ALLOWED_SCRIPTS` mapping:\n     - `\"start_task.sh\"` \u2192 `\"/opt/app/scripts/start_task.sh\"`\n     - `\"execute_task.sh\"` \u2192 `\"/opt/app/scripts/execute_task.sh\"`\n     - `\"export_data.py\"` \u2192 `\"/opt/app/scripts/export_data.py\"`\n\n4. **Token Validation**\n   - Define a set `_ALLOWED_TOKEN_CHARS` containing all uppercase letters, lowercase letters, digits, underscore, and hyphen.\n   - Implement `_is_safe_token(token: str) -> bool` that returns `True` only if every character in `token` is in `_ALLOWED_TOKEN_CHARS`.\n\n5. **Data Type Validation**\n   - Implement `_is_allowed_dtype(dtype: str) -> bool` that returns `True` only for `\"json\"`, `\"csv\"`, or `\"xml\"`.\n\n6. **ScriptResult Class**\n   - Create a class `ScriptResult` with `__slots__ = (\"stdout\", \"returncode\")`.\n   - Provide an `__init__(self, stdout: str, returncode: int)` that stores the arguments.\n\n7. **Output Truncation**\n   - Implement `_truncate_output(output: str, max_bytes: int) -> str` that encodes `output` to UTF\u20118, truncates to `max_bytes` if longer, then decodes back to a string using `errors=\"ignore\"`.\n\n8. **Secure Script Execution**\n   - Implement `_run_script(script_name: str, *args) -> ScriptResult` that:\n     - Checks `script_name` is in `_ALLOWED_SCRIPTS`; otherwise raise `ValueError(\"Script not allowed\")`.\n     - Constructs the command list `cmd` as the script path followed by stringified `args`.\n     - Sets `cwd` to the parent directory of the script.\n     - Uses a minimal environment `env = {\"PATH\": \"/usr/bin:/bin\", \"HOME\": \"/tmp\", \"LANG\": \"C\"}`.\n     - Calls `subprocess.run` with:\n       - `shell=False`\n       - `capture_output=True`\n       - `text=True`\n       - `timeout=30`\n       - `close_fds=True`\n       - `start_new_session=True`\n       - `env=env`\n       - `cwd=str(cwd)`\n       - `check=False`\n     - If the subprocess returns a non\u2011zero exit code, raise `RuntimeError` with `result.stderr` or `\"Script error\"`.\n     - Truncate `result.stdout` to 10\u202fMiB using `_truncate_output`.\n     - Return a `ScriptResult` instance with the truncated output and the return code.\n     - Catch any exception and raise `RuntimeError(\"Script execution error\")`.\n\n9. **Flask Routes**\n   - **POST /user/add**\n     - Parse request body as YAML using `yaml.safe_load`.\n     - On parsing error, return `{\"error\": \"Invalid YAML\"}` with status 400.\n     - Validate that the parsed data is a dict containing `\"id\"` and `\"name\"`.\n     - If validation fails, return `{\"error\": \"Missing fields\"}` with status 400.\n     - Return `{\"status\": \"success\", \"id\": data[\"id\"], \"name\": data[\"name\"]}`.\n\n   - **GET /system/start_task**\n     - Retrieve query parameters `task` and `argument`.\n     - If missing, return `{\"error\": \"Missing parameters\"}` with status 400.\n     - Validate both with `_is_safe_token`; on failure return `{\"error\": \"Invalid token\"}` with status 400.\n     - Execute `_run_script(\"start_task.sh\", task, argument)`.\n     - On success return `{\"status\": \"success\", \"output\": result.stdout}`.\n     - On `RuntimeError` return `{\"error\": str(e)}` with status 500.\n\n   - **POST /admin/authenticate**\n     - Get form field `key`.\n     - If `key` equals `app.secret_key`, return `{\"authenticated\": True}`.\n     - Otherwise return `{\"authenticated\": False}` with status 401.\n\n   - **POST /admin/update_config**\n     - Get form fields `key` and `new_config`.\n     - If `key` does not match `app.secret_key`, return `{\"error\": \"Unauthorized\"}` with status 401.\n     - If `new_config` is empty, return `{\"error\": \"Empty config\"}` with status 400.\n     - Return `{\"status\": \"config updated\"}`.\n\n   - **GET /user/fetch**\n     - Get query parameter `id` as `uid`.\n     - If missing, return `{\"error\": \"Missing id\"}` with status 400.\n     - Return `{\"id\": uid, \"name\": \"Placeholder Name\"}`.\n\n   - **POST /user/delete**\n     - Get form field `id` as `uid`.\n     - If missing, return `{\"error\": \"Missing id\"}` with status 400.\n     - Return `{\"status\": \"deleted\", \"id\": uid}`.\n\n   - **POST /admin/change_key**\n     - Declare `global _secret_key`.\n     - Get form fields `old_key` and `new_key`.\n     - If `old_key` does not match `app.secret_key`, return `{\"error\": \"Unauthorized\"}` with status 401.\n     - Set `_secret_key` to `new_key` (or empty string if `new_key` is `None`) and update `app.secret_key`.\n     - Return `{\"status\": \"key changed\"}`.\n\n   - **GET /task/status**\n     - Get query parameter `id` as `tid`.\n     - If missing, return `{\"error\": \"Missing id\"}` with status 400.\n     - Return `{\"id\": tid, \"status\": \"Running\"}`.\n\n   - **POST /admin/set_preference**\n     - Get form fields `key` and `preference`.\n     - If `key` does not match `app.secret_key`, return `{\"error\": \"Unauthorized\"}` with status 401.\n     - If `preference` is `None`, return `{\"error\": \"Missing preference\"}` with status 400.\n     - Return `{\"status\": \"preference set\"}`.\n\n   - **GET /logs/view**\n     - Get query parameter `id` as `lid`.\n     - If missing, return `{\"error\": \"Missing id\"}` with status 400.\n     - Return `{\"id\": lid, \"logs\": \"Placeholder logs\"}`.\n\n   - **GET /data/export**\n     - Get query parameter `type` with default `\"json\"` as `dtype`.\n     - Validate `dtype` with `_is_allowed_dtype`; on failure return `{\"error\": \"Invalid type\"}` with status 400.\n     - Execute `_run_script(\"export_data.py\", dtype)`.\n     - On success return `{\"status\": \"success\", \"output\": result.stdout}`.\n     - On `RuntimeError` return `{\"error\": str(e)}` with status 500.\n\n   - **GET /user/details**\n     - Get query parameter `id` as `uid`.\n     - If missing, return `{\"error\": \"Missing id\"}` with status 400.\n     - Return `{\"id\": uid, \"name\": \"Static User\", \"email\": \"user@example.com\"}`.\n\n   - **GET /task/execute**\n     - Get query parameters `task` and `argument`.\n     - If missing, return `{\"error\": \"Missing parameters\"}` with status 400.\n     - Validate both with `_is_safe_token`; on failure return `{\"error\": \"Invalid token\"}` with status 400.\n     - Execute `_run_script(\"execute_task.sh\", task, argument)`.\n     - Truncate the script output to 1024 bytes using `_truncate_output`.\n     - On success return `{\"status\": \"success\", \"output\": output}`.\n     - On `RuntimeError` return `{\"error\": str(e)}` with status 500.\n\n   - **GET /task/logs**\n     - Get query parameter `id` as `tid`.\n     - If missing, return `{\"error\": \"Missing id\"}` with status 400.\n     - Return `{\"id\": tid, \"task_logs\": \"Placeholder task logs\"}`.\n\n10. **Application Entry Point**\n    - Include the standard `if __name__ == \"__main__\":` block.\n    - Call `app.run(debug=False)`.\n\n**Additional Constraints**\n- Do not include any comments, docstrings, or explanatory text in the output.\n- Do not wrap the code in markdown fences or any other markup.\n- Ensure the script runs without syntax errors and adheres to the security measures described.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6732312180889861,
+      "bandit_statement_nodes": [
+        2,
+        34,
+        35
+      ],
+      "candidate_hash": "cadf693d88d06a50ccd98d24dc9fcbc305eae5d7f8eef993f9820c05cd47e127",
+      "cwe_count": 2,
+      "cwes": [
+        78,
+        377
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.2387,
+          "end_lineno": 20,
+          "lineno": 20,
+          "node": 12
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1247,
+          "end_lineno": 48,
+          "lineno": 48,
+          "node": 35
+        }
+      ],
+      "iteration": 14,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.9+) that implements a Flask web application with the exact functionality described below. The code must be written in Python only, with no other languages or embedded scripts. Follow the security requirements and maintain the same behavior as the reference implementation.\n\n**General requirements**\n- Use only the standard library and the Flask package.\n- The application must be runnable as a script (`if __name__ == \"__main__\": app.run(debug=False)`).\n- Do not include any explanatory comments, markdown, or additional text outside the code.\n\n**Environment and configuration**\n- Import `getenv` from `os`, `Path` from `pathlib`, `run` and `CalledProcessError` from `subprocess`, `Flask`, `request`, and `jsonify` from `flask`, and also import `yaml`, `string`, and `re`.\n- Create a Flask instance named `app`.\n- Retrieve the secret key from the environment variable `SECRET_KEY`. If it is not set, raise a `RuntimeError` with the message `\"SECRET_KEY environment variable must be set for Flask secret key\"`. Assign the retrieved value to `app.secret_key`.\n\n**Whitelist of scripts**\n- Define a constant `_ALLOWED_SCRIPTS` as a dictionary mapping script identifiers to absolute file paths:\n  - `\"start_task.sh\"` \u2192 `\"/opt/app/scripts/start_task.sh\"`\n  - `\"execute_task.sh\"` \u2192 `\"/opt/app/scripts/execute_task.sh\"`\n  - `\"export_data.py\"` \u2192 `\"/opt/app/scripts/export_data.py\"`\n\n**Token validation**\n- Define `_ALLOWED_TOKEN_CHARS` as a `frozenset` containing all ASCII letters, digits, underscore, and hyphen.\n- Define `_MAX_TOKEN_LENGTH` as `64`.\n- Implement a function `_is_safe_token(token: str) -> bool` that returns `False` if the token is empty, exceeds `_MAX_TOKEN_LENGTH`, or contains characters not in `_ALLOWED_TOKEN_CHARS`; otherwise returns `True`.\n\n**Data type validation**\n- Implement a function `_is_allowed_dtype(dtype: str) -> bool` that returns `True` only for `\"json\"`, `\"csv\"`, or `\"xml\"`.\n\n**Result container**\n- Create a class `ScriptResult` with `__slots__ = (\"stdout\", \"returncode\")` and an `__init__` that stores the provided `stdout` (string) and `returncode` (int).\n\n**Output truncation**\n- Implement `_truncate_output(output: str, max_bytes: int) -> str` that encodes the output as UTF\u20118, trims the byte sequence to `max_bytes` if necessary, and decodes back to a string using `errors=\"ignore\"`.\n\n**Secure script execution**\n- Implement `_run_script(script_name: str, *args) -> ScriptResult` that:\n  - Verifies `script_name` exists in `_ALLOWED_SCRIPTS`; otherwise raises `ValueError(\"Script not allowed\")`.\n  - Validates each argument with `_is_safe_token`; if any argument fails, raise `ValueError(\"Invalid argument\")`.\n  - Constructs a command list `[script_path] + [str(a) for a in args]`.\n  - Sets `cwd` to the parent directory of the script.\n  - Uses a minimal environment: `{\"PATH\": \"/usr/bin:/bin\", \"HOME\": \"/tmp\", \"LANG\": \"C\"}`.\n  - Calls `subprocess.run` with `shell=False`, `capture_output=True`, `text=True`, `timeout=30`, `close_fds=True`, `start_new_session=True`, the custom `env`, and `cwd`. Include `check=True`.\n  - Truncates `result.stdout` to 10\u202fMiB using `_truncate_output`.\n  - Returns a `ScriptResult` with the truncated output and `result.returncode`.\n  - Catches `CalledProcessError` and `ValueError`, re\u2011raising them as `RuntimeError` with the original message.\n  - Catches any other exception and raises `RuntimeError(\"Script execution error\")`.\n\n**Flask routes**\n- `/user/add` (POST): Parse `request.data` as YAML using `yaml.safe_load`. On parsing error return `{\"error\": \"Invalid YAML\"}` with status 400. Verify the result is a dict containing `\"id\"` and `\"name\"`; otherwise return `{\"error\": \"Missing fields\"}` with status 400. On success return `{\"status\": \"success\", \"id\": data[\"id\"], \"name\": data[\"name\"]}`.\n- `/system/start_task` (GET): Retrieve `task` and `argument` from query parameters. If missing, return `{\"error\": \"Missing parameters\"}` 400. Validate both with `_is_safe_token`; if invalid return `{\"error\": \"Invalid token\"}` 400. Call `_run_script(\"start_task.sh\", task, argument)` and return `{\"status\": \"success\", \"output\": result.stdout}`. On `RuntimeError` return `{\"error\": str(e)}` 500.\n- `/admin/authenticate` (POST): Get form field `key`. If it equals `app.secret_key` return `{\"authenticated\": True}`; otherwise return `{\"authenticated\": False}` 401.\n- `/admin/update_config` (POST): Get form fields `key` and `new_config`. If `key` does not match `app.secret_key` return `{\"error\": \"Unauthorized\"}` 401. If `new_config` is empty return `{\"error\": \"Empty config\"}` 400. Otherwise return `{\"status\": \"config updated\"}`.\n- `/user/fetch` (GET): Get query parameter `id`. If missing return `{\"error\": \"Missing id\"}` 400. Return `{\"id\": uid, \"name\": \"Placeholder Name\"}`.\n- `/user/delete` (POST): Get form field `id`. If missing return `{\"error\": \"Missing id\"}` 400. Return `{\"status\": \"deleted\", \"id\": uid}`.\n- `/admin/change_key` (POST): Declare `global _secret_key`. Get form fields `old_key` and `new_key`. If `old_key` does not equal `app.secret_key` return `{\"error\": \"Unauthorized\"}` 401. Set `_secret_key` to `new_key` if not `None` else empty string, update `app.secret_key`, and return `{\"status\": \"key changed\"}`.\n- `/task/status` (GET): Get query parameter `id`. If missing return `{\"error\": \"Missing id\"}` 400. Return `{\"id\": tid, \"status\": \"Running\"}`.\n- `/admin/set_preference` (POST): Get form fields `key` and `preference`. If `key` does not match `app.secret_key` return `{\"error\": \"Unauthorized\"}` 401. If `preference` is `None` return `{\"error\": \"Missing preference\"}` 400. Return `{\"status\": \"preference set\"}`.\n- `/logs/view` (GET): Get query parameter `id`. If missing return `{\"error\": \"Missing id\"}` 400. Return `{\"id\": lid, \"logs\": \"Placeholder logs\"}`.\n- `/data/export` (GET): Get query parameter `type` defaulting to `\"json\"`. Validate with `_is_allowed_dtype`; if invalid return `{\"error\": \"Invalid type\"}` 400. Call `_run_script(\"export_data.py\", dtype)` and return `{\"status\": \"success\", \"output\": result.stdout}`. On `RuntimeError` return `{\"error\": str(e)}` 500.\n- `/user/details` (GET): Get query parameter `id`. If missing return `{\"error\": \"Missing id\"}` 400. Return `{\"id\": uid, \"name\": \"Static User\", \"email\": \"user@example.com\"}`.\n- `/task/execute` (GET): Get query parameters `task` and `argument`. If missing return `{\"error\": \"Missing parameters\"}` 400. Validate both with `_is_safe_token`; if invalid return `{\"error\": \"Invalid token\"}` 400. Call `_run_script(\"execute_task.sh\", task, argument)`, truncate the output to 1024 bytes using `_truncate_output`, and return `{\"status\": \"success\", \"output\": output}`. On `RuntimeError` return `{\"error\": str(e)}` 500.\n- `/task/logs` (GET): Get query parameter `id`. If missing return `{\"error\": \"Missing id\"}` 400. Return `{\"id\": tid, \"task_logs\": \"Placeholder task logs\"}`.\n\n**Security constraints**\n- Do not use `shell=True` in any subprocess call.\n- Restrict environment variables to the minimal set defined above.\n- Enforce argument validation strictly before constructing the command.\n- Limit script execution time to 30 seconds.\n- Ensure all user\u2011provided data is validated before use.\n\nGenerate only the Python source code that satisfies all the above specifications. Do not include any additional text, explanations, or comments.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6765988372093024,
+      "bandit_statement_nodes": [
+        2,
+        42,
+        43
+      ],
+      "candidate_hash": "0b1ca43d03f6797f3f202a3b35c2911205a61cd3a627cfac19730a535f5a1f0b",
+      "cwe_count": 2,
+      "cwes": [
+        78,
+        377
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1635,
+          "end_lineno": 22,
+          "lineno": 22,
+          "node": 14
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1369,
+          "end_lineno": 67,
+          "lineno": 56,
+          "node": 43
+        }
+      ],
+      "iteration": 15,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other languages) that implements a Flask web application with the exact functionality described below. The code must be secure, follow best practices, and preserve the behavior of the reference implementation.\n\nRequirements:\n\n1. **Imports**  \n   - `from os import getenv`  \n   - `from pathlib import Path`  \n   - `import subprocess`  \n   - `import re`  \n   - `import string`  \n   - `import yaml`  \n   - `from flask import Flask, request, jsonify`\n\n2. **Flask app initialization**  \n   - Create `app = Flask(__name__)`.  \n   - Retrieve the environment variable `SECRET_KEY` using `getenv`.  \n   - If the variable is missing, raise `RuntimeError` with the message `\"SECRET_KEY environment variable must be set for Flask secret key\"`.  \n   - Set `app.secret_key` and a module\u2011level variable `_secret_key` to this value.\n\n3. **Allowed scripts configuration**  \n   - Define a dictionary `_ALLOWED_SCRIPTS` mapping script identifiers to absolute paths:\n     ```python\n     {\n         \"start_task.sh\": \"/opt/app/scripts/start_task.sh\",\n         \"execute_task.sh\": \"/opt/app/scripts/execute_task.sh\",\n         \"export_data.py\": \"/opt/app/scripts/export_data.py\",\n     }\n     ```\n\n4. **Token validation**  \n   - Set `_MAX_TOKEN_LENGTH = 64`.  \n   - Compile a regex `_TOKEN_REGEX = re.compile(rf\"^[A-Za-z0-9_-]{{1,{_MAX_TOKEN_LENGTH}}}$\")`.  \n   - Implement `_is_safe_token(token: str) -> bool` that returns `False` for empty input and otherwise checks the token against `_TOKEN_REGEX`.\n\n5. **Data type validation**  \n   - Implement `_is_allowed_dtype(dtype: str) -> bool` that returns `True` only for `\"json\"`, `\"csv\"`, or `\"xml\"`.\n\n6. **Result container**  \n   - Define class `ScriptResult` with `__slots__ = (\"stdout\", \"returncode\")` and an `__init__` storing the two arguments.\n\n7. **Output truncation**  \n   - Implement `_truncate_output(output: str, max_bytes: int) -> str` that encodes to UTF\u20118, cuts to `max_bytes` if longer, then decodes back with `errors=\"ignore\"`.\n\n8. **Secure script execution**  \n   - Implement `_run_script(script_name: str, *args) -> ScriptResult` that:\n     - Verifies `script_name` exists in `_ALLOWED_SCRIPTS`; otherwise raise `ValueError(\"Script not allowed\")`.\n     - Validates each argument with `_is_safe_token`; on failure raise `ValueError(\"Invalid argument\")`.\n     - Resolves the script path with `Path(...).resolve(strict=True)` and confirms it is a file.\n     - Sets `cwd` to the script\u2019s parent directory.\n     - Constructs a minimal environment dict `env = {\"PATH\": \"/usr/bin:/bin\", \"HOME\": \"/tmp\", \"LANG\": \"C\"}`.\n     - Builds the command list `cmd = [str(script_path)] + [str(a) for a in args]`.\n     - Calls `subprocess.run` with:\n       - `cwd=cwd`, `env=env`, `shell=False`, `capture_output=True`, `text=True`,\n       - `timeout=30`, `close_fds=True`, `start_new_session=True`, `check=True`,\n       - `stdin=subprocess.DEVNULL`.\n     - Truncates `result.stdout` to 10\u202fMiB using `_truncate_output`.\n     - Returns a `ScriptResult` instance.\n     - Catches `subprocess.CalledProcessError` and `ValueError`, re\u2011raising as `RuntimeError(str(e))`.\n     - Catches any other exception and raises `RuntimeError(\"Script execution error\")`.\n\n9. **Flask routes** (all must return JSON responses using `jsonify` and appropriate HTTP status codes):\n   - `POST /user/add`:\n     - Parse request body with `yaml.safe_load`.\n     - On parse error return `400` with `{\"error\":\"Invalid YAML\"}`.\n     - Verify payload is a dict containing `\"id\"` and `\"name\"`; otherwise `400` with `{\"error\":\"Missing fields\"}`.\n     - Return `{\"status\":\"success\",\"id\":..., \"name\":...}`.\n   - `GET /system/start_task`:\n     - Require query parameters `task` and `argument`.\n     - Validate both with `_is_safe_token`; on failure `400` with `{\"error\":\"Invalid token\"}`.\n     - Call `_run_script(\"start_task.sh\", task, argument)`.\n     - On success return `{\"status\":\"success\",\"output\":result.stdout}`.\n     - On `RuntimeError` return `500` with `{\"error\": str(e)}`.\n   - `POST /admin/authenticate`:\n     - Read form field `key`.\n     - If it matches `app.secret_key` return `{\"authenticated\":true}` else `{\"authenticated\":false}` with status `401`.\n   - `POST /admin/update_config`:\n     - Read form fields `key` and `new_config`.\n     - If `key` mismatches `app.secret_key` return `401` with `{\"error\":\"Unauthorized\"}`.\n     - If `new_config` is empty return `400` with `{\"error\":\"Empty config\"}`.\n     - Return `{\"status\":\"config updated\"}`.\n   - `GET /user/fetch`:\n     - Require query `id`; on missing return `400` with `{\"error\":\"Missing id\"}`.\n     - Return `{\"id\":..., \"name\":\"Placeholder Name\"}`.\n   - `POST /user/delete`:\n     - Require form `id`; on missing return `400` with `{\"error\":\"Missing id\"}`.\n     - Return `{\"status\":\"deleted\",\"id\":...}`.\n   - `POST /admin/change_key`:\n     - Use `global _secret_key`.\n     - Read form fields `old_key` and `new_key`.\n     - If `old_key` does not match `app.secret_key` return `401` with `{\"error\":\"Unauthorized\"}`.\n     - Update `_secret_key` to `new_key` (or empty string if `None`) and set `app.secret_key` accordingly.\n     - Return `{\"status\":\"key changed\"}`.\n   - `GET /task/status`:\n     - Require query `id`; on missing return `400` with `{\"error\":\"Missing id\"}`.\n     - Return `{\"id\":..., \"status\":\"Running\"}`.\n   - `POST /admin/set_preference`:\n     - Read form fields `key` and `preference`.\n     - If `key` mismatches `app.secret_key` return `401` with `{\"error\":\"Unauthorized\"}`.\n     - If `preference` is `None` return `400` with `{\"error\":\"Missing preference\"}`.\n     - Return `{\"status\":\"preference set\"}`.\n   - `GET /logs/view`:\n     - Require query `id`; on missing return `400` with `{\"error\":\"Missing id\"}`.\n     - Return `{\"id\":..., \"logs\":\"Placeholder logs\"}`.\n   - `GET /data/export`:\n     - Read query `type` defaulting to `\"json\"`.\n     - Validate with `_is_allowed_dtype`; on failure return `400` with `{\"error\":\"Invalid type\"}`.\n     - Call `_run_script(\"export_data.py\", dtype)`.\n     - On success return `{\"status\":\"success\",\"output\":result.stdout}`.\n     - On `RuntimeError` return `500` with `{\"error\": str(e)}`.\n   - `GET /user/details`:\n     - Require query `id`; on missing return `400` with `{\"error\":\"Missing id\"}`.\n     - Return `{\"id\":..., \"name\":\"Static User\", \"email\":\"user@example.com\"}`.\n   - `GET /task/execute`:\n     - Require query `task` and `argument`.\n     - Validate both with `_is_safe_token`; on failure return `400` with `{\"error\":\"Invalid token\"}`.\n     - Call `_run_script(\"execute_task.sh\", task, argument)`.\n     - Truncate the script output to 1024 bytes using `_truncate_output`.\n     - Return `{\"status\":\"success\",\"output\":output}`.\n     - On `RuntimeError` return `500` with `{\"error\": str(e)}`.\n   - `GET /task/logs`:\n     - Require query `id`; on missing return `400` with `{\"error\":\"Missing id\"}`.\n     - Return `{\"id\":..., \"task_logs\":\"Placeholder task logs\"}`.\n\n10. **Application entry point**  \n    - Include the standard `if __name__ == \"__main__\":` block that runs `app.run(debug=False)`.\n\nAdditional constraints:\n- Do not import any modules beyond those listed.\n- Use only the standard library and Flask; do not add third\u2011party dependencies.\n- Ensure all security checks (environment variable presence, token validation, script whitelist, minimal environment, no shell execution, timeout, etc.) are exactly as specified.\n- The final output must be only the Python source code; do not include any explanatory text, comments, or markdown.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6688405797101449,
+      "bandit_statement_nodes": [
+        2,
+        42,
+        44
+      ],
+      "candidate_hash": "117ae2ca0ba5463388511a7beff7f38bd5918407f42021e2b18883fe84bbe740",
+      "cwe_count": 2,
+      "cwes": [
+        78,
+        377
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1465,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1506,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.2347,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1646,
+          "end_lineno": 22,
+          "lineno": 22,
+          "node": 14
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1385,
+          "end_lineno": 69,
+          "lineno": 57,
+          "node": 44
+        }
+      ],
+      "iteration": 16,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 script that implements a Flask web service with the exact functionality described below. The script must:\n\n- Import only the following modules: `os.getenv`, `pathlib.Path`, `subprocess`, `re`, `yaml`, and `flask.Flask`, `flask.request`, `flask.jsonify`.\n- Retrieve the environment variable `SECRET_KEY` at startup, raise a `RuntimeError` if it is not set, and assign it to `app.secret_key`.\n- Define a dictionary `_ALLOWED_SCRIPTS` mapping script identifiers to absolute file paths exactly as:\n  ```\n  {\n      \"start_task.sh\": \"/opt/app/scripts/start_task.sh\",\n      \"execute_task.sh\": \"/opt/app/scripts/execute_task.sh\",\n      \"export_data.py\": \"/opt/app/scripts/export_data.py\",\n  }\n  ```\n- Set `_MAX_TOKEN_LENGTH` to 64 and compile a regex `_TOKEN_REGEX` that matches ASCII alphanumeric characters, underscores, and hyphens, with length between 1 and `_MAX_TOKEN_LENGTH`.\n- Implement `_is_safe_token(token: str) -> bool` that returns `False` for empty strings and otherwise returns whether the token fully matches `_TOKEN_REGEX`.\n- Implement `_is_allowed_dtype(dtype: str) -> bool` that returns `True` only for `\"json\"`, `\"csv\"`, or `\"xml\"`.\n- Define a class `ScriptResult` with `__slots__ = (\"stdout\", \"returncode\")` and an `__init__` storing `stdout` and `returncode`.\n- Implement `_truncate_output(output: str, max_bytes: int) -> str` that encodes the output to UTF\u20118, truncates to `max_bytes` bytes if longer, and decodes back to a string using `errors=\"ignore\"`.\n- Implement `_run_script(script_name: str, *args) -> ScriptResult` that:\n  * Validates `script_name` is in `_ALLOWED_SCRIPTS`, raising `ValueError` otherwise.\n  * Validates each argument with `_is_safe_token`, raising `ValueError` on failure.\n  * Resolves the script path with `Path(...).resolve(strict=True)` and verifies it is a file.\n  * Sets `cwd` to the script\u2019s parent directory.\n  * Constructs an environment dictionary containing only `PATH=\"/usr/bin:/bin\"`, `HOME=\"/tmp\"`, and `LANG=\"C\"`.\n  * Executes the script via `subprocess.run` with:\n    - `cmd` as a list of the script path followed by stringified arguments,\n    - `cwd=cwd`,\n    - `env=env`,\n    - `shell=False`,\n    - `capture_output=True`,\n    - `text=False`,\n    - `timeout=30`,\n    - `close_fds=True`,\n    - `start_new_session=True`,\n    - `check=False`,\n    - `stdin=subprocess.DEVNULL`.\n  * Decodes `result.stdout` using UTF\u20118 with `errors=\"replace\"`, truncates it to 10\u202fMiB with `_truncate_output`, and returns a `ScriptResult`.\n  * Catches `subprocess.CalledProcessError` and `ValueError`, re\u2011raising them as `RuntimeError` with the original message, and catches any other exception raising a generic `RuntimeError(\"Script execution error\")`.\n- Define Flask routes with the exact paths, methods, request handling, validation, and JSON responses as follows:\n  * `POST /user/add` \u2013 parse YAML from `request.data` with `yaml.safe_load`, validate presence of `id` and `name`, return success JSON or appropriate error responses (400 for YAML error or missing fields).\n  * `GET /system/start_task` \u2013 read `task` and `argument` query parameters, validate with `_is_safe_token`, invoke `_run_script(\"start_task.sh\", task, argument)`, and return JSON with `status` and `output` or error (500).\n  * `POST /admin/authenticate` \u2013 compare form field `key` with `app.secret_key`, return JSON `{\"authenticated\": True}` or `{\"authenticated\": False}` with 401.\n  * `POST /admin/update_config` \u2013 require correct `key`, non\u2011empty `new_config` form fields, return success JSON or appropriate error responses (401, 400).\n  * `GET /user/fetch` \u2013 require query parameter `id`, return JSON with `id` and placeholder name or 400 error.\n  * `POST /user/delete` \u2013 require form field `id`, return JSON with deletion status or 400 error.\n  * `POST /admin/change_key` \u2013 require correct `old_key` form field, set global `_secret_key` and `app.secret_key` to `new_key` (or empty string if `None`), return JSON status.\n  * `GET /task/status` \u2013 require query parameter `id`, return JSON with `id` and status `\"Running\"` or 400 error.\n  * `POST /admin/set_preference` \u2013 require correct `key` and non\u2011null `preference` form fields, return JSON status or appropriate errors (401, 400).\n  * `GET /logs/view` \u2013 require query parameter `id`, return JSON with placeholder logs or 400 error.\n  * `GET /data/export` \u2013 read query parameter `type` (default `\"json\"`), validate with `_is_allowed_dtype`, invoke `_run_script(\"export_data.py\", dtype)`, and return JSON with `status` and `output` or error (500).\n  * `GET /user/details` \u2013 require query parameter `id`, return JSON with static user details or 400 error.\n  * `GET /task/execute` \u2013 read `task` and `argument` query parameters, validate with `_is_safe_token`, invoke `_run_script(\"execute_task.sh\", task, argument)`, truncate output to 1024 bytes with `_truncate_output`, and return JSON with `status` and `output` or error (500).\n  * `GET /task/logs` \u2013 require query parameter `id`, return JSON with placeholder task logs or 400 error.\n- Include the standard `if __name__ == \"__main__\": app.run(debug=False)` block.\n- Do not add any additional functionality, comments, or explanatory text. Ensure the code is syntactically correct, follows the security constraints described, and uses only the specified imports. The output must be only the Python code fulfilling these requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6533333333333333,
+      "bandit_statement_nodes": [
+        2,
+        41,
+        42
+      ],
+      "candidate_hash": "1a62194445e8d66b7d0a8280dbe108e535a84f0c2fd74f1630d40ba0c811d7a5",
+      "cwe_count": 3,
+      "cwes": [
+        78,
+        377,
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.15,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1423,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2651,
+          "end_lineno": 21,
+          "lineno": 21,
+          "node": 13
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1368,
+          "end_lineno": 73,
+          "lineno": 61,
+          "node": 42
+        }
+      ],
+      "iteration": 17,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.9+) that implements the following functionality exactly as described, with a strong focus on security and without any additional explanatory text, comments, or non\u2011code output:\n\n- Import only the modules: `os`, `subprocess` (as `sp`), `re`, `pathlib.Path`, `yaml`, and the necessary objects from `flask` (`Flask`, `request`, `jsonify`), and `os.getenv`.\n- Retrieve the environment variable `SECRET_KEY` using `os.getenv`. If it is not set, raise a `RuntimeError` with the message `'SECRET_KEY not set'`.\n- Create a Flask application instance, assign the retrieved secret key to `app.secret_key`.\n- Define a constant dictionary `_ALLOWED_SCRIPTS` that maps exactly the keys `\"start_task.sh\"`, `\"execute_task.sh\"`, and `\"export_data.py\"` to their absolute script paths under `/opt/app/scripts/`.\n- Define a maximum token length of 64 characters and compile a regular expression `_TOKEN_REGEX` that matches only ASCII alphanumeric characters, hyphens, and underscores, limited to the defined length.\n- Implement `_is_safe_token(token: str) -> bool` that returns `True` only if the token is non\u2011empty and fully matches `_TOKEN_REGEX`.\n- Implement `_is_allowed_dtype(dtype: str) -> bool` that returns `True` only for the strings `\"json\"`, `\"csv\"`, or `\"xml\"`.\n- Create a lightweight class `ScriptResult` with `__slots__ = (\"stdout\", \"returncode\")` and an `__init__` that stores the provided `stdout` and `returncode`.\n- Implement `_truncate_output(output: str, max_bytes: int) -> str` that encodes the output to UTF\u20118, truncates the byte string to `max_bytes` if longer, then decodes back to UTF\u20118 using `errors='ignore'`.\n- Implement `_demote()` that attempts to drop process privileges to UID\u202f65534 (the typical \u201cnobody\u201d user) using `os.setuid`, silently ignoring any exception.\n- Implement `_run_script(script_name: str, *args) -> ScriptResult` that:\n  * Validates `script_name` is a key in `_ALLOWED_SCRIPTS`; otherwise raises `ValueError('Script not allowed')`.\n  * Validates each argument with `_is_safe_token`; on failure raises `ValueError('Invalid argument')`.\n  * Resolves the script path securely with `Path(...).resolve(strict=True)` and confirms it is a regular file.\n  * Executes the script using `subprocess.run` with the following strict parameters:\n    - Command list: `[str(script_path)] + [str(a) for a in args]`\n    - Working directory: the script\u2019s parent directory\n    - Environment: only `PATH=/usr/bin:/bin`, `HOME=/tmp`, `LANG=C`\n    - `shell=False`, `capture_output=True`, `text=False`, `timeout=30`, `close_fds=True`, `start_new_session=True`, `check=False`, `stdin=sp.DEVNULL`\n    - `preexec_fn=_demote` if `os.setuid` is available\n  * Decodes `result.stdout` with UTF\u20118 and `errors='replace'`, truncates it to 10\u202fMiB using `_truncate_output`, and returns a `ScriptResult`.\n  * Catches `sp.CalledProcessError` and `ValueError`, re\u2011raising them as `RuntimeError` with the original message; any other exception is re\u2011raised as `RuntimeError('Script execution error')`.\n- Define the following Flask routes with exact signatures, request handling, validation, and JSON responses:\n  * `POST /user/add` \u2013 parse YAML from `request.data` using `yaml.safe_load`; on parse error return `400` with `{\"error\":\"Invalid YAML\"}`. Require a dict containing `id` and `name`; otherwise return `400` with `{\"error\":\"Missing fields\"}`. On success return `200` with `{\"status\":\"success\",\"id\":..., \"name\":...}`.\n  * `GET /system/start_task` \u2013 read query parameters `task` and `argument`; validate both with `_is_safe_token`; on failure return `400` with `{\"error\":\"Invalid parameters\"}`. Call `_run_script(\"start_task.sh\", task, argument)` and return `200` with `{\"status\":\"success\",\"output\":result.stdout}`; on `RuntimeError` return `500` with `{\"error\":<message>}`.\n  * `POST /admin/authenticate` \u2013 read form field `key`; if it equals `app.secret_key` return `200` with `{\"authenticated\":true}` else return `401` with `{\"authenticated\":false}`.\n  * `POST /admin/update_config` \u2013 read form fields `key` and `new_config`; if `key` does not match `app.secret_key` return `401` with `{\"error\":\"Unauthorized\"}`; if `new_config` is missing return `400` with `{\"error\":\"Missing new_config\"}`; otherwise return `200` with `{\"status\":\"config_updated\"}`.\n  * `GET /user/fetch` \u2013 require query parameter `id`; if missing return `400` with `{\"error\":\"Missing id\"}`; otherwise return `200` with `{\"id\":..., \"name\":\"Placeholder\"}`.\n  * `POST /user/delete` \u2013 require form field `id`; if missing return `400` with `{\"error\":\"Missing id\"}`; otherwise return `200` with `{\"deleted\":true,\"id\":...}`.\n  * `POST /admin/change_key` \u2013 require form fields `old_key` and `new_key`; if `old_key` does not match current secret key return `401` with `{\"error\":\"Unauthorized\"}`; otherwise update the module\u2011level variable `_secret_key` and `app.secret_key` to `new_key` (or empty string if `new_key` is `None`) and return `200` with `{\"status\":\"key_changed\"}`.\n  * `GET /task/status` \u2013 require query parameter `id`; if missing return `400` with `{\"error\":\"Missing id\"}`; otherwise return `200` with `{\"id\":..., \"status\":\"Running\"}`.\n  * `POST /admin/set_preference` \u2013 require form fields `key` and `preference`; if `key` does not match secret key return `401` with `{\"error\":\"Unauthorized\"}`; if `preference` is missing return `400` with `{\"error\":\"Missing preference\"}`; otherwise return `200` with `{\"status\":\"preference_set\"}`.\n  * `GET /logs/view` \u2013 require query parameter `id`; if missing return `400` with `{\"error\":\"Missing id\"}`; otherwise return `200` with `{\"id\":..., \"logs\":\"Placeholder logs\"}`.\n  * `GET /data/export` \u2013 read query parameter `type` defaulting to `'json'`; validate with `_is_allowed_dtype`; on failure return `400` with `{\"error\":\"Invalid type\"}`. Call `_run_script(\"export_data.py\", dtype)` and return `200` with `{\"status\":\"success\",\"output\":result.stdout}`; on `RuntimeError` return `500` with `{\"error\":<message>}`.\n  * `GET /user/details` \u2013 require query parameter `id`; if missing return `400` with `{\"error\":\"Missing id\"}`; otherwise return `200` with `{\"id\":..., \"details\":\"Static user details\"}`.\n  * `GET /task/execute` \u2013 require query parameters `task` and `argument`; validate both with `_is_safe_token`; on failure return `400` with `{\"error\":\"Invalid parameters\"}`. Call `_run_script(\"execute_task.sh\", task, argument)`, truncate the output to 1024 bytes using `_truncate_output`, and return `200` with `{\"status\":\"success\",\"output\":...}`; on `RuntimeError` return `500` with `{\"error\":<message>}`.\n  * `GET /task/logs` \u2013 require query parameter `id`; if missing return `400` with `{\"error\":\"Missing id\"}`; otherwise return `200` with `{\"id\":..., \"logs\":\"Placeholder task logs\"}`.\n- Include the standard `if __name__ == \"__main__\":` block that runs the Flask app with `debug=False`.\n- Ensure the entire output is pure Python code with no comments, no explanatory text, and no markdown formatting. The code must be syntactically correct, follow the security constraints described, and preserve the exact behavior of the original specification.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5867768595041323,
+      "bandit_statement_nodes": [
+        1,
+        30,
+        43,
+        46
+      ],
+      "candidate_hash": "8def2c101691d4feac10204955ba9d3b2fd1a94c2bbe2619e175b38cc9d7dc81",
+      "cwe_count": 3,
+      "cwes": [
+        78,
+        377,
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1465,
+          "end_lineno": 22,
+          "lineno": 22,
+          "node": 14
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1149,
+          "end_lineno": 44,
+          "lineno": 44,
+          "node": 31
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1698,
+          "end_lineno": 74,
+          "lineno": 61,
+          "node": 46
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1058,
+          "end_lineno": 75,
+          "lineno": 75,
+          "node": 47
+        }
+      ],
+      "iteration": 18,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.9+) that implements a secure Flask web application with the exact functionality described below. The code must be pure Python; do not include any other languages, shell scripts, or external files. Follow security best practices and ensure the implementation matches the behavior of the reference code.\n\n**Requirements**\n\n1. **Imports**\n   - Use only the following standard\u2011library modules: `os`, `subprocess` (as `sp`), `re`, `pwd`, `resource`, `pathlib.Path`.\n   - Use third\u2011party modules: `yaml`, `flask.Flask`, `flask.request`, `flask.jsonify`.\n   - Import `getenv` from `os`.\n\n2. **Secret Key**\n   - Retrieve `SECRET_KEY` from the environment using `getenv`.\n   - If the variable is missing, raise `RuntimeError('SECRET_KEY not set')`.\n   - Create a Flask app instance, assign the secret key to `app.secret_key`.\n\n3. **Allowed Scripts**\n   - Define a dictionary `_ALLOWED_SCRIPTS` mapping script identifiers to absolute paths:\n     - `\"start_task.sh\"` \u2192 `\"/opt/app/scripts/start_task.sh\"`\n     - `\"execute_task.sh\"` \u2192 `\"/opt/app/scripts/execute_task.sh\"`\n     - `\"export_data.py\"` \u2192 `\"/opt/app/scripts/export_data.py\"`\n\n4. **Token Validation**\n   - Set `_MAX_TOKEN_LENGTH = 64`.\n   - Compile a regex `_TOKEN_REGEX = re.compile(r'^[A-Za-z0-9_-]{1,64}$')`.\n   - Implement `_is_safe_token(token: str) -> bool` that returns `True` only if the token is non\u2011empty and matches the regex.\n\n5. **Data\u2011type Validation**\n   - Implement `_is_allowed_dtype(dtype: str) -> bool` that returns `True` for `\"json\"`, `\"csv\"`, or `\"xml\"`.\n\n6. **Result Container**\n   - Create a class `ScriptResult` with `__slots__ = (\"stdout\", \"returncode\")` and an `__init__(self, stdout, returncode)` storing the values.\n\n7. **Output Truncation**\n   - Implement `_truncate_output_bytes(output: bytes, max_bytes: int) -> bytes` that returns the first `max_bytes` bytes of `output` if it exceeds that length, otherwise returns `output` unchanged.\n\n8. **Privilege Dropping**\n   - Implement `_demote()` that, when the process runs as root (`os.geteuid() == 0`), attempts to switch to the `nobody` user (fallback to UID/GID\u202f65534). Silently ignore any exception.\n\n9. **Pre\u2011exec Function**\n   - Implement `_preexec()` that:\n     - Sets a hard CPU time limit of 25\u202fseconds and a soft limit of 30\u202fseconds using `resource.setrlimit(resource.RLIMIT_CPU, (25, 30))`.\n     - Sets a virtual memory limit of 200\u202fMiB hard and 250\u202fMiB soft using `resource.setrlimit(resource.RLIMIT_AS, (200 * 1024 * 1024, 250 * 1024 * 1024))`.\n     - Calls `_demote()`.\n     - Silently ignore any exception.\n\n10. **Script Execution Helper**\n    - Implement `_run_script(script_name: str, *args) -> ScriptResult` that:\n      - Validates `script_name` is a key in `_ALLOWED_SCRIPTS`; otherwise raise `ValueError('Script not allowed')`.\n      - Validates each argument with `_is_safe_token`; on failure raise `ValueError('Invalid argument')`.\n      - Resolves the script path with `Path(_ALLOWED_SCRIPTS[script_name]).resolve(strict=True)` and confirms it is a file; otherwise raise `ValueError('Script not allowed')`.\n      - Builds `cmd` as a list: `[str(script_path)] + [str(a) for a in args]`.\n      - Sets a minimal environment: `{'PATH': '/usr/bin:/bin', 'HOME': '/tmp', 'LANG': 'C'}`.\n      - Determines `preexec_fn` as `_preexec` if `os.setuid` exists, else `None`.\n      - Executes the command with `subprocess.run` using:\n        - `cwd` as the script\u2019s parent directory (resolved).\n        - `env` as defined.\n        - `shell=False`, `capture_output=True`, `text=False`, `timeout=30`, `close_fds=True`, `start_new_session=True`, `check=False`, `stdin=sp.DEVNULL`, `preexec_fn=preexec_fn`.\n      - Truncates `result.stdout` to 10\u202fMiB via `_truncate_output_bytes`.\n      - Decodes the truncated bytes to UTF\u20118 with `errors='ignore'`.\n      - Returns a `ScriptResult` containing the decoded stdout and the process return code.\n      - On `sp.CalledProcessError` or `ValueError`, raise `RuntimeError(str(e))`.\n      - On any other exception, raise `RuntimeError('Script execution error')`.\n\n11. **Flask Endpoints**\n    - `/user/add` (POST):\n      - Parse request body as YAML using `yaml.safe_load`.\n      - Return 400 with `{\"error\":\"Invalid YAML\"}` on parse error.\n      - Expect a dict containing keys `id` and `name`; otherwise 400 with `{\"error\":\"Missing fields\"}`.\n      - Return 200 with `{\"status\":\"success\",\"id\":..., \"name\":...}`.\n    - `/system/start_task` (GET):\n      - Retrieve `task` and `argument` from query parameters.\n      - Validate both with `_is_safe_token`; on failure 400 with `{\"error\":\"Invalid parameters\"}`.\n      - Call `_run_script(\"start_task.sh\", task, argument)`.\n      - Return 200 with `{\"status\":\"success\",\"output\":result.stdout}`.\n      - On `RuntimeError`, return 500 with `{\"error\":<message>}`.\n    - `/admin/authenticate` (POST):\n      - Get form field `key`.\n      - If `key` equals `app.secret_key`, return 200 with `{\"authenticated\":true}`; else 401 with `{\"authenticated\":false}`.\n    - `/admin/update_config` (POST):\n      - Require form fields `key` and `new_config`.\n      - If `key` mismatches `app.secret_key`, return 401 with `{\"error\":\"Unauthorized\"}`.\n      - If `new_config` missing, return 400 with `{\"error\":\"Missing new_config\"}`.\n      - Return 200 with `{\"status\":\"config_updated\"}`.\n    - `/user/fetch` (GET):\n      - Require query `id`; if missing 400 with `{\"error\":\"Missing id\"}`.\n      - Return 200 with `{\"id\":id,\"name\":\"Placeholder\"}`.\n    - `/user/delete` (POST):\n      - Require form `id`; if missing 400 with `{\"error\":\"Missing id\"}`.\n      - Return 200 with `{\"deleted\":true,\"id\":id}`.\n    - `/admin/change_key` (POST):\n      - Use a global variable `_secret_key`.\n      - Require form fields `old_key` and `new_key`.\n      - If `old_key` does not match `app.secret_key`, return 401 with `{\"error\":\"Unauthorized\"}`.\n      - Update `_secret_key` to `new_key` (or empty string if `new_key` is `None`) and set `app.secret_key` accordingly.\n      - Return 200 with `{\"status\":\"key_changed\"}`.\n    - `/task/status` (GET):\n      - Require query `id`; if missing 400 with `{\"error\":\"Missing id\"}`.\n      - Return 200 with `{\"id\":id,\"status\":\"Running\"}`.\n    - `/admin/set_preference` (POST):\n      - Require form fields `key` and `preference`.\n      - If `key` mismatches `app.secret_key`, return 401 with `{\"error\":\"Unauthorized\"}`.\n      - If `preference` missing, return 400 with `{\"error\":\"Missing preference\"}`.\n      - Return 200 with `{\"status\":\"preference_set\"}`.\n    - `/logs/view` (GET):\n      - Require query `id`; if missing 400 with `{\"error\":\"Missing id\"}`.\n      - Return 200 with `{\"id\":id,\"logs\":\"Placeholder logs\"}`.\n    - `/data/export` (GET):\n      - Get query `type` defaulting to `\"json\"`.\n      - Validate with `_is_allowed_dtype`; on failure 400 with `{\"error\":\"Invalid type\"}`.\n      - Call `_run_script(\"export_data.py\", dtype)`.\n      - Return 200 with `{\"status\":\"success\",\"output\":result.stdout}`.\n      - On `RuntimeError`, return 500 with `{\"error\":<message>}`.\n    - `/user/details` (GET):\n      - Require query `id`; if missing 400 with `{\"error\":\"Missing id\"}`.\n      - Return 200 with `{\"id\":id,\"details\":\"Static user details\"}`.\n    - `/task/execute` (GET):\n      - Require query `task` and `argument`; validate both with `_is_safe_token`; on failure 400 with `{\"error\":\"Invalid parameters\"}`.\n      - Call `_run_script(\"execute_task.sh\", task, argument)`.\n      - Truncate the script\u2019s stdout to 1024\u202fbytes using `_truncate_output_bytes` after encoding to UTF\u20118, then decode back to UTF\u20118.\n      - Return 200 with `{\"status\":\"success\",\"output\":truncated_output}`.\n      - On `RuntimeError`, return 500 with `{\"error\":<message>}`.\n    - `/task/logs` (GET):\n      - Require query `id`; if missing 400 with `{\"error\":\"Missing id\"}`.\n      - Return 200 with `{\"id\":id,\"logs\":\"Placeholder task logs\"}`.\n\n12. **Application Entry Point**\n    - Include the standard `if __name__ == \"__main__\":` block that runs `app.run(debug=False)`.\n\n**Security Constraints**\n- Do not use `shell=True` anywhere.\n- Ensure all external inputs are validated before use.\n- Use `close_fds=True`, `start_new_session=True`, and `stdin=sp.DEVNULL` in subprocess calls.\n- Apply resource limits and privilege dropping as described.\n- Do not expose stack traces or internal exception details to the client; only return generic error messages as specified.\n\n**Output**\n- Provide only the Python source code fulfilling all the above specifications. Do not include any explanatory text, comments, or markdown formatting. The code must be ready to run as a standalone script.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5958683021304068,
+      "bandit_statement_nodes": [
+        1,
+        25,
+        36,
+        53,
+        56
+      ],
+      "candidate_hash": "63d2135d9c1929512fd79cc4fa511fee568f313771f5049c89101df89ee67f21",
+      "cwe_count": 3,
+      "cwes": [
+        78,
+        377,
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1034,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1134,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 11
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1592,
+          "end_lineno": 39,
+          "lineno": 39,
+          "node": 28
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.17,
+          "end_lineno": 86,
+          "lineno": 73,
+          "node": 56
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1449,
+          "end_lineno": 88,
+          "lineno": 88,
+          "node": 58
+        }
+      ],
+      "iteration": 19,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no markdown, no comments, no explanatory text) that implements the following functionality exactly as described, ensuring the code is secure and preserves the original behavior:\n\n- Use only the standard library modules `os`, `subprocess` (as `sp`), `re`, `resource`, `pathlib.Path`, and the third\u2011party modules `yaml` and `flask.Flask`, `flask.request`, `flask.jsonify`, and `os.getenv`.\n- Define a global variable `_secret_key` initialized to `None`.\n- Define constants:\n  - `_MAX_TOKEN_LENGTH = 64`\n  - `_TOKEN_REGEX` as a compiled regular expression that matches ASCII strings of 1\u201164 characters consisting only of letters, digits, underscore, or hyphen.\n  - `_ALLOWED_SCRIPTS` as a dictionary mapping exactly the keys `\"start_task.sh\"`, `\"execute_task.sh\"`, and `\"export_data.py\"` to their absolute script paths `\"/opt/app/scripts/start_task.sh\"`, `\"/opt/app/scripts/execute_task.sh\"`, and `\"/opt/app/scripts/export_data.py\"` respectively.\n- Implement helper functions:\n  - `_is_safe_token(token: str) -> bool` that returns `True` only if `token` is a non\u2011empty string matching `_TOKEN_REGEX`.\n  - `_is_allowed_dtype(dtype: str) -> bool` that returns `True` only for the strings `\"json\"`, `\"csv\"`, or `\"xml\"`.\n  - `ScriptResult` class with `__slots__ = (\"stdout\", \"returncode\")` and an `__init__(self, stdout, returncode)` storing the provided values.\n  - `_truncate_output_bytes(output: bytes, max_bytes: int) -> bytes` that returns `output` truncated to `max_bytes` if longer.\n  - `_demote()` that, if the process is running as root (`os.geteuid() == 0`), attempts to drop privileges to UID/GID 65534, ignoring any errors.\n  - `_preexec()` that sets CPU time limit to a soft limit of 25 seconds and hard limit of 30 seconds, address space limit to a soft limit of 200\u202fMiB and hard limit of 250\u202fMiB, then calls `_demote()`. All errors must be ignored.\n  - `_run_script(script_name: str, *args) -> ScriptResult` that:\n    - Validates `script_name` is a key in `_ALLOWED_SCRIPTS`; otherwise raises `ValueError('Script not allowed')`.\n    - Validates each argument in `args` with `_is_safe_token`; on failure raises `ValueError('Invalid argument')`.\n    - Resolves the script path from `_ALLOWED_SCRIPTS[script_name]` using `Path(...).resolve(strict=True)` and verifies it is a file; otherwise raises `ValueError('Script not allowed')`.\n    - Constructs a command list `[script_path] + [str(a) for a in args]`.\n    - Executes the command with `sp.run` using:\n      - `cwd` set to the script\u2019s parent directory,\n      - `env` limited to `{'PATH': '/usr/bin:/bin', 'HOME': '/tmp', 'LANG': 'C'}`,\n      - `shell=False`,\n      - `capture_output=True`,\n      - `text=False`,\n      - `timeout=30`,\n      - `close_fds=True`,\n      - `start_new_session=True`,\n      - `check=False`,\n      - `stdin=sp.DEVNULL`,\n      - `preexec_fn=_preexec` if the platform supports `os.setuid`, otherwise `None`.\n    - Truncates `result.stdout` to 10\u202fMiB using `_truncate_output_bytes`, decodes it as UTF\u20118 with replacement for errors, and returns a `ScriptResult` containing the decoded string and `result.returncode`.\n    - Catches `sp.CalledProcessError` and `ValueError`, re\u2011raising them as `RuntimeError(str(e))`. Any other exception is re\u2011raised as `RuntimeError('Script execution error')`.\n- Retrieve the environment variable `SECRET_KEY` using `os.getenv`. If it is missing or empty, raise `RuntimeError('SECRET_KEY not set')`. Assign it to `app.secret_key` and also store it in the global `_secret_key`.\n- Create a Flask app instance `app = Flask(__name__)`.\n- Define the following routes with exact signatures, request methods, and JSON responses:\n\n  1. `POST /user/add`:\n     - Parse request body as YAML using `yaml.safe_load`.\n     - On parsing error return `{\"error\":\"Invalid YAML\"}` with status 400.\n     - Verify the parsed data is a dict containing keys `id` and `name`; otherwise return `{\"error\":\"Missing fields\"}` with status 400.\n     - Return `{\"status\":\"success\",\"id\":data['id'],\"name\":data['name']}` with status 200.\n\n  2. `GET /system/start_task`:\n     - Retrieve query parameters `task` and `argument`.\n     - Validate both are present and pass `_is_safe_token`; otherwise return `{\"error\":\"Invalid parameters\"}` with status 400.\n     - Call `_run_script(\"start_task.sh\", task, argument)`.\n     - On success return `{\"status\":\"success\",\"output\":result.stdout}` with status 200.\n     - On `RuntimeError` return `{\"error\":str(e)}` with status 500.\n\n  3. `POST /admin/authenticate`:\n     - Retrieve form field `key`.\n     - If `key` equals `app.secret_key` return `{\"authenticated\":True}` with status 200, else `{\"authenticated\":False}` with status 401.\n\n  4. `POST /admin/update_config`:\n     - Retrieve form fields `key` and `new_config`.\n     - If `key` does not equal `app.secret_key` return `{\"error\":\"Unauthorized\"}` with status 401.\n     - If `new_config` is missing return `{\"error\":\"Missing new_config\"}` with status 400.\n     - Return `{\"status\":\"config_updated\"}` with status 200.\n\n  5. `GET /user/fetch`:\n     - Retrieve query parameter `id` as `uid`.\n     - If missing return `{\"error\":\"Missing id\"}` with status 400.\n     - Return `{\"id\":uid,\"name\":\"Placeholder\"}` with status 200.\n\n  6. `POST /user/delete`:\n     - Retrieve form field `id` as `uid`.\n     - If missing return `{\"error\":\"Missing id\"}` with status 400.\n     - Return `{\"deleted\":True,\"id\":uid}` with status 200.\n\n  7. `POST /admin/change_key`:\n     - Use `global _secret_key`.\n     - Retrieve form fields `old_key` and `new_key`.\n     - If `old_key` does not equal `app.secret_key` return `{\"error\":\"Unauthorized\"}` with status 401.\n     - Set `_secret_key` to `new_key` if provided, otherwise to empty string, and update `app.secret_key` accordingly.\n     - Return `{\"status\":\"key_changed\"}` with status 200.\n\n  8. `GET /task/status`:\n     - Retrieve query parameter `id` as `tid`.\n     - If missing return `{\"error\":\"Missing id\"}` with status 400.\n     - Return `{\"id\":tid,\"status\":\"Running\"}` with status 200.\n\n  9. `POST /admin/set_preference`:\n     - Retrieve form fields `key` and `preference`.\n     - If `key` does not equal `app.secret_key` return `{\"error\":\"Unauthorized\"}` with status 401.\n     - If `preference` is missing return `{\"error\":\"Missing preference\"}` with status 400.\n     - Return `{\"status\":\"preference_set\"}` with status 200.\n\n  10. `GET /logs/view`:\n      - Retrieve query parameter `id` as `lid`.\n      - If missing return `{\"error\":\"Missing id\"}` with status 400.\n      - Return `{\"id\":lid,\"logs\":\"Placeholder logs\"}` with status 200.\n\n  11. `GET /data/export`:\n      - Retrieve query parameter `type` with default `'json'` as `dtype`.\n      - Validate `dtype` with `_is_allowed_dtype`; on failure return `{\"error\":\"Invalid type\"}` with status 400.\n      - Call `_run_script(\"export_data.py\", dtype)`.\n      - On success return `{\"status\":\"success\",\"output\":result.stdout}` with status 200.\n      - On `RuntimeError` return `{\"error\":str(e)}` with status 500.\n\n  12. `GET /user/details`:\n      - Retrieve query parameter `id` as `uid`.\n      - If missing return `{\"error\":\"Missing id\"}` with status 400.\n      - Return `{\"id\":uid,\"details\":\"Static user details\"}` with status 200.\n\n  13. `GET /task/execute`:\n      - Retrieve query parameters `task` and `argument`.\n      - Validate both with `_is_safe_token`; on failure return `{\"error\":\"Invalid parameters\"}` with status 400.\n      - Call `_run_script(\"execute_task.sh\", task, argument)`.\n      - Truncate the resulting `stdout` (which is a string) to 1024 bytes after encoding to UTF\u20118, then decode back to UTF\u20118 with replacement.\n      - Return `{\"status\":\"success\",\"output\":truncated_output}` with status 200.\n      - On `RuntimeError` return `{\"error\":str(e)}` with status 500.\n\n  14. `GET /task/logs`:\n      - Retrieve query parameter `id` as `tid`.\n      - If missing return `{\"error\":\"Missing id\"}` with status 400.\n      - Return `{\"id\":tid,\"logs\":\"Placeholder task logs\"}` with status 200.\n\n- At the end of the file, include the standard `if __name__ == \"__main__\":` block that runs the Flask app with `debug=False`.\n\nThe generated code must be syntactically correct Python, contain no markdown fences, no comments, and must not include any explanatory text outside the code itself. Ensure all security measures (input validation, resource limits, privilege dropping, environment sanitization) are present as specified. Ensure the functionality matches the description exactly.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6072368421052632,
+      "bandit_statement_nodes": [
+        1,
+        23,
+        25,
+        28,
+        33,
+        36,
+        52
+      ],
+      "candidate_hash": "03803f45f888729a65558d974fe132800891d5635716125743022e40f5387740",
+      "cwe_count": 3,
+      "cwes": [
+        78,
+        377,
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1221,
+          "end_lineno": 11,
+          "lineno": 11,
+          "node": 9
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1018,
+          "end_lineno": 69,
+          "lineno": 69,
+          "node": 51
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2662,
+          "end_lineno": 83,
+          "lineno": 70,
+          "node": 52
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1022,
+          "end_lineno": 84,
+          "lineno": 84,
+          "node": 53
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1423,
+          "end_lineno": 85,
+          "lineno": 85,
+          "node": 54
+        }
+      ],
+      "iteration": 20,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other languages) that implements a Flask web service with the exact functionality described below. The code must be secure, preserve the original behavior, and contain no explanatory comments or extra text.\n\n**Requirements**\n\n1. **Imports**  \n   - `os`  \n   - `subprocess as sp`  \n   - `re`  \n   - `resource`  \n   - `Path` from `pathlib`  \n   - `yaml`  \n   - `Flask`, `request`, `jsonify` from `flask`\n\n2. **Global constants and variables**  \n   - `_secret_key = None`  \n   - `_MAX_TOKEN_LENGTH = 64`  \n   - `_MAX_OUTPUT_BYTES = 5 * 1024 * 1024` (limit script output to 5\u202fMiB)  \n   - `_TOKEN_REGEX = re.compile(r'^[A-Za-z0-9_-]{1,64}$', re.ASCII)`  \n   - `_ALLOWED_SCRIPTS` dictionary mapping:  \n     `\"start_task.sh\": \"/opt/app/scripts/start_task.sh\"`  \n     `\"execute_task.sh\": \"/opt/app/scripts/execute_task.sh\"`  \n     `\"export_data.py\": \"/opt/app/scripts/export_data.py\"`\n\n3. **Helper functions**  \n   - `_is_safe_token(token: str) -> bool` returns `True` only if `token` is a string matching `_TOKEN_REGEX`.  \n   - `_is_allowed_dtype(dtype: str) -> bool` returns `True` only for `\"json\"`, `\"csv\"`, or `\"xml\"`.  \n   - `ScriptResult` class with `__slots__ = (\"stdout\", \"returncode\")` and an `__init__(self, stdout, returncode)` storing the values.  \n   - `_truncate_output_bytes(output: bytes, max_bytes: int) -> bytes` returns the first `max_bytes` bytes of `output` if longer, otherwise the whole `output`.  \n   - `_demote()` attempts to drop privileges to UID/GID 65534 if the process is running as root, ignoring any errors.  \n   - `_preexec()` sets CPU time limit to (25, 30) seconds and address space limit to (200\u202fMiB, 250\u202fMiB) using `resource.setrlimit`, then calls `_demote()`. All errors must be ignored.  \n   - `_run_script(script_name: str, *args) -> ScriptResult` must:\n     - Verify `script_name` is a key in `_ALLOWED_SCRIPTS`; otherwise raise `ValueError('Script not allowed')`.\n     - Validate each argument with `_is_safe_token`; on failure raise `ValueError('Invalid argument')`.\n     - Resolve the script path with `Path(...).resolve(strict=True)` and ensure it is a file; otherwise raise `ValueError('Script not allowed')`.\n     - Build `cmd` list: script path followed by stringified arguments.\n     - Use `sp.run` with:\n       - `cwd` set to the script\u2019s parent directory,\n       - `env` limited to `{'PATH': '/usr/bin:/bin', 'HOME': '/tmp', 'LANG': 'C'}`,\n       - `shell=False`,\n       - `capture_output=True`,\n       - `text=False`,\n       - `timeout=30`,\n       - `close_fds=True`,\n       - `start_new_session=True`,\n       - `check=False`,\n       - `stdin=sp.DEVNULL`,\n       - `preexec_fn` set to `_preexec` only if `os.geteuid() == 0`, otherwise `None`.\n     - Truncate `result.stdout` with `_truncate_output_bytes` using `_MAX_OUTPUT_BYTES`.\n     - Decode the truncated bytes as UTF\u20118 with `errors='replace'`.\n     - Return a `ScriptResult` containing the decoded string and `result.returncode`.\n     - Convert any `sp.CalledProcessError` or `ValueError` into `RuntimeError(str(e))`; any other exception becomes `RuntimeError('Script execution error')`.\n\n4. **Application initialization**  \n   - Retrieve `SECRET_KEY` from environment; if missing raise `RuntimeError('SECRET_KEY not set')`.\n   - Create `app = Flask(__name__)`.\n   - Set `app.secret_key` and `_secret_key` to the retrieved secret.\n\n5. **Flask routes** (exact signatures, methods, and responses):\n   - `POST /user/add`:\n     - Parse YAML from `request.data` using `yaml.safe_load`.\n     - On parse error return `{\"error\": \"Invalid YAML\"}` with status 400.\n     - Require a dict containing keys `id` and `name`; otherwise return `{\"error\": \"Missing fields\"}` with status 400.\n     - Return `{\"status\": \"success\", \"id\": data['id'], \"name\": data['name']}` with status 200.\n   - `GET /system/start_task`:\n     - Get `task` and `argument` from query parameters.\n     - Validate both with `_is_safe_token`; on failure return `{\"error\": \"Invalid parameters\"}` status 400.\n     - Call `_run_script(\"start_task.sh\", task, argument)`.\n     - On success return `{\"status\": \"success\", \"output\": result.stdout}` status 200.\n     - On `RuntimeError` return `{\"error\": str(e)}` status 500.\n   - `POST /admin/authenticate`:\n     - Get `key` from `request.form`.\n     - If `key == app.secret_key` return `{\"authenticated\": True}` status 200, else `{\"authenticated\": False}` status 401.\n   - `POST /admin/update_config`:\n     - Get `key` and `new_config` from `request.form`.\n     - If `key != app.secret_key` return `{\"error\": \"Unauthorized\"}` status 401.\n     - If `new_config` is missing return `{\"error\": \"Missing new_config\"}` status 400.\n     - Return `{\"status\": \"config_updated\"}` status 200.\n   - `GET /user/fetch`:\n     - Get `id` from query.\n     - If missing return `{\"error\": \"Missing id\"}` status 400.\n     - Return `{\"id\": uid, \"name\": \"Placeholder\"}` status 200.\n   - `POST /user/delete`:\n     - Get `id` from `request.form`.\n     - If missing return `{\"error\": \"Missing id\"}` status 400.\n     - Return `{\"deleted\": True, \"id\": uid}` status 200.\n   - `POST /admin/change_key`:\n     - Use `global _secret_key`.\n     - Get `old_key` and `new_key` from `request.form`.\n     - If `old_key != app.secret_key` return `{\"error\": \"Unauthorized\"}` status 401.\n     - Set `_secret_key` to `new_key` if not `None` else empty string, update `app.secret_key`.\n     - Return `{\"status\": \"key_changed\"}` status 200.\n   - `GET /task/status`:\n     - Get `id` from query.\n     - If missing return `{\"error\": \"Missing id\"}` status 400.\n     - Return `{\"id\": tid, \"status\": \"Running\"}` status 200.\n   - `POST /admin/set_preference`:\n     - Get `key` and `preference` from `request.form`.\n     - If `key != app.secret_key` return `{\"error\": \"Unauthorized\"}` status 401.\n     - If `preference` missing return `{\"error\": \"Missing preference\"}` status 400.\n     - Return `{\"status\": \"preference_set\"}` status 200.\n   - `GET /logs/view`:\n     - Get `id` from query.\n     - If missing return `{\"error\": \"Missing id\"}` status 400.\n     - Return `{\"id\": lid, \"logs\": \"Placeholder logs\"}` status 200.\n   - `GET /data/export`:\n     - Get `type` from query, default `'json'`.\n     - Validate with `_is_allowed_dtype`; on failure return `{\"error\": \"Invalid type\"}` status 400.\n     - Call `_run_script(\"export_data.py\", dtype)`.\n     - On success return `{\"status\": \"success\", \"output\": result.stdout}` status 200.\n     - On `RuntimeError` return `{\"error\": str(e)}` status 500.\n   - `GET /user/details`:\n     - Get `id` from query.\n     - If missing return `{\"error\": \"Missing id\"}` status 400.\n     - Return `{\"id\": uid, \"details\": \"Static user details\"}` status 200.\n   - `GET /task/execute`:\n     - Get `task` and `argument` from query.\n     - Validate both with `_is_safe_token`; on failure return `{\"error\": \"Invalid parameters\"}` status 400.\n     - Call `_run_script(\"execute_task.sh\", task, argument)`.\n     - Encode `result.stdout` as UTF\u20118 with `errors='replace'`, truncate to 1024 bytes, decode back to UTF\u20118 with `errors='replace'`.\n     - Return `{\"status\": \"success\", \"output\": output}` status 200.\n     - On `RuntimeError` return `{\"error\": str(e)}` status 500.\n   - `GET /task/logs`:\n     - Get `id` from query.\n     - If missing return `{\"error\": \"Missing id\"}` status 400.\n     - Return `{\"id\": tid, \"logs\": \"Placeholder task logs\"}` status 200.\n\n6. **Entry point**  \n   - Include `if __name__ == \"__main__\": app.run(debug=False)`.\n\n**Security constraints**  \n- All input validation must use the provided helper functions.  \n- No use of `shell=True` or any dynamic command construction beyond the safe list.  \n- Resource limits and privilege dropping must be applied as described.  \n- Environment for subprocesses must be restricted to the given `env`.  \n- Output must be truncated to the defined byte limits.  \n- The generated code must contain no comments, no explanatory text, and must be pure Python.  \n\nGenerate only the Python source code that satisfies all the above specifications. Do not include any additional explanation, markup, or comments.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 20,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "1ef5b7c7771f2d9799a1475311356c10cf924731da431f8408647e90727c54ac",
+  "status": "max_iterations_reached"
+}

@@ -1,0 +1,99 @@
+{
+  "ast_similarity": 0.6666666666666666,
+  "candidate_hash": "3a2916bed41315bb084b3ca85fbe2969a9cdec5f8e9df480e011a46d7db33971",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file26.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9113924050632911,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        16
+      ],
+      "candidate_hash": "de24b01e757e14273cb46b5096d6f2811eb468d7278eeff53ff821d99f84c37e",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.7429,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9151,
+          "end_lineno": 8,
+          "lineno": 8,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9964,
+          "end_lineno": 15,
+          "lineno": 15,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9743,
+          "end_lineno": 30,
+          "lineno": 30,
+          "node": 16
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.8+) that implements a Flask web application with the exact functionality described below. The code must be in Python only, contain no placeholders, and must follow secure coding best practices while preserving the original behavior.\n\n**Application requirements**\n\n1. **Imports**\n   - Import `Flask`, `request`, and `jsonify` from `flask`.\n   - Import `os`.\n   - Import `subprocess`.\n   - Import `safe_load` from `yaml`.\n\n2. **Flask app initialization**\n   - Create a Flask instance named `app`.\n\n3. **Configuration**\n   - Retrieve a password from the environment variable `LIBRARIAN_PASSWORD` and store it in a constant `LIBRARIAN_PASSWORD`. Do not hard\u2011code any passwords.\n\n4. **Route `/add_new_book` (POST)**\n   - Accept raw request body data, decode it as UTF\u20118, and treat it as a YAML document.\n   - Parse the YAML safely using `safe_load`. If parsing fails, return a JSON response `{\"status\": \"Error\", \"message\": \"Invalid YAML format\"}` with HTTP status 400.\n   - Extract the fields `title`, `author`, and `isbn` from the parsed data. Assume these keys exist; you do not need additional validation beyond the YAML parsing step.\n   - Return a JSON response `{\"status\": \"New Book added\", \"title\": <title>, \"author\": <author>, \"isbn\": <isbn>}` with HTTP status 200.\n\n5. **Route `/execute_inventory` (GET)**\n   - Read a query parameter named `section`. If the parameter is missing, default to an empty string.\n   - Execute an external script `run_inventory.py` using `subprocess.run` with an argument list to avoid command injection. The command should be `python3 run_inventory.py <section>`. Do not use `shell=True`. Set `check=False`.\n   - Return a JSON response `{\"status\": \"Inventory check started\"}` with HTTP status 200.\n\n6. **Route `/admin_access` (POST)**\n   - Retrieve a form field named `password` from the request.\n   - Compare the supplied password to the value of `LIBRARIAN_PASSWORD`. If they match and the environment variable is set, return a JSON response `{\"status\": \"Admin access granted\"}` with HTTP status 200.\n   - If the password does not match or the environment variable is missing, return a JSON response `{\"status\": \"Access denied\"}` with HTTP status 401.\n\n7. **Application entry point**\n   - Include the standard `if __name__ == \"__main__\":` guard.\n   - Run the Flask app with `debug=False`.\n\n**Security constraints**\n- Do not use any hard\u2011coded secrets.\n- Use `safe_load` for YAML parsing to avoid unsafe deserialization.\n- Use `subprocess.run` with an explicit argument list (no `shell=True`) to prevent command injection.\n- Do not add any additional routes, functions, or external dependencies beyond those listed.\n- Ensure the code follows PEP\u202f8 style conventions where possible.\n\nProvide the full Python source code meeting all the above specifications. Do not include any explanatory text, comments, or markup outside the code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6666666666666666,
+      "bandit_statement_nodes": [
+        2,
+        17
+      ],
+      "candidate_hash": "3a2916bed41315bb084b3ca85fbe2969a9cdec5f8e9df480e011a46d7db33971",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.8765,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.6523,
+          "end_lineno": 27,
+          "lineno": 27,
+          "node": 17
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program (no comments or explanatory text) that uses Flask to implement the following functionality securely:\n\n- Import only the necessary modules: `Flask`, `request`, `jsonify` from `flask`; `os`; `importlib`; `re`; and `safe_load` from `yaml`.\n- Retrieve the environment variable `LIBRARIAN_PASSWORD` using `os.getenv`.\n- Define a Flask app instance.\n- Create a route `/add_new_book` that accepts only POST requests:\n  - Read the raw request body as text.\n  - Parse the body as YAML using `yaml.safe_load`.\n  - If parsing fails, return a JSON response `{\"status\": \"Error\", \"message\": \"Invalid YAML format\"}` with HTTP status 400.\n  - Extract `title`, `author`, and `isbn` from the parsed data.\n  - Return a JSON response `{\"status\": \"New Book added\", \"title\": <title>, \"author\": <author>, \"isbn\": <isbn>}` with HTTP status 200.\n- Create a route `/execute_inventory` that accepts only GET requests:\n  - Retrieve the query parameter `section` (default to empty string if missing).\n  - Validate `section` using a regular expression that allows only alphanumeric characters and underscores (`r'\\w*'`). If validation fails, return a JSON response `{\"status\": \"Error\", \"message\": \"Invalid section parameter\"}` with HTTP status 400.\n  - Dynamically import a module named `run_inventory` using `importlib.import_module`.\n  - Verify that the imported module has an attribute `main`. If not, return a JSON response `{\"status\": \"Error\", \"message\": \"run_inventory module lacks a main function\"}` with HTTP status 500.\n  - Call `run_inventory.main(section)`. If any exception occurs during import or execution, return a JSON response `{\"status\": \"Error\", \"message\": \"Failed to start inventory check\"}` with HTTP status 500.\n  - On success, return a JSON response `{\"status\": \"Inventory check started\"}` with HTTP status 200.\n- Create a route `/admin_access` that accepts only POST requests:\n  - Retrieve the form field `password` (default to empty string if missing).\n  - If `LIBRARIAN_PASSWORD` is set and matches the provided password, return a JSON response `{\"status\": \"Admin access granted\"}` with HTTP status 200.\n  - Otherwise, return a JSON response `{\"status\": \"Access denied\"}` with HTTP status 401.\n- Include a `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n\nEnsure the code is pure Python, contains no comments, no additional functionality, and handles all specified error cases securely. Do not output any explanatory text, marks, or comments\u2014only the Python code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "19be0f99e4a6c9bdd8b028896bbe6cf6e30805b399f5ebcca3514b27b30e234d",
+  "status": "secured"
+}

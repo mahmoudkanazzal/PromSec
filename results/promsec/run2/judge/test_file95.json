@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "33ac8fcdaf7a8ec448099bb4ba41d9e3b78fe37aa02e7e4fa501fd296ec9196a",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing required fields in the JSON payload may cause a server error.",
+      "Providing a non\u2011integer year or book_id results in a 500 error.",
+      "Searching with an empty keyword returns all books.",
+      "Updating or deleting a non\u2011existent book_id still returns a success message but affects no rows.",
+      "Large keyword strings may degrade performance.",
+      "Invalid query parameters (e.g., non\u2011numeric year) may cause SQLite errors."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a RESTful API for managing a collection of books stored in a SQLite database, allowing clients to add, search, update, delete, and retrieve books by year.",
+    "invariants": [
+      "Each book record has a unique integer id primary key.",
+      "The books table contains columns: id, title, author, year.",
+      "Year values are stored as integers.",
+      "Responses always contain valid JSON.",
+      "HTTP methods correspond to their intended CRUD operation.",
+      "The API does not alter files other than library.db."
+    ],
+    "io_behavior": [
+      "POST /add_book with JSON {title, author, year} returns 201 and a success message.",
+      "GET /search_books?keyword=... returns 200 and a JSON array of matching books.",
+      "PUT /update_book/<book_id> with JSON {title?, author?, year?} returns 200 and a success message.",
+      "DELETE /delete_book/<book_id> returns 200 and a success message.",
+      "GET /get_books_by_year?year=... returns 200 and a JSON array of books from that year.",
+      "All responses are JSON-encoded and use standard HTTP status codes."
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:DELETE /delete_book/<int:book_id>": "",
+      "route:GET /get_books_by_year": "",
+      "route:GET /search_books": "",
+      "route:POST /add_book": "",
+      "route:PUT /update_book/<int:book_id>": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the books table on /add_book.",
+      "Updates an existing row on /update_book.",
+      "Deletes a row on /delete_book.",
+      "Reads rows from the database on /search_books and /get_books_by_year.",
+      "Commits transactions to persist changes in library.db.",
+      "Opens and closes a SQLite connection for each request."
+    ],
+    "source_hash": "3c14a77e03a4f047bcd38fd49f48160e1f4423dbfe27ee323cf586f69962ee2f"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.2,
+    "invariants": 1.0,
+    "io_semantics": 0.6,
+    "side_effects": 0.2
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file95.py",
+  "gated_score": 0.4025,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.4025,
+  "original_hash": "3c14a77e03a4f047bcd38fd49f48160e1f4423dbfe27ee323cf586f69962ee2f",
+  "rationale": "Routes and basic CRUD work, but error handling deviates from contract (non\u2011existent updates/deletes return 404, invalid types return 400), cursor context manager is invalid causing runtime failures, and edge\u2011case expectations (500 errors, success on missing rows) are not met.",
+  "schema": 1,
+  "stability_abs_difference": 0.2925,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.2,
+    "invariants": 1.0,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.695,
+  "weighted_mean": 0.47,
+  "worst_dimension": 0.2
+}

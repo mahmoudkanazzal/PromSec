@@ -1,0 +1,46 @@
+{
+  "ast_similarity": 0.4332892998678996,
+  "candidate_hash": "50f854a6878a1d1556c06762000c5eccafb3dc4aba110e9f3d803eeeaa4e1c20",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file99.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.4332892998678996,
+      "bandit_statement_nodes": [
+        10,
+        14,
+        25,
+        34
+      ],
+      "candidate_hash": "50f854a6878a1d1556c06762000c5eccafb3dc4aba110e9f3d803eeeaa4e1c20",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.8107,
+          "end_lineno": 22,
+          "lineno": 22,
+          "node": 14
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the following requirements, preserving the original functionality while ensuring security and best practices:\n\n1. **General**  \n   - The script must be pure Python and runnable with `python script_name.py`.  \n   - Use only the standard library and the `flask` package.  \n   - Do **not** include any code in other languages.  \n\n2. **Database**  \n   - Use SQLite with a database file named `recipe.db`.  \n   - Provide a helper function `get_db_connection()` that returns a connection object with `row_factory = sqlite3.Row`.  \n   - Ensure every database connection is closed properly, even when exceptions occur (use `try/finally` or context managers).  \n\n3. **Security**  \n   - All SQL statements must be executed with parameterized queries (`?` placeholders) to prevent SQL injection.  \n   - Do **not** construct SQL strings with f\u2011strings, `%` formatting, or string concatenation.  \n   - Validate and sanitize all incoming request data:  \n     - `title` must be a non\u2011empty string.  \n     - `ingredients` must be a list of non\u2011empty strings.  \n     - `recipe_id` must be an integer greater than zero.  \n     - `review` must be a non\u2011empty string.  \n     - `reviewer_id` must be a non\u2011empty string.  \n   - Return a `400 Bad Request` response with a clear JSON error message if validation fails.  \n\n4. **Endpoints**  \n\n   - **POST /add_recipe**  \n     - Accept JSON payload with keys `title` and `ingredients`.  \n     - Insert a new row into `recipes(title)` using a parameterized query and retrieve the generated `recipe_id`.  \n     - Insert each ingredient into `ingredients(recipe_id, ingredient)` using a parameterized query.  \n     - Commit the transaction and close the connection.  \n     - Return JSON `{\"message\": \"Recipe added successfully\", \"recipe_id\": <id>}` with HTTP status 201.  \n\n   - **POST /submit_review**  \n     - Accept JSON payload with keys `recipe_id`, `review`, and `reviewer_id`.  \n     - Insert a new row into `reviews(recipe_id, review, reviewer_id)` using a parameterized query.  \n     - Commit and close the connection.  \n     - Return JSON `{\"message\": \"Review submitted successfully\"}` with HTTP status 200.  \n\n   - **GET /get_recipe_reviews**  \n     - Accept query parameter `recipe_id`.  \n     - Validate that `recipe_id` is a positive integer.  \n     - Execute a parameterized SELECT that returns each review text and the total count of reviews for the given recipe, grouped appropriately.  \n     - Return the results as a JSON list of objects `{\"review\": <text>, \"review_count\": <count>}` with HTTP status 200.  \n\n5. **Error Handling**  \n   - Wrap database operations in `try/except` blocks.  \n   - On any unexpected error, roll back the transaction if needed, close the connection, and return a `500 Internal Server Error` with a JSON message `{\"error\": \"Internal server error\"}`.  \n\n6. **Application Execution**  \n   - Include the standard `if __name__ == '__main__':` block to run the Flask app with `debug=False`.  \n\nGenerate only the Python code fulfilling all the above specifications. Do not include any explanatory text, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "05a8f2728379041b6e2e15e634979a3fa87f110fe73dca5cd6b12c3a325c1542",
+  "status": "secured"
+}

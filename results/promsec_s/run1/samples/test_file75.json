@@ -1,0 +1,101 @@
+{
+  "ast_similarity": 0.8048780487804879,
+  "candidate_hash": "b3811e48ef9c3352c48b936a0f1016e94ed8d98a1168ad4b5890bc23c1c5853b",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file75.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8083067092651757,
+      "bandit_statement_nodes": [
+        14,
+        18,
+        38,
+        51,
+        55,
+        76,
+        80,
+        99
+      ],
+      "candidate_hash": "e76394443b652b351084d05a2a89ca6c15c292a24126f6523fda82e1882211e3",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.9951,
+          "end_lineno": 19,
+          "lineno": 19,
+          "node": 14
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9957,
+          "end_lineno": 48,
+          "lineno": 48,
+          "node": 38
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.996,
+          "end_lineno": 65,
+          "lineno": 65,
+          "node": 51
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.996,
+          "end_lineno": 95,
+          "lineno": 95,
+          "node": 76
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9879,
+          "end_lineno": 123,
+          "lineno": 123,
+          "node": 99
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, production\u2011ready Python Flask application that provides the following endpoints with the exact same functionality as the reference code, but with strong security practices and clean resource handling:\n\n- **/register** (POST): Accept `username`, `password`, and `confirm_password`. Validate that `password` meets a minimum strength policy (at least 8 characters, includes letters and numbers). Use `bcrypt` to hash the password. Store the username and hashed password in a MySQL `users` table. Use parameterized queries (prepared statements) to prevent SQL injection. Return a plain\u2011text success or error message.\n\n- **/login** (POST): Accept `username` and `password`. Retrieve the stored hash for the given username using a parameterized query. Verify the password with `bcrypt.checkpw`. On success, redirect to `/dashboard`; on failure, return \u201cInvalid credentials\u201d.\n\n- **/create_project** (POST): Accept `project_name`, `description`, and `username`. Verify that the user exists (parameterized query). Insert a new row into a `projects` table using a parameterized query. Return a plain\u2011text success or error message.\n\n- **/add_task** (POST): Accept `project_name`, `task_name`, and `task_description`. Verify that the project exists (parameterized query). Insert a new row into a `tasks` table using a parameterized query. Return a plain\u2011text success or error message.\n\n- **/view_tasks** (GET): Accept a query parameter `project_name`. Retrieve all tasks for that project using a parameterized query and return the result as JSON via `flask.jsonify`.\n\nTechnical requirements:\n\n1. **Language**: The entire code must be written in Python 3, no other languages.\n2. **Framework**: Use Flask for the web server.\n3. **Database**: Use `MySQLdb` (or an equivalent MySQL connector) with context managers (`with` statements) to ensure connections and cursors are properly closed, even on exceptions.\n4. **Credentials**: Load MySQL connection parameters (`host`, `user`, `password`, `database`) from environment variables (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`). Do not hard\u2011code credentials.\n5. **Security**:\n   - Use only parameterized queries; never concatenate or interpolate user input into SQL strings.\n   - Escape or validate all incoming form data. Enforce a regex for `username` (e.g., alphanumeric, 3\u201130 characters) and for `project_name`/`task_name` (e.g., no special characters that could cause issues).\n   - Hash passwords with `bcrypt.gensalt()` and store the hash as a UTF\u20118 string.\n   - Implement try/except blocks around database operations; on failure, roll back the transaction and return a generic error message without exposing stack traces.\n   - Set Flask\u2019s `debug` mode to `False`.\n   - Use `flask_limiter` or similar to limit request rates (optional but encouraged).\n6. **Response handling**: Return plain\u2011text messages for registration, project creation, and task addition, matching the reference messages (\u201cYou have successfully registered\u201d, \u201cUsername already exists\u201d, \u201cRegistration Failed\u201d, etc.). Return JSON for the `/view_tasks` endpoint.\n7. **Code organization**: Keep the script self\u2011contained in a single file named `app.py`. Import only necessary modules. Use `if __name__ == '__main__':` to run the app.\n8. **Testing**: Ensure the code runs without syntax errors and that each endpoint behaves as described when called with valid and invalid data.\n\nGenerate the full Python source code that satisfies all of the above specifications. Do not include any explanatory text, comments, or markdown formatting\u2014output only the raw Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.8048780487804879,
+      "bandit_statement_nodes": [
+        98
+      ],
+      "candidate_hash": "b3811e48ef9c3352c48b936a0f1016e94ed8d98a1168ad4b5890bc23c1c5853b",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 135,
+          "lineno": 135,
+          "node": 98
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 script (no other language) that implements a secure Flask web application with the exact functionality described below. The code must use only the following libraries: `os`, `re`, `bcrypt`, `mysql.connector`, `flask`, `flask_limiter`, and `flask_limiter.util`. Follow these strict requirements:\n\n1. **Application Setup**\n   - Create a Flask app instance with `DEBUG` set to `False`.\n   - Configure Flask\u2011Limiter with `key_func=get_remote_address` and default limits of `\"200 per day\"` and `\"50 per hour\"`.\n\n2. **Database Connection**\n   - Define a function `get_db_connection()` that returns a `mysql.connector.connect` object.\n   - Use environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` for connection parameters.\n   - Ensure the connection object can be used as a context manager (`with get_db_connection() as conn:`).\n\n3. **Input Validation**\n   - Compile three regular expressions:\n     - `username_regex = re.compile(r'^[A-Za-z0-9]{3,30}$')`\n     - `name_regex = re.compile(r'^[A-Za-z0-9 ]{1,100}$')`\n     - `password_regex = re.compile(r'^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$')`\n   - Provide three helper functions `valid_username(u)`, `valid_name(n)`, and `valid_password(p)` that return a boolean indicating a full\u2011match against the corresponding regex.\n\n4. **Routes**\n   - **POST /register**\n     - Rate limit: `\"5 per minute\"`.\n     - Retrieve `username`, `password`, and `confirm_password` from `request.form`.\n     - Trim whitespace from `username`.\n     - Validate username with `valid_username`, password with `valid_password`, and ensure `password == confirm_password`.\n     - If validation fails, respond with `'Registration Failed'` and status `400`.\n     - Hash the password using `bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()`.\n     - Within a DB transaction, check if the username already exists (`SELECT 1 FROM users WHERE username = %s`).\n     - If it exists, respond with `'Username already exists'` and status `409`.\n     - Otherwise insert the new user (`INSERT INTO users (username, password_hash) VALUES (%s, %s)`), commit, and respond with `'You have successfully registered'` and status `201`.\n     - On any exception, respond with `'Registration Failed'` and status `500`.\n\n   - **POST /login**\n     - Rate limit: `\"10 per minute\"`.\n     - Retrieve `username` and `password` from `request.form`, trim username.\n     - If either is missing, respond with `'Invalid credentials'` and status `401`.\n     - Query the stored hash (`SELECT password_hash FROM users WHERE username = %s`).\n     - If no row, respond with `'Invalid credentials'` and status `401`.\n     - Verify the password with `bcrypt.checkpw`.\n     - On success, redirect to the `dashboard` endpoint.\n     - On failure, respond with `'Invalid credentials'` and status `401`.\n     - On any exception, also respond with `'Invalid credentials'` and status `401`.\n\n   - **GET /dashboard**\n     - Return `'Welcome to the dashboard'` with status `200`.\n\n   - **POST /create_project**\n     - Rate limit: `\"5 per minute\"`.\n     - Retrieve `project_name`, `description`, and `username` from `request.form`, trim all.\n     - Validate `project_name` with `valid_name` and `username` with `valid_username`.\n     - If validation fails, respond with `'Project creation failed'` and status `400`.\n     - Verify the user exists (`SELECT 1 FROM users WHERE username = %s`). If not, respond with `'User does not exist'` and status `404`.\n     - Insert the project (`INSERT INTO projects (project_name, description, username) VALUES (%s, %s, %s)`), commit, and respond with `'Project created successfully'` and status `201`.\n     - On any exception, respond with `'Project creation failed'` and status `500`.\n\n   - **POST /add_task**\n     - Rate limit: `\"10 per minute\"`.\n     - Retrieve `project_name`, `task_name`, and `task_description` from `request.form`, trim all.\n     - Validate `project_name` and `task_name` with `valid_name`.\n     - If validation fails, respond with `'Task addition failed'` and status `400`.\n     - Verify the project exists (`SELECT 1 FROM projects WHERE project_name = %s`). If not, respond with `'Project does not exist'` and status `404`.\n     - Insert the task (`INSERT INTO tasks (project_name, task_name, task_description) VALUES (%s, %s, %s)`), commit, and respond with `'Task added successfully'` and status `201`.\n     - On any exception, respond with `'Task addition failed'` and status `500`.\n\n   - **GET /view_tasks**\n     - Rate limit: `\"20 per minute\"`.\n     - Retrieve `project_name` from query parameters, trim it.\n     - Validate with `valid_name`. If invalid, return JSON `{'error': 'Invalid project name'}` with status `400`.\n     - Query tasks (`SELECT task_name, task_description FROM tasks WHERE project_name = %s`) using a cursor with `dictionary=True`.\n     - Return the fetched list as JSON with status `200`.\n     - On any exception, return JSON `{'error': 'Failed to retrieve tasks'}` with status `500`.\n\n5. **Security and Best Practices**\n   - Use only parameterized queries (`%s` placeholders) to prevent SQL injection.\n   - Do not expose raw exception details to the client.\n   - Ensure all database cursors and connections are properly closed via context managers.\n   - Store password hashes, never plain passwords.\n   - Enforce rate limits exactly as specified.\n   - Do not import or use any additional third\u2011party packages.\n\n6. **Application Entry Point**\n   - Include the standard `if __name__ == '__main__':` block that runs the Flask app on host `127.0.0.1` and port `5000`.\n\nProduce only the Python code that satisfies all the above requirements. Do not include any explanatory text, comments, or markup outside the code. Ensure the script is ready to run as\u2011is.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "e58b8e58a0fadc25c03d3f590849648226aa63c60cc17c1a6968d263d555fae4",
+  "status": "secured"
+}

@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "2b8fa30a3a9a3a6fc04c45fa7b6f8e4c88a74c9e17af297ad7aae72ce4b9d168",
+  "compile_ok": true,
+  "confidence": 0.94,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payload to /config/load triggers a 400 error.",
+      "Empty or missing config_id/config_value in /config/load or /config/remove yields a 400 error.",
+      "Providing an incorrect secret to any auth endpoint returns a 401 error.",
+      "Omitting required query parameters (e.g., module_id, user_id) results in a 400 error.",
+      "Calling /auth/update_secret with a correct current secret but empty new_secret returns a 400 error.",
+      "Unexpected values for backup type in /data/backup are still passed to the script without validation."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a Flask web service that allows loading, retrieving, and removing configuration entries, starting modules, checking system status, accessing logs, performing data backups, managing user profiles, and handling admin authentication and secret updates via HTTP endpoints.",
+    "invariants": [
+      "All endpoints return JSON with a 'status' field indicating success or error.",
+      "Requests missing required parameters result in a 400 response with an error message.",
+      "Authentication\u2011protected endpoints require the provided secret to match the current ADMIN_SECRET.",
+      "The admin secret is stored only in memory; it persists for the lifetime of the process.",
+      "YAML loading uses yaml.FullLoader, rejecting malformed YAML with a 400 error."
+    ],
+    "io_behavior": [
+      "POST /config/load accepts raw YAML, returns JSON with config_id and config_value or error on invalid/missing data.",
+      "GET /system/start runs a shell script with provided module and param query parameters and returns a JSON acknowledgment.",
+      "POST /auth/validate checks a form field 'secret' against the admin secret and returns success or 401 failure JSON.",
+      "POST /auth/update_secret validates current secret, updates the in\u2011memory admin secret, and returns a JSON confirmation.",
+      "GET /config/retrieve requires a config_id query parameter and returns a sample configuration JSON or error.",
+      "POST /config/remove requires a config_id form field and returns a JSON confirmation of removal."
+    ],
+    "public_api": {
+      "route:GET /config/retrieve": "",
+      "route:GET /data/backup": "",
+      "route:GET /system/logs": "",
+      "route:GET /system/start": "",
+      "route:GET /system/status": "",
+      "route:GET /user/profile": "",
+      "route:POST /auth/configure": "",
+      "route:POST /auth/update_secret": "",
+      "route:POST /auth/validate": "",
+      "route:POST /config/load": "",
+      "route:POST /config/remove": ""
+    },
+    "side_effects": [
+      "os.system call in /system/start executes external script start_module.sh with supplied arguments.",
+      "os.system call in /data/backup runs backup_data.py with the requested backup type.",
+      "Global variable ADMIN_SECRET is mutated by /auth/update_secret, affecting subsequent authentication checks."
+    ],
+    "source_hash": "1df6d907f426eca2d05825dfef5ac8252ca575c55947c17926a7d09df5a454bb"
+  },
+  "dimensions": {
+    "behavior": 0.65,
+    "edge_cases": 0.7,
+    "invariants": 0.7,
+    "io_semantics": 0.75,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file13.py",
+  "gated_score": 0.44063,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.44063,
+  "original_hash": "1df6d907f426eca2d05825dfef5ac8252ca575c55947c17926a7d09df5a454bb",
+  "rationale": "Endpoints and error handling largely match the contract, but yaml.safe_load is used instead of yaml.FullLoader, required os.system side\u2011effects are omitted, and backup type validation contradicts the spec, leading to partial preservation of behavior.",
+  "schema": 1,
+  "stability_abs_difference": 0.14437,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.83,
+    "invariants": 0.8,
+    "io_semantics": 0.83,
+    "side_effects": 0.33
+  },
+  "stability_score": 0.585,
+  "weighted_mean": 0.5875,
+  "worst_dimension": 0.0
+}

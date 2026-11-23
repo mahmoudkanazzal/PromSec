@@ -1,0 +1,77 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "38485a07d85df078d2f8ed59b49ff2977ea88b8291437b110cd13c4a13a668d2",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required fields in the POST /add_book JSON payload.",
+      "Providing a non\u2011existent book_id to update or delete endpoints.",
+      "Empty or absent keyword/genre query parameters resulting in all rows or none.",
+      "Invalid JSON body causing a 400 error from Flask.",
+      "SQL errors due to special characters in input (e.g., quotes) leading to request failure."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a RESTful HTTP API that lets clients add, search, update, delete, and list books stored in a SQLite database.",
+    "invariants": [
+      "Each book record contains id, title, author, and genre columns.",
+      "All endpoints return JSON payloads with appropriate HTTP status codes.",
+      "Database connections are opened, used, committed (if needed), and closed per request.",
+      "The API does not perform authentication or authorization.",
+      "Responses for list endpoints are always JSON arrays (empty if no rows match)."
+    ],
+    "io_behavior": [
+      "POST /add_book with JSON {title, author, genre} \u2192 201 and JSON confirmation.",
+      "GET /search_books?keyword=\u2026 \u2192 200 and JSON array of matching books.",
+      "PUT /update_book/<book_id> with JSON {title?, author?, genre?} \u2192 200 and JSON confirmation.",
+      "DELETE /delete_book/<book_id> \u2192 200 and JSON confirmation.",
+      "GET /get_books_by_genre?genre=\u2026 \u2192 200 and JSON array of books in that genre."
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:DELETE /delete_book/<int:book_id>": "",
+      "route:GET /get_books_by_genre": "",
+      "route:GET /search_books": "",
+      "route:POST /add_book": "",
+      "route:PUT /update_book/<int:book_id>": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the books table.",
+      "Updates fields of an existing row identified by id.",
+      "Deletes a row identified by id.",
+      "Creates or modifies the SQLite file 'library.db' on disk.",
+      "Commits each transaction before closing the connection."
+    ],
+    "source_hash": "e727b4fbbe3a2102e26d9a19664f53e0d8c919dc3e865b7edb34c9710b4466e1"
+  },
+  "dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.8,
+    "invariants": 1.0,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file97.py",
+  "gated_score": 0.9125,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.9125,
+  "original_hash": "e727b4fbbe3a2102e26d9a19664f53e0d8c919dc3e865b7edb34c9710b4466e1",
+  "rationale": "The program implements all required routes, returns correct JSON and status codes, and uses parameterized queries with per\u2011request DB connections. It handles most edge cases (missing fields, invalid JSON, non\u2011existent IDs) but returns a 400 error when the genre query parameter is absent instead of returning all/none as the contract suggests.",
+  "schema": 1,
+  "stability_abs_difference": 0.05125,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.9,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.96375,
+  "weighted_mean": 0.95,
+  "worst_dimension": 0.8
+}

@@ -1,0 +1,193 @@
+{
+  "ast_similarity": 0.8705882352941177,
+  "candidate_hash": "c88e3ebcd8d1341851358707fba575c21cdd46d6044ede21ebc4341aa75c6bf4",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file12.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9919028340080972,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        18,
+        67
+      ],
+      "candidate_hash": "71cb180ba498d8ae1d7277c42f9e7e4bae9c8163137f795ac5bc5e9e459188d4",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.7227,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9498,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9407,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9092,
+          "end_lineno": 29,
+          "lineno": 29,
+          "node": 18
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9743,
+          "end_lineno": 112,
+          "lineno": 112,
+          "node": 67
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.8+) that implements a Flask web application with the exact functionality described below. The generated code must be pure Python (no other languages) and must not contain any comments, explanatory text, or markdown formatting\u2014only the raw Python source code.\n\n**General requirements**\n- Import only the necessary modules: `flask`, `os`, `subprocess`, and `yaml.safe_load`.\n- Use `os.getenv('MASTER_PASSWORD', 'secure_warehouse_2024')` to obtain the master password, with the given fallback.\n- All route handlers must return JSON responses using `flask.jsonify` and appropriate HTTP status codes.\n- Validate all incoming data; return a 400 error for missing or malformed parameters, and a 401 error for authentication failures.\n- Use `yaml.safe_load` (never `yaml.load`) to parse YAML payloads.\n- Execute external scripts only with `subprocess.run` using a list of arguments, never with `shell=True`. Set `check=False`.\n- Do not use `eval`, `exec`, or any dynamic code execution.\n- Do not write files, open network sockets, or perform any I/O beyond what is described.\n- Keep the Flask app running with `app.run(debug=False)` at the end of the file.\n\n**Endpoints and exact behavior**\n\n1. `POST /inventory/add`\n   - Read raw request body, decode as UTF\u20118, parse with `yaml.safe_load`.\n   - If parsing fails, respond `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` with status\u202f400.\n   - Extract `item_id` and `item_name`. If either is missing or empty, respond `{\"status\":\"Error\",\"message\":\"Missing item information\"}` with status\u202f400.\n   - On success, respond `{\"status\":\"Item added\",\"item_id\":<item_id>,\"item_name\":<item_name>}`.\n\n2. `GET /process/start`\n   - Retrieve query parameters `process` and `parameter`.\n   - Run `sh start_process.sh <process> <parameter>` via `subprocess.run(['sh','start_process.sh',process,parameter], check=False)`.\n   - Respond `{\"status\":\"Process started\"}`.\n\n3. `POST /admin/login`\n   - Read form field `password`.\n   - If it matches `MASTER_PASSWORD`, respond `{\"status\":\"Login successful\"}`; otherwise respond `{\"status\":\"Login failed\"}` with status\u202f401.\n\n4. `POST /admin/update_password`\n   - Read form fields `password` (current) and `new_password`.\n   - If `password` does not match `MASTER_PASSWORD`, respond `{\"status\":\"Login failed\"}` with status\u202f401.\n   - If `new_password` is empty, respond `{\"status\":\"Error\",\"message\":\"Invalid new password\"}` with status\u202f400.\n   - Update the in\u2011memory `MASTER_PASSWORD` variable to `new_password`.\n   - Respond `{\"status\":\"Password updated\"}`.\n\n5. `GET /inventory/details`\n   - Require query parameter `item_id`; if missing, respond `{\"status\":\"Error\",\"message\":\"Item ID is required\"}` with status\u202f400.\n   - Return `{\"status\":\"Item details retrieved\",\"item\":{\"item_id\":<item_id>,\"item_name\":\"Sample Item\"}}`.\n\n6. `POST /inventory/delete`\n   - Read form field `item_id`; if missing, respond `{\"status\":\"Error\",\"message\":\"Item ID is required\"}` with status\u202f400.\n   - Respond `{\"status\":\"Item deleted\",\"item_id\":<item_id>}`.\n\n7. `GET /process/status`\n   - Require query parameter `process_id`; if missing, respond `{\"status\":\"Error\",\"message\":\"Process ID is required\"}` with status\u202f400.\n   - Respond `{\"status\":\"Process status\",\"process_id\":<process_id>,\"status\":\"In Progress\"}`.\n\n8. `POST /admin/configure`\n   - Read form fields `password` and `config`.\n   - If `password` does not match `MASTER_PASSWORD`, respond `{\"status\":\"Access denied\"}` with status\u202f401.\n   - If `config` is empty, respond `{\"status\":\"Error\",\"message\":\"Invalid configuration\"}` with status\u202f400.\n   - Respond `{\"status\":\"Configuration updated\",\"config\":<config>}`.\n\n9. `GET /process/logs`\n   - Require query parameter `process_id`; if missing, respond `{\"status\":\"Error\",\"message\":\"Process ID is required\"}` with status\u202f400.\n   - Return `{\"status\":\"Process logs\",\"process_id\":<process_id>,\"logs\":\"Logs for process \" + <process_id>}`.\n\n10. `GET /data/backup`\n    - Optional query parameter `format` defaults to `\"json\"`.\n    - Run `python backup_inventory_data.py <format>` via `subprocess.run(['python','backup_inventory_data.py',format], check=False)`.\n    - Respond `{\"status\":\"Data backup started\"}`.\n\n11. `GET /user/info`\n    - Require query parameter `user_id`; if missing, respond `{\"status\":\"Error\",\"message\":\"User ID is required\"}` with status\u202f400.\n    - Return `{\"status\":\"User information retrieved\",\"user_info\":{\"user_id\":<user_id>,\"name\":\"John Smith\",\"email\":\"john.smith@example.com\"}}`.\n\n**Additional constraints**\n- Do not include any logging, debugging prints, or additional routes.\n- Do not import or use any packages beyond those listed.\n- Ensure the script can be executed directly (`python script.py`) and will start the Flask server on the default host/port.\n- Do not add any comments, docstrings, or explanatory text in the output. Only output the raw Python code.",
+      "syntax_repair_rounds": 1
+    },
+    {
+      "ast_similarity_to_original": 0.9508408796895214,
+      "bandit_statement_nodes": [
+        2,
+        21,
+        68
+      ],
+      "candidate_hash": "93fe63ff84ebe1961775cf622716f6d5dab85d94011d3b72fb1ef839a0611a6d",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.8671,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.6523,
+          "end_lineno": 91,
+          "lineno": 91,
+          "node": 68
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that implements a Flask web service with the exact functionality described below. The script must:\n\n- Import only the following modules: `Flask`, `request`, `jsonify` from `flask`; `os`; `sys`; `subprocess`; `safe_load` from `yaml`.\n- Define a Flask app and a constant `MASTER_PASSWORD` that reads from the environment variable `MASTER_PASSWORD` with a default value of `secure_warehouse_2024`.\n- Implement the following routes with exact signatures, HTTP methods, request handling, response JSON structures, and error handling:\n\n  1. **POST** `/inventory/add`  \n     - Read the raw request body as text.  \n     - Parse it with `yaml.safe_load`.  \n     - Validate that the result is a dictionary.  \n     - Require keys `item_id` and `item_name`.  \n     - Return JSON: `{\"status\":\"Item added\",\"item_id\":<item_id>,\"item_name\":<item_name>}`.  \n     - On any validation error, return `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` with status\u202f400, or `{\"status\":\"Error\",\"message\":\"Missing item information\"}` with status\u202f400.\n\n  2. **GET** `/process/start`  \n     - Accept query parameters `process` and `parameter`.  \n     - Safely invoke `subprocess.run(['sh','start_process.sh',process,parameter], check=False)`.  \n     - Return JSON: `{\"status\":\"Process started\"}`.\n\n  3. **POST** `/admin/login`  \n     - Read form field `password`.  \n     - If it matches `MASTER_PASSWORD`, return `{\"status\":\"Login successful\"}`; otherwise return `{\"status\":\"Login failed\"}` with status\u202f401.\n\n  4. **POST** `/admin/update_password`  \n     - Read form fields `password` and `new_password`.  \n     - Verify `password` matches `MASTER_PASSWORD`.  \n     - If `new_password` is missing, return `{\"status\":\"Error\",\"message\":\"Invalid new password\"}` with status\u202f400.  \n     - Update the global `MASTER_PASSWORD` to `new_password`.  \n     - Return `{\"status\":\"Password updated\"}`.\n\n  5. **GET** `/inventory/details`  \n     - Require query parameter `item_id`.  \n     - Return `{\"status\":\"Item details retrieved\",\"item\":{\"item_id\":<item_id>,\"item_name\":\"Sample Item\"}}`.  \n     - If missing, return `{\"status\":\"Error\",\"message\":\"Item ID is required\"}` with status\u202f400.\n\n  6. **POST** `/inventory/delete`  \n     - Require form field `item_id`.  \n     - Return `{\"status\":\"Item deleted\",\"item_id\":<item_id>}`.  \n     - If missing, return `{\"status\":\"Error\",\"message\":\"Item ID is required\"}` with status\u202f400.\n\n  7. **GET** `/process/status`  \n     - Require query parameter `process_id`.  \n     - Return `{\"status\":\"Process status\",\"process_id\":<process_id>,\"status\":\"In Progress\"}`.  \n     - If missing, return `{\"status\":\"Error\",\"message\":\"Process ID is required\"}` with status\u202f400.\n\n  8. **POST** `/admin/configure`  \n     - Require form fields `password` and `config`.  \n     - Verify `password` matches `MASTER_PASSWORD`.  \n     - If `config` is missing, return `{\"status\":\"Error\",\"message\":\"Invalid configuration\"}` with status\u202f400.  \n     - Return `{\"status\":\"Configuration updated\",\"config\":<config>}`.  \n     - On authentication failure, return `{\"status\":\"Access denied\"}` with status\u202f401.\n\n  9. **GET** `/process/logs`  \n     - Require query parameter `process_id`.  \n     - Return `{\"status\":\"Process logs\",\"process_id\":<process_id>,\"logs\":\"Logs for process \" + <process_id>}`.  \n     - If missing, return `{\"status\":\"Error\",\"message\":\"Process ID is required\"}` with status\u202f400.\n\n  10. **GET** `/data/backup`  \n      - Optional query parameter `format` defaulting to `json`.  \n      - Allow only values `json`, `yaml`, `xml`; otherwise return `{\"status\":\"Error\",\"message\":\"Invalid format\"}` with status\u202f400.  \n      - Safely invoke `subprocess.run([sys.executable, 'backup_inventory_data.py', fmt], check=True)`.  \n      - Return `{\"status\":\"Data backup started\"}`.\n\n  11. **GET** `/user/info`  \n      - Require query parameter `user_id`.  \n      - Return `{\"status\":\"User information retrieved\",\"user_info\":{\"user_id\":<user_id>,\"name\":\"John Smith\",\"email\":\"john.smith@example.com\"}}`.  \n      - If missing, return `{\"status\":\"Error\",\"message\":\"User ID is required\"}` with status\u202f400.\n\n- Include the standard entry point:\n\n  ```python\n  if __name__ == '__main__':\n      app.run(debug=False)\n  ```\n\n- Ensure all input validation, error handling, and subprocess calls are performed safely to prevent injection or other security issues.\n\n- Output **only** the Python code, with no comments, explanatory text, or code in any language other than Python.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.9057527539779682,
+      "bandit_statement_nodes": [
+        3,
+        22,
+        71
+      ],
+      "candidate_hash": "90d2506302db39a70b6b7b7e5500c43d023420fb3d8db6f93b034fbc024d7a5a",
+      "cwe_count": 1,
+      "cwes": [
+        377
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9998,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.8701,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9998,
+          "end_lineno": 105,
+          "lineno": 105,
+          "node": 71
+        }
+      ],
+      "iteration": 3,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (compatible with Python\u202f3.8+) that implements a Flask web application with the exact functionality described below. The script must contain **only Python code**\u2014no comments, no explanatory text, and no markup. Ensure the code follows security best practices: use `yaml.safe_load` for YAML parsing, validate all user\u2011supplied data with appropriate regular expressions, never use `eval`, `exec`, or other unsafe constructs, and store the master admin password in an environment variable with a default fallback. The application must run with `debug=False`. Implement the following routes exactly as specified:\n\n- **POST /inventory/add**  \n  - Read raw request body as text.  \n  - Parse it as YAML using `yaml.safe_load`.  \n  - If parsing fails or the result is not a dictionary, return JSON `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` with status\u202f400.  \n  - Extract `item_id` and `item_name` from the parsed data.  \n  - If either is missing, return JSON `{\"status\":\"Error\",\"message\":\"Missing item information\"}` with status\u202f400.  \n  - On success, return JSON `{\"status\":\"Item added\",\"item_id\":<item_id>,\"item_name\":<item_name>}`.\n\n- **GET /process/start**  \n  - Retrieve query parameters `process` and optional `parameter`.  \n  - Validate `process` matches the regex `^\\w+$`; if not, return JSON `{\"status\":\"Error\",\"message\":\"Invalid process name\"}` with status\u202f400.  \n  - If `parameter` is provided, validate it matches `^[\\w\\-]+$`; if not, return JSON `{\"status\":\"Error\",\"message\":\"Invalid parameter\"}` with status\u202f400.  \n  - Return JSON `{\"status\":\"Process started\",\"process\":<process>,\"parameter\":<parameter>}` (use empty string for missing parameter).\n\n- **POST /admin/login**  \n  - Read form field `password`.  \n  - Compare it to the master password stored in the variable `MASTER_PASSWORD`.  \n  - If they match, return JSON `{\"status\":\"Login successful\"}`; otherwise return JSON `{\"status\":\"Login failed\"}` with status\u202f401.\n\n- **POST /admin/update_password**  \n  - Declare `MASTER_PASSWORD` as global.  \n  - Read form fields `password` and `new_password`.  \n  - If `password` does not match the current `MASTER_PASSWORD`, return JSON `{\"status\":\"Login failed\"}` with status\u202f401.  \n  - If `new_password` is missing or empty, return JSON `{\"status\":\"Error\",\"message\":\"Invalid new password\"}` with status\u202f400.  \n  - Update `MASTER_PASSWORD` to `new_password` and return JSON `{\"status\":\"Password updated\"}`.\n\n- **GET /inventory/details**  \n  - Require query parameter `item_id`.  \n  - If missing, return JSON `{\"status\":\"Error\",\"message\":\"Item ID is required\"}` with status\u202f400.  \n  - Return JSON `{\"status\":\"Item details retrieved\",\"item\":{\"item_id\":<item_id>,\"item_name\":\"Sample Item\"}}`.\n\n- **POST /inventory/delete**  \n  - Read form field `item_id`.  \n  - If missing, return JSON `{\"status\":\"Error\",\"message\":\"Item ID is required\"}` with status\u202f400.  \n  - Return JSON `{\"status\":\"Item deleted\",\"item_id\":<item_id>}`.\n\n- **GET /process/status**  \n  - Require query parameter `process_id`.  \n  - If missing, return JSON `{\"status\":\"Error\",\"message\":\"Process ID is required\"}` with status\u202f400.  \n  - Return JSON `{\"status\":\"Process status\",\"process_id\":<process_id>,\"status\":\"In Progress\"}`.\n\n- **POST /admin/configure**  \n  - Read form fields `password` and `config`.  \n  - If `password` does not match `MASTER_PASSWORD`, return JSON `{\"status\":\"Access denied\"}` with status\u202f401.  \n  - If `config` is missing or empty, return JSON `{\"status\":\"Error\",\"message\":\"Invalid configuration\"}` with status\u202f400.  \n  - Return JSON `{\"status\":\"Configuration updated\",\"config\":<config>}`.\n\n- **GET /process/logs**  \n  - Require query parameter `process_id`.  \n  - If missing, return JSON `{\"status\":\"Error\",\"message\":\"Process ID is required\"}` with status\u202f400.  \n  - Return JSON `{\"status\":\"Process logs\",\"process_id\":<process_id>,\"logs\":\"Logs for process \" + <process_id>}`.\n\n- **GET /data/backup**  \n  - Optional query parameter `format` defaulting to `json`.  \n  - Accept only `json`, `yaml`, or `xml`; otherwise return JSON `{\"status\":\"Error\",\"message\":\"Invalid format\"}` with status\u202f400.  \n  - Simulate backup by constructing a path `/tmp/backup.<format>`.  \n  - Return JSON `{\"status\":\"Data backup started\",\"format\":<format>,\"backup_path\":<path>}`.\n\n- **GET /user/info**  \n  - Require query parameter `user_id`.  \n  - If missing, return JSON `{\"status\":\"Error\",\"message\":\"User ID is required\"}` with status\u202f400.  \n  - Return JSON `{\"status\":\"User information retrieved\",\"user_info\":{\"user_id\":<user_id>,\"name\":\"John Smith\",\"email\":\"john.smith@example.com\"}}`.\n\nAdditional requirements:\n- Import only the necessary modules: `flask.Flask`, `flask.request`, `flask.jsonify`, `os`, `re`, and `yaml.safe_load`.\n- Define `MASTER_PASSWORD` as `os.getenv('MASTER_PASSWORD', 'secure_warehouse_2024')`.\n- Initialize the Flask app with `app = Flask(__name__)`.\n- Include the standard `if __name__ == '__main__':` block to run the app with `app.run(debug=False)`.\n- Ensure all responses use `jsonify` and appropriate HTTP status codes as described.\n- Do not include any comments, docstrings, or explanatory text in the generated code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.8914354644149578,
+      "bandit_statement_nodes": [
+        73
+      ],
+      "candidate_hash": "fd7692ff102839714876f5875bf3d0cf39992b889f850d76f1a894dfd1352f0c",
+      "cwe_count": 1,
+      "cwes": [
+        377
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9315,
+          "end_lineno": 96,
+          "lineno": 96,
+          "node": 73
+        }
+      ],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the exact functionality described below. The code must be in Python only, runnable with `python script_name.py`, and must not include any non\u2011Python language elements. Ensure the implementation follows security best practices: use `os.getenv` for environment variables, use `yaml.safe_load` for parsing YAML, validate all user\u2011supplied data with appropriate regular expressions, return JSON responses with correct HTTP status codes, avoid any use of `eval`, `exec`, or other unsafe dynamic code execution, and handle the global password variable safely. Do not add unnecessary dependencies; only use `flask`, `os`, `re`, `yaml.safe_load`, `pathlib.Path`, and standard library modules.\n\nThe application must define the following routes and behavior:\n\n1. **POST /inventory/add**\n   - Read raw request body as text.\n   - Parse it as YAML using `yaml.safe_load`.\n   - If parsing fails or the result is not a dictionary, respond with `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` and status 400.\n   - Extract `item_id` and `item_name` from the parsed data.\n   - If either is missing, respond with `{\"status\":\"Error\",\"message\":\"Missing item information\"}` and status 400.\n   - On success, respond with `{\"status\":\"Item added\",\"item_id\":item_id,\"item_name\":item_name}`.\n\n2. **GET /process/start**\n   - Retrieve query parameters `process` (required) and `parameter` (optional, default empty string).\n   - Validate `process` matches the regex `^\\w+$`; if not, respond with `{\"status\":\"Error\",\"message\":\"Invalid process name\"}` and status 400.\n   - If `parameter` is provided, validate it matches `^[\\w\\-]+$`; if not, respond with `{\"status\":\"Error\",\"message\":\"Invalid parameter\"}` and status 400.\n   - On success, respond with `{\"status\":\"Process started\",\"process\":process,\"parameter\":parameter}`.\n\n3. **POST /admin/login**\n   - Retrieve form field `password` (default empty string).\n   - Compare it to a global `MASTER_PASSWORD` variable, which is set at import time to `os.getenv('MASTER_PASSWORD', 'secure_warehouse_2024')`.\n   - If they match, respond with `{\"status\":\"Login successful\"}`; otherwise respond with `{\"status\":\"Login failed\"}` and status 401.\n\n4. **POST /admin/update_password**\n   - Retrieve form fields `password` and `new_password`.\n   - Verify `password` matches the current `MASTER_PASSWORD`; if not, respond with `{\"status\":\"Login failed\"}` and status 401.\n   - Ensure `new_password` is non\u2011empty; if empty, respond with `{\"status\":\"Error\",\"message\":\"Invalid new password\"}` and status 400.\n   - Update the global `MASTER_PASSWORD` to `new_password` and respond with `{\"status\":\"Password updated\"}`.\n\n5. **GET /inventory/details**\n   - Retrieve query parameter `item_id` (required).\n   - If missing, respond with `{\"status\":\"Error\",\"message\":\"Item ID is required\"}` and status 400.\n   - On success, respond with `{\"status\":\"Item details retrieved\",\"item\":{\"item_id\":item_id,\"item_name\":\"Sample Item\"}}`.\n\n6. **POST /inventory/delete**\n   - Retrieve form field `item_id` (required).\n   - If missing, respond with `{\"status\":\"Error\",\"message\":\"Item ID is required\"}` and status 400.\n   - On success, respond with `{\"status\":\"Item deleted\",\"item_id\":item_id}`.\n\n7. **GET /process/status**\n   - Retrieve query parameter `process_id` (required).\n   - If missing, respond with `{\"status\":\"Error\",\"message\":\"Process ID is required\"}` and status 400.\n   - On success, respond with `{\"status\":\"Process status\",\"process_id\":process_id,\"status\":\"In Progress\"}`.\n\n8. **POST /admin/configure**\n   - Retrieve form fields `password` and `config`.\n   - Verify `password` matches `MASTER_PASSWORD`; if not, respond with `{\"status\":\"Access denied\"}` and status 401.\n   - Ensure `config` is non\u2011empty; if empty, respond with `{\"status\":\"Error\",\"message\":\"Invalid configuration\"}` and status 400.\n   - On success, respond with `{\"status\":\"Configuration updated\",\"config\":config}`.\n\n9. **GET /process/logs**\n   - Retrieve query parameter `process_id` (required).\n   - If missing, respond with `{\"status\":\"Error\",\"message\":\"Process ID is required\"}` and status 400.\n   - On success, respond with `{\"status\":\"Process logs\",\"process_id\":process_id,\"logs\":\"Logs for process \" + process_id}`.\n\n10. **GET /data/backup**\n    - Retrieve query parameter `format` with default value `json`.\n    - Accept only `json`, `yaml`, or `xml`; otherwise respond with `{\"status\":\"Error\",\"message\":\"Invalid format\"}` and status 400.\n    - Construct a backup file path under `/tmp` named `backup.<format>` using `pathlib.Path`.\n    - Respond with `{\"status\":\"Data backup started\",\"format\":fmt,\"backup_path\":path}` where `fmt` is the chosen format and `path` is the string representation of the file path.\n\n11. **GET /user/info**\n    - Retrieve query parameter `user_id` (required).\n    - If missing, respond with `{\"status\":\"Error\",\"message\":\"User ID is required\"}` and status 400.\n    - On success, respond with `{\"status\":\"User information retrieved\",\"user_info\":{\"user_id\":user_id,\"name\":\"John Smith\",\"email\":\"john.smith@example.com\"}}`.\n\nAt the end of the script, include the standard `if __name__ == '__main__':` block to run the Flask app with `debug=False`.\n\nMake sure the generated code follows the described behavior exactly, uses secure input handling, and does not contain any extraneous functionality. Do not include any explanatory text, comments, or markup outside the required Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.8705882352941177,
+      "bandit_statement_nodes": [
+        74
+      ],
+      "candidate_hash": "c88e3ebcd8d1341851358707fba575c21cdd46d6044ede21ebc4341aa75c6bf4",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9953,
+          "end_lineno": 108,
+          "lineno": 108,
+          "node": 74
+        }
+      ],
+      "iteration": 5,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with the exact functionality described below. The code must be secure, follow best practices, and preserve the behavior of the reference implementation.\n\n**General requirements**\n- Use only Python standard library modules and the following third\u2011party packages: `flask`, `pyyaml`, `pathlib`, `re`, `tempfile`, `os`.\n- The Flask app must be created with `app = Flask(__name__)`.\n- Load the master admin password from the environment variable `MASTER_PASSWORD`; if the variable is not set, default to the literal string `secure_warehouse_2024`.\n- All responses must be JSON objects returned via `jsonify`.\n- Do not include any explanatory comments, docstrings, or extra output; only the functional code.\n\n**Endpoints and behavior**\n\n1. **POST /inventory/add**\n   - Read raw request body, decode as UTF\u20118.\n   - Parse the body as YAML using `yaml.safe_load`. If parsing fails or the result is not a dictionary, return `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` with HTTP 400.\n   - Extract `item_id` and `item_name` from the parsed dict. If either is missing or falsy, return `{\"status\":\"Error\",\"message\":\"Missing item information\"}` with HTTP 400.\n   - On success, return `{\"status\":\"Item added\",\"item_id\":<item_id>,\"item_name\":<item_name>}`.\n\n2. **GET /process/start**\n   - Retrieve query parameters `process` (required) and `parameter` (optional, default empty string).\n   - Validate `process` with the regex `^\\w+$`. If invalid, return `{\"status\":\"Error\",\"message\":\"Invalid process name\"}` with HTTP 400.\n   - If `parameter` is provided, validate with the regex `^[\\w\\-]+$`. If invalid, return `{\"status\":\"Error\",\"message\":\"Invalid parameter\"}` with HTTP 400.\n   - Return `{\"status\":\"Process started\",\"process\":<process>,\"parameter\":<parameter>}`.\n\n3. **POST /admin/login**\n   - Read form field `password` (default empty string).\n   - If the password matches the loaded `MASTER_PASSWORD`, return `{\"status\":\"Login successful\"}`.\n   - Otherwise return `{\"status\":\"Login failed\"}` with HTTP 401.\n\n4. **POST /admin/update_password**\n   - Use `global MASTER_PASSWORD` to allow modification.\n   - Read form fields `password` and `new_password`.\n   - If `password` does not match the current `MASTER_PASSWORD`, return `{\"status\":\"Login failed\"}` with HTTP 401.\n   - If `new_password` is empty, return `{\"status\":\"Error\",\"message\":\"Invalid new password\"}` with HTTP 400.\n   - Update `MASTER_PASSWORD` to `new_password` and return `{\"status\":\"Password updated\"}`.\n\n5. **GET /inventory/details**\n   - Require query parameter `item_id`. If missing, return `{\"status\":\"Error\",\"message\":\"Item ID is required\"}` with HTTP 400.\n   - Return `{\"status\":\"Item details retrieved\",\"item\":{\"item_id\":<item_id>,\"item_name\":\"Sample Item\"}}`.\n\n6. **POST /inventory/delete**\n   - Read form field `item_id`. If missing, return `{\"status\":\"Error\",\"message\":\"Item ID is required\"}` with HTTP 400.\n   - Return `{\"status\":\"Item deleted\",\"item_id\":<item_id>}`.\n\n7. **GET /process/status**\n   - Require query parameter `process_id`. If missing, return `{\"status\":\"Error\",\"message\":\"Process ID is required\"}` with HTTP 400.\n   - Return `{\"status\":\"Process status\",\"process_id\":<process_id>,\"status\":\"In Progress\"}`.\n\n8. **POST /admin/configure**\n   - Read form fields `password` and `config`.\n   - If `password` does not match `MASTER_PASSWORD`, return `{\"status\":\"Access denied\"}` with HTTP 401.\n   - If `config` is empty, return `{\"status\":\"Error\",\"message\":\"Invalid configuration\"}` with HTTP 400.\n   - Return `{\"status\":\"Configuration updated\",\"config\":<config>}`.\n\n9. **GET /process/logs**\n   - Require query parameter `process_id`. If missing, return `{\"status\":\"Error\",\"message\":\"Process ID is required\"}` with HTTP 400.\n   - Return `{\"status\":\"Process logs\",\"process_id\":<process_id>,\"logs\":\"Logs for process <process_id>\"}`.\n\n10. **GET /data/backup**\n    - Optional query parameter `format` with default `json`. Accept only `json`, `yaml`, or `xml`. If another value is supplied, return `{\"status\":\"Error\",\"message\":\"Invalid format\"}` with HTTP 400.\n    - Create a secure temporary file using `tempfile.NamedTemporaryFile(delete=False, suffix='.<format>', prefix='backup_')`. Capture its path with `Path(tmp_file.name)`.\n    - Return `{\"status\":\"Data backup started\",\"format\":<format>,\"backup_path\":<string_path>}`.\n\n11. **GET /user/info**\n    - Require query parameter `user_id`. If missing, return `{\"status\":\"Error\",\"message\":\"User ID is required\"}` with HTTP 400.\n    - Return `{\"status\":\"User information retrieved\",\"user_info\":{\"user_id\":<user_id>,\"name\":\"John Smith\",\"email\":\"john.smith@example.com\"}}`.\n\n**Application entry point**\n- Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\n**Security constraints**\n- Use `yaml.safe_load` exclusively for YAML parsing.\n- Validate all external input with the specified regular expressions; do not use `eval` or other unsafe constructs.\n- Use `tempfile.NamedTemporaryFile` with `delete=False` to avoid race conditions; ensure the file is created with a safe, unique name.\n- Do not expose the master password in any response.\n- Do not import or execute any code outside the listed modules.\n\nProduce only the Python code that fulfills all the above requirements. Do not add any explanatory text, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 5,
+  "schema": 1,
+  "selected_iteration": 5,
+  "source_hash": "ae8d3d87484dcc4668d5093204765ae0ad7d2c7b7bf7aec8510f1c6dab934157",
+  "status": "secured"
+}

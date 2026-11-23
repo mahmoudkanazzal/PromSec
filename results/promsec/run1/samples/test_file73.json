@@ -1,0 +1,77 @@
+{
+  "ast_similarity": 1.0,
+  "candidate_hash": "c8468b0452fd3dd56214a97e13ee0241f3ade9c104e6d22cb8dd8f56d96120b0",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file73.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 1.0,
+      "bandit_statement_nodes": [
+        16,
+        30,
+        54,
+        68,
+        72,
+        88,
+        92
+      ],
+      "candidate_hash": "c8468b0452fd3dd56214a97e13ee0241f3ade9c104e6d22cb8dd8f56d96120b0",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1571,
+          "end_lineno": 37,
+          "lineno": 37,
+          "node": 30
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1569,
+          "end_lineno": 64,
+          "lineno": 64,
+          "node": 54
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1568,
+          "end_lineno": 81,
+          "lineno": 81,
+          "node": 68
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1709,
+          "end_lineno": 85,
+          "lineno": 85,
+          "node": 72
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.171,
+          "end_lineno": 109,
+          "lineno": 109,
+          "node": 92
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service with the following specifications:\n\n- The script must be written in Python 3 and import only the standard library modules (`os`, `hashlib`) and `MySQLdb`.\n- All database connection parameters (host, user, password, database name, charset) must be read from environment variables (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_CHARSET`) and must not be hard\u2011coded.\n- Define a function `get_db_connection()` that returns a `MySQLdb` connection using the environment variables.\n- Implement the following routes with exact functionality:\n\n  1. **POST `/register`**\n     - Retrieve `username` and `password` from `request.form`.\n     - Generate a 16\u2011byte random salt using `os.urandom`.\n     - Compute a SHA\u2011256 hash of the UTF\u20118 encoded password concatenated with the salt.\n     - Store the concatenation of the hash and the salt as a hex string in the `users` table (`username`, `password` columns) using a parameterized INSERT query.\n     - On success, redirect to `/home`; on any exception, redirect to `/home` after closing resources.\n\n  2. **POST `/login`**\n     - Retrieve `username` and `password` from `request.form`.\n     - Query the `users` table for the stored password hex string using a parameterized SELECT query.\n     - If a record exists, convert the stored hex string back to bytes, extract the last 16 bytes as the salt, recompute the SHA\u2011256 hash of the provided password plus the salt, and compare it to the first 32 bytes of the stored value.\n     - If the hashes match, redirect to `/dashboard`; otherwise return the plain text `\"Invalid credentials\"`.\n     - On any exception, return the plain text `\"Login failed\"` after closing resources.\n\n  3. **POST `/add_book`**\n     - Retrieve `book_id`, `title`, and `author` from `request.form`.\n     - Insert a new record into the `books` table using a parameterized INSERT query.\n     - On success return the plain text `\"Book successfully added\"`; on failure return `\"Failed to add book\"` after closing resources.\n\n  4. **POST `/checkout`**\n     - Retrieve `username` and `book_id` from `request.form`.\n     - Verify that the user exists in the `users` table with a parameterized SELECT query.\n     - If the user exists, insert a record into the `checkouts` table using a parameterized INSERT query and return `\"Book successfully checked out\"`.\n     - If the user does not exist, return `\"User not found\"`.\n     - On any exception, return `\"Checkout failed\"` after closing resources.\n\n  5. **POST `/return`**\n     - Retrieve `username` and `book_id` from `request.form`.\n     - Check for an existing record in `checkouts` matching both fields using a parameterized SELECT query.\n     - If found, delete that record with a parameterized DELETE query and return `\"Book successfully returned\"`.\n     - If not found, return `\"Checkout record not found\"`.\n     - On any exception, return `\"Return failed\"` after closing resources.\n\n  6. **GET `/view_books`**\n     - Retrieve all rows from the `books` table using a parameterized SELECT query.\n     - Return the result as JSON using `flask.jsonify`.\n     - On any exception, return the plain text `\"Failed to retrieve books\"` after closing resources.\n\n- For every route, ensure that database cursors and connections are closed in a `finally` block.\n- Use only parameterized queries (`%s` placeholders) to prevent SQL injection.\n- Do not expose stack traces or internal error details in responses.\n- Set `app.run(debug=False)` in the `if __name__ == '__main__':` block.\n- Do not include any comments, explanatory text, or non\u2011code output in the generated script.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "a4a023812d8d87d69ca6b7c153a086fae31bb10841e6483047d43e29bb8d72c9",
+  "status": "secured"
+}

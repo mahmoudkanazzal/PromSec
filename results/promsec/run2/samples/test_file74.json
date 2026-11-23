@@ -1,0 +1,50 @@
+{
+  "ast_similarity": 0.9082969432314411,
+  "candidate_hash": "fdaefd7ce4c9025e27d9674471faca9fa92564ddb9a0459edf4b0af3bc725791",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file74.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9082969432314411,
+      "bandit_statement_nodes": [
+        14
+      ],
+      "candidate_hash": "fdaefd7ce4c9025e27d9674471faca9fa92564ddb9a0459edf4b0af3bc725791",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2448,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1835,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a Python Flask application that implements a `/register` endpoint with the following exact specifications:\n\n- Use only Python code; do not include any other programming languages.\n- Import the modules: `Flask`, `request`, `redirect` from `flask`; `re`; `MySQLdb`; and `bcrypt`.\n- Create a Flask app instance named `app`.\n- Define a route `@app.route('/register', methods=['POST'])` with a function `register()` that:\n  1. Retrieves `username`, `password`, and `confirm_password` from `request.form`.\n  2. Hashes the password using `bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())`.\n  3. Connects securely to a MySQL database at host `127.0.0.1` with user `root`, password `password`, and database `cwe_900` using `MySQLdb.connect`.\n  4. Uses **parameterized queries** (prepared statements) for **all** SQL interactions to prevent SQL injection.\n  5. Checks if a user with the given `username` already exists:\n     - Execute `SELECT * FROM users WHERE username = %s` with the `username` as a parameter.\n     - Fetch the result.\n  6. If the username does **not** exist:\n     - Insert the new user with the hashed password using `INSERT INTO users(username, pw_hash) VALUES(%s, %s)` with parameters `(username, pw_hash)`.\n     - Commit the transaction.\n     - Return the message `\"You have successfully registered\"`.\n  7. If the username **does** exist, return the message `\"Username already exists\"`.\n  8. If any database operation raises an exception:\n     - Roll back the transaction.\n     - Return the message `\"Registration Failed\"`.\n  9. Ensure that the database cursor and connection are **always** closed, even if an exception occurs, using `try...except...finally` or context managers.\n- Preserve the original functionality (returning plain text messages) while improving security (parameterized queries, proper resource cleanup, and robust error handling).",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "06e708a7b4ad639efd4a0d86556d5374fa58ed79501c414b2611df3f8bd5c195",
+  "status": "secured"
+}

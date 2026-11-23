@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "f1788a72d6019465336505a97b760edce721d06928df48efddeb14a1b6b1ec81",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields or query parameters cause a generic failure message.",
+      "Database connection errors or query execution errors return a generic failure message.",
+      "Attempting to register an existing username returns \"Username already exists\".",
+      "Login with incorrect credentials returns \"Invalid credentials\".",
+      "Deleting or updating a task that does not belong to the user still returns a success message (no existence check).",
+      "Providing empty strings for usernames or passwords is accepted but may lead to unexpected database entries."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple web API for user registration, authentication, and basic task management (add, view, delete, update) backed by a MySQL database.",
+    "invariants": [
+      "Usernames must be unique; duplicate registration attempts are rejected.",
+      "Task operations succeed only if the supplied username exists in the users table.",
+      "Each task is associated with exactly one username.",
+      "Database connections are always closed before a response is sent.",
+      "Successful operations always result in an HTTP 200 response (or a redirect).",
+      "All responses are plain text or JSON; no HTML templates are rendered."
+    ],
+    "io_behavior": [
+      "POST /register with form fields username and password returns a redirect to /home on success or a plain\u2011text message on failure.",
+      "POST /login with form fields username and password returns a redirect to /dashboard on success or a plain\u2011text error message.",
+      "POST /add_task with form fields username, task_name, task_description returns a plain\u2011text confirmation or error message.",
+      "GET /view_tasks with query parameter username returns a JSON array of the user's tasks or a plain\u2011text error message.",
+      "POST /delete_task with form fields username and task_id returns a plain\u2011text confirmation or error message.",
+      "POST /update_task with form fields username, task_id, new_task_name, new_task_description returns a plain\u2011text confirmation or error message."
+    ],
+    "public_api": {
+      "route:GET /view_tasks": "",
+      "route:POST /add_task": "",
+      "route:POST /delete_task": "",
+      "route:POST /login": "",
+      "route:POST /register": "",
+      "route:POST /update_task": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the users table on successful registration.",
+      "Creates a new session\u2011less login check; no session state is stored.",
+      "Inserts, updates, or deletes rows in the tasks table for the specified user.",
+      "Commits each successful database transaction.",
+      "Opens and closes a MySQL connection for every request.",
+      "Issues HTTP redirects for successful registration and login."
+    ],
+    "source_hash": "fd8d3f80dfea0f7dacbff0e4f889261b1c0df6f0eae8c3c6b8814d368e3b41ef"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.7,
+    "io_semantics": 0.4,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file44.py",
+  "gated_score": 0.39125,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.39125,
+  "original_hash": "fd8d3f80dfea0f7dacbff0e4f889261b1c0df6f0eae8c3c6b8814d368e3b41ef",
+  "rationale": "Core functionality (registration, login, task CRUD) is present and uses redirects, DB commits, and connection handling, but the program deviates from the contract on edge\u2011case handling (different status codes and messages), returns JSON instead of plain\u2011text confirmations, and enforces existence checks on delete/update that the contract explicitly omits.",
+  "schema": 1,
+  "stability_abs_difference": 0.06,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.2,
+    "invariants": 0.8,
+    "io_semantics": 0.3,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.45125,
+  "weighted_mean": 0.455,
+  "worst_dimension": 0.2
+}

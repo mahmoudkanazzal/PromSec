@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "ff3520a79ebebc486ff6c46c3bb1952b6b3ba18012e17b8fe38116f92d298056",
+  "compile_ok": true,
+  "confidence": 0.94,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields or query parameters cause a generic failure message.",
+      "Database connection failures trigger the generic \"... failed\" error responses.",
+      "Attempting to register an already existing username returns \"Username already exists\".",
+      "Login with incorrect credentials returns \"Invalid credentials\".",
+      "Adding a task for a non\u2011existent user returns \"User not found\".",
+      "Providing an invalid or non\u2011existent task_id for delete/update still returns a success message (no verification)."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a web API for user registration, login, and basic task management (add, view, delete, update) using HTTP requests.",
+    "invariants": [
+      "Usernames must be unique; duplicate registration attempts are rejected.",
+      "A task can only be added, viewed, updated, or deleted if the associated username exists in the users table.",
+      "Each successful write operation (register, add_task, delete_task, update_task) results in a committed transaction.",
+      "All responses are either a redirect, JSON payload, or plain\u2011text message; no HTML pages are rendered.",
+      "Database connections are always closed before the HTTP response is returned.",
+      "Task identifiers are assumed to be unique per user (task_id column)."
+    ],
+    "io_behavior": [
+      "POST /register with form fields username and password returns a redirect to /home on success or a plain text error message.",
+      "POST /login with form fields username and password returns a redirect to /dashboard on success or a plain text error message.",
+      "POST /add_task with form fields username, task_name, task_description returns a plain text confirmation or error message.",
+      "GET /view_tasks with query parameter username returns a JSON array of the user's tasks or a plain text error message.",
+      "POST /delete_task with form fields username and task_id returns a plain text confirmation or error message.",
+      "POST /update_task with form fields username, task_id, new_task_name, new_task_description returns a plain text confirmation or error message."
+    ],
+    "public_api": {
+      "route:GET /view_tasks": "",
+      "route:POST /add_task": "",
+      "route:POST /delete_task": "",
+      "route:POST /login": "",
+      "route:POST /register": "",
+      "route:POST /update_task": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the users table on successful registration.",
+      "Creates a new session\u2011less redirect response (no server\u2011side session state).",
+      "Inserts, updates, or deletes rows in the tasks table for the specified user.",
+      "Commits database transactions to make changes durable.",
+      "Closes the database connection after each request.",
+      "Potentially modifies the database schema indirectly via malformed SQL (e.g., injection)."
+    ],
+    "source_hash": "fd8d3f80dfea0f7dacbff0e4f889261b1c0df6f0eae8c3c6b8814d368e3b41ef"
+  },
+  "dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.8,
+    "invariants": 1.0,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file44.py",
+  "gated_score": 0.77875,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.77875,
+  "original_hash": "fd8d3f80dfea0f7dacbff0e4f889261b1c0df6f0eae8c3c6b8814d368e3b41ef",
+  "rationale": "The program implements the required routes, redirects, JSON output, and database handling, preserving most invariants and side\u2011effects. It correctly handles registration, login, task addition, and viewing. However, it deviates from the contract for delete/update edge cases: it verifies task existence and returns error messages instead of the specified unconditional success response, breaking the listed edge\u2011case behavior and affecting overall I/O semantics.",
+  "schema": 1,
+  "stability_abs_difference": 0.10163,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.67,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.88038,
+  "weighted_mean": 0.805,
+  "worst_dimension": 0.7
+}

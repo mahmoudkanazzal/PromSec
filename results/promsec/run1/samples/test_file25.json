@@ -1,0 +1,139 @@
+{
+  "ast_similarity": 0.7521367521367521,
+  "candidate_hash": "3dd3c19f26b296bb454238f8b84b1fa5ca15f039060864e2c3bbecb714ab0497",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file25.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7154471544715447,
+      "bandit_statement_nodes": [
+        4,
+        7,
+        17,
+        26,
+        36,
+        43,
+        48,
+        51,
+        56,
+        60,
+        69
+      ],
+      "candidate_hash": "7730e2051d052678651652477efec7ed289ae08c16395d322476bfde0a189603",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.2802,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2642,
+          "end_lineno": 27,
+          "lineno": 27,
+          "node": 17
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2642,
+          "end_lineno": 69,
+          "lineno": 69,
+          "node": 43
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.5119,
+          "end_lineno": 77,
+          "lineno": 77,
+          "node": 48
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.5036,
+          "end_lineno": 80,
+          "lineno": 80,
+          "node": 51
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the exact functionality described below. The script must be written in Python only and must not contain any explanatory text, comments, or markup outside of the code itself.\n\n**General requirements**\n- Use only the standard library and the following third\u2011party packages: `flask`, `pyyaml`.\n- Import `os`, `yaml`, `subprocess`, and any other needed modules.\n- Create a Flask app instance named `app`.\n- Retrieve the environment variable `LIBRARIAN_PASSWORD` using `os.getenv`.\n- All routes must return JSON responses using `flask.jsonify`.\n- All user\u2011supplied data must be validated securely.\n- Use `yaml.safe_load` for parsing any YAML payloads.\n- When invoking external scripts with `subprocess.run`, pass arguments as a list, set `check=True`, and redirect both `stdout` and `stderr` to `subprocess.DEVNULL`. Do not use `shell=True`.\n- Validate any string parameters that will be passed to external scripts by ensuring they consist only of alphanumeric characters and underscores (i.e., `str.isidentifier()`).\n\n**Endpoints**\n\n1. `POST /add_book`\n   - Read the raw request body, decode as UTF\u20118, and parse as YAML.\n   - Expected fields: `title`, `author`, `isbn`, `publication_year`.\n   - If `title`, `author`, or `isbn` are missing or empty, respond with status 400 and JSON `{\"status\": \"Error\", \"message\": \"Invalid book information\"}`.\n   - On success, respond with status 200 and JSON containing `\"status\": \"Book added\"` and the received fields.\n\n2. `GET /run_inventory`\n   - Query parameter `section`.\n   - Validate `section` with `str.isidentifier()`. If invalid, respond 400 with `{\"status\": \"Error\", \"message\": \"Invalid section parameter\"}`.\n   - Execute `python inventory_script.py <section>` via `subprocess.run` as described above.\n   - If the subprocess raises `CalledProcessError`, respond 500 with `{\"status\": \"Error\", \"message\": \"Inventory script failed\"}`.\n   - On success, respond 200 with `{\"status\": \"Inventory check initiated\"}`.\n\n3. `POST /librarian_access`\n   - Form field `password`.\n   - If `LIBRARIAN_PASSWORD` is `None`, respond 500 with `{\"status\": \"Error\", \"message\": \"Server configuration error\"}`.\n   - If the supplied password matches the environment variable, respond 200 with `{\"status\": \"Librarian access granted\"}`; otherwise respond 401 with `{\"status\": \"Access denied\"}`.\n\n4. `POST /update_book`\n   - Read raw request body, decode UTF\u20118, parse YAML.\n   - Expected fields: `isbn`, `new_title`, `new_author`, `new_year`.\n   - If `isbn` is missing or empty, respond 400 with `{\"status\": \"Error\", \"message\": \"Invalid book information\"}`.\n   - On success, respond 200 with `{\"status\": \"Book updated\", \"isbn\": isbn, \"new_title\": new_title, \"new_author\": new_author, \"new_year\": new_year}`.\n\n5. `POST /delete_book`\n   - Read raw request body, decode UTF\u20118, parse YAML.\n   - Expected field: `isbn`.\n   - If `isbn` is missing or empty, respond 400 with `{\"status\": \"Error\", \"message\": \"Invalid book information\"}`.\n   - On success, respond 200 with `{\"status\": \"Book deleted\", \"isbn\": isbn}`.\n\n6. `GET /generate_reports`\n   - Query parameter `type`.\n   - Validate `type` with `str.isidentifier()`. If invalid, respond 400 with `{\"status\": \"Error\", \"message\": \"Invalid report type\"}`.\n   - Execute `python report_generator.py <type>` via `subprocess.run`.\n   - If the subprocess fails, respond 500 with `{\"status\": \"Error\", \"message\": \"Report generation failed\"}`.\n   - On success, respond 200 with `{\"status\": \"Report generation started\"}`.\n\n7. `POST /admin_panel`\n   - Form field `action`.\n   - If `action` is `\"backup\"`, run `python backup_script.py` via `subprocess.run`. On failure respond 500 with `{\"status\": \"Error\", \"message\": \"Backup failed\"}`; on success respond 200 with `{\"status\": \"Backup initiated\"}`.\n   - If `action` is `\"restore\"`, run `python restore_script.py` similarly, handling errors with `{\"status\": \"Error\", \"message\": \"Restore failed\"}` and success with `{\"status\": \"Restore initiated\"}`.\n   - For any other `action`, respond 400 with `{\"status\": \"Invalid action\"}`.\n\n8. `GET /view_books`\n   - Query parameter `category`.\n   - Validate `category` with `str.isidentifier()`. If invalid, respond 400 with `{\"status\": \"Error\", \"message\": \"Invalid category\"}`.\n   - Execute `python view_books.py <category>` via `subprocess.run`.\n   - If the subprocess fails, respond 500 with `{\"status\": \"Error\", \"message\": \"Book view script failed\"}`.\n   - On success, respond 200 with `{\"status\": \"Books retrieval initiated\", \"category\": category}`.\n\n9. `POST /add_member`\n   - Read raw request body, decode UTF\u20118, parse YAML.\n   - Expected fields: `name`, `id`, `membership_date`.\n   - If `name` or `id` are missing or empty, respond 400 with `{\"status\": \"Error\", \"message\": \"Invalid member information\"}`.\n   - On success, respond 200 with `{\"status\": \"Member added\", \"name\": name, \"id\": id, \"membership_date\": membership_date}`.\n\n10. `POST /update_member`\n    - Read raw request body, decode UTF\u20118, parse YAML.\n    - Expected fields: `id`, `new_name`, `new_date`.\n    - If `id` is missing or empty, respond 400 with `{\"status\": \"Error\", \"message\": \"Invalid member information\"}`.\n    - On success, respond 200 with `{\"status\": \"Member updated\", \"id\": id, \"new_name\": new_name, \"new_date\": new_date}`.\n\n**Application entry point**\n- Include the standard `if __name__ == '__main__':` block to run the Flask app with `debug=False`.\n\nProduce only the Python code that fulfills all the above requirements. Do not include any additional explanation, comments, or non\u2011code text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.7521367521367521,
+      "bandit_statement_nodes": [
+        2,
+        24,
+        58,
+        65,
+        70,
+        79
+      ],
+      "candidate_hash": "3dd3c19f26b296bb454238f8b84b1fa5ca15f039060864e2c3bbecb714ab0497",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.3605,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.3274,
+          "end_lineno": 32,
+          "lineno": 32,
+          "node": 24
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.3274,
+          "end_lineno": 77,
+          "lineno": 77,
+          "node": 58
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.5167,
+          "end_lineno": 87,
+          "lineno": 87,
+          "node": 65
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.5167,
+          "end_lineno": 93,
+          "lineno": 93,
+          "node": 70
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program that implements a Flask web application with the exact functionality described below. The code must be pure Python (no other languages) and must not contain any explanatory text, comments, or markup outside of the required code.\n\n**General requirements**\n- Use only the standard library and the following third\u2011party packages: `flask`, `pyyaml`.\n- Import the entry\u2011point functions `main` from the modules `inventory_script`, `report_generator`, `backup_script`, `restore_script`, and `view_books` directly. If an import fails, set the corresponding variable to `None` and handle the missing function gracefully at runtime.\n- Do **not** use `subprocess`, `os.system`, `eval`, `exec`, or any dynamic code execution.\n- Load request bodies with `yaml.safe_load` and validate that the result is a dictionary before accessing keys.\n- Validate any string that will be used as an identifier (e.g., URL parameters) with a helper `is_valid_identifier` that returns `True` only if the value is a non\u2011empty string and `str.isidentifier()` is `True`.\n- Retrieve the librarian password from the environment variable `LIBRARIAN_PASSWORD`. If the variable is missing, return a 500 error for the relevant endpoint.\n- All responses must be JSON objects returned via `flask.jsonify` with appropriate HTTP status codes.\n- Do not include any logging, debugging prints, or `app.run(debug=True)`. Use `app.run(debug=False)` in the `if __name__ == '__main__'` block.\n\n**Endpoints and behavior**\n\n1. `POST /add_book`\n   - Parse YAML from the request body.\n   - Required fields: `title`, `author`, `isbn`. Optional: `publication_year`.\n   - If parsing fails or required fields are missing, respond with `{\"status\":\"Error\",\"message\":\"Invalid book information\"}` and status 400.\n   - On success, respond with `{\"status\":\"Book added\",\"title\":..., \"author\":..., \"isbn\":..., \"publication_year\":...}` and status 200.\n\n2. `GET /run_inventory`\n   - Query parameter `section`.\n   - Validate `section` with `is_valid_identifier`; on failure respond with `{\"status\":\"Error\",\"message\":\"Invalid section parameter\"}` and status 400.\n   - If `inventory_main` is `None`, respond with `{\"status\":\"Error\",\"message\":\"Inventory script not available\"}` and status 500.\n   - Call `inventory_main(section)` inside a try/except; on exception respond with `{\"status\":\"Error\",\"message\":\"Inventory script failed\"}` and status 500.\n   - On success respond with `{\"status\":\"Inventory check initiated\"}` and status 200.\n\n3. `POST /librarian_access`\n   - Retrieve form field `password`.\n   - If `LIBRARIAN_PASSWORD` is not set, respond with `{\"status\":\"Error\",\"message\":\"Server configuration error\"}` and status 500.\n   - If the supplied password matches, respond with `{\"status\":\"Librarian access granted\"}` and status 200; otherwise respond with `{\"status\":\"Access denied\"}` and status 401.\n\n4. `POST /update_book`\n   - Parse YAML from the request body.\n   - Required field: `isbn`. Optional: `new_title`, `new_author`, `new_year`.\n   - On parsing error or missing `isbn`, respond with `{\"status\":\"Error\",\"message\":\"Invalid book information\"}` and status 400.\n   - On success respond with `{\"status\":\"Book updated\",\"isbn\":..., \"new_title\":..., \"new_author\":..., \"new_year\":...}` and status 200.\n\n5. `POST /delete_book`\n   - Parse YAML from the request body.\n   - Required field: `isbn`.\n   - On error respond with the same error JSON as above (status 400).\n   - On success respond with `{\"status\":\"Book deleted\",\"isbn\":...}` and status 200.\n\n6. `GET /generate_reports`\n   - Query parameter `type`.\n   - Validate with `is_valid_identifier`; on failure respond with `{\"status\":\"Error\",\"message\":\"Invalid report type\"}` and status 400.\n   - If `report_main` is `None`, respond with `{\"status\":\"Error\",\"message\":\"Report generator not available\"}` and status 500.\n   - Call `report_main(report_type)` inside a try/except; on exception respond with `{\"status\":\"Error\",\"message\":\"Report generation failed\"}` and status 500.\n   - On success respond with `{\"status\":\"Report generation started\"}` and status 200.\n\n7. `POST /admin_panel`\n   - Form field `action` can be `backup` or `restore`.\n   - For `backup`:\n     * If `backup_main` is `None`, respond with `{\"status\":\"Error\",\"message\":\"Backup script not available\"}` and status 500.\n     * Call `backup_main()` inside try/except; on exception respond with `{\"status\":\"Error\",\"message\":\"Backup failed\"}` and status 500.\n     * On success respond with `{\"status\":\"Backup initiated\"}` and status 200.\n   - For `restore`:\n     * If `restore_main` is `None`, respond with `{\"status\":\"Error\",\"message\":\"Restore script not available\"}` and status 500.\n     * Call `restore_main()` inside try/except; on exception respond with `{\"status\":\"Error\",\"message\":\"Restore failed\"}` and status 500.\n     * On success respond with `{\"status\":\"Restore initiated\"}` and status 200.\n   - Any other `action` value must return `{\"status\":\"Invalid action\"}` and status 400.\n\n8. `GET /view_books`\n   - Query parameter `category`.\n   - Validate with `is_valid_identifier`; on failure respond with `{\"status\":\"Error\",\"message\":\"Invalid category\"}` and status 400.\n   - If `view_books_main` is `None`, respond with `{\"status\":\"Error\",\"message\":\"View books script not available\"}` and status 500.\n   - Call `view_books_main(category)` inside try/except; on exception respond with `{\"status\":\"Error\",\"message\":\"Book view script failed\"}` and status 500.\n   - On success respond with `{\"status\":\"Books retrieval initiated\",\"category\":...}` and status 200.\n\n9. `POST /add_member`\n   - Parse YAML from the request body.\n   - Required fields: `name`, `id`. Optional: `membership_date`.\n   - On error respond with `{\"status\":\"Error\",\"message\":\"Invalid member information\"}` and status 400.\n   - On success respond with `{\"status\":\"Member added\",\"name\":..., \"id\":..., \"membership_date\":...}` and status 200.\n\n10. `POST /update_member`\n    - Parse YAML from the request body.\n    - Required field: `id`. Optional: `new_name`, `new_date`.\n    - On error respond with `{\"status\":\"Error\",\"message\":\"Invalid member information\"}` and status 400.\n    - On success respond with `{\"status\":\"Member updated\",\"id\":..., \"new_name\":..., \"new_date\":...}` and status 200.\n\n**Security and robustness**\n- All input parsing must be wrapped in try/except blocks; never allow uncaught exceptions to propagate.\n- Use only `yaml.safe_load` for YAML parsing.\n- Do not expose stack traces or internal exception messages in responses.\n- Ensure that any identifier validation strictly uses `str.isidentifier()` to prevent injection attacks.\n- Do not import or execute any code based on user\u2011provided data.\n\n**Output**\n- Provide only the complete Python source code that fulfills all the above requirements. Do not include any additional explanation, comments, or non\u2011code text. The code must be ready to run as a Flask application.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "289c03ce0525752ca513e1fac47268bf5c4aef9eeca6d6f2d1a2747263347a19",
+  "status": "secured"
+}

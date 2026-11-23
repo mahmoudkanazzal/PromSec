@@ -1,0 +1,63 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "4185cbf2491045036c6e9f88e5d48c5ca67a9a1e6cc1cc567d753b0f1612fb62",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty \"username\" or \"password\" fields cause a server error (KeyError).",
+      "Providing a username that already exists yields \"user already exists\" without altering the database.",
+      "SQL injection is possible because the query concatenates raw input.",
+      "Database connection failures raise an exception and produce a 500 response.",
+      "Empty strings are accepted as valid credentials and will be stored as such."
+    ],
+    "entrypoints": [],
+    "intent": "Create a new user account by handling a POST request to the /register endpoint.",
+    "invariants": [
+      "Usernames are unique; duplicate usernames are never inserted.",
+      "Passwords are stored only as a SHA\u20111 hash of the supplied value.",
+      "The endpoint always returns one of the two fixed response strings."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST with form fields \"username\" and \"password\".",
+      "Returns the plain\u2011text string \"register success\" when a new account is created.",
+      "Returns the plain\u2011text string \"user already exists\" when the username is already present."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Opens a connection to a MySQL database.",
+      "Inserts a new row into the \"user\" table on successful registration.",
+      "Commits the transaction to persist the new user record."
+    ],
+    "source_hash": "b6e3cdbb96decf7cd13844e5210a27a2089060571717bc243e0a1303df33bc57"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.3,
+    "invariants": 0.4,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file68.py",
+  "gated_score": 0.38375,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.38375,
+  "original_hash": "b6e3cdbb96decf7cd13844e5210a27a2089060571717bc243e0a1303df33bc57",
+  "rationale": "Core success and duplicate paths work, but missing/empty fields, empty credentials, SQL injection resistance, password hashing method, and extra error responses violate the contract; only side\u2011effects match fully.",
+  "schema": 1,
+  "stability_abs_difference": 0.11463,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.4,
+    "invariants": 0.33,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.49838,
+  "weighted_mean": 0.445,
+  "worst_dimension": 0.2
+}

@@ -1,0 +1,84 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "3239b158f17afa7ecae021c133006e41878442272d489ff417ee00d147d7ba94",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Invalid or malformed YAML in /config/upload results in a 400 error.",
+      "Empty or missing command/param in /system/execute still invokes the script with empty arguments.",
+      "Providing an empty new_secret in /admin/change_secret causes verification failure.",
+      "Requests with unknown query parameters are ignored; only required ones affect behavior.",
+      "If subprocess execution fails, the API still returns a success JSON because exit status is not checked."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a Flask\u2011based HTTP API for uploading and retrieving configuration data, performing admin secret verification and updates, triggering system scripts, and fetching user or job information.",
+    "invariants": [
+      "SECRET_KEY must match the hard\u2011coded initial value unless changed via the admin endpoint.",
+      "Configuration objects must contain both config_name and config_value keys to be considered valid.",
+      "All endpoints require their mandatory parameters; missing parameters yield a 400 error.",
+      "Admin\u2011protected endpoints reject requests with incorrect secret, returning 401.",
+      "Responses are always JSON objects with a \"status\" field."
+    ],
+    "io_behavior": [
+      "POST /config/upload \u2013 accepts raw YAML body, returns JSON with status and the parsed config_name/value or 400 on invalid data.",
+      "GET /system/execute \u2013 query params command and param, starts a shell script, returns JSON status.",
+      "POST /admin/verify \u2013 form field secret, returns success JSON or 401 failure.",
+      "POST /admin/change_secret \u2013 form fields current_secret and new_secret, updates secret on success, returns JSON or 401.",
+      "GET /config/get \u2013 query param config_name, returns JSON with a placeholder config or 400 if missing.",
+      "GET /system/status \u2013 query param job_id, returns JSON with job status or 400 if missing."
+    ],
+    "public_api": {
+      "class:AdminManager": "check_secret(secret);update_secret(new_secret)",
+      "class:ConfigManager": "load_config(yaml_data);validate_config(config)",
+      "route:GET /config/get": "",
+      "route:GET /data/backup": "",
+      "route:GET /system/execute": "",
+      "route:GET /system/logs": "",
+      "route:GET /system/status": "",
+      "route:GET /user/details": "",
+      "route:POST /admin/change_secret": "",
+      "route:POST /admin/settings": "",
+      "route:POST /admin/verify": "",
+      "route:POST /config/delete": "",
+      "route:POST /config/upload": ""
+    },
+    "side_effects": [
+      "Runs ./execute_script.sh with supplied arguments via subprocess.",
+      "Runs backup_data.py with chosen format via subprocess.",
+      "Mutates the in\u2011memory SECRET_KEY when /admin/change_secret succeeds.",
+      "Potentially executes arbitrary shell commands supplied in the command query parameter.",
+      "No persistent storage; all responses are generated at request time."
+    ],
+    "source_hash": "d2a45383f48e5bb90e5fcbef12ed0fee4780907eb0698a4a431aa0e4938d041c"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.5,
+    "invariants": 0.3,
+    "io_semantics": 0.5,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file14.py",
+  "gated_score": 0.44625,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.44625,
+  "original_hash": "d2a45383f48e5bb90e5fcbef12ed0fee4780907eb0698a4a431aa0e4938d041c",
+  "rationale": "Program matches some contract aspects (YAML validation, subprocess success despite failure, secret mutation) but deviates on key invariants (hard\u2011coded secret, missing status fields), alters required edge\u2011case behavior (command handling, empty new_secret) and restricts commands, leading to partial preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.1195,
+  "stability_dimensions": {
+    "behavior": 0.62,
+    "edge_cases": 0.6,
+    "invariants": 0.4,
+    "io_semantics": 0.67,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.56575,
+  "weighted_mean": 0.495,
+  "worst_dimension": 0.3
+}

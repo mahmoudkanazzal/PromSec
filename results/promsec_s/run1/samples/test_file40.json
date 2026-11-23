@@ -1,0 +1,65 @@
+{
+  "ast_similarity": 0.9819905213270143,
+  "candidate_hash": "da8a89be28ac6530092a3fe3364ae0cfbd20d623f4783015d7b900938d4b7cb9",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    703
+  ],
+  "error": "",
+  "file": "test_file40.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9819905213270143,
+      "bandit_statement_nodes": [
+        44,
+        52
+      ],
+      "candidate_hash": "da8a89be28ac6530092a3fe3364ae0cfbd20d623f4783015d7b900938d4b7cb9",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.8833,
+          "end_lineno": 18,
+          "lineno": 18,
+          "node": 2
+        },
+        {
+          "ast_type": "Assert",
+          "change": 1.0,
+          "end_lineno": 88,
+          "lineno": 88,
+          "node": 44
+        },
+        {
+          "ast_type": "Assert",
+          "change": 1.0,
+          "end_lineno": 98,
+          "lineno": 98,
+          "node": 52
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9947,
+          "end_lineno": 245,
+          "lineno": 245,
+          "node": 142
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module (compatible with Python\u202f3.11+) that reproduces the exact functionality of the provided Zope PageTemplate test suite while adhering to modern security best practices. The prompt must enforce the following constraints and requirements:\n\n1. **Language**: The output must be pure Python code; no other languages or mixed\u2011language snippets are allowed.\n2. **Imports**:  \n   - Import only the minimal required symbols.  \n   - Replace the original `import zope.component.testing` with the specific import `from zope.component.testing import PlacelessSetup` to avoid pulling in the entire testing module.  \n   - Keep all other imports exactly as needed for the test suite to run (e.g., `unittest`, `chameleon.exc.ExpressionError`, `zope.component.provideAdapter`, etc.).  \n   - Do **not** use any deprecated or insecure modules; if a module is known to be unsafe, replace it with a safe alternative or a stub that mimics the required interface.\n3. **Security Policy Stub**:  \n   - Implement a `UnitTestSecurityPolicy` class that safely stubs the Zope security policy for testing.  \n   - Ensure the stub does not perform any real permission checks and returns permissive values (`1` or `True`).  \n   - Document that this class is only for unit\u2011test isolation.\n4. **Template Classes**:  \n   - Define `AqPageTemplate` as a subclass of `Implicit` and `PageTemplate`.  \n   - Define a simple `Folder` class inheriting from `util.Base`.\n5. **Test Case Class**:  \n   - Create a test case class `HTMLTests` that inherits from `PlacelessSetup` and `unittest.TestCase`.  \n   - Include a class attribute `PREFIX = None`.  \n   - Implement `setUp` and `tearDown` methods that:  \n     * Call `super().setUp()` / `super().tearDown()`.  \n     * Activate the Chameleon engine via `useChameleonEngine()`.  \n     * Register the default traversable adapter with `zope.component.provideAdapter`.  \n     * Register the default Unicode encoding conflict resolver utility.  \n     * Instantiate a `Folder` object, assign two `AqPageTemplate` instances to attributes `laf` and `t`.  \n     * Install the `UnitTestSecurityPolicy` using `SecurityManager.setSecurityPolicy` and clear any existing security manager with `noSecurityManager()`.  \n     * Restore the original policy and security manager in `tearDown`.\n6. **Helper Assertion Methods**:  \n   - Implement `assert_expected(self, t, fname, *args, **kwargs)` that writes the template source from `util.read_input(fname)`, checks for `_v_errors`, reads the expected output (handling optional `PREFIX`), renders the template, and validates the HTML with `util.check_html`.  \n   - Implement `assert_expected_unicode(self, t, fname, *args, **kwargs)` similarly, but ensure the expected output is decoded to a Unicode string if necessary.\n7. **Utility Data Provider**:  \n   - Provide a `getProducts(self)` method returning a list of dictionaries matching the original test data.\n8. **Test Methods**:  \n   - Replicate **all** test methods from the original suite (`test_1`, `test_2`, `test_3`, `testSimpleLoop`, `testFancyLoop`, `testGlobalsShadowLocals`, `testStringExpressions`, `testReplaceWithNothing`, `testWithXMLHeader`, `testNotExpression`, `testPathNothing`, `testPathAlt`, `testPathTraverse`, `testBatchIteration`, `testUnicodeInserts`, `testI18nTranslate`, `testImportOldStyleClass`, `testRepeatVariable`, `testBooleanAttributes`, `testBooleanAttributesAndDefault`, `testInterpolationInContent`, `testBadExpression`, `testPathAlternativesWithSpaces`, `testDefaultKeywordHandling`, `testSwitch`, `test_unicode_conflict_resolution`, `test_underscore_traversal`, `testHandleException`).  \n   - Each test must call the appropriate helper (`assert_expected` or `assert_expected_unicode`) with the correct template file name and any required arguments (e.g., `getProducts=self.getProducts`).  \n   - For tests that manipulate the folder structure (`testPathTraverse`), import `OFS.Folder.Folder` locally and replace `self.folder` as described.  \n   - For `testBadExpression`, assert that `ExpressionError` is raised.  \n   - For `test_underscore_traversal`, assert that `NotFound` is raised for each unsafe traversal attempt.  \n   - For `testHandleException`, deliberately trigger a `ZeroDivisionError` inside a template, catch it, and include a comment noting that swallowing the exception is intentional for the test (CWE\u2011703).\n9. **Main Guard**:  \n   - Include the standard `if __name__ == '__main__':` block that imports `sys` and runs `unittest.main(argv=[sys.argv[0]], exit=False)`.\n10. **Security and Safety**:  \n    - Do **not** use `eval`, `exec`, or any dynamic code execution beyond what the template engine already performs.  \n    - Ensure all file reads (`util.read_input`, `util.read_output`) are performed safely; assume these utilities are trusted.  \n    - Add inline comments (only where necessary for clarity) that explain security\u2011related decisions, such as why the stub policy is permissive and why certain imports are limited.\n11. **Formatting**:  \n    - Follow PEP\u202f8 style guidelines.  \n    - Use explicit relative imports where appropriate.  \n    - Preserve the original class and method names exactly to maintain compatibility with any external test runners.\n\nGenerate the full Python source code meeting all the above specifications. Do not include any explanatory text outside the code block. Do not add any additional files or documentation. The output must be a single, executable Python script.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "9c44c438ad588374e7c508259d0b68610b89ace157dc4d31bcf0a91f5cba1300",
+  "status": "secured"
+}

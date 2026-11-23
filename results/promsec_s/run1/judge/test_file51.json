@@ -1,0 +1,65 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "baca4bdad3a1169ae21718ba9b65d6c18bac4b39bf3a64f11003765bc0aaf0f9",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and result in a 500 error.",
+      "SQL injection is possible because the username is concatenated directly into the query string.",
+      "Empty password results in the MD5 hash of an empty string being compared to the stored hash.",
+      "Non\u2011ASCII characters in the password may raise a TypeError when hashing.",
+      "Database connection failures raise an exception and produce a 500 error."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by verifying the supplied password against the stored MD5 hash and redirecting on success.",
+    "invariants": [
+      "The endpoint only responds to POST requests; other methods are ignored.",
+      "The response is always one of three values: a redirect, \"Incorrect Password\", or \"User does not exist\".",
+      "Password comparison is performed using an MD5 hash of the raw password value.",
+      "No data is written or modified in the database."
+    ],
+    "io_behavior": [
+      "Accepts a POST request to /login with form fields 'username' and 'password'.",
+      "Returns the plain text string \"Incorrect Password\" when the password hash does not match.",
+      "Returns the plain text string \"User does not exist\" when no matching username is found.",
+      "Issues an HTTP 302 redirect to \"/user\" when authentication succeeds."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to a local MySQL server.",
+      "Executes a SELECT query that reads data from the 'user' table.",
+      "Creates a database cursor object (resource allocation)."
+    ],
+    "source_hash": "eab027460cfa38735ab3752a9a2c224b29ac6214ceb144f47363617e22aab5ec"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file51.py",
+  "gated_score": 0.3725,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.3725,
+  "original_hash": "eab027460cfa38735ab3752a9a2c224b29ac6214ceb144f47363617e22aab5ec",
+  "rationale": "The candidate fulfills the basic I/O contract (POST /login, returns expected strings and redirect) and performs the same side\u2011effects (DB connection, SELECT, cursor). However it diverges on key behavioral aspects: missing fields do not raise KeyError, uses a parameterised query (no SQL injection), hashes with SHA\u2011256 instead of MD5, handles non\u2011ASCII safely, and adds an extra \"Internal Server Error\" response, breaking the invariant of only three possible outputs. Consequently most edge\u2011cases fro",
+  "schema": 1,
+  "stability_abs_difference": 0.06837,
+  "stability_dimensions": {
+    "behavior": 0.0,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 1.0,
+    "side_effects": 0.67
+  },
+  "stability_score": 0.30413,
+  "weighted_mean": 0.43,
+  "worst_dimension": 0.2
+}

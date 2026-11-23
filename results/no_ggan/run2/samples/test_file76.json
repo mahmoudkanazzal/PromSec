@@ -1,0 +1,72 @@
+{
+  "ast_similarity": 0.5567190226876091,
+  "candidate_hash": "04073285eed275faba6279e65a12946dc608b4f36c4a3e71464705bc3bdce4de",
+  "complete": true,
+  "config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file76.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9868421052631579,
+      "bandit_statement_nodes": [
+        16,
+        19,
+        23,
+        25
+      ],
+      "candidate_hash": "3f352ce2601333d0c9a65ca9a6211a05c94d10db59aa6a33bbc2cee97e1dab72",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/register` endpoint handling POST requests. The script must:\n\n- Import only the following modules: `Flask`, `request`, `redirect`, `url_for` from `flask`; `os`; `bcrypt`; `MySQLdb`; `secrets`; `urllib.parse`.\n- Create a Flask app instance.\n- Define a route `/register` that accepts only POST requests.\n- Retrieve form fields: `username`, `password`, `name`, `cweid`, `email`.\n- Hash the password using `bcrypt` with a generated salt, then decode to a UTF\u20118 string.\n- Connect to a MySQL database using `MySQLdb.connect` with `host`, `user`, `passwd`, and `db` taken from the environment variables `DATABASE_URL`, `DATABASE_USER`, `DATABASE_PASSWORD`, and `DATABASE_NAME`.\n- Use a cursor and perform all SQL statements with parameterized queries to prevent SQL injection.\n- Check if the `username` already exists; if it does, return HTTP 409 with the plain text message `Username is already taken`.\n- If the username does not exist, insert a new user into a `users` table with columns `(username, password, name, email, cweid)`, commit the transaction, and obtain the new `user_id`.\n- Generate a secure `session_id` using `secrets.token_urlsafe(16)`.\n- Insert a new record into a `sessions` table with columns `(username, user_id, session_id)`, commit the transaction.\n- Retrieve the session record (`username`, `password`, `session_id`, `stake`) for the newly created session using a parameterized SELECT query.\n- If the session record is found, build a safe redirect URL to `/login` with query parameters `username`, `session_id`, and `stake` (converted to a string) using `urllib.parse.urlencode`, and return a Flask `redirect` to that URL.\n- If the session retrieval fails, return HTTP 500 with the plain text message `Failed to create session`.\n- Include generic error handling for database connection failures and unexpected exceptions, returning HTTP 500 with a generic plain text error message.\n- Ensure all responses are plain strings, not HTML.\n- The script must be valid Python 3 code, runnable as a module, and must contain no comments or explanatory text.\n- Do not include any additional functionality beyond what is described.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6980306345733042,
+      "bandit_statement_nodes": [
+        36,
+        39
+      ],
+      "candidate_hash": "6c353181e33c2f3f89966efa5470772a93d70cba277925ee01b9f804dc33f96b",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, secure Python 3 program that implements a Flask web application with a user registration endpoint. The program must:\n\n- Import only the following modules: `os`, `logging`, `secrets`, `bcrypt`, `MySQLdb`, and the necessary objects from `flask` (`Flask`, `request`, `redirect`, `url_for`, `session` as `flask_session`).\n- Configure logging at the INFO level and create a logger named after the module.\n- Create a Flask app instance and set a secret key for session management using the environment variable `FLASK_SECRET_KEY`; if the variable is not set, generate a random 32\u2011byte hex token with `secrets.token_hex`.\n- Update the Flask app configuration to enforce secure cookies:\n  - `SESSION_COOKIE_SECURE=True`\n  - `SESSION_COOKIE_HTTPONLY=True`\n  - `SESSION_COOKIE_SAMESITE='Lax'`\n- Define a function `get_db_connection()` that returns a MySQLdb connection using the following environment variables (with sensible defaults):\n  - `DATABASE_URL` (default `'localhost'`) for `host`\n  - `DATABASE_USER` (default `'root'`) for `user`\n  - `DATABASE_PASSWORD` (default empty string) for `passwd`\n  - `DATABASE_NAME` (default `'app'`) for `db`\n  - Set `charset='utf8mb4'` and `use_unicode=True`.\n- Implement a route `@app.route('/register', methods=['POST'])` with a function `register()` that:\n  1. Retrieves and strips the form fields `username`, `name`, `cweid`, and `email`; obtains `password` without stripping.\n  2. Returns a 400 response with the text `'Missing credentials'` if `username` or `password` is empty.\n  3. Hashes the password using `bcrypt.hashpw` with a generated salt (`bcrypt.gensalt()`), encoding the password as UTF\u20118 and decoding the resulting hash to a UTF\u20118 string.\n  4. Opens a database connection via `get_db_connection()` and creates a cursor.\n  5. Checks for an existing username with a parameterized query: `SELECT 1 FROM users WHERE username = %s`. If a row is found, return a 409 response with `'Username is already taken'`.\n  6. Inserts the new user with a parameterized `INSERT` statement into the `users` table (`username`, `password`, `name`, `email`, `cweid`). Commit the transaction and capture the new `user_id` from `cursor.lastrowid`.\n  7. Generates a secure session identifier using `secrets.token_urlsafe(16)`.\n  8. Inserts a session record into a `sessions` table (`username`, `user_id`, `session_id`) with a parameterized query and commits.\n  9. Stores `session_id`, `user_id`, and `username` in the Flask session (`flask_session`).\n  10. Redirects the client to the endpoint named `'login'` using `url_for`.\n  11. Catches any exception, logs the full traceback with `logger.exception('Error during registration')`, and returns a 500 response with `'Internal server error'`.\n  12. Ensures that both the cursor and connection are closed in a `finally` block, suppressing any errors during cleanup.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with `app.run()`.\n\nThe generated code must:\n- Be valid Python code only (no other languages or markup).\n- Follow security best practices: use environment variables for secrets, never hard\u2011code credentials, use parameterized SQL queries to prevent injection, set secure cookie attributes, and generate cryptographically strong tokens.\n- Contain no explanatory comments or extra text outside the required code.\n- Produce exactly the described functionality.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5567190226876091,
+      "bandit_statement_nodes": [
+        46,
+        48,
+        49,
+        51
+      ],
+      "candidate_hash": "04073285eed275faba6279e65a12946dc608b4f36c4a3e71464705bc3bdce4de",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (Python\u202f3) that implements a secure user registration web service using Flask and MySQL. The program must:\n\n- Import only the following modules: os, re, logging, secrets, bcrypt, MySQLdb, contextmanager from contextlib, and Flask components (Flask, request, redirect, url_for, session as flask_session).\n- Configure logging with level INFO and create a logger named __name__.\n- Create a Flask app, set its secret_key from the environment variable FLASK_SECRET_KEY or generate a random 32\u2011byte hex token if not set, and enforce secure session cookie settings: SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='Strict'.\n- Define a function get_db_connection() that reads DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME from environment variables (defaulting to localhost, root, empty password, and app) and returns a MySQLdb connection with charset='utf8mb4', use_unicode=True, autocommit=False.\n- Implement a context manager db_cursor() that obtains a connection via get_db_connection(), yields a tuple (conn, cursor), commits on success, rolls back on exception, and always closes cursor and connection safely.\n- Provide input validation helpers:\n  * USERNAME_REGEX = r'^[A-Za-z0-9_]{3,30}$'\n  * EMAIL_REGEX = r'^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$'\n  * Functions is_valid_username(username: str) -> bool and is_valid_email(email: str) -> bool that return True only if the full string matches the respective regex.\n- Define a Flask route '/register' that accepts POST requests and performs:\n  * Retrieve and strip form fields: username, name, cweid, email, password.\n  * Return HTTP 400 with 'Missing credentials' if username or password is empty.\n  * Validate username with is_valid_username; on failure return HTTP 400 with 'Invalid username format'.\n  * If email is provided, validate with is_valid_email; on failure return HTTP 400 with 'Invalid email format'.\n  * Hash the password using bcrypt.hashpw with a generated salt, then decode to UTF\u20118 string.\n  * Within db_cursor():\n    - Check for existing username in table users; if found return HTTP 409 with 'Username is already taken'.\n    - Insert a new row into users (username, password, name, email, cweid) using parameterized query; capture the inserted user_id.\n    - Generate a session_id using secrets.token_urlsafe(32).\n    - Insert a new row into sessions (username, user_id, session_id) using parameterized query.\n  * After the transaction, store session_id, user_id, and username in flask_session.\n  * Redirect the client to the Flask endpoint named 'login'.\n  * On any exception, log the full stack trace with logger.exception('Error during registration') and return HTTP 500 with 'Internal server error'.\n- Include the standard \u201cif __name__ == '__main__':\u201d block that runs app.run().\n- Ensure all SQL statements use parameter placeholders (%s) to prevent injection.\n- Use only the specified imports, no additional libraries.\n- The code must be valid Python, follow best security practices, and match the described functionality exactly.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 3,
+  "schema": 1,
+  "selected_iteration": 3,
+  "source_hash": "a00a27b7d592b11e9682a9850db8e3599255cdbc72ac01f2d99d62959b572c63",
+  "status": "secured"
+}

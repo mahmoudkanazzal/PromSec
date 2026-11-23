@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "26eee464582450bdc101feb2c60c80b0e909578cd5fc6e4ae3785cebb5e7a791",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "SQL injection is possible because the username is concatenated directly into the query.",
+      "Missing 'username' or 'password' fields raise a KeyError, resulting in a 500 error.",
+      "An empty password hashes to a known SHA\u20111 value, which may unintentionally authenticate if stored.",
+      "Multiple rows with the same username cause only the first row to be considered.",
+      "Database connection failures raise exceptions and produce a 500 response.",
+      "Non\u2011POST requests to /login receive Flask's default 405 Method Not Allowed."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via an HTTP POST to /login and return a welcome message on success or a failure message otherwise.",
+    "invariants": [
+      "Password verification always uses SHA\u20111 hashing.",
+      "The response strings are fixed and do not include user\u2011controlled data beyond the username in the welcome message.",
+      "Only a SELECT statement is executed; no data is written to the database.",
+      "Database connection parameters (host, user, password, db) are constant.",
+      "The endpoint only processes POST requests; other methods are rejected by Flask.",
+      "The first row returned for a username is used for authentication."
+    ],
+    "io_behavior": [
+      "Accepts a POST request at /login with form fields 'username' and 'password'.",
+      "Connects to a local MySQL database using hard\u2011coded credentials.",
+      "Executes a SELECT query for the supplied username.",
+      "Computes SHA\u20111 hash of the supplied password and compares it to the stored hash.",
+      "Returns plain\u2011text \"Welcome <username>!\" when the hashes match.",
+      "Returns plain\u2011text \"Login failed!\" for any mismatch or missing user."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to the MySQL server.",
+      "Performs a read\u2011only SELECT query on the 'user' table.",
+      "May emit error traces to the server console if exceptions occur."
+    ],
+    "source_hash": "a1ecab2d254217bc6498996cd220a7dc8d9961ae33e3974a0681928247d3b1d9"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.6,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file47.py",
+  "gated_score": 0.425,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.425,
+  "original_hash": "a1ecab2d254217bc6498996cd220a7dc8d9961ae33e3974a0681928247d3b1d9",
+  "rationale": "Core login flow present but deviates from contract: uses parameterized query (no SQL injection), returns 400/401 instead of 500 on missing fields, employs werkzeug password check instead of SHA\u20111, and DB credentials are env\u2011based rather than hard\u2011coded; only some edge cases and invariants are preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.00375,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.2,
+    "invariants": 0.3,
+    "io_semantics": 0.6,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.42875,
+  "weighted_mean": 0.5,
+  "worst_dimension": 0.2
+}

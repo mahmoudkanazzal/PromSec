@@ -1,0 +1,69 @@
+{
+  "ast_similarity": 0.5626072041166381,
+  "candidate_hash": "fce358a5c8ca818d581876470f4e9806a9229b0eafb08f7efa9ca21b4d2ed545",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file98.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5996343692870201,
+      "bandit_statement_nodes": [
+        10,
+        14,
+        25,
+        34
+      ],
+      "candidate_hash": "dbd21d0bd8066fe9b7a65857a85b61d0bb496b232ffa44f21d2595533d81aff2",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.8107,
+          "end_lineno": 24,
+          "lineno": 24,
+          "node": 14
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the following requirements:\n\n1. **Environment**  \n   - Use only Python standard libraries and the `flask` and `sqlite3` modules.  \n   - The script must be runnable as `python script_name.py` and start the Flask server with `debug=False`.\n\n2. **Database**  \n   - Connect to an SQLite database file named `voting.db`.  \n   - Provide a helper function `get_db_connection()` that returns a new connection object.\n\n3. **Endpoints**  \n   - **POST /create_poll**  \n     - Accept a JSON payload containing `\"title\"` (string) and `\"options\"` (list of strings).  \n     - Insert the poll title into a `polls` table and retrieve the generated `poll_id`.  \n     - Insert each option into an `options` table linked to the `poll_id`.  \n     - Use **parameterized SQL queries** for all inserts to prevent SQL injection.  \n     - Return JSON `{\"message\": \"Poll created successfully\", \"poll_id\": poll_id}` with HTTP status 201.\n\n   - **POST /vote**  \n     - Accept a JSON payload containing `\"poll_id\"` (integer), `\"option_id\"` (integer), and `\"voter_id\"` (string).  \n     - Insert a new row into a `votes` table with these values.  \n     - Use a **parameterized SQL query** for the insert.  \n     - Return JSON `{\"message\": \"Vote recorded successfully\"}` with HTTP status 200.\n\n   - **GET /get_results**  \n     - Accept a query parameter `poll_id` (integer).  \n     - Retrieve each option\u2019s text and the count of votes it received, using a LEFT JOIN between `options` and `votes`.  \n     - Use a **parameterized SQL query** for the SELECT statement.  \n     - Return the results as a JSON list of objects `{\"option_text\": ..., \"vote_count\": ...}` with HTTP status 200.\n\n4. **Security**  \n   - All SQL statements must be safe from injection (no string interpolation or f\u2011strings for query construction).  \n   - Validate that required JSON fields are present; if any are missing, return a 400 error with an appropriate JSON error message.  \n   - Ensure the database connection is closed after each request, even if an exception occurs.\n\n5. **Output**  \n   - Provide only the Python code; do not include any explanatory text, comments, or markup outside the code block.  \n   - The code must be ready to run without modification.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5626072041166381,
+      "bandit_statement_nodes": [
+        63
+      ],
+      "candidate_hash": "fce358a5c8ca818d581876470f4e9806a9229b0eafb08f7efa9ca21b4d2ed545",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 104,
+          "lineno": 104,
+          "node": 63
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, secure Python program (no other language) that implements a Flask web application with the following exact functionality:\n\n- Import only the modules: `os`, `flask` (specifically `Flask`, `request`, `jsonify`, `abort`), and `sqlite3`.\n- Create a Flask app instance and set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`, defaulting to `'default-secret'` if not set.\n- Define a function `get_db_connection()` that opens a SQLite database file named `voting.db`, sets `row_factory` to `sqlite3.Row`, and returns the connection.\n- Define a function `init_db()` that:\n  - Calls `get_db_connection()`.\n  - Executes `PRAGMA foreign_keys = ON`.\n  - Executes a script that creates three tables if they do not exist:\n    1. `polls` with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT) and `title` (TEXT NOT NULL).\n    2. `options` with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `poll_id` (INTEGER NOT NULL), `option_text` (TEXT NOT NULL), and a foreign key on `poll_id` referencing `polls(id)` with `ON DELETE CASCADE`.\n    3. `votes` with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `poll_id` (INTEGER NOT NULL), `option_id` (INTEGER NOT NULL), `voter_id` (TEXT NOT NULL), and foreign keys on `poll_id` and `option_id` referencing `polls(id)` and `options(id)` respectively, both with `ON DELETE CASCADE`.\n  - Commits the transaction and ensures the connection is closed even on error.\n\n- Implement the route `/create_poll` accepting only POST requests that:\n  - Parses JSON from the request body.\n  - Returns a 400 error with JSON `{'error': 'Invalid JSON'}` if parsing fails.\n  - Validates that the JSON contains a string `title` and a list `options` where each element is a string; otherwise returns a 400 error with JSON `{'error': 'Missing or invalid fields'}`.\n  - Inserts a new row into `polls` with the provided title using a parameterized query, retrieves the generated `poll_id`, and inserts each option into `options` linked to that `poll_id` using parameterized queries.\n  - Commits the transaction, closes the connection, and returns a 201 response with JSON `{'message': 'Poll created successfully', 'poll_id': poll_id}`.\n\n- Implement the route `/vote` accepting only POST requests that:\n  - Parses JSON from the request body.\n  - Returns a 400 error with JSON `{'error': 'Invalid JSON'}` if parsing fails.\n  - Validates that the JSON contains integer `poll_id`, integer `option_id`, and string `voter_id`; otherwise returns a 400 error with JSON `{'error': 'Missing or invalid fields'}`.\n  - Inserts a new row into `votes` with the provided values using a parameterized query, commits, closes the connection, and returns a 200 response with JSON `{'message': 'Vote recorded successfully'}`.\n\n- Implement the route `/get_results` accepting only GET requests that:\n  - Retrieves a query parameter `poll_id` as an integer; if missing, returns a 400 error with JSON `{'error': 'poll_id query parameter is required'}`.\n  - Queries the database to select each option's text and the count of votes for that option (including options with zero votes) for the given `poll_id`. Use a LEFT JOIN between `options` and `votes`, group by option ID, order by option ID, and use parameterized queries.\n  - Returns a 200 response with a JSON array where each element is an object `{'option_text': <text>, 'vote_count': <count>}`.\n\n- In the `if __name__ == '__main__':` block, call `init_db()` and start the Flask development server with `host='127.0.0.1'`, `port=5000`, and `debug=False`.\n\nSecurity requirements:\n- Use only parameterized SQL statements; never concatenate user input into SQL strings.\n- Validate all incoming data types and presence as described.\n- Ensure database connections are always closed using try/finally or context managers.\n- Do not use `eval`, `exec`, or any dynamic code execution.\n- Do not expose stack traces or internal errors to the client; use generic error messages as specified.\n- Keep the secret key handling as described, avoiding hard\u2011coded secrets beyond the default fallback.\n\nThe entire output must be valid, runnable Python code that meets all the above specifications. Do not include any explanatory text, comments, or markup outside the code. Do not output anything else.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "cb74b9aedccb24444e80858bad4d052615ee38524c155193f1a527b08f91a887",
+  "status": "secured"
+}

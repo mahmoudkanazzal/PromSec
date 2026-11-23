@@ -1,0 +1,79 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "6c1b8463f2f3448eac395e4d8e0551d13b5ce67967b599c75756e539acd051e3",
+  "compile_ok": true,
+  "confidence": 0.8,
+  "contract": {
+    "edge_cases": [
+      "Calling FakeChannel.json_body or .code before any response has been written raises an exception.",
+      "Providing a non\u2011bytes method or path to make_request triggers automatic ASCII encoding.",
+      "Supplying an unknown hostname to the resolver results in a failed Deferred with DNSLookupError.",
+      "Passing a dict as content to make_request is JSON\u2011encoded; passing a non\u2011dict non\u2011bytes raises no error but may produce malformed payloads.",
+      "If access_token is None, no Authorization header is added; malformed tokens are not validated here.",
+      "When federation_auth_origin is set, an Authorization header with placeholder signature is added, which may be rejected by downstream logic."
+    ],
+    "entrypoints": [],
+    "intent": "Provide test utilities for the Sydent identity server, including functions to create a test Sydent instance, fabricate HTTP requests/responses, configure logging, and supply a memory\u2011based Twisted reactor with fake DNS resolution.",
+    "invariants": [
+      "If no \"db\" entry is supplied to make_sydent, an in\u2011memory SQLite DB is always used.",
+      "make_request always prefixes paths that do not start with \"/_matrix\" with \"/_matrix/identity/v2/\".",
+      "All request bodies are encoded as UTF\u20118 JSON bytes before being placed in the request.",
+      "FakeChannel stores response data in a dict under keys \"code\", \"headers\", \"body\", and \"done\".",
+      "ResolvingMemoryReactorClock's nameResolver only resolves names present in its internal lookups dict.",
+      "Logging format is fixed to \"%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s\"."
+    ],
+    "io_behavior": [
+      "make_sydent returns a Sydent object configured with an in\u2011memory SQLite DB and a custom reactor.",
+      "make_request builds a FakeChannel and a Request, writes the supplied body to the request, and returns both objects.",
+      "FakeChannel records HTTP status code, headers, and body which can be inspected via its properties.",
+      "ToTwistedHandler forwards Python logging records to Twisted's logging system.",
+      "ResolvingMemoryReactorClock resolves hostnames using an internal dict, returning a Deferred that succeeds or fails.",
+      "FAKE_SERVER_CERT_PEM is loaded as a TLS certificate when getPeerCertificate() is called on a FakeChannel."
+    ],
+    "public_api": {
+      "class:FakeChannel": "code(self);getHost(self);getPeer(self);getPeerCertificate(self);headers(self);json_body(self);registerProducer(self, producer, streaming);requestDone(self, _self);transport(self);unregisterProducer(self);write(self, content);writeHeaders(self, version, code, reason, headers)",
+      "class:FakeSite": "",
+      "class:ResolvingMemoryReactorClock": "installNameResolver(self, resolver: IHostnameResolver)",
+      "class:ToTwistedHandler": "emit(self, record)",
+      "func:make_request": "(reactor, method, path, content=b'', access_token=None, request=Request, shorthand=True, federation_auth_origin=None)",
+      "func:make_sydent": "(test_config={})",
+      "func:setup_logging": "()"
+    },
+    "side_effects": [
+      "Adds a ToTwistedHandler to the root Python logger and sets its level based on SYDENT_TEST_LOG_LEVEL.",
+      "Initialises a global OpenSSL certificate object each time getPeerCertificate() is accessed.",
+      "Modifies the global name resolution mapping in ResolvingMemoryReactorClock instances.",
+      "Potentially creates files or sockets only if the underlying Sydent code does so (outside this module).",
+      "Registers the custom reactor class with Twisted's IReactorPluggableNameResolver interface.",
+      "May raise exceptions if FakeChannel properties are accessed before a result is written."
+    ],
+    "source_hash": "1a39a4177928ac3d32e74a2ff0d447c7f6ce1c7a9a28105b4f5d40c44d317349"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.4,
+    "invariants": 0.3,
+    "io_semantics": 0.6,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file33.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.40125,
+  "original_hash": "1a39a4177928ac3d32e74a2ff0d447c7f6ce1c7a9a28105b4f5d40c44d317349",
+  "rationale": "Key contract points are missing or incorrect: make_request does not handle non\u2011dict/non\u2011bytes content as specified, ignores federation_auth_origin, and prefixes paths indiscriminately; FakeChannel lacks a \"done\" key and may not record response writes; make_sydent defaults DB only when test_config is None; resolver behavior and logging format are correct, but several invariants and edge\u2011case behaviors are violated.",
+  "schema": 1,
+  "stability_abs_difference": 0.16375,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.6,
+    "invariants": 0.4,
+    "io_semantics": 0.7,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.565,
+  "weighted_mean": 0.435,
+  "worst_dimension": 0.3
+}

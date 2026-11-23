@@ -1,0 +1,37 @@
+{
+  "ast_similarity": 0.6135957066189625,
+  "candidate_hash": "fb78b4d5c2a6df3252f31ef0f3de3a6a86f646aad80f0ef84f2a58ab49393725",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file94.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6135957066189625,
+      "bandit_statement_nodes": [
+        10,
+        19,
+        29
+      ],
+      "candidate_hash": "fb78b4d5c2a6df3252f31ef0f3de3a6a86f646aad80f0ef84f2a58ab49393725",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python Flask application that implements a simple library API using SQLite. The code must be written **only in Python** and must include the following exact functionality and security measures:\n\n1. **Imports**: `from flask import Flask, request, jsonify, abort` and `import sqlite3`.\n\n2. **Flask app initialization**: `app = Flask(__name__)`.\n\n3. **Database connection helper**:\n   - Define `get_db_connection()` that opens a connection to a SQLite database file named `library.db`.\n   - Set `row_factory` to `sqlite3.Row`.\n   - Return the connection object.\n   - Use a context manager (`with` statement) wherever the connection is used to ensure proper closing.\n\n4. **Integer validation helper**:\n   - Define `validate_int(value, name)` that attempts to convert `value` to `int`.\n   - If conversion fails, abort with HTTP 400 and a descriptive message: `\"Invalid integer for '<name>'\"`.\n\n5. **Endpoint `/add_book` (POST)**:\n   - Accept JSON body containing `\"title\"` and `\"author\"`.\n   - Validate presence of both fields; if missing, abort with HTTP 400 and message `\"Missing 'title' or 'author' in request body\"`.\n   - Ensure both fields are strings; otherwise abort with HTTP 400 and message `\"'title' and 'author' must be strings\"`.\n   - Insert the new book into the `books` table using a **parameterized** SQL statement: `INSERT INTO books (title, author) VALUES (?, ?)`.\n   - Commit the transaction.\n   - Return JSON `{\"message\": \"Book added successfully\"}` with HTTP status 201.\n\n6. **Endpoint `/get_book` (GET)**:\n   - Require query parameter `id`.\n   - If missing, abort with HTTP 400 and message `\"Missing 'id' query parameter\"`.\n   - Validate `id` using `validate_int`.\n   - Retrieve the book with the given `id` using a **parameterized** SELECT query.\n   - If no record is found, abort with HTTP 404 and message `\"Book not found\"`.\n   - Return the row as JSON (convert `sqlite3.Row` to a dict) with HTTP status 200.\n\n7. **Endpoint `/update_copies` (POST)**:\n   - Accept JSON body containing `\"book_id\"` and `\"copies\"`.\n   - Validate presence of both fields; if missing, abort with HTTP 400 and message `\"Missing 'book_id' or 'copies' in request body\"`.\n   - Convert both fields to integers using `validate_int`.\n   - Update the `copies` column by adding the provided `copies` value to the existing count using a **parameterized** UPDATE query: `UPDATE books SET copies = copies + ? WHERE id = ?`.\n   - If `cursor.rowcount` is 0 (no rows updated), abort with HTTP 404 and message `\"Book not found\"`.\n   - Commit the transaction.\n   - Return JSON `{\"message\": \"Copies updated successfully\"}` with HTTP status 200.\n\n8. **Endpoint `/get_catalog` (GET)**:\n   - Retrieve all books ordered by `title` using a SELECT query that returns `title`, `author`, and `copies`.\n   - Convert each row to a dict and return a JSON list of these dicts with HTTP status 200.\n\n9. **Application entry point**:\n   - Include `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n\n10. **Security requirements**:\n    - Use only **parameterized** SQL queries to prevent SQL injection.\n    - Perform strict type checking and input validation as described.\n    - Do not use `eval`, `exec`, or any dynamic code execution.\n    - Ensure the Flask app does not expose debug information.\n    - Use proper HTTP status codes and descriptive error messages via `abort`.\n    - Keep the database connection handling safe with context managers.\n\nGenerate the full Python source code that meets all the above specifications, without any additional explanatory text, comments, or non\u2011Python content. Ensure the code is ready to run as a standalone script.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "e073dd9a61e0cb410dcefad0439b1bca1f2d3d6f7cbd533ee88fe43dc93f9972",
+  "status": "secured"
+}

@@ -1,0 +1,84 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "1f4f8c6469f79bebf5daff3723894ab32bb032ec89e4a6829822721238721a11",
+  "compile_ok": true,
+  "confidence": 0.8,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payloads cause a 400 error for add_book, submit_review, and submit_event.",
+      "Providing a non\u2011integer year_published leads to a 400 error.",
+      "Incorrect admin credentials return a 401 error without changing state.",
+      "Changing the password to an empty string is allowed and will lock out future admin logins unless corrected.",
+      "Calling /inventory/check with empty section/location still spawns the subprocess with empty arguments.",
+      "Submitting a review with rating outside 1\u20115 or missing any field results in a 400 error."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple library management web API that allows adding, removing, querying, and updating book records, handling admin authentication, and processing auxiliary actions like inventory checks, reviews, and events via HTTP requests.",
+    "invariants": [
+      "A book addition requires non\u2011empty title, author, and isbn fields.",
+      "year_published must be an integer; otherwise the request is rejected.",
+      "Review submissions require rating between 1 and 5 inclusive.",
+      "Admin login succeeds only when password matches the current LIBRARIAN_PASSWORD and secret_key equals the hard\u2011coded value.",
+      "All endpoints return JSON with a \"status\" field indicating success or error.",
+      "Missing required parameters result in a 400 response (or 401 for admin auth)."
+    ],
+    "io_behavior": [
+      "POST /library/add_book with YAML body returns JSON confirming addition or error for missing/invalid fields.",
+      "POST /library/remove_book with form field 'isbn' returns JSON confirming removal or error if absent.",
+      "GET /inventory/check with query parameters 'section' and 'location' triggers a subprocess and returns a JSON status.",
+      "POST /admin/login with form fields 'password' and 'secret_key' returns admin access JSON or 401 error.",
+      "POST /admin/change_password with form fields 'old_password' and 'new_password' updates the in\u2011memory password and returns success JSON or 401 error.",
+      "Various GET/POST endpoints under /library and /api return JSON responses reflecting the requested operation (book info, list, availability, request, return, review, event)."
+    ],
+    "public_api": {
+      "route:GET /api/check_availability": "",
+      "route:GET /inventory/check": "",
+      "route:GET /library/book_info": "",
+      "route:GET /library/list_books": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/login": "",
+      "route:POST /api/request_book": "",
+      "route:POST /api/return_book": "",
+      "route:POST /api/submit_event": "",
+      "route:POST /api/submit_review": "",
+      "route:POST /library/add_book": "",
+      "route:POST /library/remove_book": "",
+      "route:POST /library/update_book": ""
+    },
+    "side_effects": [
+      "Executes an external Python script via os.system in /inventory/check.",
+      "Modifies the global LIBRARIAN_PASSWORD variable when /admin/change_password succeeds.",
+      "Potentially logs request data through Flask's default logging (implicit side effect)."
+    ],
+    "source_hash": "79f06a718f9233fb94588d4ef4a2c9ddacb133ad2041110188b3de4c6ce1c069"
+  },
+  "dimensions": {
+    "behavior": 0.45,
+    "edge_cases": 0.5,
+    "invariants": 0.5,
+    "io_semantics": 0.55,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file4.py",
+  "gated_score": 0.53813,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.53813,
+  "original_hash": "79f06a718f9233fb94588d4ef4a2c9ddacb133ad2041110188b3de4c6ce1c069",
+  "rationale": "Key contract edge cases (empty password allowed, empty inventory params) and invariants (status field on errors, non\u2011empty title/author/isbn) are not met; other core functionalities and side\u2011effects largely align.",
+  "schema": 1,
+  "stability_abs_difference": 0.00188,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.5,
+    "invariants": 0.3,
+    "io_semantics": 0.8,
+    "side_effects": 0.6
+  },
+  "stability_score": 0.53625,
+  "weighted_mean": 0.5675,
+  "worst_dimension": 0.45
+}

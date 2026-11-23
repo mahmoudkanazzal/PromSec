@@ -1,0 +1,68 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "9c5c68857bb89b9941a0e558b127b9fe754aa656f1a312ed25aeba2b929004a7",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing \"username\" or \"password\" fields raise a server error (KeyError).",
+      "Concatenating a binary salt with a string may raise a TypeError in some Python versions.",
+      "The raw string interpolation of the username allows SQL injection if the username contains special characters.",
+      "Database connection failures or query errors result in an unhandled exception.",
+      "Extremely long usernames or passwords may exceed database column limits and cause insertion failures."
+    ],
+    "entrypoints": [],
+    "intent": "Create a new user account when a client POSTs a username and password to the /register endpoint.",
+    "invariants": [
+      "Usernames are unique; duplicate usernames never result in a new record.",
+      "Passwords are never stored in plain text; they are stored as SHA\u2011256(salt + password).",
+      "Each stored user record includes the generated salt and a non\u2011zero account_created flag.",
+      "The same database connection is used for the SELECT and INSERT within a single request."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request with form fields \"username\" and \"password\".",
+      "If the username already exists, responds with an HTTP 307 redirect to \"/login\".",
+      "If the username is new, inserts a record into the MySQL \"users\" table and returns the default Flask response (200 OK with empty body).",
+      "Relies on the request body for input and the HTTP response for output."
+    ],
+    "public_api": {
+      "func:register": "()",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Generates a 16\u2011byte random salt for each registration attempt.",
+      "Executes a SELECT query against the MySQL database to check for existing usernames.",
+      "Executes an INSERT query to store the new username, hashed password, salt, and a constant account_created flag.",
+      "Commits the transaction and closes the database connection.",
+      "May cause an HTTP redirect to the client."
+    ],
+    "source_hash": "e74543c04541d3dcdf19b2647e08c7219671da9ae93285ddd645be4d5f294202"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.3,
+    "side_effects": 0.85
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file69.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.35937,
+  "original_hash": "e74543c04541d3dcdf19b2647e08c7219671da9ae93285ddd645be4d5f294202",
+  "rationale": "The program deviates from the contract on key edge cases (missing fields, type errors, SQL injection risk, unhandled DB errors, long inputs) and changes I/O semantics (returns 400/201 with body instead of 200 empty). It preserves most side effects and some invariants (uniqueness, flag, same DB connection) but stores passwords using PBKDF2 rather than raw SHA\u2011256(salt+password). Overall preservation is partial.",
+  "schema": 1,
+  "stability_abs_difference": 0.14438,
+  "stability_dimensions": {
+    "behavior": 0.55,
+    "edge_cases": 0.2,
+    "invariants": 0.75,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.50375,
+  "weighted_mean": 0.4125,
+  "worst_dimension": 0.2
+}

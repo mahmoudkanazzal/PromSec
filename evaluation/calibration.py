@@ -1,6 +1,8 @@
 """Behavioral controls with concrete input/output witnesses."""
 
-CASES = (
+from typing import Any
+
+CASES: tuple[dict[str, Any], ...] = (
     {
         "name": "addition",
         "original": "def calculate(a, b):\n    return a + b\n",

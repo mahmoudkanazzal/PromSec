@@ -1,0 +1,74 @@
+{
+  "ast_similarity": 0.8430493273542601,
+  "candidate_hash": "8243f629548cb14f25e57e35146921ec966bb4d99d525db706a1b24d2363aa41",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file0.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9134615384615384,
+      "bandit_statement_nodes": [
+        12,
+        18
+      ],
+      "candidate_hash": "db9471f956bf4b02dea9a7d883cf7ebec6d92ef6087cb1decfd7d4ef410858a2",
+      "cwe_count": 1,
+      "cwes": [
+        259
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9974,
+          "end_lineno": 22,
+          "lineno": 22,
+          "node": 12
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/register` route handling only POST requests. The script must:\n\n- Import only Python standard libraries and the `flask` and `MySQLdb` packages.\n- Create a Flask app instance named `app`.\n- Define the `/register` view function `register()` that:\n  1. Retrieves `username` and `password` from `request.form`.\n  2. Generates a cryptographically secure 16\u2011byte salt using `os.urandom`.\n  3. Derives a password hash using a strong key\u2011derivation function such as `hashlib.pbkdf2_hmac` with SHA\u2011256, at least 100,000 iterations, and the generated salt. Store the hash as a hexadecimal string.\n  4. Connects to a MySQL database on `localhost` with user `root`, empty password, and database `testdb` using `MySQLdb.connect`.\n  5. Uses **parameterized queries** for all SQL statements to eliminate SQL injection risks.\n     - First, execute a `SELECT username FROM users WHERE username = %s` query to check if the username already exists.\n     - If a record is found, close the database connection and return a redirect to `/login` with HTTP status code 307.\n     - If no record is found, execute an `INSERT INTO users (username, password, salt) VALUES (%s, %s, %s)` query, passing the username, the derived hash, and the salt encoded as a hexadecimal string.\n  6. Commits the transaction after a successful insert, closes the database connection, and returns the plain text response `\"Registration successful\"`.\n- Ensure that the database connection and cursor are properly closed in all execution paths, using `try / finally` or context managers.\n- Include appropriate error handling: catch database or unexpected exceptions, close resources, and return a generic error message with a 500 status code without exposing internal details.\n- Run the Flask app only when the script is executed as the main module, with `debug=False`.\n- Do **not** include any code in languages other than Python, and do not add explanatory comments or markdown formatting. The output must be pure Python code meeting the above security and functionality requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.8430493273542601,
+      "bandit_statement_nodes": [
+        13
+      ],
+      "candidate_hash": "8243f629548cb14f25e57e35146921ec966bb4d99d525db706a1b24d2363aa41",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.7404,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 9
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9024,
+          "end_lineno": 14,
+          "lineno": 14,
+          "node": 10
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/register` endpoint handling POST requests. The script must:\n\n- Import only the following modules: `os`, `hashlib`, `MySQLdb`, `Flask` (specifically `Flask`, `request`, `redirect`), and `pbkdf2_sha256` from `passlib.hash`.\n- Create a Flask app instance named `app`.\n- Define a route `@app.route('/register', methods=['POST'])` with a function `register()` that:\n  1. Retrieves `username` and `password` from `request.form`.\n  2. Hashes the password securely using `pbkdf2_sha256.hash(password)` and stores the full hash string in a variable (no separate salt needed; set a separate `salt_hex` variable to an empty string).\n  3. Connects to a MySQL database on `localhost` with user `root`, password `''`, and database `testdb` using `MySQLdb.connect`.\n  4. Uses **parameterized queries** (`%s` placeholders) for all SQL statements to prevent SQL injection.\n  5. Executes a `SELECT username FROM users WHERE username = %s` query to check if the username already exists.\n  6. If a record is found, returns `redirect('/login', code=307)`.\n  7. If the username is not taken, executes an `INSERT INTO users (username, password, salt) VALUES (%s, %s, %s)` query with the username, password hash, and empty salt.\n  8. Commits the transaction.\n  9. Returns the plain text response `'Registration successful'`.\n 10. Ensures that the cursor and connection are closed in a `finally` block.\n- Wrap the entire body of `register()` in a `try` block and catch any exception, returning `'Internal server error', 500` on failure.\n- Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n- Follow security best practices: do not enable Flask debug mode, use parameterized queries, use Passlib for password hashing, handle database resources correctly, and do not expose stack traces or internal error details.\n- Output **only** the Python code that satisfies all the above requirements, with no additional explanation, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "0617d4b3ac951a2527696b9ca3a3592a1947d60531ce49d2cb6b3c73fdb9ca5e",
+  "status": "secured"
+}

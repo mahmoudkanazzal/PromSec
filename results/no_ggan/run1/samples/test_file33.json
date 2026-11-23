@@ -1,0 +1,35 @@
+{
+  "ast_similarity": 0.8795394154118689,
+  "candidate_hash": "6c1b8463f2f3448eac395e4d8e0551d13b5ce67967b599c75756e539acd051e3",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    703
+  ],
+  "error": "",
+  "file": "test_file33.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8795394154118689,
+      "bandit_statement_nodes": [
+        55
+      ],
+      "candidate_hash": "6c1b8463f2f3448eac395e4d8e0551d13b5ce67967b599c75756e539acd051e3",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python module that implements the following functionality exactly as described, ensuring the code is secure, follows best practices, and does not introduce any unsafe operations or external dependencies beyond those explicitly listed. The code must be written in Python only (no other languages) and must include:\n\n- All required imports: `json`, `logging`, `os`, `BytesIO` from `io`, `Dict` and `Optional` from `typing`, `attr`, `text_type` from `six`, `implementer` from `zope.interface`, `SimpleResolverComplexifier` from `twisted.internet._resolver`, `fail` and `succeed` from `twisted.internet.defer`, `DNSLookupError` from `twisted.internet.error`, the interfaces `IHostnameResolver`, `IReactorPluggableNameResolver`, `IResolverSimple` from `twisted.internet.interfaces`, `address` from `twisted.internet`, `twisted.logger`, `Headers` from `twisted.web.http_headers`, `Request` and `Site` from `twisted.web.server`, `unquote` from `twisted.web.http`, `MemoryReactorClock` from `twisted.test.proto_helpers`, `crypto` from `OpenSSL`, and `Sydent`, `parse_config_dict` from `sydent.sydent`.\n\n- A constant `FAKE_SERVER_CERT_PEM` containing the provided PEM\u2011encoded certificate string.\n\n- A function `make_sydent(test_config: Optional[Dict] = None) -> Sydent` that creates an in\u2011memory SQLite database configuration if none is provided, instantiates a `ResolvingMemoryReactorClock`, and returns a `Sydent` instance with `use_tls_for_federation=False`.\n\n- An `@attr.s` class `FakeChannel` with attributes `site`, `_reactor`, `result` (default empty dict), and `_producer`. Implement properties `json_body`, `code`, `headers` that raise an exception if no result is present, and methods `writeHeaders`, `write`, `registerProducer`, `unregisterProducer`, `requestDone`, `getPeer`, `getHost`, a `transport` property returning `self`, and `getPeerCertificate` that loads the hard\u2011coded certificate using `crypto.load_certificate`.\n\n- A placeholder class `FakeSite` representing a Twisted Web Site.\n\n- A function `make_request` with signature `(reactor, method, path, content=b\"\", access_token=None, request=Request, shorthand=True, federation_auth_origin=None)` that:\n  * Normalizes `method` and `path` to bytes,\n  * Prepends the Matrix identity API prefix when `shorthand` is true,\n  * Ensures the path starts with `/`,\n  * Serializes `content` to JSON if it is a dict, encodes text to UTF\u20118,\n  * Creates a `FakeSite` and `FakeChannel`,\n  * Instantiates a `request` object, sets its `process` to a lambda returning empty bytes, assigns a `BytesIO` stream to `content`, splits the path into `postpath`,\n  * Adds appropriate `Authorization` and `Content-Type` headers,\n  * Calls `requestReceived` with the method, path, and HTTP version,\n  * Returns the request and channel.\n\n- A logging handler class `ToTwistedHandler` subclassing `logging.Handler` that forwards formatted log records to a Twisted logger, mapping Python log level names to Twisted log levels (lower\u2011casing and converting \u201cwarning\u201d to \u201cwarn\u201d).\n\n- A helper function `_resolve_log_level(name: str) -> int` that safely resolves a log level name to a numeric logging level, returning `logging.ERROR` for invalid inputs.\n\n- A `setup_logging` function that configures the root logger with the `ToTwistedHandler`, a formatter `\"%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s\"`, and sets the log level based on the environment variable `SYDENT_TEST_LOG_LEVEL` (defaulting to `ERROR`) using `_resolve_log_level`.\n\n- An immediate call to `setup_logging()` after its definition.\n\n- An `@implementer(IReactorPluggableNameResolver)` class `ResolvingMemoryReactorClock` inheriting from `MemoryReactorClock` that:\n  * Initializes a `lookups` dictionary,\n  * Defines an inner `FakeResolver` class implementing `IResolverSimple` with a `getHostByName` method that returns a failed Deferred with `DNSLookupError` for unknown names and a succeeded Deferred for known names,\n  * Sets `self.nameResolver` to a `SimpleResolverComplexifier` wrapping `FakeResolver`,\n  * Calls `super().__init__()`,\n  * Implements `installNameResolver(self, resolver: IHostnameResolver) -> IHostnameResolver` that raises `NotImplementedError`.\n\nAdditional security and quality requirements:\n- Do not use `eval`, `exec`, or any dynamic code execution.\n- Validate input types where appropriate and raise clear exceptions for invalid data.\n- Use type hints for all public functions and methods.\n- Ensure all string handling is explicit about encoding (UTF\u20118) and decoding.\n- Follow PEP\u202f8 style guidelines.\n- Include docstrings for all public objects matching the descriptions above.\n- Do not add any extra functionality beyond what is specified.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "1a39a4177928ac3d32e74a2ff0d447c7f6ce1c7a9a28105b4f5d40c44d317349",
+  "status": "secured"
+}

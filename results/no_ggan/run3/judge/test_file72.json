@@ -1,0 +1,68 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "c29baf84b84e08f753a043376ee3c5fe536e49ab5d10cf833db384740874ef03",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a 400 Bad Request error.",
+      "Database connection or query errors trigger a redirect without insertion.",
+      "SQL injection is possible via a crafted username because the query is built by string concatenation.",
+      "Binary password data may cause encoding errors when inserted into MySQL.",
+      "If the random salt generation fails (unlikely), hashing will raise an exception.",
+      "The second definition of `register` overwrites the first; only the latter logic is executed."
+    ],
+    "entrypoints": [],
+    "intent": "Register a new user via an HTTP POST request and store the hashed credentials in a MySQL database.",
+    "invariants": [
+      "A fresh 16\u2011byte random salt is generated for each request.",
+      "Password is stored as SHA\u2011256 digest concatenated with the salt.",
+      "Database connection parameters are fixed (localhost, root, cisco123, mysite).",
+      "The endpoint always redirects to /home, regardless of success or failure."
+    ],
+    "io_behavior": [
+      "Accepts a POST request to /register with form fields 'username' and 'password'.",
+      "Returns an HTTP 302 redirect to /home on all code paths.",
+      "Prints the hashed password and the generated SQL statement to the server's standard output.",
+      "If required form fields are missing, Flask raises a BadRequestKeyError (400 response)."
+    ],
+    "public_api": {
+      "func:register": "()",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the MySQL table `user` (username, password).",
+      "Commits the transaction to the database.",
+      "Writes diagnostic information (hashed password, SQL string) to stdout.",
+      "May create duplicate usernames because no uniqueness check is performed."
+    ],
+    "source_hash": "1d85cc97c3c3687ad4e1f27b1e2cf9944d891a79de7a2dc960b45beaf7549667"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.3,
+    "io_semantics": 0.1,
+    "side_effects": 0.4
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file72.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.1825,
+  "original_hash": "1d85cc97c3c3687ad4e1f27b1e2cf9944d891a79de7a2dc960b45beaf7549667",
+  "rationale": "The program diverges from the contract: missing fields trigger a redirect instead of a 400 error, uses Werkzeug's generate_password_hash rather than a SHA\u2011256+salt scheme, does not generate a random 16\u2011byte salt, employs parameterized queries (preventing the intended SQL injection), and omits the required stdout diagnostics, preserving only a small fraction of the specified behavior.",
+  "schema": 1,
+  "stability_abs_difference": 0.19,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.3,
+    "side_effects": 0.6
+  },
+  "stability_score": 0.3725,
+  "weighted_mean": 0.21,
+  "worst_dimension": 0.1
+}

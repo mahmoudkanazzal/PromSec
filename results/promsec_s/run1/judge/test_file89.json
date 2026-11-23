@@ -1,0 +1,76 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "975adf5da52f0f8d3bf7082e2951b59fc1c8853edd0851ca4aa06c0a150df467",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields cause a server error (e.g., KeyError).",
+      "Registering an already\u2011existing username triggers a redirect back to the registration page.",
+      "Providing an empty password or email is accepted and stored as\u2011is.",
+      "An empty search term returns all users (because the LIKE pattern matches everything).",
+      "Extremely long or malicious input can trigger SQL injection, altering query results or database state."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a simple HTTP API for user registration, authentication, profile updates, deletion, and searching using a MySQL backend.",
+    "invariants": [
+      "Each request opens a MySQL connection, creates a cursor, and closes both before responding.",
+      "All routes accept only the HTTP method declared (POST for mutating actions, GET for search).",
+      "Usernames are treated as case\u2011sensitive identifiers.",
+      "Responses are plain\u2011text strings or HTTP redirects; no JSON is produced.",
+      "No password hashing or validation is performed; passwords are stored verbatim."
+    ],
+    "io_behavior": [
+      "POST /register with username and password redirects to /register if the username exists, otherwise redirects to /login.",
+      "POST /login with username and password returns the plain text \"Login successful\" or \"Invalid credentials\".",
+      "POST /update_profile with username and email returns the plain text \"Profile updated successfully\".",
+      "POST /delete_user with username returns the plain text \"User deleted successfully\".",
+      "GET /search_users?term=... returns a string representation of a list of matching user rows."
+    ],
+    "public_api": {
+      "route:GET /search_users": "",
+      "route:POST /delete_user": "",
+      "route:POST /login": "",
+      "route:POST /register": "",
+      "route:POST /update_profile": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the User table on successful registration.",
+      "Commits updates to the Email column on profile update.",
+      "Deletes a row from the User table on user deletion.",
+      "Performs SELECT queries that may be affected by crafted input (SQL injection).",
+      "Issues HTTP redirects for registration flow."
+    ],
+    "source_hash": "fdcfb580cb033ecb594cc18d05c20a28b63c8fa9fcd5f471a8049ce5015b5728"
+  },
+  "dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.5,
+    "invariants": 1.0,
+    "io_semantics": 0.85,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file89.py",
+  "gated_score": 0.72125,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.72125,
+  "original_hash": "fdcfb580cb033ecb594cc18d05c20a28b63c8fa9fcd5f471a8049ce5015b5728",
+  "rationale": "Most routes and invariants match the contract, but missing form fields do not raise errors, search output format differs, and parameterized queries prevent the expected SQL\u2011injection side effect.",
+  "schema": 1,
+  "stability_abs_difference": 0.08313,
+  "stability_dimensions": {
+    "behavior": 0.75,
+    "edge_cases": 0.4,
+    "invariants": 0.8,
+    "io_semantics": 0.7,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.63812,
+  "weighted_mean": 0.795,
+  "worst_dimension": 0.5
+}

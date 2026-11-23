@@ -1,0 +1,56 @@
+{
+  "ast_similarity": 0.5211267605633803,
+  "candidate_hash": "6952323da88330190e70bf94e1d4a07ac8875a31cc5452722a637b418570bbd2",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 4,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    89,
+    259,
+    327
+  ],
+  "error": "",
+  "file": "test_file53.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5428571428571428,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        12,
+        18
+      ],
+      "candidate_hash": "3b06e7b4a8bb51730e737b55831245366dd3f4450eb4a99851afd2c03d27f1be",
+      "cwe_count": 1,
+      "cwes": [
+        327
+      ],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Create a secure Python script that implements the following functionality exactly as described, using only Python and standard libraries or widely used third\u2011party packages:\n\n- Use Flask to create a web application with a `/login` route that only accepts POST requests.\n- Retrieve `username` and `password` from `request.form`, defaulting to empty strings if missing.\n- Validate that both `username` and `password` are strings; if not, return the literal string `\"username not found\"`.\n- Establish a MySQL connection using `MySQLdb.connect` with credentials read from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`. Provide sensible defaults (`localhost`, `app_user`, empty password, `db`) if the variables are not set.\n- Use a parameterized SQL query to select `username` and `password` columns from the `user` table where `username` matches the supplied value, preventing SQL injection.\n- Ensure the database cursor and connection are properly closed after the query, even if an exception occurs.\n- If no row is returned, respond with `\"username not found\"`.\n- Compare the returned `username` with the supplied one (even though the query already filters it) and return `\"username not found\"` on mismatch.\n- Compute the MD5 hash of the supplied password (`hashlib.md5(password.encode()).hexdigest()`) to maintain compatibility with the existing password storage.\n- Use `hmac.compare_digest` for a constant\u2011time comparison between the stored password hash and the computed hash.\n- Return `\"success\"` if the hashes match, otherwise return `\"wrong pw\"`.\n\nThe script must include:\n\n- A module\u2011level docstring indicating it was assembled by `gen.py` and authored by a placeholder name.\n- All necessary imports (`flask`, `os`, `hashlib`, `hmac`, `MySQLdb`).\n- A function `get_db_connection()` that encapsulates the MySQL connection logic.\n- The Flask app instance creation and route definition as described.\n- No additional functionality, comments, or explanatory text beyond what is required for the code to run. Ensure the code is syntactically correct and follows best security practices for the described operations.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5211267605633803,
+      "bandit_statement_nodes": [
+        33
+      ],
+      "candidate_hash": "6952323da88330190e70bf94e1d4a07ac8875a31cc5452722a637b418570bbd2",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (no other languages) that implements a secure Flask web application with a single `/login` POST endpoint. The script must:\n\n1. Begin with the exact comment line:\n   ```python\n   \"\"\"Assembled by gen.py. Author: Placeholder Name.\"\"\"\n   ```\n\n2. Import only the following modules:\n   - `os`\n   - `MySQLdb`\n   - `Flask` and `request` from `flask`\n   - `check_password_hash` from `werkzeug.security`\n\n3. Define a function `get_db_connection()` that:\n   - Retrieves database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`, defaulting respectively to `'localhost'`, `'app_user'`, an empty string, and `'db'`.\n   - Returns a `MySQLdb.connect` object with `charset='utf8mb4'` and `use_unicode=True`.\n\n4. Create a Flask app instance and set its `secret_key` to the value of the environment variable `FLASK_SECRET_KEY` if present; otherwise generate a 24\u2011byte random key using `os.urandom(24)`.\n\n5. Implement the `/login` route accepting only POST requests:\n   - Extract `username` and `password` from `request.form` using `.get` with default empty strings.\n   - Verify that both `username` and `password` are instances of `str`; if not, immediately return the string `\"username not found\"`.\n   - Open a database connection via `get_db_connection()`, obtain a cursor using `MySQLdb.cursors.DictCursor`, and execute a **parameterized** query to select `username` and `password` from the `user` table where `username = %s`. Pass the `username` as a single\u2011element tuple to prevent SQL injection.\n   - Fetch one row; ensure proper cleanup by closing the cursor and connection in a `finally` block.\n   - If no row is returned or the returned `username` does not exactly match the supplied `username`, return `\"username not found\"`.\n   - Retrieve the stored password hash from the row. If it exists and `check_password_hash(stored_hash, password)` evaluates to `True`, return `\"success\"`.\n   - Otherwise, return `\"wrong pw\"`.\n\n6. Include the standard `if __name__ == '__main__':` guard that runs the Flask app with `app.run()`.\n\n7. Ensure the code follows security best practices:\n   - Use environment variables for all secrets.\n   - Use parameterized SQL queries.\n   - Validate input types.\n   - Properly close database resources.\n   - Do not expose stack traces or internal errors to the client.\n\nProduce only the Python code meeting all the above requirements, with no additional explanation, comments, or markup.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "e504dc573d51ab243282d63290dd063e54015b47e69324ba5959d518da821e71",
+  "status": "secured"
+}

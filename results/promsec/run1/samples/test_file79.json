@@ -1,0 +1,189 @@
+{
+  "ast_similarity": 0.4528301886792453,
+  "candidate_hash": "5b18a930615eeb9354b1fcd8541715c067c3427d252f35363ca522a27e4d8cb0",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    89,
+    259
+  ],
+  "error": "",
+  "file": "test_file79.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5966850828729282,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        12,
+        26
+      ],
+      "candidate_hash": "8d81a036734b271c2f7382e84a45489ba766bbcd7a572b74d71f9b4a775742b7",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1809,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1587,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 3
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1566,
+          "end_lineno": 27,
+          "lineno": 27,
+          "node": 10
+        },
+        {
+          "ast_type": "AugAssign",
+          "change": 0.2401,
+          "end_lineno": 41,
+          "lineno": 41,
+          "node": 21
+        },
+        {
+          "ast_type": "AugAssign",
+          "change": 0.2275,
+          "end_lineno": 43,
+          "lineno": 43,
+          "node": 23
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python script that implements the following functionality:\n\n- Use Flask to create a web application with a POST route at `/buy_order`.\n- In the route handler, retrieve `stock_name` and `stock_quantity` from `request.form` and the current `username` from the Flask `session`.\n- Connect to a MySQL database using `MySQLdb`. Obtain the connection parameters (`host`, `user`, `passwd`, `db`) from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`, providing sensible defaults (`localhost`, `root`, `root`, `db`).\n- Insert a new record into the table `db_table.order_table` with columns `username`, `stock_name`, and `stock_quantity`. Use a **parameterized query** to prevent SQL injection.\n- Properly handle any database errors: roll back the transaction on failure, close the connection, and return a generic error message (`'Error: Something went wrong. Please try again later.'`).\n- After a successful insert, construct an absolute path to an external script named `algorithm.py` located one directory level above the current file.\n- Build a command list to execute the script with `subprocess.run` **without using a shell**. The command should be: `python3 <algorithm_path> buy <username> <stock_name> <stock_quantity>`.\n- Execute the command, capture both stdout and stderr, and return the captured standard output as the HTTP response.\n- Ensure the code follows security best practices: validate and sanitize input types, avoid shell injection, close all resources, and handle exceptions gracefully.\n- Include all necessary imports (`flask`, `os`, `subprocess`, `MySQLdb`) and set a secret key for Flask sessions.\n- The entire code must be written in Python only; do not include any other programming languages or explanatory text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4114285714285714,
+      "bandit_statement_nodes": [
+        1,
+        36
+      ],
+      "candidate_hash": "2cd9b7c0745a86cca238c37fc700e51496814c0e5d3989ed7c461c026cbc055c",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1676,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2507,
+          "end_lineno": 42,
+          "lineno": 42,
+          "node": 36
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1046,
+          "end_lineno": 49,
+          "lineno": 49,
+          "node": 41
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, secure Python 3 program that implements the following functionality:\n\n- Use only Python standard libraries and the third\u2011party packages `Flask`, `MySQLdb`, and `importlib.util`.\n- Import `os`, `MySQLdb`, `importlib.util`, `re`, and from `flask` import `Flask`, `request`, `session`, `make_response`.\n- Create a Flask app instance and set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`, defaulting to the string `\"change_me\"` if the variable is not set.\n- Define two compiled regular expressions:\n  - `USERNAME_REGEX` that matches only strings consisting of letters, digits, and underscores (`^[A-Za-z0-9_]+$`).\n  - `STOCK_NAME_REGEX` that matches only strings consisting of letters, digits, and underscores (`^[A-Za-z0-9_]+$`).\n- Implement a function `load_algorithm_module()` that:\n  - Determines the absolute path of the directory containing the current file.\n  - Constructs the absolute path to a file named `algorithm.py` located one directory level above the current file.\n  - Uses `importlib.util.spec_from_file_location` and `importlib.util.module_from_spec` to load the module named `\"algorithm\"` from that path.\n  - Returns the loaded module if successful, otherwise returns `None`.\n- Call `load_algorithm_module()` once at import time and store the result in a variable named `algorithm_module`.\n- Define a Flask route `@app.route('/buy_order', methods=['POST'])` with a view function `buy_order()` that:\n  - Checks that the key `'username'` exists in the Flask session; if not, returns a 401 response with the body `\"Error: Unauthorized\"`.\n  - Retrieves `username` from the session and validates it against `USERNAME_REGEX`; if validation fails, returns a 400 response with the body `\"Error: Invalid username\"`.\n  - Retrieves `stock_name` and `stock_quantity` from `request.form`, stripping surrounding whitespace.\n  - Validates that `stock_name` is non\u2011empty and matches `STOCK_NAME_REGEX`; if not, returns a 400 response with the body `\"Error: Invalid stock name\"`.\n  - Validates that `stock_quantity` consists only of digits; if not, returns a 400 response with the body `\"Error: Invalid stock quantity\"`.\n  - Converts `stock_quantity` to an integer.\n  - Reads database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"`.\n  - Establishes a connection to a MySQL database using `MySQLdb.connect` with the retrieved parameters.\n  - Executes a parameterized SQL statement to insert a new row into `order_table` with columns `username`, `stock_name`, and `stock_quantity`. Use placeholders (`%s`) and pass the validated values as a tuple to `cursor.execute`.\n  - Commits the transaction, closes the cursor, and ensures the connection is closed in a `finally` block.\n  - If any `MySQLdb.Error` occurs, rolls back the transaction (if a connection exists) and returns a 500 response with the body `\"Error: Something went wrong. Please try again later.\"`.\n  - After a successful database insert, determines the output to return:\n    - If `algorithm_module` is not `None` and has an attribute `main` that is callable, call `algorithm_module.main('buy', username, stock_name, str(stock_quantity))` and store its return value in a variable `output`. If the call raises any exception, set `output` to an empty string.\n    - If the module cannot be used, fall back to executing the external script `algorithm.py` via `subprocess.run`. Construct the absolute path to `algorithm.py` (same location used in `load_algorithm_module`). Build the command list `['python3', algorithm_path, 'buy', username, stock_name, str(stock_quantity)]`. Run the command with `capture_output=True`, `text=True`, and `check=False`. Store `result.stdout` in `output`. If the subprocess raises any exception, set `output` to an empty string.\n  - Return a 200 response with the body set to `output`.\n- Include a `if __name__ == '__main__':` block that starts the Flask development server bound to `127.0.0.1` on port `5000` with `debug=False`.\n- Ensure the entire program is written in Python only, uses parameterized queries to prevent SQL injection, validates all external inputs against the defined whitelists, handles all exceptions gracefully, and does not execute arbitrary code beyond the controlled loading or subprocess execution of `algorithm.py`. Do not include any code in languages other than Python.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.43724696356275305,
+      "bandit_statement_nodes": [
+        4,
+        57
+      ],
+      "candidate_hash": "19768045c86eaa29f8fd0d50da670aa4db2f108d05a00d262bfaade0d3279c4c",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2781,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1186,
+          "end_lineno": 11,
+          "lineno": 11,
+          "node": 8
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1133,
+          "end_lineno": 12,
+          "lineno": 12,
+          "node": 9
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1357,
+          "end_lineno": 70,
+          "lineno": 70,
+          "node": 57
+        }
+      ],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program that implements a Flask web application with a single POST endpoint `/buy_order`. The program must:\n\n- Import only the following modules: `os`, `re`, `MySQLdb`, `importlib.util`, and from `flask` import `Flask`, `request`, `session`, `make_response`.\n- Create a Flask app with a secret key taken from the environment variable `FLASK_SECRET_KEY`, defaulting to `'change_me'`.\n- Define two compiled regular expressions `USERNAME_REGEX` and `STOCK_NAME_REGEX` that only allow ASCII letters, digits and underscores.\n- Determine the absolute path to a sibling directory's file named `algorithm.py` located one level up from the script's directory, using `os.path` functions.\n- Implement a function `load_algorithm_module()` that safely loads the module from that path using `importlib.util.spec_from_file_location`, executes it, and returns the module or `None` on any exception.\n- Store the loaded module in a variable `algorithm_module`.\n- Define the `/buy_order` route accepting only POST requests. Inside:\n  * Verify that `'username'` exists in Flask session; if not, return a 401 response with text `Error: Unauthorized`.\n  * Validate the session username against `USERNAME_REGEX`; on failure return 400 with `Error: Invalid username`.\n  * Retrieve `stock_name` and `stock_quantity` from `request.form`, strip whitespace, validate `stock_name` with `STOCK_NAME_REGEX` and ensure `stock_quantity` consists only of digits; on failure return 400 with appropriate error messages.\n  * Convert `stock_quantity` to an integer.\n  * Connect to a MySQL database using `MySQLdb.connect` with host, user, password, and database name taken from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`, defaulting to `'localhost'`, `'root'`, `'root'`, `'db'` respectively, and `charset='utf8mb4'`.\n  * Use a cursor to execute a parameterised INSERT into table `order_table` (`username`, `stock_name`, `stock_quantity`) using placeholders (`%s`) to prevent SQL injection.\n  * Commit the transaction; on any `MySQLdb.Error` rollback and return a 500 response with `Error: Something went wrong. Please try again later.`.\n  * Ensure cursor and connection are closed in a `finally` block.\n  * If `algorithm_module` is loaded and has a callable attribute `main`, call `algorithm_module.main('buy', username, stock_name, str(stock_quantity_int))` inside a try/except; on exception set `output` to an empty string. If the module or function is missing, set `output` to an empty string.\n  * Return a 200 response with the `output` string.\n- Include the standard Flask application entry point that runs the app on host `127.0.0.1`, port `5000`, with debug disabled.\n- Ensure the code follows security best practices: use environment variables for secrets, validate all inputs, use parameterised queries, handle exceptions without exposing stack traces, and avoid executing arbitrary code.\n- The entire output must be valid Python code only, with no additional explanation, comments, or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4528301886792453,
+      "bandit_statement_nodes": [
+        13
+      ],
+      "candidate_hash": "5b18a930615eeb9354b1fcd8541715c067c3427d252f35363ca522a27e4d8cb0",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1082,
+          "end_lineno": 10,
+          "lineno": 10,
+          "node": 7
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1131,
+          "end_lineno": 11,
+          "lineno": 11,
+          "node": 8
+        }
+      ],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that implements a Flask web service with a `/buy_order` POST endpoint. The program must:\n\n- Import only the following modules: `os`, `re`, `MySQLdb`, `importlib.util`, and from `flask` import `Flask`, `request`, `session`, `make_response`.\n- Create a Flask app and set `app.secret_key` from the environment variable `FLASK_SECRET_KEY`, defaulting to `'change_me'`.\n- Define `USERNAME_REGEX` and `STOCK_NAME_REGEX` as compiled regular expressions that allow only alphanumeric characters (`A\u2011Z`, `a\u2011z`, `0\u20119`) with a length between 1 and 30 characters.\n- Determine the absolute path of the current file, its parent directory, and construct `algorithm_path` as `<parent_directory>/algorithm.py`.\n- Implement a function `load_algorithm_module()` that safely loads the module named `'algorithm'` from `algorithm_path` using `importlib.util`. The function should return the loaded module or `None` on any exception.\n- Load the module at startup into a variable `algorithm_module`.\n- Define the `/buy_order` route handling POST requests with the following logic:\n  1. Verify that `'username'` exists in the Flask `session`; if not, return a 401 response with the body `Error: Unauthorized`.\n  2. Validate the `username` against `USERNAME_REGEX`; on failure return a 400 response with the body `Error: Invalid username`.\n  3. Retrieve `stock_name` and `stock_quantity` from `request.form`, stripping leading and trailing whitespace.\n  4. Validate `stock_name` against `STOCK_NAME_REGEX`; on failure return a 400 response with the body `Error: Invalid stock name`.\n  5. Ensure `stock_quantity` consists only of digits; on failure return a 400 response with the body `Error: Invalid stock quantity`.\n  6. Convert `stock_quantity` to an integer `stock_quantity_int`.\n  7. Establish a MySQL connection using `MySQLdb.connect` with parameters:\n     - `host` from environment variable `DB_HOST` (default `'localhost'`)\n     - `user` from `DB_USER` (default `'root'`)\n     - `password` from `DB_PASS` (default `'root'`)\n     - `database` from `DB_NAME` (default `'db'`)\n     - `charset='utf8mb4'`\n  8. Use a cursor to execute a parameterized `INSERT` statement into `order_table` with columns `(username, stock_name, stock_quantity)`. Commit the transaction on success.\n  9. On any `MySQLdb.Error`, roll back the transaction, close any open resources, and return a 500 response with the body `Error: Something went wrong. Please try again later.`.\n 10. Ensure the cursor and connection are closed in a `finally` block regardless of success or failure.\n 11. If `algorithm_module` is loaded, has an attribute `main`, and `main` is callable, invoke `algorithm_module.main('buy', username, stock_name, str(stock_quantity_int))`. Capture its return value; if the return is `None` or an exception occurs, treat the output as an empty string.\n 12. Return the algorithm output (or an empty string) with a 200 response.\n\n- Include the standard `if __name__ == '__main__':` block to run the Flask app on host `127.0.0.1`, port `5000`, with `debug=False`.\n- Ensure all inputs are validated, use parameterized queries to prevent SQL injection, handle exceptions without exposing stack traces, and do not import any additional libraries.\n- The code must be valid Python 3, contain no explanatory comments, and be ready to execute as provided.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 4,
+  "schema": 1,
+  "selected_iteration": 4,
+  "source_hash": "af64aaef30e33624fe62fe243029377344aebc3fb5040c046582ee15c2712898",
+  "status": "secured"
+}

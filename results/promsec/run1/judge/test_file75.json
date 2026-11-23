@@ -1,0 +1,77 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "0af82014c5cbd4718f574e5c0a73bba9b795832bc5276bec979105c2586b5094",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields result in a server error or unexpected response.",
+      "Attempting to register with an existing username returns \"Username already exists\".",
+      "Login with incorrect password or non\u2011existent username returns \"Invalid credentials\".",
+      "Creating a project for a non\u2011existent user returns \"User not found\".",
+      "Adding a task to a non\u2011existent project returns \"Project not found\".",
+      "SQL injection is possible due to string concatenation in queries."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple web API for user registration, authentication, project creation, task management, and task viewing in a project management system.",
+    "invariants": [
+      "Usernames must be unique; duplicate registration attempts are rejected.",
+      "Passwords are stored only as bcrypt hashes, never in plain text.",
+      "A project can be created only for an existing username.",
+      "A task can be added only to an existing project.",
+      "All database connections are closed after each request."
+    ],
+    "io_behavior": [
+      "POST /register with form fields username, password, confirm_password returns a success or error message.",
+      "POST /login with form fields username, password redirects to /dashboard on success or returns \"Invalid credentials\".",
+      "POST /create_project with form fields project_name, description, username creates a project record and returns a status message.",
+      "POST /add_task with form fields project_name, task_name, task_description adds a task to an existing project and returns a status message.",
+      "GET /view_tasks?project_name=... returns a JSON array of tasks for the specified project."
+    ],
+    "public_api": {
+      "route:GET /view_tasks": "",
+      "route:POST /add_task": "",
+      "route:POST /create_project": "",
+      "route:POST /login": "",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Inserts new rows into the users table on successful registration.",
+      "Inserts new rows into the projects table on successful project creation.",
+      "Inserts new rows into the tasks table on successful task addition.",
+      "Commits or rolls back database transactions based on operation outcome.",
+      "Issues an HTTP redirect to /dashboard after a successful login."
+    ],
+    "source_hash": "e58b8e58a0fadc25c03d3f590849648226aa63c60cc17c1a6968d263d555fae4"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 0.95
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file75.py",
+  "gated_score": 0.59937,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.59937,
+  "original_hash": "e58b8e58a0fadc25c03d3f590849648226aa63c60cc17c1a6968d263d555fae4",
+  "rationale": "Core functionality and most invariants are met, but edge\u2011case messages differ from the contract and the expected SQL\u2011injection vulnerability is absent, reducing overall behavior and edge\u2011case scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.18313,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.4,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.7825,
+  "weighted_mean": 0.7325,
+  "worst_dimension": 0.2
+}

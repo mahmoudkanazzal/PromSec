@@ -1,0 +1,69 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "4c35114513df722373f6b7bb3a9a744a2f0f1c87eb8abe564cf5a073b4fdad74",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields in the form cause a KeyError before DB access.",
+      "If the username does not exist, the query returns no rows and the comparison defaults to false.",
+      "An empty password stored in the database is treated as a valid credential only if the supplied password is also empty.",
+      "SQL injection is possible because the username is interpolated directly into the query string.",
+      "Multiple rows for the same username result in the last fetched password being used for comparison.",
+      "Database connection failures or query errors cause the function to return \"false\"."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by checking the supplied username and password against stored credentials and indicate success or failure.",
+    "invariants": [
+      "The response body is always either the string \"true\" or \"false\".",
+      "A database connection is closed in the finally block regardless of outcome.",
+      "Only POST method is accepted; other methods are not routed to this function.",
+      "The function does not modify any database records."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to the /login endpoint with form fields 'username' and 'password'.",
+      "Queries a MySQL database for the password associated with the given username.",
+      "Compares the retrieved password with the supplied password.",
+      "Returns the plain\u2011text string \"true\" if they match, otherwise returns \"false\".",
+      "If a database error occurs, returns \"false\".",
+      "Closes the database connection before completing the request."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to a local MySQL server.",
+      "Executes a SELECT statement against the 'users' table.",
+      "Writes error information to the server's standard output on DB failures.",
+      "Consumes request data from the Flask request object."
+    ],
+    "source_hash": "55839422c7e82b0affceca53de499b8c424c0256b63e5d5cec1b9eb6abce93b4"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 1.0,
+    "io_semantics": 0.6,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file57.py",
+  "gated_score": 0.455,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.455,
+  "original_hash": "55839422c7e82b0affceca53de499b8c424c0256b63e5d5cec1b9eb6abce93b4",
+  "rationale": "The program returns true/false via POST and closes DB connections, preserving invariants and side\u2011effects, but it deviates from the contract on key edge cases (no KeyError, uses parameterized queries, bcrypt hashing, early validation) and changes core behavior (secure password handling, prevents SQL injection).",
+  "schema": 1,
+  "stability_abs_difference": 0.13525,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.33,
+    "invariants": 1.0,
+    "io_semantics": 0.6,
+    "side_effects": 0.75
+  },
+  "stability_score": 0.59025,
+  "weighted_mean": 0.54,
+  "worst_dimension": 0.2
+}

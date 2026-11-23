@@ -1,0 +1,73 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "7d38700526111a22fded534f44b46c38d4c20083f86bb646c0d1905726027052",
+  "compile_ok": true,
+  "confidence": 0.8,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty stock_name, stock_quantity, or session username raises a KeyError.",
+      "Database connection or query failure triggers a rollback and returns an error string.",
+      "Unsanitized inputs allow SQL injection or command injection via the constructed shell command.",
+      "algorithm.py crashes or produces no output, resulting in an empty response string.",
+      "Extremely long input values may exceed command\u2011line length limits or cause buffer issues.",
+      "If the subprocess cannot be started, the request may hang or return no output."
+    ],
+    "entrypoints": [],
+    "intent": "Handle a buy order request: store the order in a MySQL database, invoke an external algorithm script with the order details, and return the script's output to the client.",
+    "invariants": [
+      "A database connection is always closed before the request ends.",
+      "The response is always a string (either script output or an error message).",
+      "The SQL INSERT statement is always executed (or attempted) with the supplied values.",
+      "The subprocess is always launched with shell=True and its stdout is captured.",
+      "Either db.commit() or db.rollback() is called for each request.",
+      "The session must contain a username for the request to proceed."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST to /buy_order with form fields stock_name and stock_quantity.",
+      "Reads the current username from the session.",
+      "Returns the stdout of algorithm.py as the HTTP response body.",
+      "Returns a plain\u2011text error message if the database insert fails.",
+      "Uses a MySQL database to persist the order record.",
+      "Executes a shell command built from the request data."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Inserts a new row into db_table.order_table.",
+      "Commits the transaction on success or rolls back on failure.",
+      "Opens and closes a MySQL database connection.",
+      "Spawns a subprocess that runs algorithm.py.",
+      "Potentially modifies external state via the algorithm script.",
+      "Closes the subprocess pipe after reading its output."
+    ],
+    "source_hash": "af64aaef30e33624fe62fe243029377344aebc3fb5040c046582ee15c2712898"
+  },
+  "dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.3,
+    "invariants": 0.8,
+    "io_semantics": 0.6,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file79.py",
+  "gated_score": 0.57375,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.57375,
+  "original_hash": "af64aaef30e33624fe62fe243029377344aebc3fb5040c046582ee15c2712898",
+  "rationale": "Main functionality is present, but it diverges from the contract on several edge cases (no KeyError, prevents injection, handles subprocess failures differently) and on the invariant requiring shell=True, reducing overall preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.06475,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.22,
+    "invariants": 0.85,
+    "io_semantics": 0.8,
+    "side_effects": 0.95
+  },
+  "stability_score": 0.6385,
+  "weighted_mean": 0.665,
+  "worst_dimension": 0.3
+}

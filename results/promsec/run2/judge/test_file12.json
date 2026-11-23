@@ -1,0 +1,82 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "2183d04fb5bc9bac2d34ecad51d44e13b8a2b3dd252c5661fc343e18e3936c4e",
+  "compile_ok": true,
+  "confidence": 0.96,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payload in /inventory/add returns 400.",
+      "Empty or missing 'item_id'/'item_name' in add request returns 400.",
+      "Missing query parameters (e.g., process, parameter, item_id) cause 400 errors.",
+      "Providing a wrong admin password to any admin endpoint yields 401.",
+      "Empty 'new_password' or 'config' fields trigger 400 errors.",
+      "If the external shell script fails, the endpoint still returns a success JSON."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a RESTful API for managing inventory items, controlling processes, handling admin authentication, and retrieving user or process information.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" field.",
+      "Required parameters missing result in HTTP 400 with an error message.",
+      "Incorrect admin password results in HTTP 401.",
+      "MASTER_PASSWORD must match the stored value for privileged actions.",
+      "The API does not persist any data beyond the runtime of the process."
+    ],
+    "io_behavior": [
+      "POST /inventory/add \u2013 accepts YAML body, returns JSON with item_id and item_name.",
+      "GET /process/start \u2013 reads 'process' and 'parameter' query strings, runs a shell script, returns JSON status.",
+      "POST /admin/login \u2013 reads form field 'password', returns JSON indicating success or 401 failure.",
+      "GET /inventory/details \u2013 requires 'item_id' query, returns JSON with static item details.",
+      "POST /admin/update_password \u2013 requires current password and new_password, updates in\u2011memory password, returns JSON status.",
+      "GET /data/backup \u2013 optional 'format' query, runs backup script, returns JSON status."
+    ],
+    "public_api": {
+      "route:GET /data/backup": "",
+      "route:GET /inventory/details": "",
+      "route:GET /process/logs": "",
+      "route:GET /process/start": "",
+      "route:GET /process/status": "",
+      "route:GET /user/info": "",
+      "route:POST /admin/configure": "",
+      "route:POST /admin/login": "",
+      "route:POST /admin/update_password": "",
+      "route:POST /inventory/add": "",
+      "route:POST /inventory/delete": ""
+    },
+    "side_effects": [
+      "Executes external commands via os.system (start_process.sh and backup_inventory_data.py).",
+      "Modifies the in\u2011memory MASTER_PASSWORD variable.",
+      "No persistent file or database changes are made.",
+      "Flask server listens for HTTP requests on the default host/port."
+    ],
+    "source_hash": "ae8d3d87484dcc4668d5093204765ae0ad7d2c7b7bf7aec8510f1c6dab934157"
+  },
+  "dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 1.0,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file12.py",
+  "gated_score": 1.0,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 1.0,
+  "original_hash": "ae8d3d87484dcc4668d5093204765ae0ad7d2c7b7bf7aec8510f1c6dab934157",
+  "rationale": "The program implements all required routes, returns JSON with a status field, handles all specified error conditions, executes external scripts without affecting success responses, updates the in\u2011memory password, and matches the contract\u2019s I/O and side\u2011effect specifications.",
+  "schema": 1,
+  "stability_abs_difference": 0.0,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 1.0,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 1.0,
+  "weighted_mean": 1.0,
+  "worst_dimension": 1.0
+}

@@ -1,0 +1,66 @@
+{
+  "ast_similarity": 0.8879310344827587,
+  "candidate_hash": "c913670fa28d265e3fdc0a570b775d83ba67c846537851c8385f8b6118b97825",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file0.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9155555555555556,
+      "bandit_statement_nodes": [
+        12,
+        18
+      ],
+      "candidate_hash": "7304a1a46979dfe87b296b0a0c857b8848464d892ca1ca8d82ea575354eb5eef",
+      "cwe_count": 1,
+      "cwes": [
+        259
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1485,
+          "end_lineno": 22,
+          "lineno": 22,
+          "node": 12
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1342,
+          "end_lineno": 31,
+          "lineno": 31,
+          "node": 18
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/register` POST endpoint. The script must:\n\n- Import `Flask`, `request`, `redirect` from `flask`; import `MySQLdb`; import `hashlib`; import `os`.\n- Create a Flask app instance.\n- Define a route `/register` that accepts only POST requests.\n- Retrieve `username` and `password` from `request.form`.\n- Generate a 16\u2011byte cryptographically secure random salt using `os.urandom`.\n- Compute a SHA\u2011256 hash of the concatenation of the salt and the UTF\u20118 encoded password, and store the hex digest.\n- Connect to a MySQL database on `localhost` with user `root`, empty password, database `testdb` using `MySQLdb`.\n- Use a cursor and execute a **parameterized** `SELECT` query to check if the username already exists.\n- If the username exists, close the database connection and return a 307 redirect to `/login`.\n- If the username does not exist, execute a **parameterized** `INSERT` query to store `username`, the hashed password, and the salt (as a hex string) into the `users` table, commit, close the connection, and return the plain text message `Registration successful`.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app with `debug=False`.\n- Ensure all database interactions use parameterized queries to prevent SQL injection.\n- Ensure the code runs under Python 3 and contains no syntax errors.\n- Do not include any additional functionality, comments, or explanations. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.8879310344827587,
+      "bandit_statement_nodes": [
+        14
+      ],
+      "candidate_hash": "c913670fa28d265e3fdc0a570b775d83ba67c846537851c8385f8b6118b97825",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/register` route handling only POST requests. The script must:\n\n- Import only the following modules: `Flask`, `request`, `redirect` from `flask`; `MySQLdb`; `hashlib`; `os`.\n- Create a Flask app instance.\n- Define a function `register()` mapped to `/register` that:\n  1. Retrieves `username` and `password` from `request.form` using `get`.\n  2. Returns a 400 response with the text \u201cMissing username or password\u201d if either value is missing.\n  3. Generates a 16\u2011byte cryptographically secure random salt with `os.urandom`.\n  4. Computes a SHA\u2011256 hash of the concatenation of the salt and the UTF\u20118 encoded password, storing the hexadecimal digest as `password_hash`.\n  5. Connects to a MySQL database using `MySQLdb.connect` with parameters: `host='localhost'`, `user='root'`, `passwd=''`, `db='testdb'`.\n  6. Uses a cursor to execute a parameterized SELECT query (`SELECT 1 FROM users WHERE username=%s`) to check if the username already exists.\n  7. If the username exists, closes the cursor and connection and returns a 307 redirect to `/login`.\n  8. If the username does not exist, executes a parameterized INSERT query to add the new user with columns `username`, `password_hash`, and `salt` (store the salt as a hex string using `salt.hex()`).\n  9. Commits the transaction, closes the cursor and connection, and returns a 200 response with the text \u201cRegistration successful\u201d.\n- Ensure the Flask app runs only when the script is executed directly, using `app.run(debug=False)`.\n- Do not include any comments, explanatory text, or code in languages other than Python. The output must be only the Python code fulfilling the above requirements.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "0617d4b3ac951a2527696b9ca3a3592a1947d60531ce49d2cb6b3c73fdb9ca5e",
+  "status": "secured"
+}

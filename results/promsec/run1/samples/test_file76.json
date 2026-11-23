@@ -1,0 +1,67 @@
+{
+  "ast_similarity": 0.754,
+  "candidate_hash": "2b12aa328d60a54feee85fad7aea2d72838e8669d6fedda42189cb990519a483",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file76.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.754,
+      "bandit_statement_nodes": [
+        16,
+        19,
+        23,
+        25
+      ],
+      "candidate_hash": "2b12aa328d60a54feee85fad7aea2d72838e8669d6fedda42189cb990519a483",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1433,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1157,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 3
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1792,
+          "end_lineno": 35,
+          "lineno": 35,
+          "node": 19
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2161,
+          "end_lineno": 40,
+          "lineno": 40,
+          "node": 23
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, secure Python script (Python\u202f3) that implements the following functionality using only the specified libraries: `os`, `random`, `string`, `flask`, `bcrypt`, and `mysql.connector`.\n\n**Requirements**\n1. Create a Flask app instance.\n2. Define a route `@app.route('/register', methods=['POST'])` with a function `register()` that:\n   - Retrieves the fields `username`, `password`, `name`, `cweid`, and `email` from `request.form`.\n   - Validates that each field is present, non\u2011empty, and that `username` and `email` conform to reasonable length limits (e.g., max 150 characters) and character restrictions (e.g., alphanumeric for username). Return an appropriate error response if validation fails.\n   - Hashes the password using `bcrypt.hashpw` with a generated salt (`bcrypt.gensalt()`). Store the hash as a UTF\u20118 string.\n   - Connects to a MySQL database using credentials taken securely from environment variables `DATABASE_URL`, `DATABASE_USER`, `DATABASE_PASSWORD`, and `DATABASE_NAME`. Use `os.getenv` with explicit error handling if any variable is missing.\n   - Uses a context manager (`with` statement) for the database connection and cursor to ensure proper cleanup.\n   - Executes a **parameterized** SELECT query to check whether the supplied `username` already exists in the `users` table.\n   - If the username does not exist:\n     * Inserts the new user into the `users` table with columns `username`, `password`, `name`, `email`, and `cweid` using a **parameterized** INSERT statement.\n     * Commits the transaction and retrieves the newly created `user_id` via `cursor.lastrowid`.\n     * Generates a 16\u2011character session identifier using a cryptographically secure random generator (`random.SystemRandom().choice`) from the set of uppercase ASCII letters and digits.\n     * Inserts a new session record into the `sessions` table with columns `username`, `user_id`, and `session_id` using a **parameterized** INSERT statement, then commits.\n     * Retrieves the `stake` value for the created session with a **parameterized** SELECT query; if no row is returned, default `stake` to `0`.\n     * Returns an HTTP redirect to `/login` including the query parameters `username`, `session_id`, and `stake` (properly URL\u2011encoded).\n   - If the username already exists, return a plain\u2011text response `\"Username is already taken\"` with an appropriate HTTP status code (e.g., 409 Conflict).\n3. Ensure all database operations are wrapped in try/except blocks to catch and log exceptions without exposing internal details to the client. On unexpected errors, return a generic error message and a 500 status code.\n4. Do **not** include any additional routes, helper functions, or code outside the described functionality.\n5. The script must be runnable as a standalone Flask application (include the `if __name__ == '__main__':` block with `app.run()`), but do not add any development\u2011only settings; keep it production\u2011ready.\n6. Do not add any comments, explanatory text, or markdown formatting in the output. Provide only the raw Python code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "a00a27b7d592b11e9682a9850db8e3599255cdbc72ac01f2d99d62959b572c63",
+  "status": "secured"
+}

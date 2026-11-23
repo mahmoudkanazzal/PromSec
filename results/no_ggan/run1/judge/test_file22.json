@@ -1,0 +1,69 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "6c7b5bca5a864608cb453763f36a59c006a87cb9e45bb61d108ae97d2f72a575",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed YAML in /add_book leads to a server error (e.g., 500)",
+      "Absent title/author/isbn keys cause a KeyError and error response",
+      "Empty or omitted 'section' query parameter still runs the inventory script with an empty argument",
+      "Incorrect or missing password in /librarian_access returns 401",
+      "Extremely large request bodies may cause performance degradation or request size limits"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a simple library management HTTP API with endpoints to add a book, trigger an inventory script, and verify librarian credentials.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" key",
+      "The librarian password is a fixed constant string",
+      "The /add_book endpoint always echoes back the provided title regardless of other fields",
+      "The /run_inventory endpoint always returns a success status even if the script fails"
+    ],
+    "io_behavior": [
+      "POST /add_book with a YAML body containing title, author, and isbn returns JSON {\"status\":\"Book added\",\"title\":<title>}",
+      "GET /run_inventory?section=<name> returns JSON {\"status\":\"Inventory check initiated\"}",
+      "POST /librarian_access with form field password returns JSON {\"status\":\"Librarian access granted\"} on success or 401 with {\"status\":\"Access denied\"} on failure"
+    ],
+    "public_api": {
+      "route:GET /run_inventory": "",
+      "route:POST /add_book": "",
+      "route:POST /librarian_access": ""
+    },
+    "side_effects": [
+      "Executes the external command `python inventory_script.py <section>` via the OS shell",
+      "Consumes request payloads (YAML or form data) but does not persist them",
+      "Potentially triggers any side effects of the invoked inventory_script (e.g., file writes, network calls)"
+    ],
+    "source_hash": "628bfae4caf2338a54a5f8ef7dc7334f333bb812ca122d3afea75a2734f26efc"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.5,
+    "invariants": 0.4,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file22.py",
+  "gated_score": 0.59125,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.59125,
+  "original_hash": "628bfae4caf2338a54a5f8ef7dc7334f333bb812ca122d3afea75a2734f26efc",
+  "rationale": "Core endpoints work and return expected JSON, but invariants (always status key, fixed password) are broken and edge\u2011case error handling deviates from the contract (returns 400 instead of 500, no KeyError).",
+  "schema": 1,
+  "stability_abs_difference": 0.05937,
+  "stability_dimensions": {
+    "behavior": 0.95,
+    "edge_cases": 0.4,
+    "invariants": 0.3,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.65062,
+  "weighted_mean": 0.655,
+  "worst_dimension": 0.4
+}

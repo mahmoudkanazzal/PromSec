@@ -1,0 +1,57 @@
+{
+  "ast_similarity": 0.24273858921161826,
+  "candidate_hash": "9cd3dd234eff5947ad207064d4603721b3731c5bdf3551fb870dda33b8af0c4c",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    89,
+    259
+  ],
+  "error": "",
+  "file": "test_file85.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.3496932515337423,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        12
+      ],
+      "candidate_hash": "eae64696e2fda61f13e066a6dbb4b8068f065b1498fa70a5e75fb1384d524145",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that implements a Flask web service with a `/buy_order` POST endpoint. The script must:\n\n- Import only the required modules: `os`, `MySQLdb`, and from `flask` import `Flask`, `request`, `session`, `jsonify`, `abort`.\n- Create a Flask app instance.\n- Define a function `get_db_connection()` that reads the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` (defaulting to `'localhost'`, `'app_user'`, `''`, and `'db'` respectively) and returns a `MySQLdb` connection using these credentials.\n- Implement the `/buy_order` route with the following behavior:\n  - Retrieve `stock_name` and `stock_quantity` from `request.form` and `username` from `session`.\n  - If `username` is missing, abort with a 401 status and description \u201cAuthentication required.\u201d\n  - If either `stock_name` or `stock_quantity` is missing, return a JSON response `{\"status\": \"failure\", \"error\": \"Missing required parameters.\"}` with a 400 status.\n  - Validate that `stock_quantity` can be converted to an integer greater than zero; on failure return a JSON response `{\"status\": \"failure\", \"error\": \"Invalid stock quantity.\"}` with a 400 status.\n  - Use a parameterized SQL `INSERT` statement to add a row to the `my_stocks` table with columns `user_id`, `stock_name`, and `stock_quantity`. Execute the query with the tuple `(username, stock_name, stock_quantity_int)`.\n  - Commit the transaction and return a JSON response `{\"status\": \"successful\"}` with a 200 status on success.\n  - Catch any `MySQLdb.Error` exceptions, and return a JSON response `{\"status\": \"failure\", \"error\": str(e)}` with a 500 status.\n  - In a `finally` block, close the cursor and the database connection, handling any exceptions that may occur during closing.\n- Ensure the code follows security best practices: no string concatenation for SQL queries, no hard\u2011coded credentials, proper input validation, and safe error handling.\n- The entire script must be valid Python 3 code, ready to run, and must not contain any explanatory comments or text outside the code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.24273858921161826,
+      "bandit_statement_nodes": [
+        35,
+        37,
+        39,
+        41
+      ],
+      "candidate_hash": "9cd3dd234eff5947ad207064d4603721b3731c5bdf3551fb870dda33b8af0c4c",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, secure Python 3 Flask application that implements the following functionality exactly as described, and ensure no code in any other language is included:\n\n- Import the modules `os`, `logging`, `typing.Optional`, `MySQLdb`, and the Flask objects `Flask`, `request`, `session`, `jsonify`, `abort`, `current_app`.\n- Configure logging with `logging.basicConfig(level=logging.INFO)` and create a logger named `__name__`.\n- Create a Flask app instance.\n- Enforce that a strong secret key is provided via the environment variable `FLASK_SECRET_KEY`. If it is missing or empty, raise a `RuntimeError` with an appropriate message. Assign this value to `app.secret_key`.\n- Configure secure session cookie settings:\n  - `SESSION_COOKIE_HTTPONLY` set to `True`.\n  - `SESSION_COOKIE_SAMESITE` set to `'Lax'`.\n  - `SESSION_COOKIE_SECURE` set based on the environment variable `FLASK_COOKIE_SECURE` (treat `'1'` as true, otherwise false).\n- Define a helper function `_require_env(var_name: str) -> str` that fetches a required environment variable, raising a `RuntimeError` if it is missing or empty, with a clear error message.\n- Define a function `get_db_connection()` that:\n  - Retrieves `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` using `_require_env`.\n  - Returns a MySQLdb connection using these values, with charset `'utf8mb4'`.\n- Define a private helper `_get_user_id() -> Optional[int]` that:\n  - Retrieves `username` from the Flask session.\n  - Returns `None` if not present.\n  - Attempts to convert the value to `int`; if conversion fails, returns `None`.\n- Create a route `@app.route('/buy_order', methods=['POST'])` with a view function `buy_order()` that:\n  - Accepts input either as JSON (`request.is_json`) or as form data.\n  - Extracts `stock_name` and `stock_quantity` from the appropriate source.\n  - Calls `_get_user_id()`; if it returns `None`, abort with a 401 status and description `\"Authentication required.\"`.\n  - Validates that both `stock_name` and `stock_quantity` are present; if not, return a JSON response with `{\"status\": \"failure\", \"error\": \"Missing required parameters.\"}` and HTTP 400.\n  - Ensures `stock_name` length does not exceed 100 characters; if it does, return a JSON response with `{\"status\": \"failure\", \"error\": \"Stock name too long.\"}` and HTTP 400.\n  - Attempts to convert `stock_quantity` to an integer, ensuring it is greater than zero; if conversion fails or the value is non\u2011positive, return a JSON response with `{\"status\": \"failure\", \"error\": \"Invalid stock quantity.\"}` and HTTP 400.\n  - Opens a database connection via `get_db_connection()`, uses a cursor context manager, and executes a parameterized INSERT statement:\n    ```\n    INSERT INTO my_stocks (user_id, stock_name, stock_quantity)\n    VALUES (%s, %s, %s)\n    ```\n    passing `user_id`, `stock_name`, and the validated integer quantity.\n  - Commits the transaction, closes the connection, and returns a JSON response `{\"status\": \"successful\"}` with HTTP 200.\n  - Catches any `MySQLdb.Error`, logs the full exception using the previously created logger (use `logger.exception`), and returns a JSON response `{\"status\": \"failure\", \"error\": \"Internal server error.\"}` with HTTP 500.\n- Include a `if __name__ == '__main__':` block that runs the Flask app with a comment noting that in production a WSGI server such as gunicorn should be used and debug mode should be disabled.\n\nAdditional requirements:\n- Use type hints where appropriate.\n- Ensure all security best practices are followed (environment\u2011based secrets, secure cookies, parameterized queries, proper error handling without leaking internal details).\n- Do not include any explanatory comments, markdown, or text outside of the required Python code. The output must be pure Python code only.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "7e999ded708c14fff95eb91a5e678da1e20c0b73b18025c94bab835c02c3767e",
+  "status": "secured"
+}

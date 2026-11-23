@@ -1,0 +1,64 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "56d016790d751ce93d41fd97cd940ec7605905d627f1e2582db5bf6f99ed9c66",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty form fields may cause a server error or unexpected redirect",
+      "Database connection failures result in an internal server error",
+      "SQL statements are built via string concatenation, making the endpoint vulnerable to injection attacks",
+      "If the random session generator fails, session creation will not succeed",
+      "If the database commit fails after inserting the user but before inserting the session, the user record may remain without a session"
+    ],
+    "entrypoints": [],
+    "intent": "Create a new user account and start a session for the user",
+    "invariants": [
+      "Usernames must be unique; a duplicate username prevents account creation",
+      "Passwords are stored only as bcrypt hashes, never in plain text",
+      "A session identifier is a 16\u2011character random string consisting of uppercase letters and digits",
+      "All required environment variables for database connection must be present"
+    ],
+    "io_behavior": [
+      "Accepts a POST request to /register with form fields: username, password, name, email, cweid",
+      "On success, redirects the client to /login with query parameters username, session_id, and stake",
+      "On failure due to an existing username, returns the plain text message \"Username is already taken\""
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the users table in the MySQL database",
+      "Inserts a new row into the sessions table to record the generated session identifier",
+      "Commits the database transaction for both inserts"
+    ],
+    "source_hash": "a00a27b7d592b11e9682a9850db8e3599255cdbc72ac01f2d99d62959b572c63"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.6,
+    "invariants": 0.9,
+    "io_semantics": 0.95,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file76.py",
+  "gated_score": 0.81,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.81,
+  "original_hash": "a00a27b7d592b11e9682a9850db8e3599255cdbc72ac01f2d99d62959b572c63",
+  "rationale": "The program fulfills the main intent, redirects correctly, enforces unique usernames, hashes passwords, generates proper session IDs, and performs the required DB inserts. It handles missing username/password and duplicate usernames as specified. However, it avoids the injection vulnerability described in the contract, does not explicitly check environment variables, and lacks explicit handling for random generator or commit failures, so edge\u2011case coverage is partial.",
+  "schema": 1,
+  "stability_abs_difference": 0.1755,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 1.0,
+    "invariants": 0.96,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.9855,
+  "weighted_mean": 0.88,
+  "worst_dimension": 0.6
+}

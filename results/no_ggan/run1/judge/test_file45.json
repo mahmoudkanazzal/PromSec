@@ -1,0 +1,69 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "46c23cd46f3428613706f7bf05af0986678626d457db405759778d7b9f90e5c8",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and trigger a redirect to '/login'.",
+      "SQL injection is possible because inputs are interpolated directly into the query.",
+      "Database connection failures or query errors are caught and result in a redirect to '/login'.",
+      "If the query returns no rows, the code falls into the exception block and redirects to '/login'.",
+      "When multiple rows match, the last row's id and role overwrite previous values in the session.",
+      "Any unexpected exception inside the try block leads to a redirect to '/login'."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via POST /login and redirect to the appropriate page based on credential verification.",
+    "invariants": [
+      "The endpoint only responds to POST requests at the path '/login'.",
+      "Database connection parameters (host, user, password, db) are fixed in the code.",
+      "Session keys 'id' and 'Role' are set only when a query returns at least one row.",
+      "Redirect destinations are always either '/dashboard' or '/login'.",
+      "The SQL query is built via string interpolation without parameterization."
+    ],
+    "io_behavior": [
+      "Accepts a POST request with form fields 'username' and 'password'.",
+      "Executes a SELECT query against a local MySQL database using the supplied values.",
+      "On a successful match, stores the user's id and role in the Flask session and returns an HTTP 302 redirect to '/dashboard'.",
+      "On any error or when no matching record is found, returns an HTTP 302 redirect to '/login'.",
+      "The response body is empty; only the redirect location header is observable."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a connection to a MySQL server on localhost with hard\u2011coded credentials.",
+      "Runs a SQL statement that may read data from the 'users' table.",
+      "Writes two keys ('id' and 'Role') into the Flask session store.",
+      "May raise and catch exceptions, influencing the redirect outcome."
+    ],
+    "source_hash": "82a598df24f20127548a17aeae223f565253b9c8deab6eb8a9c0ff434bc08957"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.3,
+    "invariants": 0.2,
+    "io_semantics": 0.7,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file45.py",
+  "gated_score": 0.40625,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.40625,
+  "original_hash": "82a598df24f20127548a17aeae223f565253b9c8deab6eb8a9c0ff434bc08957",
+  "rationale": "Core login flow and redirects are preserved, but key contract details (KeyError on missing fields, string\u2011interpolated SQL, hard\u2011coded DB creds, exact session key names, handling of multiple rows, and catching all exceptions) are altered, breaking several invariants and edge\u2011case expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.09412,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.17,
+    "invariants": 0.2,
+    "io_semantics": 1.0,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.50037,
+  "weighted_mean": 0.475,
+  "worst_dimension": 0.2
+}

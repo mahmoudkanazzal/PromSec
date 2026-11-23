@@ -1,0 +1,42 @@
+{
+  "ast_similarity": 0.6966911764705882,
+  "candidate_hash": "e7d7af4820fd51f652caa2c69837897a4ffe5daf154993f8a70f57d6d0d21ff0",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file75.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6966911764705882,
+      "bandit_statement_nodes": [
+        14,
+        18,
+        38,
+        51,
+        55,
+        76,
+        80,
+        99
+      ],
+      "candidate_hash": "e7d7af4820fd51f652caa2c69837897a4ffe5daf154993f8a70f57d6d0d21ff0",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python 3 program that implements the following functionality using only Python code (no other languages). The program must:\n\n- Import only the standard library modules `os` and `json`, plus the third\u2011party packages `bcrypt`, `MySQLdb`, and `flask`.\n- Create a Flask application instance named `app`.\n- Define a helper function `get_db_connection()` that reads the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` (with sensible defaults) and returns a MySQLdb connection using UTF\u20118 encoding, Unicode support, and proper error handling.\n- Implement a `/register` route that accepts POST requests with form fields `username`, `password`, and `confirm_password`. It must:\n  * Validate that all fields are present and that `password` equals `confirm_password`; otherwise abort with HTTP 400 and a clear description.\n  * Hash the password using `bcrypt.hashpw` with a generated salt, storing the result as a UTF\u20118 string.\n  * Use a parameterized SQL query to check if the username already exists; if it does, return HTTP 409 with an appropriate message.\n  * Insert the new user with the hashed password using a parameterized INSERT statement, commit the transaction, and return HTTP 201 with a success message.\n  * Roll back and return HTTP 500 with the exception message on any MySQLdb error.\n  * Ensure the cursor and connection are closed in a `finally` block.\n\n- Implement a `/login` route that accepts POST requests with form fields `username` and `password`. It must:\n  * Validate presence of both fields; abort with HTTP 400 if missing.\n  * Retrieve the stored password hash for the given username using a parameterized SELECT.\n  * Verify the supplied password with `bcrypt.checkpw`. If valid, redirect to the `dashboard` endpoint; otherwise return HTTP 401 with \u201cInvalid credentials\u201d.\n  * Handle MySQLdb errors by returning HTTP 500 with the exception message.\n  * Ensure proper cleanup of cursor and connection.\n\n- Implement a `/dashboard` route (GET) that returns a simple placeholder string indicating a successful login.\n\n- Implement a `/create_project` route that accepts POST requests with form fields `project_name`, `description`, and `username`. It must:\n  * Validate all fields; abort with HTTP 400 if any are missing.\n  * Verify that the provided username exists in the `users` table using a parameterized SELECT; if not, return HTTP 404.\n  * Insert a new project record into a `projects` table with the given data using a parameterized INSERT, commit, and return HTTP 201 with a success message.\n  * Roll back and return HTTP 500 on any MySQLdb error.\n  * Ensure cursor and connection are closed.\n\n- Implement an `/add_task` route that accepts POST requests with form fields `project_name`, `task_name`, and `task_description`. It must:\n  * Validate all fields; abort with HTTP 400 if missing.\n  * Verify that the specified project exists in the `projects` table; if not, return HTTP 404.\n  * Insert a new task into a `tasks` table using a parameterized INSERT, commit, and return HTTP 201 with a success message.\n  * Roll back and return HTTP 500 on any MySQLdb error.\n  * Ensure proper cleanup of resources.\n\n- Implement a `/view_tasks` route that accepts GET requests with a query parameter `project_name`. It must:\n  * Validate that `project_name` is provided; abort with HTTP 400 if missing.\n  * Retrieve all tasks for the given project using a parameterized SELECT, format each row as a dictionary with keys `task_name` and `task_description`, and return a JSON array of these dictionaries.\n  * Return HTTP 500 with the exception message on any MySQLdb error.\n  * Ensure cursor and connection are closed.\n\n- At the bottom of the file, include the standard `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n\nAdditional security and quality requirements:\n- Use only parameterized queries (`%s` placeholders) to prevent SQL injection.\n- Encode/decode strings to UTF\u20118 where required for bcrypt operations.\n- Use explicit `try/except/finally` blocks for all database interactions to guarantee rollback on failure and proper resource cleanup.\n- Do not include any hard\u2011coded credentials; rely exclusively on environment variables.\n- Do not import or use any modules outside the ones listed.\n- Ensure the code follows PEP\u202f8 style conventions and includes clear, concise docstrings for each function and route.\n- The entire output must be valid, runnable Python code with no extraneous text, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "e58b8e58a0fadc25c03d3f590849648226aa63c60cc17c1a6968d263d555fae4",
+  "status": "secured"
+}

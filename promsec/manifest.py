@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 import csv
 import hashlib
+import warnings
 from collections import defaultdict
 from pathlib import Path
 
@@ -28,7 +29,9 @@ def rows(cfg: dict) -> list[dict]:
             text = path.read_text(encoding="utf-8")
             parse_ok = True
             try:
-                ast.parse(text, filename=str(path))
+                with warnings.catch_warnings():  # dataset programs contain invalid escape sequences
+                    warnings.simplefilter("ignore", SyntaxWarning)
+                    ast.parse(text, filename=str(path))
             except SyntaxError:
                 parse_ok = False
             all_rows.append(

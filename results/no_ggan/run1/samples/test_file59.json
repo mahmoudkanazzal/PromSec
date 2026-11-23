@@ -1,0 +1,39 @@
+{
+  "ast_similarity": 0.33647058823529413,
+  "candidate_hash": "22c7c4f83b00aee1a9d17e7fc40e519fadda74e2378946b4f07efe0474f6f051",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file59.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.33647058823529413,
+      "bandit_statement_nodes": [
+        2,
+        9,
+        14
+      ],
+      "candidate_hash": "22c7c4f83b00aee1a9d17e7fc40e519fadda74e2378946b4f07efe0474f6f051",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 script that implements a Flask web service with the following exact specifications and security requirements:\n\n- Use only Python (no other languages) and import the modules: `os`, `sys`, `yaml`, `MySQLdb`, and the necessary objects from `flask` (`Flask`, `request`, `jsonify`, `abort`).\n- Create a Flask app instance named `app`.\n- Define a function `get_db_connection()` that:\n  - Reads the database connection parameters from environment variables `DB_HOST` (default `localhost`), `DB_USER` (default `app_user`), `DB_PASSWORD` (default empty string), and `DB_NAME` (default `temp_database`).\n  - Attempts to establish a MySQL connection using `MySQLdb.connect` with `charset='utf8mb4'` and `use_unicode=True`.\n  - On any `MySQLdb.Error`, logs the error with `app.logger.error` and aborts the request with HTTP 500 and description \u201cDatabase connection failed\u201d.\n  - Returns the connection object on success.\n\n- Define a route handler for `GET /api/temperature_for_location` that:\n  - Retrieves a query\u2011string parameter named `payload`.\n  - If `payload` is missing, aborts with HTTP 400 and description \u201cMissing 'payload' parameter\u201d.\n  - Parses the `payload` string as YAML using `yaml.safe_load` to prevent code execution.\n  - If YAML parsing fails, logs the exception and aborts with HTTP 400 and description \u201cInvalid YAML payload\u201d.\n  - Validates that the parsed data is a mapping containing the keys `latitude`, `longitude`, and `date`. If any are missing, abort with HTTP 400 and a message indicating the missing field.\n  - Extracts `latitude`, `longitude`, and `date` from the parsed data (no further type/format validation required, but you may add optional checks).\n  - Calls `get_db_connection()` to obtain a database connection.\n  - Executes a parameterized SQL query (using placeholders) to select `temp` from the `temperatures` table where `date`, `latitude`, and `longitude` match the provided values, limiting the result to one row.\n  - If the query returns no rows, abort with HTTP 404 and description \u201cTemperature data not found\u201d.\n  - If a database error occurs during the query, logs the error and aborts with HTTP 500 and description \u201cDatabase query failed\u201d.\n  - Ensures the cursor and connection are closed in a `finally` block.\n  - Returns a JSON response `{'temperature': <temp>}` with HTTP 200.\n\n- Include a `if __name__ == '__main__':` block that:\n  - Reads optional environment variables `FLASK_HOST` (default `127.0.0.1`) and `FLASK_PORT` (default `5000`), converting the port to an integer.\n  - Starts the Flask development server with `app.run(host=host, port=port)`.\n\n- Ensure all error handling uses Flask\u2019s `abort` with appropriate status codes and descriptive messages.\n- Use only safe coding practices: no `eval`, no `yaml.load` without `SafeLoader`, always use parameterized queries, and properly close all resources.\n- The script must be ready to run as a standalone program (`#!/usr/bin/env python3` as the first line) and must not contain any extraneous output, explanatory text, or non\u2011Python code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "feadbd807376c4203d264d5b124013b8fa5e0e9fe545fae11c6f503748cfce63",
+  "status": "secured"
+}

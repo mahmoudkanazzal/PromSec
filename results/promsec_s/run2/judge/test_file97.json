@@ -1,0 +1,76 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "ba1723973df2b987d916e3dfb72e8b2e417f3e1769b13610566ba8dcb573df7c",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required fields in POST /add_book results in a server error (e.g., KeyError)",
+      "Updating a non\u2011existent book_id still returns a success message but changes no rows",
+      "Searching with an empty keyword returns all rows (or none if the table is empty)",
+      "Providing an empty genre in /get_books_by_genre returns no rows",
+      "SQL injection is possible because query strings are built via string interpolation",
+      "Very large request bodies may cause SQLite or Flask to raise errors"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a RESTful HTTP API that lets clients add, search, update, delete, and list books stored in a SQLite 'library.db' database.",
+    "invariants": [
+      "All responses are JSON-encoded and include an HTTP status code as defined above",
+      "Each book row contains the columns id, title, author, and genre",
+      "Database connections are always closed before the request handler returns",
+      "The API does not perform authentication or authorization"
+    ],
+    "io_behavior": [
+      "POST /add_book with JSON {title, author, genre} \u2192 201 and JSON {\"message\":\"Book added successfully\"}",
+      "GET /search_books?keyword=\u2026 \u2192 200 and JSON array of books whose title or author contains the keyword",
+      "PUT /update_book/<book_id> with JSON {title?, author?, genre?} \u2192 200 and JSON {\"message\":\"Book updated successfully\"}",
+      "DELETE /delete_book/<book_id> \u2192 200 and JSON {\"message\":\"Book deleted successfully\"}",
+      "GET /get_books_by_genre?genre=\u2026 \u2192 200 and JSON array of books matching the genre"
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:DELETE /delete_book/<int:book_id>": "",
+      "route:GET /get_books_by_genre": "",
+      "route:GET /search_books": "",
+      "route:POST /add_book": "",
+      "route:PUT /update_book/<int:book_id>": ""
+    },
+    "side_effects": [
+      "Writes to the file 'library.db' (inserts, updates, deletes rows)",
+      "Creates 'library.db' if it does not already exist",
+      "Opens a network socket to listen for HTTP requests",
+      "Closes the SQLite connection after each request"
+    ],
+    "source_hash": "e727b4fbbe3a2102e26d9a19664f53e0d8c919dc3e865b7edb34c9710b4466e1"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 1.0,
+    "io_semantics": 0.5,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file97.py",
+  "gated_score": 0.53,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.53,
+  "original_hash": "e727b4fbbe3a2102e26d9a19664f53e0d8c919dc3e865b7edb34c9710b4466e1",
+  "rationale": "The program implements the required routes and basic functionality, closes DB connections, and performs the expected side\u2011effects, but it deviates from the contract on several edge cases (e.g., missing fields handling, lack of SQL injection vulnerability, strict required fields on update) and does not support partial updates as specified, reducing IO semantics and edge\u2011case preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.19713,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.33,
+    "invariants": 1.0,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.72713,
+  "weighted_mean": 0.64,
+  "worst_dimension": 0.2
+}

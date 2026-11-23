@@ -1,0 +1,66 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "62e8ca2eaecc58006cb67261dea6e4d0573c41a597ea821d83c8cdc35b92597e",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'username' or 'password' fields may cause a server error.",
+      "Database connection failures result in an internal error (no graceful handling).",
+      "SQL injection is possible because query strings are formatted with raw input.",
+      "Providing a non\u2011byte password may raise an exception in hashlib.sha256.",
+      "Very long usernames or passwords could exceed database column limits.",
+      "If the INSERT fails (e.g., constraint violation), the client still receives a redirect."
+    ],
+    "entrypoints": [],
+    "intent": "Handle user registration by accepting a username and password via an HTTP POST request and creating a new account if the username is not already taken.",
+    "invariants": [
+      "Usernames are unique; duplicate usernames are never inserted.",
+      "Passwords are stored only as a SHA\u2011256 hexadecimal digest.",
+      "Database connections are closed after each request.",
+      "The endpoint always returns a redirect response (no raw data is sent)."
+    ],
+    "io_behavior": [
+      "Accepts a POST request to /register with form fields 'username' and 'password'.",
+      "If the username already exists, responds with an HTTP redirect to './register'.",
+      "If the username is new, inserts the user into the database and responds with an HTTP redirect to the login page (intended './login').",
+      "Returns a 302 redirect response in both success and duplicate\u2011username cases."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Executes a SELECT query against the MySQL database to check for existing usernames.",
+      "On success, executes an INSERT query to store the new username and hashed password.",
+      "Commits the transaction and closes the database cursor and connection."
+    ],
+    "source_hash": "e82f97abc9451d6afee5108e6b9a64a8d93a919f73c3c0c31b37c04b3b5b72d6"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.4,
+    "io_semantics": 0.2,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file66.py",
+  "gated_score": 0.265,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.265,
+  "original_hash": "e82f97abc9451d6afee5108e6b9a64a8d93a919f73c3c0c31b37c04b3b5b72d6",
+  "rationale": "The program deviates from the contract on many fronts: it returns 400 errors instead of redirects for invalid input, uses PBKDF2 instead of raw SHA\u2011256, prevents SQL injection, validates username length, and returns 500 on DB errors rather than a redirect. It does perform the required SELECT/INSERT/commit and closes connections, preserving side\u2011effects, but overall behavior, I/O semantics, invariants, and edge\u2011case handling are largely mismatched.",
+  "schema": 1,
+  "stability_abs_difference": 0.29875,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.2,
+    "invariants": 0.3,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.56375,
+  "weighted_mean": 0.32,
+  "worst_dimension": 0.1
+}

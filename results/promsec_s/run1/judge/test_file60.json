@@ -1,0 +1,73 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "0dcf4127fc0c840363838250cc2c10acc26cc60368d3ace22637cbf9646d7078",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty `payload` query parameter results in a parsing error.",
+      "Malformed YAML causes a yaml.safe_load exception.",
+      "YAML that lacks `latitude`, `longitude`, or `date` keys leads to a KeyError.",
+      "No matching temperature record returns an empty list (`[]`).",
+      "Database connection failure raises an exception and aborts the request.",
+      "Multiple rows for the same coordinates/date are returned as a list of tuples."
+    ],
+    "entrypoints": [],
+    "intent": "Provide the temperature for a given geographic location and date via a GET request to /api/temperature_for_location.",
+    "invariants": [
+      "The endpoint only responds to GET requests at the exact path `/api/temperature_for_location`.",
+      "The MySQL query uses parameterised placeholders, preventing SQL syntax alteration.",
+      "The response is always a string representation of the fetched rows (even if empty).",
+      "The Flask app does not modify any files on disk.",
+      "Database credentials (host, user, password, db) are fixed at startup.",
+      "The service runs in a single\u2011process Flask context unless otherwise configured."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP GET request with a query parameter named `payload` containing a YAML document.",
+      "Parses the YAML to extract `latitude`, `longitude`, and `date` fields.",
+      "Queries a local MySQL database for a matching temperature record.",
+      "Returns the query result as a plain\u2011text string in the HTTP response body.",
+      "Writes the raw payload and the intermediate YAML string to the server's standard output (log).",
+      "Closes the database connection before completing the request."
+    ],
+    "public_api": {
+      "route:GET /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to the MySQL server on localhost.",
+      "Executes a SELECT statement against the `temperature_data` table.",
+      "Writes diagnostic information to the process stdout/stderr.",
+      "Potentially creates a new MySQL session for each request.",
+      "May trigger MySQL logging or audit mechanisms.",
+      "Consumes network bandwidth for the HTTP request/response."
+    ],
+    "source_hash": "ec4dd14bd2fbe472ac338770df0bdf848373148e37c52bb097b1b9aa92b55517"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.3,
+    "invariants": 0.5,
+    "io_semantics": 0.4,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file60.py",
+  "gated_score": 0.32,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.32,
+  "original_hash": "ec4dd14bd2fbe472ac338770df0bdf848373148e37c52bb097b1b9aa92b55517",
+  "rationale": "The program accepts the GET payload and parses YAML, but deviates from the contract on error handling, response format, logging, credential handling, and multiple-row handling, reducing behavior and edge\u2011case preservation while retaining some side\u2011effects and invariants.",
+  "schema": 1,
+  "stability_abs_difference": 0.07875,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.3,
+    "side_effects": 0.6
+  },
+  "stability_score": 0.39875,
+  "weighted_mean": 0.36,
+  "worst_dimension": 0.2
+}

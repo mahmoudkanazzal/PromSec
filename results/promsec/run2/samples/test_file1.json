@@ -1,0 +1,88 @@
+{
+  "ast_similarity": 0.6734006734006734,
+  "candidate_hash": "ade3aab18755693775ecf6f1c53d1a60c3377b4d2f14b587d7e1bfe2712d046d",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file1.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7380073800738007,
+      "bandit_statement_nodes": [
+        18,
+        23
+      ],
+      "candidate_hash": "b1db52a1bc4834c4ed8d6d65a9dec5e646a9de89b7f2eedeb969447d12d93f3d",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1026,
+          "end_lineno": 23,
+          "lineno": 23,
+          "node": 15
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2379,
+          "end_lineno": 27,
+          "lineno": 27,
+          "node": 18
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1618,
+          "end_lineno": 35,
+          "lineno": 35,
+          "node": 23
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program (no other language) that implements a secure user registration endpoint using Flask and MySQL. The program must:\n\n- Import only the necessary modules: `flask.Flask`, `flask.request`, `flask.redirect`, `hashlib`, `os`, and `MySQLdb`.\n- Create a Flask app instance.\n- Define a route `/register` that accepts only POST requests.\n- Retrieve `username` and `password` from `request.form`.\n- Generate a cryptographically secure random 16\u2011byte salt with `os.urandom`.\n- Hash the password using `hashlib.pbkdf2_hmac` with the SHA\u2011256 algorithm, the generated salt, and 100,000 iterations.\n- Convert both the salt and the resulting hash to hexadecimal strings.\n- Connect to a MySQL database using `MySQLdb.connect`. Do **not** hard\u2011code credentials; instead, read the host, user, password, and database name from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`.\n- Use a cursor to execute **parameterized** SQL queries only (no string interpolation) to:\n  1. Check if a user with the given username already exists in the `users` table.\n  2. If the user exists, redirect to `/login` with HTTP status code 307.\n  3. If the user does not exist, insert a new record into `users` with columns `username`, `password`, `salt`, and `account_created`. Set `account_created` to the current Unix timestamp (use `int(time.time())`).\n- Commit the transaction after a successful insert.\n- Ensure that the cursor and database connection are properly closed in a `finally` block.\n- Return a plain\u2011text response `\"Registration successful\"` with HTTP status code 201 after a successful registration.\n- Include a `if __name__ == \"__main__\":` block that runs the Flask app on host `0.0.0.0` and port `5000` with debug mode disabled.\n- Follow security best practices: use environment variables for sensitive data, use strong password hashing, avoid SQL injection, and do not expose stack traces.\n- The code must be valid Python 3 syntax, fully functional, and contain no explanatory comments or markdown.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6734006734006734,
+      "bandit_statement_nodes": [
+        34
+      ],
+      "candidate_hash": "ade3aab18755693775ecf6f1c53d1a60c3377b4d2f14b587d7e1bfe2712d046d",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1396,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2404,
+          "end_lineno": 40,
+          "lineno": 40,
+          "node": 34
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, secure Python program that implements the following functionality exactly as described, and output only the Python code with no additional text, comments, or explanations:\n\n- Use Flask to create a web application.\n- Define a `/register` route that only accepts POST requests.\n- Retrieve `username` and `password` from `request.form`. If either is missing, return a 400 response with the text \u201cMissing credentials\u201d.\n- Generate a 16\u2011byte cryptographic salt using `secrets.token_bytes` and store its hexadecimal representation.\n- Hash the password with PBKDF2\u2011HMAC using SHA\u2011256, the generated salt, and 100,000 iterations. Store the hash as a hexadecimal string.\n- Obtain MySQL connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables using `os.getenv`.\n- Connect to the MySQL database using `MySQLdb.connect` with the obtained parameters.\n- Use a cursor to:\n  1. Execute a parameterized SELECT query to check if the provided username already exists in the `users` table.\n  2. If the username exists, redirect the client to `/login` with HTTP status code 307.\n  3. If the username does not exist, execute a parameterized INSERT query to add a new row to `users` with columns `username`, `password`, `salt`, and `account_created` (set to the current UNIX timestamp using `UNIX_TIMESTAMP()`).\n- Commit the transaction after a successful insert.\n- Ensure that the cursor and connection are properly closed in a `finally` block, even if an exception occurs.\n- After successful registration, return a 201 response with the text \u201cRegistration successful\u201d.\n- In the `if __name__ == '__main__':` block, read `FLASK_HOST` (default `127.0.0.1`) and `FLASK_PORT` (default `5000`) from environment variables, convert the port to an integer, and start the Flask app with `debug=False`.\n- The code must be pure Python, use only the specified libraries (`flask`, `hashlib`, `os`, `secrets`, `MySQLdb`), avoid any SQL injection risks, never store plaintext passwords, and handle all resources securely.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "91acf2a5aef5bcd370c6a3200ba7ebb3820f83aa24caea6ae6604f49f50bfecf",
+  "status": "secured"
+}

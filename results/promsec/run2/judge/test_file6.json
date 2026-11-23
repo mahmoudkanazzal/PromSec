@@ -1,0 +1,83 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "bbea2a594280ab1c1bdc6546b303669cd2896cc8c420a897196245a9794f3402",
+  "compile_ok": true,
+  "confidence": 0.94,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty required fields result in 400 Bad Request with an error message.",
+      "Incorrect admin password yields 401 Unauthorized.",
+      "Invalid YAML in /task/create triggers a parsing error and 400 response.",
+      "Empty task_name or task_param still invokes the shell script, potentially causing unexpected behavior.",
+      "Changing the admin password to an empty string allows future admin actions without authentication."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple HTTP API for creating, retrieving, updating, deleting, executing, and managing tasks, as well as basic admin authentication and configuration.",
+    "invariants": [
+      "ADMIN_PASSWORD must match the stored value for any admin\u2011only endpoint.",
+      "Required parameters (e.g., task_id, task_description, password) must be non\u2011empty for successful responses.",
+      "YAML payload must be parseable; otherwise a 400 error is returned.",
+      "All endpoints return JSON with a \"status\" field indicating outcome."
+    ],
+    "io_behavior": [
+      "POST /task/create with YAML body returns task_id and description on success or 400 on invalid YAML/missing fields.",
+      "GET /task/execute?task_name=&task_param= triggers a shell script and returns a JSON acknowledgement.",
+      "POST /admin/login with form field password returns access granted or 401 denied.",
+      "POST /admin/configure with password and new_config updates configuration and returns confirmation or error codes.",
+      "GET /task/retrieve?task_id= returns a sample task description or 400 if missing.",
+      "GET /task/status?task_id= returns a JSON status of \"Running\" or 400 if missing."
+    ],
+    "public_api": {
+      "route:GET /task/execute": "",
+      "route:GET /task/export": "",
+      "route:GET /task/logs": "",
+      "route:GET /task/retrieve": "",
+      "route:GET /task/status": "",
+      "route:GET /user/profile": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/configure": "",
+      "route:POST /admin/login": "",
+      "route:POST /admin/settings": "",
+      "route:POST /task/assign": "",
+      "route:POST /task/create": "",
+      "route:POST /task/delete": "",
+      "route:POST /task/update": ""
+    },
+    "side_effects": [
+      "os.system call to execute_task.sh with provided parameters.",
+      "os.system call to export_tasks.py with chosen format.",
+      "In\u2011memory change of the ADMIN_PASSWORD variable via /admin/change_password.",
+      "No persistent storage; all responses are generated at request time."
+    ],
+    "source_hash": "6f7f42fcdfeb992e9bbe8a2cc5e9fd37dda5914349e632e695f6397675f28c28"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.9,
+    "invariants": 1.0,
+    "io_semantics": 0.95,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file6.py",
+  "gated_score": 0.5925,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.5925,
+  "original_hash": "6f7f42fcdfeb992e9bbe8a2cc5e9fd37dda5914349e632e695f6397675f28c28",
+  "rationale": "All specified endpoints and response formats are implemented and admin/YAML handling matches the contract, but the program never invokes the required os.system side\u2011effects and it rejects empty task_name/task_param, violating the listed edge case.",
+  "schema": 1,
+  "stability_abs_difference": 0.0545,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.6,
+    "invariants": 0.8,
+    "io_semantics": 0.83,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.647,
+  "weighted_mean": 0.79,
+  "worst_dimension": 0.0
+}

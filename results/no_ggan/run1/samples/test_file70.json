@@ -1,0 +1,42 @@
+{
+  "ast_similarity": 0.7494305239179955,
+  "candidate_hash": "d3b9b655124cc81c84c14d0c45f002f767147f0ae2daa90f846875be14e5a42f",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file70.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7494305239179955,
+      "bandit_statement_nodes": [
+        14,
+        19,
+        30,
+        45,
+        49,
+        62,
+        66,
+        77
+      ],
+      "candidate_hash": "d3b9b655124cc81c84c14d0c45f002f767147f0ae2daa90f846875be14e5a42f",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python Flask application that implements user registration, login, project creation, task addition, and task viewing using a MySQL database. The code must:\n\n- Be written entirely in Python.\n- Import only the following modules: `os`, `hashlib`, `Flask` (including `request`, `redirect`, `jsonify`, `abort`), `MySQLdb`, and `MySQLdb.cursors`.\n- Define a Flask app instance and configure database connection settings with keys `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, and `DB_CHARSET`.\n- Provide a `get_db_connection()` function that returns a `MySQLdb.connect` object using the configured settings, with `cursorclass=MySQLdb.cursors.DictCursor` and `autocommit=False`.\n- Implement a `hash_password(password: str, salt: bytes = None)` function that:\n  - Generates a 16\u2011byte random salt with `os.urandom` if none is provided.\n  - Uses `hashlib.pbkdf2_hmac('sha256', ...)` with 100,000 iterations to derive a key.\n  - Returns the salt and derived key as hexadecimal strings.\n- Implement a `verify_password(stored_hash: str, stored_salt: str, password: str) -> bool` function that:\n  - Converts the stored salt from hex to bytes.\n  - Calls `hash_password` with the provided password and the salt.\n  - Compares the computed hash to the stored hash using a constant\u2011time comparison (`hashlib.compare_digest`).\n- Create a `/register` route (POST) that:\n  - Retrieves `username` and `password` from `request.form`, stripping whitespace.\n  - Returns a 400 error if either field is missing.\n  - Checks if the username already exists using a parameterized `SELECT` query.\n  - If the user exists, redirects to `/login` with HTTP status 307.\n  - Otherwise, hashes the password, inserts a new record into the `users` table with fields `username`, `password`, `salt`, and `account_created` set to `NOW()`.\n  - Commits the transaction and returns a success message.\n  - Ensures the database connection is closed in a `finally` block.\n- Create a `/login` route (POST) that:\n  - Retrieves `username` and `password` from `request.form`, stripping whitespace.\n  - Returns a 400 error if either field is missing.\n  - Selects `password` and `salt` for the given username using a parameterized query.\n  - Verifies the password with `verify_password`.\n  - If verification succeeds, redirects to `/dashboard` with HTTP status 307.\n  - If verification fails, returns a 401 response with \"Invalid credentials\".\n  - Ensures the database connection is closed in a `finally` block.\n- Create a `/project/create` route (POST) that:\n  - Retrieves `username` and `project_name` from `request.form`, stripping whitespace.\n  - Returns a 400 error if either field is missing.\n  - Checks that the user exists with a parameterized `SELECT`.\n  - If the user does not exist, returns a 404 response with \"User not found\".\n  - Inserts a new record into the `projects` table with `username` and `project_name`.\n  - Commits the transaction and returns a success message.\n  - Ensures the database connection is closed in a `finally` block.\n- Create a `/task/add` route (POST) that:\n  - Retrieves `project_name`, `task_name`, and `task_description` from `request.form`, stripping whitespace.\n  - Returns a 400 error if `project_name` or `task_name` is missing.\n  - Checks that the project exists with a parameterized `SELECT`.\n  - If the project does not exist, returns a 404 response with \"Project not found\".\n  - Inserts a new record into the `tasks` table with `project_name`, `task_name`, and `task_description`.\n  - Commits the transaction and returns a success message.\n  - Ensures the database connection is closed in a `finally` block.\n- Create a `/tasks/view` route (GET) that:\n  - Retrieves `project_name` from the query string, stripping whitespace.\n  - Returns a 400 error if `project_name` is missing.\n  - Selects `task_name` and `task_description` from the `tasks` table for the given `project_name` using a parameterized query.\n  - Returns the result as JSON.\n  - Ensures the database connection is closed in a `finally` block.\n- Use only parameterized queries throughout to prevent SQL injection.\n- Ensure all database connections are properly closed and transactions are committed or rolled back as appropriate.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app with `debug=False`.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "6d4e51f8cfe78b6dadd8dc3e30ee24aee6e08732d4bad4f640760688e2a3b5cd",
+  "status": "secured"
+}

@@ -1,0 +1,132 @@
+{
+  "ast_similarity": 0.8199470432480142,
+  "candidate_hash": "a837e26adef2b89c4454692f9c95068379d08b3ec3f6dcc6d0d655c84a6ef794",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file27.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.782793867120954,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        20,
+        30,
+        43,
+        51,
+        56,
+        59,
+        64,
+        69,
+        80
+      ],
+      "candidate_hash": "19f475c9146c8e436bacba48c0f9bcdd2ffc019ece52c0ff518ff4a1687316a5",
+      "cwe_count": 3,
+      "cwes": [
+        78,
+        259,
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9945,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 8
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9885,
+          "end_lineno": 66,
+          "lineno": 66,
+          "node": 43
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9993,
+          "end_lineno": 88,
+          "lineno": 88,
+          "node": 56
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9977,
+          "end_lineno": 91,
+          "lineno": 91,
+          "node": 59
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9908,
+          "end_lineno": 106,
+          "lineno": 106,
+          "node": 69
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service with the exact same routes and behavior as the code shown below. The script must be written in Python only. Ensure the code is secure by following these requirements:\n\n- Use `yaml.safe_load` for all YAML parsing; never use `yaml.load` with `FullLoader` or any unsafe loader.\n- Replace every `os.system` call with `subprocess.run` using an explicit list of arguments, without `shell=True`, and capture errors.\n- Validate and sanitize all user\u2011supplied data (query parameters, form fields, request bodies). Return `400 Bad Request` for missing or malformed required fields.\n- Store the admin password in an environment variable named `LIBRARIAN_PASSWORD`; if the variable is not set, fall back to a secure default value and log a warning.\n- Handle exceptions gracefully, returning appropriate JSON error messages and HTTP status codes.\n- Use `jsonify` for all responses and set `debug=False` when running the Flask app.\n- Preserve the original functionality of each endpoint (`/add_new_book`, `/execute_inventory`, `/admin_access`, `/update_book_details`, `/delete_book`, `/generate_reports`, `/librarian_panel`, `/view_books`, `/add_new_member`, `/update_member_details`), including the same request methods and expected parameters.\n- Do not include any explanatory comments, markdown formatting, or additional text outside the Python code.\n\nProvide only the Python code implementing the described Flask application.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.8199470432480142,
+      "bandit_statement_nodes": [
+        3,
+        12,
+        41,
+        126
+      ],
+      "candidate_hash": "a837e26adef2b89c4454692f9c95068379d08b3ec3f6dcc6d0d655c84a6ef794",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9925,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9109,
+          "end_lineno": 16,
+          "lineno": 16,
+          "node": 12
+        },
+        {
+          "ast_type": "Assign",
+          "change": 1.0,
+          "end_lineno": 65,
+          "lineno": 65,
+          "node": 41
+        },
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 186,
+          "lineno": 186,
+          "node": 126
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 program (no other language) that implements a secure Flask web application with the exact functionality described below. The code must:\n\n- Begin with `from __future__ import annotations` and import only the standard library modules `os`, `logging`, `secrets`, `mimetypes`, `typing` (Any, Dict, List) and the third\u2011party packages `yaml` and `flask` (Flask, request, jsonify, abort).\n- Configure logging with `logging.basicConfig(level=logging.INFO)` and create a logger named `__name__`.\n- Create a Flask app instance named `app`.\n- Retrieve the admin password from the environment variable `LIBRARIAN_PASSWORD`. If it is not set, generate a secure random password with `secrets.token_urlsafe(32)`, assign it to `ADMIN_PASSWORD`, and log a warning.\n- Define two in\u2011memory stores: `books: List[Dict[str, Any]] = []` and `members: List[Dict[str, Any]] = []`.\n- Implement helper functions:\n  - `def find_book(isbn: str) -> Dict[str, Any] | None:` returns the first book dict with matching `isbn` or `None`.\n  - `def find_member(member_id: str) -> Dict[str, Any] | None:` returns the first member dict with matching `member_id` or `None`.\n- Register Flask error handlers for status codes 400, 404, and 500 that return JSON with keys `error` and `message`.\n- Implement the following routes with exact behavior, input validation, and security considerations:\n\n  1. `POST /add_new_book`\n     - Require a JSON body containing `title`, `author`, and `isbn`.\n     - Return 400 if any field is missing or if a book with the same ISBN already exists.\n     - Append a dict `{'title': title, 'author': author, 'isbn': isbn}` to `books`.\n     - Respond with JSON `{'message': 'Book added successfully'}` and status 201.\n\n  2. `POST /execute_inventory`\n     - Do **not** use `subprocess` or any external command execution.\n     - Use `mimetypes.guess_type` on the static filename `inventory.txt`.\n     - Return JSON `{'output': f'Inventory executed, mime type: {mime_type}'}` with status 200.\n\n  3. `POST /admin_access`\n     - Accept form\u2011encoded data; retrieve `password` from `request.form`.\n     - Return 400 if password is missing, 403 if it does not match `ADMIN_PASSWORD`.\n     - On success, return JSON `{'message': 'Admin access granted'}` with status 200.\n\n  4. `PUT /update_book_details`\n     - Require a JSON body containing at least `isbn`.\n     - Return 400 if `isbn` is missing, 404 if no matching book is found.\n     - Update any provided `title` or `author` fields in the found book.\n     - Respond with JSON `{'message': 'Book details updated'}` and status 200.\n\n  5. `DELETE /delete_book`\n     - Require query parameter `isbn`.\n     - Return 400 if missing, 404 if no matching book.\n     - Remove the book from `books`.\n     - Respond with JSON `{'message': 'Book deleted'}` and status 200.\n\n  6. `GET /generate_reports`\n     - Compute `total_books = len(books)` and `total_members = len(members)`.\n     - Return a JSON report containing `total_books`, `total_members`, the full `books` list, and the full `members` list with status 200.\n\n  7. `GET /librarian_panel`\n     - Require query parameter `password`.\n     - Return 400 if missing, 403 if incorrect.\n     - On success, return JSON `{'message': 'Welcome to the librarian panel'}` with status 200.\n\n  8. `GET /view_books`\n     - Return JSON `{'books': books}` with status 200.\n\n  9. `POST /add_new_member`\n     - Require a JSON body containing `name` and `member_id`.\n     - Return 400 if any field is missing or if a member with the same ID already exists.\n     - Append a dict `{'name': name, 'member_id': member_id}` to `members`.\n     - Respond with JSON `{'message': 'Member added successfully'}` and status 201.\n\n  10. `PUT /update_member_details`\n      - Require a JSON body containing `member_id`.\n      - Return 400 if missing, 404 if no matching member.\n      - If `name` is provided, update the member\u2019s name.\n      - Respond with JSON `{'message': 'Member details updated'}` and status 200.\n\n  11. `POST /load_yaml`\n      - Require a JSON body with a key `yaml` containing a YAML string.\n      - Return 400 if missing.\n      - Parse the YAML safely using `yaml.safe_load`; on parsing error, log the exception and return JSON `{'error': 'Invalid YAML', 'details': str(e)}` with status 400.\n      - On success, return JSON `{'parsed': parsed}` with status 200.\n\n- Include a `if __name__ == '__main__':` block that runs the Flask app on host `127.0.0.1`, port `5000`, with `debug=False`.\n\n- Ensure all endpoints use proper Flask request handling (`request.is_json`, `request.get_json()`, `request.args`, `request.form`) and abort with appropriate status codes and descriptive messages.\n\n- Use type hints throughout, avoid any insecure practices (no `eval`, no `exec`, no `subprocess` for external commands), and follow Python security best practices.\n\n- Output **only** the Python code; do not include any explanatory text, comments, or markup.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "76dd5602682d017e8d799027a76b3dc516f12e33666b851d5e47359bb6ab8bf7",
+  "status": "secured"
+}

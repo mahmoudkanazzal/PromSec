@@ -1,0 +1,70 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "fa21b137792c48719bdf4608bd5bbeb5e193eabbc323261b5b48a0aeaa439fd6",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'payload' query parameter.",
+      "Malformed YAML causing a parsing exception.",
+      "Missing required keys in the parsed YAML dictionary.",
+      "Failure to connect to the MySQL server (wrong credentials or unreachable host).",
+      "SQL execution error or unexpected schema (e.g., missing columns).",
+      "No row matches the supplied datetime, resulting in 'No matching location found.'"
+    ],
+    "entrypoints": [],
+    "intent": "Provide the temperature value for a given datetime (and location) via a web API endpoint.",
+    "invariants": [
+      "The 'payload' query parameter must be present; otherwise the response is 'ERROR: No payload'.",
+      "The payload must be valid YAML containing keys 'latitude', 'longitude', and 'datetime'.",
+      "Database connection parameters must be defined in the environment.",
+      "The 'temperature' table must have at least three columns, where column index 2 holds the temperature value.",
+      "The endpoint always returns a string (temperature or error message) and never a binary payload."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP GET request to /api/temperature_for_location with a query parameter named 'payload'.",
+      "Parses the 'payload' value as YAML and extracts 'latitude', 'longitude', and 'datetime' fields.",
+      "Returns a plain\u2011text response containing the temperature string from the database, or an error message.",
+      "Uses environment variables DB_HOST, DB_USER, DB_PASS, and DB_NAME to locate the MySQL database.",
+      "Executes a SELECT query filtered only by the supplied datetime.",
+      "Closes the database cursor and connection before sending the response."
+    ],
+    "public_api": {
+      "route:GET /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to the MySQL server.",
+      "Performs a read query on the 'temperature' table.",
+      "May log exceptions implicitly via the Flask framework.",
+      "Consumes CPU cycles for YAML parsing and query execution."
+    ],
+    "source_hash": "ae4325c3c4083066963ec9e246397c503ca804a818fc22d148025686388c28c6"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.5,
+    "invariants": 0.3,
+    "io_semantics": 0.1,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file63.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.28375,
+  "original_hash": "ae4325c3c4083066963ec9e246397c503ca804a818fc22d148025686388c28c6",
+  "rationale": "The program performs the core DB lookup but deviates from the contract: uses POST instead of GET, reads body not query param, returns JSON not plain text, and error messages differ, breaking several invariants and I/O semantics while preserving side\u2011effects.",
+  "schema": 1,
+  "stability_abs_difference": 0.16375,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.5,
+    "invariants": 0.2,
+    "io_semantics": 0.4,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.4475,
+  "weighted_mean": 0.345,
+  "worst_dimension": 0.1
+}

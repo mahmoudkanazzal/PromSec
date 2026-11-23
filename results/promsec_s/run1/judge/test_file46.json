@@ -1,0 +1,65 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "61f127d682d888c5df5ef77d1bc65a458ce289f6225f23128ac437b589d0112c",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and result in a server error.",
+      "Empty strings for username or password are treated as normal values and may return \"Bad Login\".",
+      "SQL injection is possible because the query is built with string interpolation.",
+      "Database connection failures raise an exception and produce a 500 response.",
+      "Very long input values may exceed MySQL limits or cause performance issues."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by checking provided username and password against a MySQL user table.",
+    "invariants": [
+      "The endpoint always returns a string response, never JSON or HTML.",
+      "Only the two exact strings \"Good Login\" or \"Bad Login\" are returned on successful processing.",
+      "The HTTP method must be POST; other methods are not handled.",
+      "Database resources are released (cursor and connection closed) for every request."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST requests to the /login route with form fields 'username' and 'password'.",
+      "Returns the plain\u2011text response \"Good Login\" when a matching record is found.",
+      "Returns the plain\u2011text response \"Bad Login\" when no matching record is found.",
+      "Responds with a 500 error if required form fields are missing or a server error occurs."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection to localhost using root credentials.",
+      "Executes a SELECT query against the 'user' table.",
+      "Closes the database cursor and connection after the query."
+    ],
+    "source_hash": "c342ac763cd38f3e4cf27c5d04160741be7feb9eb24def7a7b7d8a73ecb749f8"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.2,
+    "invariants": 0.9,
+    "io_semantics": 0.3,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file46.py",
+  "gated_score": 0.39125,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.39125,
+  "original_hash": "c342ac763cd38f3e4cf27c5d04160741be7feb9eb24def7a7b7d8a73ecb749f8",
+  "rationale": "Missing fields do not raise KeyError or 500, password is hashed (changing matching logic), errors return Bad Login instead of 500, and SQL injection is prevented; however, response format, POST method, and resource cleanup follow the contract.",
+  "schema": 1,
+  "stability_abs_difference": 0.04375,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.1,
+    "invariants": 1.0,
+    "io_semantics": 0.3,
+    "side_effects": 0.2
+  },
+  "stability_score": 0.3475,
+  "weighted_mean": 0.455,
+  "worst_dimension": 0.2
+}

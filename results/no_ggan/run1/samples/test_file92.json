@@ -1,0 +1,39 @@
+{
+  "ast_similarity": 0.6504992867332382,
+  "candidate_hash": "a2e5a332ba6d3ad5296afa0912bed5869406d5e425f625dc67274e216235a7a9",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file92.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6504992867332382,
+      "bandit_statement_nodes": [
+        8,
+        13,
+        23,
+        32,
+        41
+      ],
+      "candidate_hash": "a2e5a332ba6d3ad5296afa0912bed5869406d5e425f625dc67274e216235a7a9",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with the exact functionality described below, while following security best practices and preserving the original behavior.\n\n**Requirements**\n1. **Imports**: `os`, `Flask`, `request`, `redirect`, `url_for` from `flask`, and `MySQLdb`.\n2. **Flask app**: Create `app = Flask(__name__)`.\n3. **Database connection**: Define a function `get_db_connection()` that returns a `MySQLdb.connect` using the following environment variables (with the given defaults if not set):\n   - `DB_HOST` \u2192 host (default `'localhost'`)\n   - `DB_USER` \u2192 user (default `'testuser'`)\n   - `DB_PASSWORD` \u2192 passwd (default `'test123'`)\n   - `DB_NAME` \u2192 db (default `'EVENTDB'`)\n4. **Input handling**: For every request parameter, retrieve the value with `request.form.get` (for POST) or `request.args.get` (for GET), defaulting to an empty string. Strip leading/trailing whitespace and ensure the value is a non\u2011empty string before using it; if validation fails, return an appropriate error response (e.g., `400 Bad Request` with a clear message).\n5. **Routes**:\n   - `POST /add_event`:\n     * Retrieve `title` and `date`.\n     * Use a parameterized SELECT to check if an event with the same title already exists.\n     * If it exists, redirect back to the same route (`url_for('add_event')`).\n     * If not, insert the new event with a parameterized INSERT, commit, close resources, and redirect to `view_events`.\n   - `POST /update_event_date`:\n     * Retrieve `title` and `new_date`.\n     * Update the event\u2019s date with a parameterized UPDATE, commit, close resources, and return the plain text message `\"Event date updated successfully\"`.\n   - `POST /delete_event`:\n     * Retrieve `title`.\n     * Delete the event with a parameterized DELETE, commit, close resources, and return the plain text message `\"Event deleted successfully\"`.\n   - `GET /search_events`:\n     * Retrieve query parameter `term`.\n     * Build a LIKE pattern safely (`%{term}%`) and execute a parameterized SELECT with `LIKE`, fetch all rows, close resources, and return the string representation of the result list.\n   - `GET /view_events`:\n     * Execute a parameterized SELECT to retrieve all rows, fetch all, close resources, and return the string representation of the result list.\n6. **Resource management**: For each route, obtain a connection via `get_db_connection()`, create a cursor, wrap database operations in a `try...finally` block to ensure both cursor and connection are closed even on error.\n7. **Error handling**: Catch any database exceptions, log them (you may use `print` for simplicity), roll back the transaction if needed, and return a generic `500 Internal Server Error` with a non\u2011revealing message.\n8. **Security**:\n   - Use only parameterized queries; never concatenate user input into SQL strings.\n   - Do not enable Flask debug mode (`debug=False`).\n   - Limit request size to a reasonable maximum (e.g., `app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024` for 1\u202fMB).\n   - Ensure the Flask app runs only when the script is executed directly (`if __name__ == '__main__':`).\n9. **Output**: The script must end with `app.run(debug=False)` inside the `if __name__ == '__main__':` block.\n\n**Deliverable**\nProvide only the Python code that satisfies all the above requirements, with no additional explanation, comments, or markup. The code must be ready to run as a standalone file.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "d84a9609bbb8f855b34f74858f98b2d52127ee7a0edd954cac0ab277af3ac497",
+  "status": "secured"
+}

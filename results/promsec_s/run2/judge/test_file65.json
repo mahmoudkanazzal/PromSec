@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "7c842f41771f479bbb366836148127f734f56833a1b7ccdfa2debb0d1ea5382d",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and result in a 500 Internal Server Error.",
+      "Empty strings for username or password are accepted and stored as such.",
+      "SQL injection is possible if the username contains malicious characters, because values are interpolated directly into the query.",
+      "If the password is not a byte string, hashlib.md5 may raise a TypeError.",
+      "Database connection failures or constraint violations (e.g., duplicate usernames) raise exceptions and return a 500 error.",
+      "Using a username that already exists may cause the INSERT to fail depending on database constraints."
+    ],
+    "entrypoints": [],
+    "intent": "Register a new user by storing the supplied username and an MD5 hash of the password in a MySQL database, then redirect the client to the home page.",
+    "invariants": [
+      "Every successful request results in exactly one database INSERT and a redirect to '/'.",
+      "The database connection parameters (host, user, password, db) are fixed constants.",
+      "The password stored is always the MD5 hexadecimal digest of the submitted password.",
+      "No session or cookie data is created or modified.",
+      "The endpoint does not return any content other than the redirect header."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /register with form fields 'username' and 'password'.",
+      "Returns an HTTP 302 redirect response pointing to '/' on successful processing.",
+      "If required form fields are missing, Flask raises a 400 Bad Request error.",
+      "The response body is empty (only the redirect header).",
+      "Content-Type defaults to text/html for the redirect response."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the User table of the MySQL database.",
+      "Commits the transaction, persisting the new user record.",
+      "Opens and then closes a network connection to the configured MySQL server.",
+      "Stores the password as an MD5 hash rather than plain text.",
+      "Uses the supplied username also as the Email column value."
+    ],
+    "source_hash": "1ec38e4c642a37d2cb64a04549047e30fcca03ab84852352f032a6ece72b73f8"
+  },
+  "dimensions": {
+    "behavior": 0.1,
+    "edge_cases": 0.0,
+    "invariants": 0.2,
+    "io_semantics": 0.2,
+    "side_effects": 0.4
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file65.py",
+  "gated_score": 0.12375,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.12375,
+  "original_hash": "1ec38e4c642a37d2cb64a04549047e30fcca03ab84852352f032a6ece72b73f8",
+  "rationale": "The program deviates from the contract on missing/empty fields, uses safe parameterized queries and a different password hash, catches exceptions and redirects instead of returning 500, and reads DB credentials from env instead of fixed constants; only the successful redirect and single INSERT roughly match.",
+  "schema": 1,
+  "stability_abs_difference": 0.285,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.0,
+    "invariants": 0.4,
+    "io_semantics": 0.6,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.40875,
+  "weighted_mean": 0.165,
+  "worst_dimension": 0.0
+}

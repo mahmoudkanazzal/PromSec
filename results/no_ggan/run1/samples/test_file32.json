@@ -1,0 +1,35 @@
+{
+  "ast_similarity": 0.8854581673306773,
+  "candidate_hash": "b3b88fcdd6345c47c90d4e4b0e5baed3a1f7da4a32d3eaec4e5f7d18a45eb55a",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    703
+  ],
+  "error": "",
+  "file": "test_file32.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8854581673306773,
+      "bandit_statement_nodes": [
+        49
+      ],
+      "candidate_hash": "b3b88fcdd6345c47c90d4e4b0e5baed3a1f7da4a32d3eaec4e5f7d18a45eb55a",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module that implements the following functionality exactly as described, ensuring the code is secure, follows best practices, and does not rely on any external language or platform-specific features:\n\n1. **Imports**  \n   - Import the standard libraries `json`, `logging`, `os`, and `io.BytesIO`.  \n   - Import third\u2011party packages: `attr`, `six.text_type`, `twisted.internet.address`, `twisted.logger`, `twisted.web.http_headers.Headers`, `twisted.web.server.Request` and `twisted.web.server.Site`, `twisted.web.http.unquote`, `twisted.test.proto_helpers.MemoryReactorClock`, and `OpenSSL.crypto`.  \n   - Import `Sydent` and `parse_config_dict` from `sydent.sydent`.\n\n2. **Constant**  \n   - Define a multi\u2011line string constant `FAKE_SERVER_CERT_PEM` containing a PEM\u2011encoded X.509 certificate (the exact certificate text provided).\n\n3. **Function `make_sydent(test_config=None)`**  \n   - Create a new `Sydent` instance for testing.  \n   - Accept an optional dictionary `test_config` for configuration overrides.  \n   - Ensure a shallow copy of `test_config` is used to avoid mutating the caller\u2019s data.  \n   - Default to an in\u2011memory SQLite database (`\":memory:\"`) if no `db` entry is present, and set this default safely if a `db` dict exists but lacks the `db.file` key.  \n   - Instantiate a `MemoryReactorClock` and pass it along with the parsed configuration to `Sydent`.  \n   - Return the created `Sydent` instance.\n\n4. **`FakeChannel` class (using `attr.s`)**  \n   - Define attributes: `site` (type `Site`), `_reactor`, `result` (default empty dict via `attr.Factory(dict)`), and `_producer` (initially `None`).  \n   - Implement read\u2011only properties `json_body`, `code`, and `headers` that raise an exception if `result` is empty, and otherwise return parsed JSON, integer status code, and a `Headers` object built from `result[\"headers\"]`.  \n   - Implement methods `writeHeaders`, `write`, `registerProducer`, `unregisterProducer`, `requestDone`, `getPeer`, `getHost`, and a `transport` property returning `self`.  \n   - In `registerProducer`, schedule periodic calls to `resumeProducing` using the reactor, handling both streaming and non\u2011streaming producers safely.  \n   - In `getPeer`, return an `address.IPv4Address` with a loopback address to ensure `getClientIP` is non\u2011null.  \n   - Implement `getPeerCertificate` to return the hard\u2011coded certificate loaded via `crypto.load_certificate`.\n\n5. **`FakeSite` class**  \n   - Define an empty placeholder class representing a Twisted Web Site.\n\n6. **Function `make_request`**  \n   - Signature: `make_request(reactor, method, path, content=b\"\", access_token=None, request=Request, shorthand=True, federation_auth_origin=None)`.  \n   - Convert `method` and `path` to ASCII `bytes` safely, ignoring errors.  \n   - If `shorthand` is true and the path does not start with `b\"/_matrix\"`, prepend `b\"/_matrix/identity/v2/\"` and collapse duplicate slashes. Ensure the final path starts with a single leading slash.  \n   - Encode `content`:\n     - If a `dict`, JSON\u2011encode to UTF\u20118 bytes.  \n     - If a `six.text_type` string, encode to UTF\u20118 bytes.  \n   - Instantiate `FakeSite` and `FakeChannel` with the provided `reactor`.  \n   - Create a request object using the supplied `request` class, set `process` to a no\u2011op lambda, assign a `BytesIO` stream for `content`, and populate `postpath` by splitting the URL path on slashes and unquoting each segment.  \n   - If `access_token` is provided, add an `Authorization: Bearer <token>` header, ensuring the token is UTF\u20118 encoded.  \n   - If `federation_auth_origin` is not `None`, safely encode it to bytes and add an `Authorization` header with the format `X-Matrix origin=<origin>,key=,sig=`.  \n   - If there is a body, add a `Content-Type: application/json` header.  \n   - Call `requestReceived` with the method, path, and HTTP version `b\"1.1\"`.  \n   - Return a tuple `(req, channel)`.\n\n7. **`ToTwistedHandler` logging handler**  \n   - Subclass `logging.Handler`.  \n   - Create a class\u2011level `twisted.logger.Logger` instance named `tx_log`.  \n   - Implement `emit(self, record)` to format the log record, map the Python log level name to a Twisted `LogLevel` (lower\u2011casing and converting `\"warning\"` to `\"warn\"`), and emit the message to `tx_log` using `self.tx_log.emit`.\n\n8. **Function `setup_logging()`**  \n   - Obtain the root logger via `logging.getLogger()`.  \n   - Define a log format string that includes timestamp, logger name, line number, level name, and message.  \n   - Instantiate `ToTwistedHandler`, set a `logging.Formatter` with the defined format, and attach the handler to the root logger.  \n   - Read the environment variable `SYDENT_TEST_LOG_LEVEL` (default `\"ERROR\"`), convert it to upper case, and safely map it to a logging level integer using `getattr(logging, env_level, None)`.  \n   - If the mapping does not yield an integer, fall back to `logging.ERROR`.  \n   - Set the root logger\u2019s level to the resolved log level.\n\n9. **Execute `setup_logging()` at import time** to configure logging for tests.\n\n**Security and correctness requirements**  \n- Validate and sanitize all external inputs (environment variables, method/path strings, tokens, federation origins) to prevent injection or malformed data.  \n- Use explicit type checks and safe encoding/decoding (ASCII for HTTP method/path, UTF\u20118 for bodies and tokens).  \n- Ensure that mutable default arguments are avoided; use `attr.Factory` or explicit defaults.  \n- Preserve the exact functional behavior of the original code, including the handling of the fake TLS certificate and the reactor\u2011driven producer logic.  \n- Do not include any code in languages other than Python.  \n- Do not add explanatory comments, markdown, or any non\u2011code text in the output.\n\nGenerate only the Python code that satisfies all of the above specifications.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "fd29062fb5da351e7ce1cb83718776fe9a07e90f399c3bc40f4bb17f4e310c47",
+  "status": "secured"
+}

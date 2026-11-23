@@ -1,0 +1,513 @@
+{
+  "ast_similarity": 0.8391608391608392,
+  "candidate_hash": "2d5b04a34c08ee3e41af790d03f34dad24fd6851e4c00394b1095f479f5fa5d0",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 1,
+  "cwe_count_before": 1,
+  "cwes_after": [
+    703
+  ],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file88.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8391608391608392,
+      "bandit_statement_nodes": [
+        8,
+        12,
+        26,
+        38,
+        47,
+        56
+      ],
+      "candidate_hash": "2d5b04a34c08ee3e41af790d03f34dad24fd6851e4c00394b1095f479f5fa5d0",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1209,
+          "end_lineno": 19,
+          "lineno": 19,
+          "node": 12
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1361,
+          "end_lineno": 40,
+          "lineno": 40,
+          "node": 26
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1252,
+          "end_lineno": 59,
+          "lineno": 59,
+          "node": 38
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1289,
+          "end_lineno": 89,
+          "lineno": 89,
+          "node": 56
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that uses Flask to implement the following REST endpoints with the exact functionality described:\n\n- **/add_member** (POST): Accept form fields `name` and `email`. Connect to a MySQL database `community_db` on localhost using MySQLdb. Retrieve the database host, user, and password from environment variables `DB_HOST`, `DB_USER`, and `DB_PASSWORD`. Use a parameterized SELECT query to check if a member with the given name exists. If not, insert the new member with a parameterized INSERT query, commit the transaction, and return the text \u201cMember added successfully\u201d. If the member already exists, return \u201cMember already exists\u201d. On any database error, roll back the transaction and return \u201cFailed to add member\u201d without exposing error details.\n\n- **/login_member** (POST): Accept form fields `name` and `email`. Use a parameterized SELECT query to find a matching row. If a row is found, return \u201cLogin successful\u201d; otherwise return \u201cInvalid credentials\u201d. Ensure proper connection handling and error safety.\n\n- **/update_member_profile** (POST): Accept form fields `name` and `new_email`. Use a parameterized UPDATE query to set the email for the given name, commit the transaction, and return \u201cProfile updated successfully\u201d. Handle errors securely.\n\n- **/search_members** (GET): Accept a query parameter `term`. Use a parameterized SELECT query with a LIKE clause (`%term%`) to retrieve all member names containing the term. Return the result as a string representation of the fetched rows. Ensure safe query construction.\n\n- **/remove_member** (POST): Accept form field `name`. Use a parameterized DELETE query to remove the member with that name, commit the transaction, and return \u201cMember removed successfully\u201d. Handle errors securely.\n\nAdditional requirements:\n1. Import only Flask, MySQLdb, and standard library modules.\n2. Create a reusable function to obtain a new MySQLdb connection and cursor, using context managers or try/finally to guarantee that both cursor and connection are closed after each operation.\n3. All SQL statements must be parameterized to prevent SQL injection.\n4. Do not hard\u2011code any credentials; retrieve them from the specified environment variables.\n5. Implement comprehensive exception handling: on any database exception, roll back the transaction (if applicable) and return a generic failure message without leaking internal details.\n6. The Flask app must run only when the script is executed directly (`if __name__ == '__main__':`) with `debug=False`.\n7. Do not include any additional functionality, comments, or explanatory text. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5099476439790576,
+      "bandit_statement_nodes": [
+        25,
+        51,
+        73
+      ],
+      "candidate_hash": "46e84c98f9cbeda615336fab9351b027dafc5baa2740bcfb53ce9e82d86167e5",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1155,
+          "end_lineno": 16,
+          "lineno": 10,
+          "node": 6
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, secure Python 3 program that implements a Flask web service with the following requirements:\n\n- The code must be pure Python and use only standard library modules plus `flask` and `MySQLdb`.\n- Configure logging with `logging.basicConfig(level=logging.INFO)` and obtain a logger via `logging.getLogger(__name__)`.\n- Create a context manager function `get_db()` that:\n  * Reads the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, optional `DB_NAME` (default to `community_db`), optional `DB_SSL_CA`, `DB_SSL_CERT`, and `DB_SSL_KEY`.\n  * Raises a `RuntimeError` if `DB_HOST`, `DB_USER`, or `DB_PASSWORD` are missing.\n  * Builds a MySQL connection dictionary including `host`, `user`, `passwd`, `db`, `charset='utf8mb4'`, and, if SSL variables are provided, an `ssl` dictionary with the appropriate keys.\n  * Connects using `MySQLdb.connect(**conn_kwargs)`, creates a cursor, yields `(conn, cur)`, and ensures both cursor and connection are closed in a `finally` block.\n- Define the Flask app with the following routes, using only parameterized SQL queries to prevent injection, handling missing parameters with a `400` response, and logging any exceptions with stack traces:\n  * `POST /add_member` \u2013 expects form fields `name` and `email`. Checks for existing member, inserts new member, commits, and returns appropriate success or error messages.\n  * `POST /login_member` \u2013 expects form fields `name` and `email`. Validates credentials against the `members` table and returns success or invalid messages.\n  * `POST /update_member_profile` \u2013 expects form fields `name` and `new_email`. Updates the member\u2019s email, commits, and returns success or error messages.\n  * `GET /search_members` \u2013 accepts query parameter `term`. Performs a `LIKE` search on member names, returns the list of matching names, and handles errors.\n  * `POST /remove_member` \u2013 expects form field `name`. Deletes the member, commits, and returns success or error messages.\n- In each route, on any exception, log the exception, attempt to roll back the transaction if a connection is available, and return a generic failure response.\n- Ensure the script can be executed directly with:\n  ```python\n  if __name__ == '__main__':\n      app.run(debug=False)\n  ```\n- Do not include any code in languages other than Python, and do not add explanatory comments or text outside the code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5191897654584222,
+      "bandit_statement_nodes": [
+        49,
+        65,
+        82,
+        110
+      ],
+      "candidate_hash": "0c5f46ce3e26a9ca87c122c1449e84b4b2d53ce7aaac0f45e333b7e544dc9ee5",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service with the following requirements:\n\n- The script must be pure Python and must not contain any code in other languages.\n- Use `import os`, `import logging`, `from contextlib import contextmanager`, `from flask import Flask, request, jsonify, abort`, and `import MySQLdb`.\n- Configure logging with `logging.basicConfig(level=logging.INFO)` and create a logger using `logger = logging.getLogger(__name__)`.\n- Define a context manager function `get_db()` that:\n  * Reads the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`. If any of these are missing, raise a `RuntimeError` with the message \u201cMissing required DB environment variables\u201d.\n  * Reads optional environment variables `DB_NAME` (default to `\"community_db\"`), `DB_SSL_CA`, `DB_SSL_CERT`, `DB_SSL_KEY`.\n  * Constructs a dictionary `conn_kwargs` with keys `host`, `user`, `passwd`, `db`, `charset` set to `\"utf8mb4\"`, and `cursorclass` set to `MySQLdb.cursors.DictCursor`.\n  * If any SSL variables are provided, add an `ssl` entry to `conn_kwargs` containing a dictionary with the provided `ca`, `cert`, and `key` values.\n  * Creates a MySQL connection with `MySQLdb.connect(**conn_kwargs)`, obtains a cursor, yields a tuple `(conn, cur)`, and ensures the cursor and connection are closed in a `finally` block.\n- Create a Flask app instance with `app = Flask(__name__)`.\n- Implement the following routes, each using only parameterized SQL queries to prevent injection, handling missing parameters with `abort(400, ...)`, and returning JSON responses with appropriate HTTP status codes:\n\n  1. `POST /add_member`\n     * Retrieve `name` and `email` from `request.form`.\n     * If a member with the same `name` and `email` already exists, return `{'status': 'error', 'message': 'Member already exists'}` with status 400.\n     * Otherwise insert the new member, commit the transaction, and return `{'status': 'success', 'message': 'Member added'}` with status 201.\n     * On any exception, log the stack trace with `logger.exception`, attempt `conn.rollback()`, and return `{'status': 'error', 'message': 'Failed to add member'}` with status 500.\n\n  2. `POST /login_member`\n     * Retrieve `name` and `email` from `request.form`.\n     * If a matching member exists, return `{'status': 'success', 'message': 'Login successful'}` with status 200; otherwise return `{'status': 'error', 'message': 'Invalid credentials'}` with status 401.\n     * On exception, log, attempt rollback, and return `{'status': 'error', 'message': 'Login failed'}` with status 500.\n\n  3. `POST /update_member_profile`\n     * Retrieve `name` and `new_email` from `request.form`.\n     * Update the member\u2019s email. If no rows are affected, return `{'status': 'error', 'message': 'Member not found'}` with status 404; otherwise commit and return `{'status': 'success', 'message': 'Profile updated'}` with status 200.\n     * On exception, log, attempt rollback, and return `{'status': 'error', 'message': 'Failed to update profile'}` with status 500.\n\n  4. `GET /search_members`\n     * Retrieve `term` from `request.args`.\n     * Perform a case\u2011insensitive search using `LIKE` with the pattern `%{term}%` and return a list of matching member names in `{'status': 'success', 'members': results}` with status 200.\n     * On exception, log and return `{'status': 'error', 'message': 'Search failed'}` with status 500.\n\n  5. `POST /remove_member`\n     * Retrieve `name` from `request.form`.\n     * Delete the member with that name. If no rows are affected, return `{'status': 'error', 'message': 'Member not found'}` with status 404; otherwise commit and return `{'status': 'success', 'message': 'Member removed'}` with status 200.\n     * On exception, log, attempt rollback, and return `{'status': 'error', 'message': 'Failed to remove member'}` with status 500.\n\n- Ensure each route uses a `with get_db() as (conn, cur):` block for database operations.\n- At the end of the script, include the standard `if __name__ == '__main__':` guard that runs the Flask app with `debug=False`.\n- The generated code must be secure, follow best practices, and preserve the exact functionality described above. Do not include any explanatory comments or additional text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4865134865134865,
+      "bandit_statement_nodes": [
+        42,
+        58,
+        75,
+        104
+      ],
+      "candidate_hash": "d09d12d05d03045486a270a057b2908bb6bb2e1c04c04793261e3b94b1245aa2",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other language) that implements a Flask web service with the following requirements:\n\n- Use only Python standard library modules and the third\u2011party packages `flask`, `MySQLdb`, and `MySQLdb.cursors`.\n- Configure logging with `logging.basicConfig(level=logging.INFO)` and obtain a logger named `__name__`.\n- Define a context manager `get_db()` that:\n  * Reads the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD` (required) and raises `RuntimeError('Missing required DB environment variables')` if any are missing.\n  * Reads optional environment variables `DB_NAME` (default `community_db`), `DB_SSL_CA`, `DB_SSL_CERT`, `DB_SSL_KEY`.\n  * Builds a `conn_kwargs` dictionary with keys `host`, `user`, `passwd`, `db`, `charset='utf8mb4'`, and `cursorclass=MySQLdb.cursors.DictCursor`.\n  * If any SSL variables are provided, adds an `ssl` sub\u2011dictionary containing the provided `ca`, `cert`, and `key`.\n  * Connects to MySQL with `MySQLdb.connect(**conn_kwargs)`, creates a cursor, yields a tuple `(conn, cur)`, and ensures the cursor and connection are closed in a `finally` block.\n- Create a Flask app instance `app = Flask(__name__)`.\n- Implement the following routes with exact behavior, using only parameterized queries (`%s` placeholders) to prevent SQL injection, proper error handling, and JSON responses:\n\n  1. `POST /add_member`\n     - Retrieve `name` and `email` from `request.form`.\n     - If missing, abort with 400 and description \u201cMissing name or email\u201d.\n     - Within `get_db()`, check if a member with the same `name` and `email` exists; if so, return JSON `{'status':'error','message':'Member already exists'}` with status 400.\n     - Otherwise insert the new member, commit, and return JSON `{'status':'success','message':'Member added'}` with status 201.\n     - On any exception, log the stack trace with `logger.exception('Failed to add member')`, attempt `conn.rollback()`, and return JSON `{'status':'error','message':'Failed to add member'}` with status 500.\n\n  2. `POST /login_member`\n     - Retrieve `name` and `email` from `request.form`.\n     - If missing, abort with 400 and description \u201cMissing name or email\u201d.\n     - Within `get_db()`, query for a matching member; if found return JSON `{'status':'success','message':'Login successful'}` with status 200, else return JSON `{'status':'error','message':'Invalid credentials'}` with status 401.\n     - On exception, log with `logger.exception('Login failed')`, attempt `conn.rollback()`, and return JSON `{'status':'error','message':'Login failed'}` with status 500.\n\n  3. `POST /update_member_profile`\n     - Retrieve `name` and `new_email` from `request.form`.\n     - If missing, abort with 400 and description \u201cMissing name or new_email\u201d.\n     - Within `get_db()`, execute an UPDATE setting `email=%s` where `name=%s`.\n     - If `cur.rowcount` is 0, return JSON `{'status':'error','message':'Member not found'}` with status 404.\n     - Otherwise commit and return JSON `{'status':'success','message':'Profile updated'}` with status 200.\n     - On exception, log with `logger.exception('Failed to update profile')`, attempt `conn.rollback()`, and return JSON `{'status':'error','message':'Failed to update profile'}` with status 500.\n\n  4. `GET /search_members`\n     - Retrieve query parameter `term`; if absent abort with 400 and description \u201cMissing search term\u201d.\n     - Build a pattern `f'%{term}%'`.\n     - Within `get_db()`, select `name` from `members` where `name LIKE %s` using the pattern.\n     - Return JSON `{'status':'success','members':[list of names]}` with status 200.\n     - On exception, log with `logger.exception('Search failed')` and return JSON `{'status':'error','message':'Search failed'}` with status 500.\n\n  5. `POST /remove_member`\n     - Retrieve `name` from `request.form`.\n     - If missing, abort with 400 and description \u201cMissing name\u201d.\n     - Within `get_db()`, execute a DELETE where `name=%s`.\n     - If `cur.rowcount` is 0, return JSON `{'status':'error','message':'Member not found'}` with status 404.\n     - Otherwise commit and return JSON `{'status':'success','message':'Member removed'}` with status 200.\n     - On exception, log with `logger.exception('Failed to remove member')`, attempt `conn.rollback()`, and return JSON `{'status':'error','message':'Failed to remove member'}` with status 500.\n\n- At the bottom, include the standard `if __name__ == '__main__':` guard that runs `app.run(debug=False)`.\n- Ensure the script contains **no explanatory comments**, no extra output, and adheres to security best practices (parameterized queries, no debug mode, proper handling of environment variables, logging of exceptions).",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4760508308895406,
+      "bandit_statement_nodes": [
+        55,
+        73,
+        92,
+        123
+      ],
+      "candidate_hash": "571d5f1b187e999e6b6dad5fd77ee8dfb2c0a10c78b4f022bbc5e4a54e6432d7",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 5,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages, no explanatory text, no comments) that implements a Flask web application with the following requirements:\n\n- Use only the standard library plus `Flask`, `MySQLdb`, and `MySQLdb.cursors`.\n- Configure logging with `logging.basicConfig(level=logging.INFO)` and obtain a logger named `__name__`.\n- Define a context manager `get_db()` that:\n  * Reads the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, optional `DB_NAME` (default `community_db`), `DB_SSL_CA`, `DB_SSL_CERT`, and `DB_SSL_KEY`.\n  * Raises a `RuntimeError` if any of `DB_HOST`, `DB_USER`, or `DB_PASSWORD` are missing.\n  * Builds a connection dictionary with keys `host`, `user`, `passwd`, `db`, `charset='utf8mb4'`, and `cursorclass=MySQLdb.cursors.DictCursor`.\n  * If any SSL variables are present, adds an `ssl` sub\u2011dictionary containing the provided `ca`, `cert`, and `key`.\n  * Connects to MySQL using `MySQLdb.connect(**conn_kwargs)`, yields a tuple `(conn, cur)` where `cur` is a cursor, and ensures both cursor and connection are closed in a `finally` block.\n- Create a Flask app instance.\n- Implement the following routes with exact behavior, using only parameterized queries (`%s` placeholders) and proper error handling:\n  1. `POST /add_member`:\n     * Retrieve `name` and `email` from `request.form`.\n     * Return 400 if either is missing.\n     * Within `get_db()`, check if a member with the same `name` and `email` exists; if so, return JSON `{'status':'error','message':'Member already exists'}` with status 400.\n     * Otherwise insert the new member, commit, and return JSON `{'status':'success','message':'Member added'}` with status 201.\n     * On any exception, log the stack trace, roll back if a connection exists, and return JSON `{'status':'error','message':'Failed to add member'}` with status 500.\n  2. `POST /login_member`:\n     * Retrieve `name` and `email` from `request.form`.\n     * Return 400 if missing.\n     * Within `get_db()`, query for a matching member; if found return JSON `{'status':'success','message':'Login successful'}` with status 200, else return JSON `{'status':'error','message':'Invalid credentials'}` with status 401.\n     * On exception, log, roll back if needed, and return JSON `{'status':'error','message':'Login failed'}` with status 500.\n  3. `POST /update_member_profile`:\n     * Retrieve `name` and `new_email` from `request.form`.\n     * Return 400 if missing.\n     * Within `get_db()`, execute an UPDATE setting `email=%s` where `name=%s`.\n     * If `cur.rowcount` is 0, return JSON `{'status':'error','message':'Member not found'}` with status 404.\n     * Otherwise commit and return JSON `{'status':'success','message':'Profile updated'}` with status 200.\n     * On exception, log, roll back if needed, and return JSON `{'status':'error','message':'Failed to update profile'}` with status 500.\n  4. `GET /search_members`:\n     * Retrieve query parameter `term`.\n     * Return 400 if missing.\n     * Build a pattern `'%{term}%'`.\n     * Within `get_db()`, select `name` from `members` where `name LIKE %s` using the pattern.\n     * Return JSON `{'status':'success','members':[list of names]}` with status 200.\n     * On exception, log and return JSON `{'status':'error','message':'Search failed'}` with status 500.\n  5. `POST /remove_member`:\n     * Retrieve `name` from `request.form`.\n     * Return 400 if missing.\n     * Within `get_db()`, delete from `members` where `name=%s`.\n     * If `cur.rowcount` is 0, return JSON `{'status':'error','message':'Member not found'}` with status 404.\n     * Otherwise commit and return JSON `{'status':'success','message':'Member removed'}` with status 200.\n     * On exception, log, roll back if needed, and return JSON `{'status':'error','message':'Failed to remove member'}` with status 500.\n- At the bottom, include the typical `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n- Ensure all database interactions use parameterized queries to prevent SQL injection.\n- Do not include any comments, explanatory text, or code in languages other than Python. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.47373540856031127,
+      "bandit_statement_nodes": [
+        32,
+        35,
+        55,
+        73,
+        92,
+        122
+      ],
+      "candidate_hash": "20c6cb71b0211efaee83d2f58182b1dcce59726c2a4dad34940611d2ac14ab82",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 6,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web service with the following requirements:\n\n- Use only Python standard library modules and the third\u2011party packages `flask`, `MySQLdb`, and `MySQLdb.cursors`.\n- Configure logging with `logging.basicConfig(level=logging.INFO)` and create a logger named `__name__`.\n- Define a context manager `get_db()` that:\n  * Reads required database connection parameters from environment variables: `DB_HOST`, `DB_USER`, `DB_PASSWORD`. If any are missing, raise `RuntimeError('Missing required DB environment variables')`.\n  * Reads optional `DB_NAME` (default to `'community_db'`) and optional SSL variables `DB_SSL_CA`, `DB_SSL_CERT`, `DB_SSL_KEY`.\n  * Builds a `conn_kwargs` dictionary with keys `host`, `user`, `passwd`, `db`, `charset='utf8mb4'`, and `cursorclass=MySQLdb.cursors.DictCursor`.\n  * If any SSL variables are present, adds an `ssl` sub\u2011dictionary to `conn_kwargs` containing the provided keys.\n  * Connects to MySQL using `MySQLdb.connect(**conn_kwargs)`, obtains a cursor, yields `(conn, cur)`, and ensures both cursor and connection are closed in a `finally` block, swallowing any exceptions during close.\n- Create a Flask app instance.\n- Implement the following routes with exact functionality, using only parameterized queries (`%s` placeholders) to prevent SQL injection, proper error handling, transaction commit/rollback, and JSON responses with the specified HTTP status codes:\n\n  1. `POST /add_member`\n     - Retrieve `name` and `email` from `request.form`.\n     - If missing, return `{'status':'error','message':'Missing name or email'}` with status 400.\n     - Within `get_db()`, check if a member with the same `name` and `email` exists. If so, return `{'status':'error','message':'Member already exists'}` with status 400.\n     - Insert the new member, commit, and return `{'status':'success','message':'Member added'}` with status 201.\n     - On any exception, log the stack trace, rollback if a connection exists, and return `{'status':'error','message':'Failed to add member'}` with status 500.\n\n  2. `POST /login_member`\n     - Retrieve `name` and `email` from `request.form`.\n     - If missing, return `{'status':'error','message':'Missing name or email'}` with status 400.\n     - Within `get_db()`, query for a matching member. If found, return `{'status':'success','message':'Login successful'}` with status 200; otherwise return `{'status':'error','message':'Invalid credentials'}` with status 401.\n     - On exception, log, rollback if needed, and return `{'status':'error','message':'Login failed'}` with status 500.\n\n  3. `POST /update_member_profile`\n     - Retrieve `name` and `new_email` from `request.form`.\n     - If missing, return `{'status':'error','message':'Missing name or new_email'}` with status 400.\n     - Within `get_db()`, execute an `UPDATE` to set `email` to `new_email` where `name` matches.\n     - If `cur.rowcount` is 0, return `{'status':'error','message':'Member not found'}` with status 404.\n     - Commit and return `{'status':'success','message':'Profile updated'}` with status 200.\n     - On exception, log, rollback if needed, and return `{'status':'error','message':'Failed to update profile'}` with status 500.\n\n  4. `GET /search_members`\n     - Retrieve query parameter `term` from `request.args`.\n     - If missing, return `{'status':'error','message':'Missing search term'}` with status 400.\n     - Build a pattern `'%{term}%'` and, within `get_db()`, execute a `SELECT name FROM members WHERE name LIKE %s` using the pattern.\n     - Return `{'status':'success','members': [list of names]}` with status 200.\n     - On exception, log and return `{'status':'error','message':'Search failed'}` with status 500.\n\n  5. `POST /remove_member`\n     - Retrieve `name` from `request.form`.\n     - If missing, return `{'status':'error','message':'Missing name'}` with status 400.\n     - Within `get_db()`, execute a `DELETE FROM members WHERE name=%s`.\n     - If `cur.rowcount` is 0, return `{'status':'error','message':'Member not found'}` with status 404.\n     - Commit and return `{'status':'success','message':'Member removed'}` with status 200.\n     - On exception, log, rollback if needed, and return `{'status':'error','message':'Failed to remove member'}` with status 500.\n\n- At the end of the script, include the standard entry point:\n  ```python\n  if __name__ == '__main__':\n      app.run(debug=False)\n  ```\n- Do not include any comments, explanatory text, or code in any language other than Python. Ensure the script is secure (use environment variables for secrets, parameterized queries, proper exception handling, and resource cleanup) and matches the described functionality exactly.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5164369034994698,
+      "bandit_statement_nodes": [
+        32,
+        35,
+        55,
+        73,
+        92,
+        123
+      ],
+      "candidate_hash": "72dc36c1b2a2e05d957e9afe9d886c7d2ad486f08fbe0a95b63ee05dc38b4c35",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 7,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (Python\u202f3) that implements a Flask web service with the following requirements, and output **only** the Python code (no explanations, no comments, no markdown formatting):\n\n1. **Imports**:  \n   - `os`  \n   - `logging`  \n   - `contextlib.contextmanager`  \n   - `MySQLdb` and `MySQLdb.cursors`  \n   - `flask.Flask`, `flask.request`, `flask.jsonify`\n\n2. **Logging**:  \n   - Configure basic logging at INFO level.  \n   - Create a logger named after the module (`__name__`).\n\n3. **Database connection context manager `get_db()`**:  \n   - Retrieve required DB credentials from environment variables: `DB_HOST`, `DB_USER`, `DB_PASSWORD`. Raise `RuntimeError` if any are missing.  \n   - Use optional `DB_NAME` (default `\"community_db\"`).  \n   - Build a `conn_kwargs` dictionary with keys: `host`, `user`, `passwd`, `db`, `charset='utf8mb4'`, `cursorclass=MySQLdb.cursors.DictCursor`.  \n   - If any of `DB_SSL_CA`, `DB_SSL_CERT`, `DB_SSL_KEY` are set, add an `ssl` sub\u2011dictionary to `conn_kwargs` containing the provided values (`ca`, `cert`, `key`).  \n   - Connect with `MySQLdb.connect(**conn_kwargs)`, obtain a cursor, and yield `(conn, cur)`.  \n   - Ensure both cursor and connection are closed in a `finally` block, swallowing any exceptions during close.\n\n4. **Flask app**:  \n   - Instantiate `app = Flask(__name__)`.  \n   - Do **not** enable debug mode when running.\n\n5. **Endpoints** (all must use the `get_db` context manager, parameterized queries, proper error handling, and logging of exceptions):\n\n   - `POST /add_member`  \n     - Expect form fields `name` and `email`.  \n     - Return 400 if missing.  \n     - Check for existing member (`SELECT 1 FROM members WHERE name=%s AND email=%s`). If exists, return 400 with error.  \n     - Insert new member (`INSERT INTO members (name, email) VALUES (%s, %s)`). Commit and return 201 on success.  \n     - On any exception, log it, rollback if possible, and return 500.\n\n   - `POST /login_member`  \n     - Expect form fields `name` and `email`.  \n     - Return 400 if missing.  \n     - Verify credentials with the same SELECT as above. Return 200 on success, 401 on failure.  \n     - On exception, log, rollback if possible, and return 500.\n\n   - `POST /update_member_profile`  \n     - Expect form fields `name` and `new_email`.  \n     - Return 400 if missing.  \n     - Update email (`UPDATE members SET email=%s WHERE name=%s`). If `rowcount` is 0, return 404. Commit and return 200 on success.  \n     - On exception, log, rollback if possible, and return 500.\n\n   - `GET /search_members`  \n     - Expect query parameter `term`. Return 400 if missing.  \n     - Search with `LIKE` using pattern `%term%` (`SELECT name FROM members WHERE name LIKE %s`). Return JSON list of matching names with 200.  \n     - On exception, log and return 500.\n\n   - `POST /remove_member`  \n     - Expect form field `name`. Return 400 if missing.  \n     - Delete member (`DELETE FROM members WHERE name=%s`). If `rowcount` is 0, return 404. Commit and return 200 on success.  \n     - On exception, log, rollback if possible, and return 500.\n\n6. **Application entry point**:  \n   - Include `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\n7. **Security and robustness**:  \n   - Use only parameterized queries (no string interpolation for SQL).  \n   - Validate presence of required inputs and return appropriate HTTP status codes.  \n   - Ensure all database resources are properly closed.  \n   - Log full stack traces for unexpected errors using `logger.exception`.  \n   - Do not expose internal error details in responses.  \n   - Do not enable Flask debug mode.  \n\nProduce the code exactly as specified, with no additional text, comments, or formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5088819226750261,
+      "bandit_statement_nodes": [
+        32,
+        35,
+        53,
+        69,
+        86,
+        115
+      ],
+      "candidate_hash": "fcf5842688979be10faa8fd916f2cb8a5eb7941cf1ed0af19322000bdfa7f4c4",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 8,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.8+) that implements a Flask web service with the following specifications, ensuring the code is secure, follows best practices, and retains the exact functionality described:\n\n1. **Imports**  \n   - `os`, `logging`, `contextlib.contextmanager`  \n   - `MySQLdb` and `MySQLdb.cursors`  \n   - `Flask`, `request`, `jsonify` from `flask`\n\n2. **Logging**  \n   - Configure basic logging at INFO level.  \n   - Create a logger named after the module (`__name__`).\n\n3. **Database Context Manager (`get_db`)**  \n   - Retrieve `DB_HOST`, `DB_USER`, `DB_PASSWORD` from environment variables; raise `RuntimeError` with message \u201cDatabase credentials missing\u201d if any are absent.  \n   - Use `DB_NAME` environment variable with default value `community_db`.  \n   - Build a `conn_kwargs` dictionary containing:\n     - `host`, `user`, `passwd`, `db`, `charset='utf8mb4'`\n     - `cursorclass=MySQLdb.cursors.DictCursor`\n   - If any of `DB_SSL_CA`, `DB_SSL_CERT`, `DB_SSL_KEY` are set, construct an `ssl` sub\u2011dictionary with the provided keys and add it to `conn_kwargs` under the key `ssl`.  \n   - Establish a MySQL connection with `MySQLdb.connect(**conn_kwargs)`.  \n   - Obtain a cursor from the connection.  \n   - Yield a tuple `(conn, cur)` to the caller.  \n   - In the `finally` block, close the cursor and connection safely, suppressing any exceptions.\n\n4. **Flask Application**  \n   - Instantiate `app = Flask(__name__)`.\n\n5. **Endpoints**  \n\n   - **POST `/add_member`**  \n     - Expect form fields `name` and `email`. Return `400` with JSON error if missing.  \n     - Within `get_db` context, check for existing member using a parameterized SELECT (`SELECT 1 FROM members WHERE name=%s AND email=%s`). If found, return `400` with error \u201cMember already exists\u201d.  \n     - Insert new member with a parameterized INSERT (`INSERT INTO members (name, email) VALUES (%s, %s)`). Commit transaction. Return `201` with message \u201cMember added\u201d.  \n     - On any exception, log the stack trace, attempt `conn.rollback()`, and return `500` with error \u201cInternal server error\u201d.\n\n   - **POST `/login_member`**  \n     - Expect form fields `name` and `email`. Return `400` if missing.  \n     - Within `get_db`, perform a parameterized SELECT to verify credentials. If a row exists, return `200` with message \u201cLogin successful\u201d; otherwise return `401` with error \u201cInvalid credentials\u201d.  \n     - On exception, log, rollback, and return `500` as above.\n\n   - **POST `/update_member_profile`**  \n     - Expect form fields `name` and `new_email`. Return `400` if missing.  \n     - Within `get_db`, execute a parameterized UPDATE (`UPDATE members SET email=%s WHERE name=%s`). If `cur.rowcount` is `0`, return `404` with error \u201cMember not found\u201d. Otherwise commit and return `200` with message \u201cProfile updated\u201d.  \n     - On exception, log, rollback, and return `500`.\n\n   - **GET `/search_members`**  \n     - Expect query parameter `term`. Return `400` if missing.  \n     - Within `get_db`, construct a pattern `f'%{term}%'` and execute a parameterized SELECT (`SELECT name FROM members WHERE name LIKE %s`). Fetch all rows, extract the `name` field into a list, and return JSON `{ \"names\": [...] }` with status `200`.  \n     - On exception, log and return `500`.\n\n   - **POST `/remove_member`**  \n     - Expect form field `name`. Return `400` if missing.  \n     - Within `get_db`, execute a parameterized DELETE (`DELETE FROM members WHERE name=%s`). If `cur.rowcount` is `0`, return `404` with error \u201cMember not found\u201d. Otherwise commit and return `200` with message \u201cMember removed\u201d.  \n     - On exception, log, rollback, and return `500`.\n\n6. **Application Entry Point**  \n   - Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\n7. **Security and Best Practices**  \n   - Use only parameterized queries to prevent SQL injection.  \n   - Do not expose raw exception details to clients; log them internally.  \n   - Ensure all resources (cursor, connection) are closed even on errors.  \n   - Validate presence of required inputs and return appropriate HTTP status codes.  \n   - Do not import or use any non\u2011standard libraries beyond those listed.  \n   - The entire script must be pure Python; do not include any other language code or explanatory comments.  \n\nGenerate only the Python code that fulfills all the above requirements. Do not add any additional text, explanations, or comments.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4919191919191919,
+      "bandit_statement_nodes": [
+        35,
+        39,
+        57,
+        73,
+        90,
+        119
+      ],
+      "candidate_hash": "f99faef4a61abf9e521fbbc87a57a0fc5a57b0b242e4cd248b62e0069aba6e86",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 9,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service with the following requirements:\n\n- Use only Python and standard libraries plus `MySQLdb`, `flask`, and `logging`.\n- Import `os`, `logging`, `contextlib.contextmanager`, `MySQLdb`, `MySQLdb.cursors`, and the necessary objects from `flask`.\n- Configure logging with `logging.basicConfig(level=logging.INFO)` and create a logger named `__name__`.\n- Define a context manager function `get_db()` that:\n  * Retrieves `DB_HOST`, `DB_USER`, and `DB_PASSWORD` from environment variables and raises `RuntimeError('Database credentials missing')` if any are absent.\n  * Retrieves optional `DB_NAME` (default `'community_db'`) and optional SSL variables `DB_SSL_CA`, `DB_SSL_CERT`, `DB_SSL_KEY`.\n  * Constructs a `conn_kwargs` dictionary with keys `host`, `user`, `passwd`, `db`, `charset='utf8mb4'`, and `cursorclass=MySQLdb.cursors.DictCursor`.\n  * If any SSL variable is present, adds an `ssl` entry to `conn_kwargs` containing a dictionary with the provided `ca`, `cert`, and/or `key`.\n  * Connects to the database with `MySQLdb.connect(**conn_kwargs)`, obtains a cursor, and yields a tuple `(conn, cur)`.\n  * Ensures the cursor and connection are closed safely in a `finally` block, suppressing any exceptions during close.\n- Create a Flask app instance.\n- Implement the following routes with exact functionality, using only parameterized queries and proper error handling:\n\n  1. `POST /add_member`\n     - Retrieve `name` and `email` from `request.form`.\n     - Return `400` with JSON `{'error': 'Missing name or email'}` if either is missing.\n     - Within `get_db()`, check if a member with the same `name` and `email` exists; if so, return `400` with `{'error': 'Member already exists'}`.\n     - Insert the new member, commit the transaction, and return `201` with `{'message': 'Member added'}`.\n     - On any exception, log the stack trace with `logger.exception`, attempt `conn.rollback()`, and return `500` with `{'error': 'Internal server error'}`.\n\n  2. `POST /login_member`\n     - Retrieve `name` and `email` from `request.form`.\n     - Validate presence as above, returning `400` if missing.\n     - Within `get_db()`, query for a matching member; if found, return `200` with `{'message': 'Login successful'}`, otherwise return `401` with `{'error': 'Invalid credentials'}`.\n     - On exception, log, rollback if possible, and return `500` as above.\n\n  3. `POST /update_member_profile`\n     - Retrieve `name` and `new_email` from `request.form`.\n     - Validate presence, returning `400` if missing.\n     - Within `get_db()`, execute an `UPDATE` to set `email` to `new_email` where `name` matches.\n     - If `cur.rowcount` is `0`, return `404` with `{'error': 'Member not found'}`.\n     - Commit and return `200` with `{'message': 'Profile updated'}`.\n     - On exception, log, rollback if possible, and return `500`.\n\n  4. `GET /search_members`\n     - Retrieve query parameter `term` from `request.args`.\n     - Validate presence, returning `400` if missing.\n     - Within `get_db()`, construct a pattern `'%{term}%'` and execute a `SELECT name FROM members WHERE name LIKE %s` using the pattern.\n     - Return `200` with JSON `{'names': [list of matching names]}`.\n     - On exception, log and return `500`.\n\n  5. `POST /remove_member`\n     - Retrieve `name` from `request.form`.\n     - Validate presence, returning `400` if missing.\n     - Within `get_db()`, execute a `DELETE FROM members WHERE name=%s`.\n     - If `cur.rowcount` is `0`, return `404` with `{'error': 'Member not found'}`.\n     - Commit and return `200` with `{'message': 'Member removed'}`.\n     - On exception, log, rollback if possible, and return `500`.\n\n- At the end of the script, include the standard entry point:\n  ```python\n  if __name__ == '__main__':\n      app.run(debug=False)\n  ```\n- Ensure the script contains no explanatory comments, no code in any language other than Python, and follows security best practices: no hard\u2011coded credentials, use of parameterized queries, proper resource cleanup, and logging of exceptions without exposing sensitive data.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.48554336989032904,
+      "bandit_statement_nodes": [
+        32,
+        35,
+        55,
+        73,
+        92,
+        123
+      ],
+      "candidate_hash": "ffaac8a67404ec8acd5b032e5703048c569dafe214aef1027c73a1a8f465b688",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 10,
+      "optimized_prompt": "Write a complete, production\u2011ready Python script (no markdown fences, no explanatory text, no comments) that implements the following functionality exactly as described, ensuring the code is secure, uses best practices, and runs only in Python:\n\n- Use only the standard library and the third\u2011party packages `Flask`, `MySQLdb`, and `MySQLdb.cursors`.\n- Configure logging with `logging.basicConfig(level=logging.INFO)` and obtain a logger named `__name__`.\n- Define a context manager `get_db()` that:\n  * Reads the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (default to `community_db` if not set), `DB_SSL_CA`, `DB_SSL_CERT`, and `DB_SSL_KEY`.\n  * Raises a `RuntimeError` if `DB_HOST`, `DB_USER`, or `DB_PASSWORD` are missing.\n  * Builds a dictionary of connection arguments including `host`, `user`, `passwd`, `db`, `charset='utf8mb4'`, and `cursorclass=MySQLdb.cursors.DictCursor`.\n  * If any of the SSL variables are provided, adds an `ssl` dictionary with the appropriate keys (`ca`, `cert`, `key`) to the connection arguments.\n  * Connects to MySQL with `MySQLdb.connect(**conn_kwargs)`, creates a cursor, yields a tuple `(conn, cur)`, and ensures both cursor and connection are closed in a `finally` block, swallowing any exceptions during close.\n- Create a Flask app instance.\n- Implement the following routes, each using only parameterized queries (no string interpolation for SQL) and handling errors securely:\n  1. `POST /add_member`:\n     * Retrieve `name` and `email` from `request.form`.\n     * Return `400` with JSON `{'error': 'Missing name or email'}` if either is missing.\n     * Within `get_db()`, check if a member with the same `name` and `email` already exists; if so, return `400` with `{'error': 'Member already exists'}`.\n     * Insert the new member, commit the transaction, and return `201` with `{'message': 'Member added'}`.\n  2. `POST /login_member`:\n     * Retrieve `name` and `email` from `request.form`.\n     * Return `400` with `{'error': 'Missing name or email'}` if missing.\n     * Within `get_db()`, verify the member exists; if found, return `200` with `{'message': 'Login successful'}`, otherwise return `401` with `{'error': 'Invalid credentials'}`.\n  3. `POST /update_member_profile`:\n     * Retrieve `name` and `new_email` from `request.form`.\n     * Return `400` with `{'error': 'Missing name or new_email'}` if missing.\n     * Within `get_db()`, execute an `UPDATE` to set `email = new_email` where `name = name`.\n     * If `cur.rowcount` is `0`, return `404` with `{'error': 'Member not found'}`; otherwise commit and return `200` with `{'message': 'Profile updated'}`.\n  4. `GET /search_members`:\n     * Retrieve `term` from `request.args`.\n     * Return `400` with `{'error': 'Missing term'}` if missing.\n     * Within `get_db()`, construct a pattern `'%{term}%'` safely and execute a `SELECT name FROM members WHERE name LIKE %s`.\n     * Return `200` with JSON `{'names': [list of matching names]}`.\n  5. `POST /remove_member`:\n     * Retrieve `name` from `request.form`.\n     * Return `400` with `{'error': 'Missing name'}` if missing.\n     * Within `get_db()`, execute a `DELETE FROM members WHERE name = %s`.\n     * If `cur.rowcount` is `0`, return `404` with `{'error': 'Member not found'}`; otherwise commit and return `200` with `{'message': 'Member removed'}`.\n- For each route, wrap the database operations in a `try/except` block:\n  * Log the full exception stack trace using the configured logger (`logger.exception(...)`).\n  * If a connection object exists, attempt to `rollback()` inside the exception handling, ignoring any rollback errors.\n  * Return `500` with `{'error': 'Internal server error'}` for any unexpected exception.\n- At the bottom of the script, include the standard `if __name__ == '__main__':` guard that runs the Flask app with `debug=False`.\n\nThe generated code must be syntactically correct, follow the described behavior exactly, and contain no additional text, comments, or markdown formatting. Ensure all SQL statements use parameter placeholders (`%s`) and pass parameters as a tuple to prevent SQL injection. Ensure proper resource cleanup and error handling as specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4909274193548387,
+      "bandit_statement_nodes": [
+        32,
+        35,
+        55,
+        73,
+        92,
+        109,
+        127
+      ],
+      "candidate_hash": "5d1b6937a6e4e8741f66a7ebe6443ef1f8c5c28d67975652658776aecc59fe80",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 11,
+      "optimized_prompt": "Write a complete, production\u2011ready Python 3 program that implements a Flask web service with the following requirements, ensuring the code is secure, functional equivalent to the reference, and contains no language other than Python:\n\n- Use only the standard library and the packages: flask, MySQLdb, MySQLdb.cursors, logging, os, contextlib.\n- Configure logging with `logging.basicConfig(level=logging.INFO)` and obtain a logger via `logging.getLogger(__name__)`.\n- Create a context manager function `get_db()` that:\n  * Reads the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and optionally `DB_NAME` (default to `\"community_db\"`). If any of the required variables are missing, raise a `RuntimeError` with an appropriate message.\n  * Builds a dictionary `conn_kwargs` containing the keys `host`, `user`, `passwd`, `db`, `charset` set to `\"utf8mb4\"`, and `cursorclass` set to `MySQLdb.cursors.DictCursor`.\n  * Reads optional SSL environment variables `DB_SSL_CA`, `DB_SSL_CERT`, `DB_SSL_KEY`. If any are present, construct an `ssl` sub\u2011dictionary with the corresponding keys (`ca`, `cert`, `key`) and add it to `conn_kwargs` under the key `ssl`.\n  * Connects to MySQL using `MySQLdb.connect(**conn_kwargs)`, creates a cursor, yields a tuple `(conn, cur)`, and in a `finally` block safely closes the cursor and connection, suppressing any exceptions during close.\n- Initialize a Flask app with `app = Flask(__name__)`.\n- Implement the following routes, each using `with get_db() as (conn, cur):` and handling errors with try/except, logging exceptions, rolling back on failure, and returning JSON responses with appropriate HTTP status codes:\n\n  1. `POST /add_member`\n     * Retrieve `name` and `email` from `request.form`.\n     * Validate presence of both fields; if missing, return `{'error': 'Missing name or email'}` with status 400.\n     * Check if a member with the same name and email already exists using a parameterized SELECT query.\n     * If exists, return `{'error': 'Member already exists'}` with status 400.\n     * Insert the new member with a parameterized INSERT query, commit, and return `{'message': 'Member added'}` with status 201.\n\n  2. `POST /login_member`\n     * Retrieve `name` and `email` from `request.form`.\n     * Validate presence; on missing fields return 400 with appropriate error.\n     * Verify credentials with a parameterized SELECT query.\n     * If a matching record is found, return `{'message': 'Login successful'}` with status 200; otherwise return `{'error': 'Invalid credentials'}` with status 401.\n\n  3. `POST /update_member_profile`\n     * Retrieve `name` and `new_email` from `request.form`.\n     * Validate presence; on missing fields return 400.\n     * Update the member\u2019s email with a parameterized UPDATE query.\n     * If `cur.rowcount` is 0, return `{'error': 'Member not found'}` with status 404.\n     * On success, commit and return `{'message': 'Profile updated'}` with status 200.\n\n  4. `GET /search_members`\n     * Retrieve `term` from `request.args`.\n     * Validate presence; on missing term return 400.\n     * Construct a pattern `%{term}%` and execute a parameterized SELECT query to find member names matching the pattern.\n     * Return a JSON object `{'names': [list of matching names]}` with status 200.\n\n  5. `POST /remove_member`\n     * Retrieve `name` from `request.form`.\n     * Validate presence; on missing name return 400.\n     * Delete the member with a parameterized DELETE query.\n     * If `cur.rowcount` is 0, return `{'error': 'Member not found'}` with status 404.\n     * On success, commit and return `{'message': 'Member removed'}` with status 200.\n\n- In each route, ensure that any caught exception logs the full stack trace using `logger.exception`, attempts a rollback if a connection was established, and returns `{'error': 'Internal server error'}` with status 500.\n- Do not include any explanatory comments or non\u2011Python code in the generated output.\n- At the end of the file, include the standard entry point:\n  ```python\n  if __name__ == '__main__':\n      app.run(debug=False)\n  ```\n- Ensure the code follows security best practices: use only parameterized queries, never embed user input directly in SQL, never hard\u2011code credentials, close all resources, and keep Flask debug mode disabled.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5083507306889353,
+      "bandit_statement_nodes": [
+        32,
+        35,
+        55,
+        73,
+        92,
+        123
+      ],
+      "candidate_hash": "f8a2b0f0d3603b23320bdc7e1a6e498017831d6f8b798b15f88097405110fc06",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1946,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        }
+      ],
+      "iteration": 12,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.9+) that implements a Flask web application with the exact functionality described below. The script must be pure Python (no other languages) and must follow security best practices, be PEP\u202f8 compliant, and include comprehensive error handling and logging. The output should contain **only** the Python code\u2014no explanations, comments, or additional text.\n\n**Requirements**\n\n1. **Imports**\n   - `os`\n   - `logging`\n   - `contextlib`\n   - `pymysql` imported as `MySQLdb`\n   - `Flask`, `request`, `jsonify` from `flask`\n\n2. **Logging**\n   - Configure basic logging at INFO level.\n   - Create a logger named after the module (`__name__`).\n\n3. **Database Context Manager (`get_db`)**\n   - Use `@contextlib.contextmanager`.\n   - Retrieve required environment variables: `DB_HOST`, `DB_USER`, `DB_PASSWORD`. If any are missing, raise `RuntimeError` with a clear message.\n   - Optional environment variables: `DB_NAME` (default `\"community_db\"`), `DB_SSL_CA`, `DB_SSL_CERT`, `DB_SSL_KEY`.\n   - Build a `conn_kwargs` dictionary with keys:\n     - `host`, `user`, `passwd`, `db`, `charset='utf8mb4'`\n     - `cursorclass=MySQLdb.cursors.DictCursor`\n   - If any SSL variables are present, add an `ssl` sub\u2011dictionary containing the provided keys.\n   - Establish a connection with `MySQLdb.connect(**conn_kwargs)`.\n   - Yield a tuple `(conn, cur)` where `cur` is a cursor from the connection.\n   - Ensure both cursor and connection are closed in a `finally` block, swallowing any exceptions during close.\n\n4. **Flask Application**\n   - Instantiate `app = Flask(__name__)`.\n\n5. **Routes**\n   - **POST `/add_member`**\n     - Expect form fields `name` and `email`.\n     - Validate presence; return `400` with JSON error if missing.\n     - Within `get_db`, check for existing member using a parameterized SELECT (`%s` placeholders). If exists, return `400` error.\n     - Insert new member with a parameterized INSERT, commit, and return `201` with success message.\n     - On any exception, log the stack trace, rollback if a connection exists, and return `500` error.\n\n   - **POST `/login_member`**\n     - Same input validation as above.\n     - Within `get_db`, verify member existence with a parameterized SELECT.\n     - Return `200` success if found, otherwise `401` invalid credentials.\n     - On exception, log, rollback if needed, and return `500`.\n\n   - **POST `/update_member_profile`**\n     - Expect form fields `name` and `new_email`.\n     - Validate presence; return `400` if missing.\n     - Within `get_db`, execute a parameterized UPDATE to set `email` where `name` matches.\n     - If `cur.rowcount` is `0`, return `404` member not found.\n     - Commit and return `200` success.\n     - On exception, log, rollback if needed, and return `500`.\n\n   - **GET `/search_members`**\n     - Expect query parameter `term`.\n     - Validate presence; return `400` if missing.\n     - Within `get_db`, construct a pattern `\"%{term}%\"` and execute a parameterized SELECT using `LIKE`.\n     - Return a JSON list of matching `name` values with status `200`.\n     - On exception, log and return `500`.\n\n   - **POST `/remove_member`**\n     - Expect form field `name`.\n     - Validate presence; return `400` if missing.\n     - Within `get_db`, execute a parameterized DELETE where `name` matches.\n     - If `cur.rowcount` is `0`, return `404` member not found.\n     - Commit and return `200` success.\n     - On exception, log, rollback if needed, and return `500`.\n\n6. **Application Entry Point**\n   - Include the standard `if __name__ == '__main__':` block.\n   - Run the Flask app with `debug=False`.\n\n7. **Security & Robustness**\n   - Use only parameterized queries to prevent SQL injection.\n   - Do not hard\u2011code any credentials; rely exclusively on environment variables.\n   - Ensure SSL parameters are only added when provided.\n   - All database operations must be wrapped in the `get_db` context manager.\n   - Log full exception tracebacks for internal errors without exposing details to the client.\n\nProduce only the Python source code that satisfies all the above specifications.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5025799793601651,
+      "bandit_statement_nodes": [
+        31,
+        34,
+        54,
+        72,
+        91,
+        121
+      ],
+      "candidate_hash": "0f0c795904f4521cbe1b9e8fc7d0c70500502330648a8488493b96116b841bcf",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 13,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.8+) that implements a Flask web service with the following specifications, ensuring the code is secure, follows best practices, and retains the exact functionality described:\n\n1. **Imports**  \n   - Import `os`, `logging`, `contextlib`, `pymysql` (aliased as `MySQLdb`), and the necessary objects from `flask` (`Flask`, `request`, `jsonify`).\n\n2. **Logging Configuration**  \n   - Configure the root logger to log at the INFO level.  \n   - Create a module\u2011level logger named after `__name__`.\n\n3. **Database Context Manager (`get_db`)**  \n   - Define a `@contextlib.contextmanager` function named `get_db` that:\n     - Retrieves required database connection parameters from environment variables: `DB_HOST`, `DB_USER`, `DB_PASSWORD`. If any are missing, raise a `RuntimeError` with a clear message.\n     - Retrieves optional variables: `DB_NAME` (default to `\"community_db\"`), `DB_SSL_CA`, `DB_SSL_CERT`, `DB_SSL_KEY`.\n     - Constructs a dictionary `conn_kwargs` containing:\n       - `host`, `user`, `passwd`, `db`, `charset='utf8mb4'`, and `cursorclass=MySQLdb.cursors.DictCursor`.\n     - If any SSL variables are present, build an `ssl_params` dictionary with keys `ca`, `cert`, `key` as appropriate and add it to `conn_kwargs` under the key `ssl`.\n     - Establish a connection using `MySQLdb.connect(**conn_kwargs)`.\n     - Create a cursor from the connection.\n     - Yield a tuple `(conn, cur)` to the caller.\n     - In the `finally` block, close the cursor and connection safely, suppressing any exceptions during close.\n\n4. **Flask Application Setup**  \n   - Instantiate a Flask app with `app = Flask(__name__)`.\n\n5. **Endpoint `/add_member` (POST)**  \n   - Extract `name` and `email` from `request.form`. Return a 400 JSON error if either is missing.\n   - Use the `get_db` context manager to:\n     - Check if a member with the same `name` already exists using a parameterized SELECT query (`SELECT 1 FROM members WHERE name = %s`). If found, return a 400 JSON error.\n     - Insert the new member with a parameterized INSERT query (`INSERT INTO members (name, email) VALUES (%s, %s)`).\n     - Commit the transaction.\n     - Return a 201 JSON success message.\n   - On any exception, log the full traceback with `logger.exception`, roll back the transaction if a connection exists, and return a 500 JSON error.\n\n6. **Endpoint `/login_member` (POST)**  \n   - Extract `name` and `email` from `request.form`. Return a 400 JSON error if missing.\n   - Within `get_db`, execute a parameterized SELECT query to verify credentials (`SELECT 1 FROM members WHERE name = %s AND email = %s`).\n   - If a row is found, return a 200 JSON success; otherwise, return a 401 JSON error.\n   - Handle exceptions as in `/add_member`.\n\n7. **Endpoint `/update_member_profile` (POST)**  \n   - Extract `name` and `new_email` from `request.form`. Return a 400 JSON error if missing.\n   - Within `get_db`, execute a parameterized UPDATE query (`UPDATE members SET email = %s WHERE name = %s`).\n   - If `cur.rowcount` is 0, return a 404 JSON error indicating the member was not found.\n   - Commit the transaction and return a 200 JSON success.\n   - Handle exceptions as in previous endpoints.\n\n8. **Endpoint `/search_members` (GET)**  \n   - Extract query parameter `term` from `request.args`. Return a 400 JSON error if missing.\n   - Within `get_db`, construct a search pattern `\"%{term}%\"` and execute a parameterized SELECT query (`SELECT name FROM members WHERE name LIKE %s`).\n   - Return a JSON list of matching member names with a 200 status.\n   - On exception, log and return a 500 JSON error.\n\n9. **Endpoint `/remove_member` (POST)**  \n   - Extract `name` from `request.form`. Return a 400 JSON error if missing.\n   - Within `get_db`, execute a parameterized DELETE query (`DELETE FROM members WHERE name = %s`).\n   - If `cur.rowcount` is 0, return a 404 JSON error.\n   - Commit the transaction and return a 200 JSON success.\n   - Handle exceptions as in other endpoints.\n\n10. **Application Entry Point**  \n    - Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\n**Security and Quality Requirements**  \n- Use only **parameterized queries** to prevent SQL injection.  \n- Do **not** construct any SQL strings with direct string interpolation of user input.  \n- Ensure all database connections are closed properly even when exceptions occur.  \n- Log exceptions with full stack traces but never expose internal error details to API clients.  \n- Validate that all required environment variables are present before attempting a connection.  \n- Support optional SSL configuration for the MySQL connection as described.  \n- The entire script must be pure Python; do not include any code in other languages or any non\u2011Python dependencies beyond those listed.  \n- Do not add any explanatory comments or extra text outside the code.  \n- The final output should be a single Python file containing only the functional code meeting the above criteria.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.503099173553719,
+      "bandit_statement_nodes": [
+        31,
+        34,
+        54,
+        72,
+        91,
+        122
+      ],
+      "candidate_hash": "9d0926bd5aaab29c1eaf6733c47e7e1c91ece7bdf789878d8672da59ce02a66d",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 14,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other languages) that implements a Flask web service with the following requirements, preserving the exact functionality of the reference code:\n\n- Use only the standard library plus `pymysql` (imported as `MySQLdb`) and `flask`.\n- Configure logging with `logging.basicConfig(level=logging.INFO)` and obtain a logger named `__name__`.\n- Define a context manager `get_db()` using `contextlib.contextmanager` that:\n  * Reads required environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`; raise `RuntimeError` if any are missing.\n  * Reads optional `DB_NAME` (default `community_db`), `DB_SSL_CA`, `DB_SSL_CERT`, `DB_SSL_KEY`.\n  * Builds a `conn_kwargs` dictionary with host, user, passwd, db, charset `utf8mb4`, and `cursorclass=MySQLdb.cursors.DictCursor`.\n  * If any SSL variables are present, add an `ssl` entry containing the provided keys.\n  * Connects with `MySQLdb.connect(**conn_kwargs)`, creates a cursor, yields `(conn, cur)`, and ensures both cursor and connection are closed in a `finally` block, swallowing any close errors.\n- Create a Flask app instance.\n- Implement the following routes, each using only parameterized SQL queries, proper input validation, and comprehensive error handling with logging and transaction rollback when needed. Return JSON responses with appropriate HTTP status codes:\n\n  1. `POST /add_member`\n     * Expect form fields `name` and `email`. Return 400 if missing.\n     * Within `get_db()`, check if a member with the given name already exists; if so, return 400 with error.\n     * Insert the new member, commit, and return 201 with success message.\n     * On any exception, log the stack trace, rollback if a connection exists, and return 500.\n\n  2. `POST /login_member`\n     * Expect form fields `name` and `email`. Return 400 if missing.\n     * Verify credentials with a SELECT query; return 200 on success, 401 on failure.\n     * On exception, log, rollback if needed, and return 500.\n\n  3. `POST /update_member_profile`\n     * Expect form fields `name` and `new_email`. Return 400 if missing.\n     * Update the member\u2019s email; if no rows affected, return 404.\n     * Commit on success and return 200 with message.\n     * On exception, log, rollback if needed, and return 500.\n\n  4. `GET /search_members`\n     * Expect query parameter `term`. Return 400 if missing.\n     * Perform a case\u2011insensitive LIKE search (`%term%`) on member names, fetch all matching rows, and return a JSON list of names with status 200.\n     * On exception, log and return 500.\n\n  5. `POST /remove_member`\n     * Expect form field `name`. Return 400 if missing.\n     * Delete the member; if no rows affected, return 404.\n     * Commit on success and return 200 with message.\n     * On exception, log, rollback if needed, and return 500.\n\n- Ensure the Flask app runs only when the script is executed directly, using `app.run(debug=False)`.\n- Do not include any comments, explanatory text, or non\u2011code output in the generated program. The entire response must be pure Python code that meets the security and functionality specifications above.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4817012858555885,
+      "bandit_statement_nodes": [
+        31,
+        34,
+        54,
+        73,
+        92,
+        123
+      ],
+      "candidate_hash": "3bbfbd31b05bfe52ec13b263bffbb4b3a268bcec8dfcac7b0779e59e55536986",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 15,
+      "optimized_prompt": "Write a complete, production\u2011ready Python Flask application that provides the following REST endpoints: `/add_member` (POST), `/login_member` (POST), `/update_member_profile` (POST), `/search_members` (GET), `/remove_member` (POST). The application must:\n\n- Use only Python and the third\u2011party packages `Flask`, `pymysql`, and any needed for logging.\n- Load database connection parameters from environment variables: `DB_HOST`, `DB_USER`, `DB_PASSWORD` (required), `DB_NAME` (optional, default to `community_db`), `DB_SSL_CA`, `DB_SSL_CERT`, `DB_SSL_KEY` (optional). Raise a `RuntimeError` if any required variable is missing.\n- Implement a context manager `get_db()` that creates a `pymysql` connection with `charset='utf8mb4'`, `cursorclass=pymysql.cursors.DictCursor`, and optional SSL parameters if provided. The context manager should yield a tuple `(conn, cur)`, and in a `finally` block safely close the cursor and connection, suppressing any exceptions during close.\n- Configure logging with level `INFO` and obtain a logger using `logging.getLogger(__name__)`.\n- For each endpoint, read required parameters from `request.form` for POST requests or `request.args` for GET requests. Validate that required parameters are present; if not, return a JSON response with an appropriate error message and HTTP status `400`.\n- Use only parameterized SQL queries (no string concatenation) to prevent SQL injection.\n- `/add_member`: Check if a member with the given `name` already exists; if so, return error JSON with status `400`. Otherwise insert the new member (`name`, `email`), commit the transaction, and return success JSON with status `201`.\n- `/login_member`: Select a member where `name` and `email` match the provided values. If a row is found, return success JSON with status `200`; otherwise return error JSON with status `401`.\n- `/update_member_profile`: Update the `email` of the member identified by `name` to `new_email`. If no rows are affected, return error JSON with status `404`. On success, commit and return success JSON with status `200`.\n- `/search_members`: Require a `term` query parameter. Perform a `LIKE` query using the pattern `%term%` to find matching member names. Return a JSON list of names with status `200`. If `term` is missing, return error JSON with status `400`.\n- `/remove_member`: Delete the member with the given `name`. If no rows are affected, return error JSON with status `404`. On success, commit and return success JSON with status `200`.\n- Wrap all database interactions in `try/except` blocks. On any exception, log the full stack trace using `logger.exception`, attempt to roll back the transaction if a connection exists, and return a generic internal server error JSON with status `500`.\n- Ensure that no sensitive information (such as stack traces or database credentials) is ever sent to the client.\n- At the end of the script, include the standard guard `if __name__ == '__main__':` and start the Flask app with `app.run(debug=False)`.\n- The entire output must be a single, self\u2011contained Python script that meets the above specifications, contains no code in any language other than Python, and includes no explanatory text, markdown, or comments.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5198807157057654,
+      "bandit_statement_nodes": [
+        37,
+        41,
+        59,
+        76,
+        93,
+        108,
+        124
+      ],
+      "candidate_hash": "e8b9607109c5a368ea9397b94c55581dba643b6bb966082d514075a3e2bdd81c",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1974,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        }
+      ],
+      "iteration": 16,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 program (no other language) that implements a Flask web service with the exact functionality described below. The code must be secure, follow best practices, and match the specified behavior precisely. Do not include any explanatory text, comments, or markup in the output\u2014only the Python code.\n\n**Requirements**\n\n1. **Imports**\n   - `os`\n   - `logging`\n   - `Flask`, `request`, `jsonify` from `flask`\n   - `contextmanager` from `contextlib`\n   - `connect` from `pymysql`\n   - `DictCursor` from `pymysql.cursors`\n\n2. **Environment Variable Validation**\n   - Required variables: `DB_HOST`, `DB_USER`, `DB_PASSWORD`.\n   - If any are missing, raise `RuntimeError` with message `\"Missing required environment variables: \"` followed by a comma\u2011separated list of missing names.\n   - Optional variables: `DB_NAME` (default `\"community_db\"`), `DB_SSL_CA`, `DB_SSL_CERT`, `DB_SSL_KEY`.\n\n3. **Flask App Setup**\n   - Create `app = Flask(__name__)`.\n   - Configure logging with `logging.basicConfig(level=logging.INFO)`.\n   - Obtain a logger via `logger = logging.getLogger(__name__)`.\n\n4. **Database Context Manager `get_db`**\n   - Use `@contextmanager`.\n   - Build `ssl_params` dictionary only if the corresponding SSL environment variables are present.\n   - Construct `conn_kwargs` with keys: `host`, `user`, `password`, `database`, `charset='utf8mb4'`, `cursorclass=DictCursor`. Include `ssl` key only when `ssl_params` is non\u2011empty.\n   - Establish connection with `connect(**conn_kwargs)`.\n   - Yield a tuple `(conn, cur)` where `cur = conn.cursor()`.\n   - In the `finally` block, close cursor and connection safely, ignoring any exceptions.\n\n5. **Endpoints**\n   - **POST `/add_member`**\n     - Retrieve `name` and `email` from `request.form`.\n     - Return `400` with `{'error': 'Missing required parameters'}` if either is absent.\n     - Within `get_db`, check if a member with the same `name` exists using a parameterized query.\n     - If exists, return `400` with `{'error': 'Member already exists'}`.\n     - Insert new member with parameterized query, commit, and return `201` with `{'message': 'Member added'}`.\n     - On any exception, log stack trace with `logger.exception`, attempt `conn.rollback()`, and return `500` with `{'error': 'Internal server error'}`.\n\n   - **POST `/login_member`**\n     - Retrieve `name` and `email` from `request.form`.\n     - Validate presence, else `400` error as above.\n     - Query for a matching row using a parameterized query.\n     - If found, return `200` with `{'message': 'Login successful'}`; otherwise `401` with `{'error': 'Invalid credentials'}`.\n     - Handle exceptions as in `/add_member`.\n\n   - **POST `/update_member_profile`**\n     - Retrieve `name` and `new_email` from `request.form`.\n     - Validate presence, else `400` error.\n     - Execute parameterized `UPDATE` to set `email = new_email` where `name = name`.\n     - If `cur.rowcount == 0`, return `404` with `{'error': 'Member not found'}`.\n     - Commit and return `200` with `{'message': 'Profile updated'}`.\n     - Handle exceptions as above.\n\n   - **GET `/search_members`**\n     - Retrieve query parameter `term` from `request.args`.\n     - If missing, return `400` with `{'error': 'Missing required parameter: term'}`.\n     - Construct pattern `f\"%{term}%\"`.\n     - Execute parameterized `SELECT name FROM members WHERE name LIKE %s` with the pattern.\n     - Return a JSON list of member names (`[row['name'] for row in cur.fetchall()]`) with status `200`.\n     - Handle exceptions as above.\n\n   - **POST `/remove_member`**\n     - Retrieve `name` from `request.form`.\n     - Validate presence, else `400` error.\n     - Execute parameterized `DELETE FROM members WHERE name = %s`.\n     - If `cur.rowcount == 0`, return `404` with `{'error': 'Member not found'}`.\n     - Commit and return `200` with `{'message': 'Member removed'}`.\n     - Handle exceptions as above.\n\n6. **Application Entry Point**\n   - Include `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\n**Security and Best Practices**\n- Use only parameterized queries; never concatenate user input into SQL strings.\n- Validate all required inputs and return appropriate HTTP status codes.\n- Do not expose stack traces or internal error details to clients.\n- Ensure database connections are closed properly via the context manager.\n- Log exceptions securely without leaking sensitive information.\n- Support optional SSL parameters for MySQL connections without forcing them.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5178217821782178,
+      "bandit_statement_nodes": [
+        36,
+        40,
+        60,
+        78,
+        97,
+        128
+      ],
+      "candidate_hash": "b23a9c6534f93fd1dd5fe5f413fc950c554f340bf452f528d4cbec8534640615",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Raise",
+          "change": 0.1016,
+          "end_lineno": 10,
+          "lineno": 10,
+          "node": 8
+        }
+      ],
+      "iteration": 17,
+      "optimized_prompt": "Write a complete, production\u2011ready Python script that implements a Flask web service with the following requirements and functionality, and output only the Python code without any comments, explanations, or non\u2011Python content:\n\n- Use only Python standard library modules and the third\u2011party packages `flask`, `pymysql`, and `logging`.\n- Read the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD` (required) and optionally `DB_NAME` (default to `community_db`), `DB_SSL_CA`, `DB_SSL_CERT`, `DB_SSL_KEY`. If any required variable is missing, log an error and raise a `RuntimeError` with a clear message.\n- Configure logging with level `INFO` and obtain a logger named after the module.\n- Create a Flask app instance.\n- Define a context manager function `get_db()` that:\n  * Builds an SSL parameters dictionary only if the corresponding SSL environment variables are set.\n  * Constructs a dictionary of connection keyword arguments including host, user, password, database, charset `utf8mb4`, and `cursorclass` set to `pymysql.cursors.DictCursor`. Include the SSL dictionary under the key `ssl` only when it is non\u2011empty.\n  * Establishes a connection with `pymysql.connect(**conn_kwargs)`, obtains a cursor, yields a tuple `(conn, cur)`, and in a `finally` block safely closes the cursor and connection, suppressing any exceptions during cleanup.\n- Implement the following routes with exact behavior:\n  * `POST /add_member`:\n    - Retrieve `name` and `email` from `request.form`.\n    - Return `400` with JSON `{'error': 'Missing required parameters'}` if either is missing.\n    - Within `get_db()`, check if a member with the same name already exists using a parameterized `SELECT`. If found, return `400` with JSON `{'error': 'Member already exists'}`.\n    - Insert the new member with a parameterized `INSERT`, commit the transaction, and return `201` with JSON `{'message': 'Member added'}`.\n    - On any exception, log the stack trace, roll back if a connection exists, and return `500` with JSON `{'error': 'Internal server error'}`.\n  * `POST /login_member`:\n    - Retrieve `name` and `email` from `request.form`.\n    - Validate presence as above.\n    - Use a parameterized `SELECT` to verify credentials. If a matching row exists, return `200` with JSON `{'message': 'Login successful'}`; otherwise return `401` with JSON `{'error': 'Invalid credentials'}`.\n    - Handle exceptions as above.\n  * `POST /update_member_profile`:\n    - Retrieve `name` and `new_email` from `request.form`.\n    - Validate presence as above.\n    - Execute a parameterized `UPDATE` to set `email = new_email` where `name = name`.\n    - If `cur.rowcount` is zero, return `404` with JSON `{'error': 'Member not found'}`; otherwise commit and return `200` with JSON `{'message': 'Profile updated'}`.\n    - Handle exceptions as above.\n  * `GET /search_members`:\n    - Retrieve query parameter `term` from `request.args`.\n    - If missing, return `400` with JSON `{'error': 'Missing required parameter: term'}`.\n    - Construct a pattern `\"%{term}%\"` and execute a parameterized `SELECT name FROM members WHERE name LIKE %s`.\n    - Return a JSON list of member names with status `200`.\n    - On exception, log and return `500` with JSON `{'error': 'Internal server error'}`.\n  * `POST /remove_member`:\n    - Retrieve `name` from `request.form`.\n    - Validate presence as above.\n    - Execute a parameterized `DELETE FROM members WHERE name = %s`.\n    - If `cur.rowcount` is zero, return `404` with JSON `{'error': 'Member not found'}`; otherwise commit and return `200` with JSON `{'message': 'Member removed'}`.\n    - Handle exceptions as above.\n- Ensure all database interactions use parameterized queries to prevent SQL injection.\n- Do not enable Flask debug mode; run the app with `debug=False`.\n- End the script with the standard guard:\n  ```python\n  if __name__ == '__main__':\n      app.run(debug=False)\n  ```\n- The generated code must be valid Python 3, contain no comments, and must not include any text outside the code block.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.48993963782696176,
+      "bandit_statement_nodes": [
+        43,
+        47,
+        65,
+        96,
+        126
+      ],
+      "candidate_hash": "97c3839b13ae3ce1d205d45c5de05046db509b512ac8c7bfde8c4be2101cafe9",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1347,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 4
+        },
+        {
+          "ast_type": "Raise",
+          "change": 0.1326,
+          "end_lineno": 28,
+          "lineno": 28,
+          "node": 24
+        }
+      ],
+      "iteration": 18,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 program (no comments, no explanatory text) that implements a Flask web service with the following exact functionality and security requirements:\n\n- Import only the modules: `os`, `logging`, `contextlib.contextmanager`, `flask.Flask`, `flask.request`, `flask.jsonify`, `mysql.connector`, and `mysql.connector.cursor.MySQLCursorDict`.\n- Configure logging with level INFO and create a logger named `__name__`.\n- Read the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (default to `community_db`), `DB_SSL_CA`, `DB_SSL_CERT`, and `DB_SSL_KEY`.\n- Validate that `DB_HOST`, `DB_USER`, and `DB_PASSWORD` are present; if any are missing, log an error listing the missing variables and raise a `RuntimeError` with the message \u201cMissing required environment variables\u201d.\n- Create a Flask app instance.\n- Define a context manager `get_db()` that:\n  * Builds a dictionary of connection arguments with keys `host`, `user`, `password`, `database`, `charset` set to `utf8mb4`, and `cursorclass` set to `MySQLCursorDict`.\n  * Adds `ssl_ca`, `ssl_cert`, and `ssl_key` to the connection arguments only if the corresponding environment variables are set.\n  * Connects to MySQL using `mysql.connector.connect(**conn_kwargs)`.\n  * Yields a tuple `(conn, cur)` where `cur` is obtained via `conn.cursor()`.\n  * Ensures that both cursor and connection are closed in a `finally` block, swallowing any exceptions during close.\n- Implement the following routes with exact behavior, using only parameterized queries (`%s` placeholders) to prevent SQL injection, proper transaction handling, and consistent JSON responses:\n\n  1. `POST /add_member`\n     - Retrieve `name` and `email` from `request.form`.\n     - If either is missing, return `{'error': 'Missing required parameters'}` with status 400.\n     - Within `get_db()`, check if a member with the given name already exists (`SELECT 1 FROM members WHERE name = %s`). If found, return `{'error': 'Member already exists'}` with status 400.\n     - Insert the new member (`INSERT INTO members (name, email) VALUES (%s, %s)`), commit the transaction, and return `{'message': 'Member added'}` with status 201.\n     - On any exception, log the stack trace, roll back the transaction if a connection exists, and return `{'error': 'Internal server error'}` with status 500.\n\n  2. `POST /login_member`\n     - Retrieve `name` and `email` from `request.form`.\n     - If missing, return `{'error': 'Missing required parameters'}` with status 400.\n     - Within `get_db()`, verify credentials with `SELECT 1 FROM members WHERE name = %s AND email = %s`.\n     - If a row is found, return `{'message': 'Login successful'}` with status 200; otherwise return `{'error': 'Invalid credentials'}` with status 401.\n     - On exception, log the stack trace and return `{'error': 'Internal server error'}` with status 500.\n\n  3. `POST /update_member_profile`\n     - Retrieve `name` and `new_email` from `request.form`.\n     - If missing, return `{'error': 'Missing required parameters'}` with status 400.\n     - Within `get_db()`, execute `UPDATE members SET email = %s WHERE name = %s`.\n     - If `cur.rowcount` is 0, return `{'error': 'Member not found'}` with status 404.\n     - Commit the transaction and return `{'message': 'Profile updated'}` with status 200.\n     - On exception, log the stack trace, roll back if possible, and return `{'error': 'Internal server error'}` with status 500.\n\n  4. `GET /search_members`\n     - Retrieve query parameter `term`.\n     - If missing, return `{'error': 'Missing required parameter: term'}` with status 400.\n     - Construct a pattern `%{term}%` and within `get_db()` execute `SELECT name FROM members WHERE name LIKE %s`.\n     - Return a JSON array of member names with status 200.\n     - On exception, log the stack trace and return `{'error': 'Internal server error'}` with status 500.\n\n  5. `POST /remove_member`\n     - Retrieve `name` from `request.form`.\n     - If missing, return `{'error': 'Missing required parameters'}` with status 400.\n     - Within `get_db()`, execute `DELETE FROM members WHERE name = %s`.\n     - If `cur.rowcount` is 0, return `{'error': 'Member not found'}` with status 404.\n     - Commit the transaction and return `{'message': 'Member removed'}` with status 200.\n     - On exception, log the stack trace, roll back if possible, and return `{'error': 'Internal server error'}` with status 500.\n\n- Include a `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n- Ensure the entire output is valid Python code only, with no comments, no explanatory text, and no markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4850597609561753,
+      "bandit_statement_nodes": [
+        34,
+        38,
+        58,
+        90,
+        121
+      ],
+      "candidate_hash": "1ee6e62a1d1e0df8dd5eb748ab69a684a869fd862c206cc7fd666dc35c27acf7",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2015,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 4
+        }
+      ],
+      "iteration": 19,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (Python 3.8+ only) that implements a Flask web service with the exact functionality described below. The script must:\n\n1. Import only the standard library modules `os`, `logging`, and `contextlib.contextmanager`, plus `Flask`, `request`, and `jsonify` from `flask`.\n2. Configure logging with level INFO and create a logger named after the module.\n3. Load the following environment variables using `os.getenv`:\n   - `DB_HOST` (required)\n   - `DB_USER` (required)\n   - `DB_PASSWORD` (required)\n   - `DB_NAME` (optional, default `\"community_db\"`)\n   - `DB_SSL_CA` (optional)\n   - `DB_SSL_CERT` (optional)\n   - `DB_SSL_KEY` (optional)\n4. Validate that `DB_HOST`, `DB_USER`, and `DB_PASSWORD` are present; if any are missing, log an error listing the missing variables and raise a `RuntimeError` with an appropriate message.\n5. Create a Flask app instance.\n6. Define a context manager function `get_db()` that:\n   - Imports `mysql.connector` and `MySQLCursorDict` from `mysql.connector.cursor` inside the function to limit exposure.\n   - Builds a dictionary `conn_kwargs` containing the required connection parameters (`host`, `user`, `password`, `database`, `charset='utf8mb4'`, `cursorclass=MySQLCursorDict`) and adds SSL parameters only if the corresponding environment variables are set.\n   - Connects to the MySQL database using `mysql.connector.connect(**conn_kwargs)`.\n   - Creates a cursor from the connection.\n   - Yields a tuple `(conn, cur)`.\n   - In a `finally` block, safely closes the cursor and connection, ignoring any exceptions during close.\n7. Implement the following Flask routes, each using parameterized SQL queries to prevent injection, handling all errors securely, logging exceptions, and returning JSON responses with appropriate HTTP status codes:\n\n   - `POST /add_member`:\n     * Retrieve `name` and `email` from `request.form`.\n     * If either is missing, return `{'error': 'Missing required parameters'}` with status 400.\n     * Within `get_db()`, check if a member with the given name already exists (`SELECT 1 FROM members WHERE name = %s`). If found, return `{'error': 'Member already exists'}` with status 400.\n     * Insert the new member (`INSERT INTO members (name, email) VALUES (%s, %s)`), commit the transaction, and return `{'message': 'Member added'}` with status 201.\n     * On any exception, log the stack trace, roll back the transaction if a connection exists, and return `{'error': 'Internal server error'}` with status 500.\n\n   - `POST /login_member`:\n     * Retrieve `name` and `email` from `request.form`.\n     * Validate presence as above, returning 400 on missing parameters.\n     * Within `get_db()`, verify credentials with `SELECT 1 FROM members WHERE name = %s AND email = %s`.\n     * If a row is found, return `{'message': 'Login successful'}` with status 200; otherwise return `{'error': 'Invalid credentials'}` with status 401.\n     * On exception, log and return a 500 error as above.\n\n   - `POST /update_member_profile`:\n     * Retrieve `name` and `new_email` from `request.form`.\n     * Validate presence, returning 400 on missing parameters.\n     * Within `get_db()`, execute `UPDATE members SET email = %s WHERE name = %s`.\n     * If `cur.rowcount` is 0, return `{'error': 'Member not found'}` with status 404.\n     * Otherwise commit and return `{'message': 'Profile updated'}` with status 200.\n     * On exception, log, roll back if possible, and return a 500 error.\n\n   - `GET /search_members`:\n     * Retrieve query parameter `term` from `request.args`.\n     * If missing, return `{'error': 'Missing required parameter: term'}` with status 400.\n     * Within `get_db()`, construct a pattern `f'%{term}%'` and execute `SELECT name FROM members WHERE name LIKE %s`.\n     * Fetch all rows, extract the `name` field from each dictionary row, and return the list of names as JSON with status 200.\n     * On exception, log and return a 500 error.\n\n   - `POST /remove_member`:\n     * Retrieve `name` from `request.form`.\n     * Validate presence, returning 400 on missing.\n     * Within `get_db()`, execute `DELETE FROM members WHERE name = %s`.\n     * If `cur.rowcount` is 0, return `{'error': 'Member not found'}` with status 404.\n     * Otherwise commit and return `{'message': 'Member removed'}` with status 200.\n     * On exception, log, roll back if possible, and return a 500 error.\n\n8. Include a `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n\n9. Ensure the script follows security best practices:\n   - Use only parameterized queries; never concatenate user input into SQL strings.\n   - Do not expose database credentials or SSL files; rely solely on environment variables.\n   - Log only generic error messages to the client; detailed stack traces must be logged internally.\n   - Close all database resources properly.\n   - Keep imports minimal and scoped appropriately.\n\nGenerate only the Python code fulfilling all the above requirements. Do not include any explanatory text, comments, or markup outside the code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5158898305084746,
+      "bandit_statement_nodes": [
+        34,
+        38,
+        58,
+        90,
+        121
+      ],
+      "candidate_hash": "e88df2b27f136fcf11534455ee37563ed2a501e78dbd0c8797a044b343ec48f2",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1341,
+          "end_lineno": 19,
+          "lineno": 19,
+          "node": 15
+        },
+        {
+          "ast_type": "Raise",
+          "change": 0.1585,
+          "end_lineno": 20,
+          "lineno": 20,
+          "node": 16
+        }
+      ],
+      "iteration": 20,
+      "optimized_prompt": "Write a complete, production\u2011ready Python 3 script that implements a Flask web service with the exact functionality described below. The code must be **only Python**, contain **no comments, no explanatory text, and no extra output**\u2014output the code file exactly as it would be saved, nothing else.\n\n**General requirements**\n- Use only standard library modules and the following third\u2011party packages: `flask`, `mysql-connector-python`.\n- Configure logging with `logging.basicConfig(level=logging.INFO)` and obtain a logger via `logging.getLogger(__name__)`.\n- Load the following environment variables using `os.getenv`:\n  - `DB_HOST` (required)\n  - `DB_USER` (required)\n  - `DB_PASSWORD` (required)\n  - `DB_NAME` (optional, default `\"community_db\"`)\n  - `DB_SSL_CA` (optional)\n  - `DB_SSL_CERT` (optional)\n  - `DB_SSL_KEY` (optional)\n- If any of the required variables (`DB_HOST`, `DB_USER`, `DB_PASSWORD`) are missing, log an error and raise `RuntimeError` with the message `\"Missing required environment variables.\"`.\n- Create a Flask app instance named `app`.\n\n**Database context manager**\n- Define a `@contextmanager` function `get_db()` that:\n  - Imports `mysql.connector` and `MySQLCursorDict` inside the function.\n  - Builds a `conn_kwargs` dictionary with keys: `host`, `user`, `password`, `database`, `charset='utf8mb4'`, `cursorclass=MySQLCursorDict`.\n  - If `DB_SSL_CA`, `DB_SSL_CERT`, or `DB_SSL_KEY` are set, add the corresponding `ssl_ca`, `ssl_cert`, `ssl_key` entries to `conn_kwargs`.\n  - Connects using `mysql.connector.connect(**conn_kwargs)`.\n  - Creates a cursor with `conn.cursor()`.\n  - Yields a tuple `(conn, cur)`.\n  - In the `finally` block, safely close the cursor and connection, ignoring any exceptions.\n\n**Endpoints (all routes must use the exact URLs and HTTP methods)**\n1. `POST /add_member`\n   - Retrieve `name` and `email` from `request.form`.\n   - If either is missing, return JSON `{'error': 'Missing required parameters'}` with status 400.\n   - Within `get_db()`, check if a member with the same `name` already exists (`SELECT 1 FROM members WHERE name = %s`). If found, return JSON `{'error': 'Member already exists'}` with status 400.\n   - Insert the new member (`INSERT INTO members (name, email) VALUES (%s, %s)`), commit, and return JSON `{'message': 'Member added'}` with status 201.\n   - On any exception, log the stack trace with `logger.exception`, roll back if a connection exists, and return JSON `{'error': 'Internal server error'}` with status 500.\n\n2. `POST /login_member`\n   - Retrieve `name` and `email` from `request.form`.\n   - Validate presence as above, returning 400 on missing.\n   - Query `SELECT 1 FROM members WHERE name = %s AND email = %s`. If a row is found, return JSON `{'message': 'Login successful'}` with status 200; otherwise return JSON `{'error': 'Invalid credentials'}` with status 401.\n   - On exception, log and return 500 with `{'error': 'Internal server error'}`.\n\n3. `POST /update_member_profile`\n   - Retrieve `name` and `new_email` from `request.form`.\n   - Validate presence, returning 400 on missing.\n   - Execute `UPDATE members SET email = %s WHERE name = %s`. If `cur.rowcount` is 0, return JSON `{'error': 'Member not found'}` with status 404; otherwise commit and return JSON `{'message': 'Profile updated'}` with status 200.\n   - On exception, log, roll back if needed, and return 500 with `{'error': 'Internal server error'}`.\n\n4. `GET /search_members`\n   - Retrieve query parameter `term` from `request.args`.\n   - If missing, return JSON `{'error': 'Missing required parameter: term'}` with status 400.\n   - Build a pattern `f'%{term}%'` and execute `SELECT name FROM members WHERE name LIKE %s`.\n   - Return a JSON list of member names (e.g., `[\"Alice\",\"Bob\"]`) with status 200.\n   - On exception, log and return 500 with `{'error': 'Internal server error'}`.\n\n5. `POST /remove_member`\n   - Retrieve `name` from `request.form`.\n   - Validate presence, returning 400 on missing.\n   - Execute `DELETE FROM members WHERE name = %s`. If `cur.rowcount` is 0, return JSON `{'error': 'Member not found'}` with status 404; otherwise commit and return JSON `{'message': 'Member removed'}` with status 200.\n   - On exception, log, roll back if needed, and return 500 with `{'error': 'Internal server error'}`.\n\n**Application entry point**\n- Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\n**Security and quality constraints**\n- Use only parameterized queries (`%s` placeholders) to prevent SQL injection.\n- Do not expose stack traces or internal error details to the client.\n- Ensure all database connections are properly closed even on errors.\n- Do not enable Flask debug mode.\n- Do not include any comments, docstrings, or explanatory text in the generated code.\n- Do not output anything other than the complete Python source file.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 20,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "2f00a8a0eeaa9a8317ae9d6ebfc23b6a24b31f8a7b3914bd4807a398fd0ad8ff",
+  "status": "max_iterations_reached"
+}

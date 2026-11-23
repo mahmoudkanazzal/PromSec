@@ -1,0 +1,65 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "24a4dc1ede522a05ea557f20cb3535528d16229318bff5e3c4d93cf46a8ab4c9",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'payload' query parameter.",
+      "Payload that is not valid YAML or lacks required keys.",
+      "Database connection failure or query error.",
+      "No matching temperature record for the given coordinates and date.",
+      "Unexpected data types for latitude/longitude/date causing query mismatches."
+    ],
+    "entrypoints": [],
+    "intent": "Return the temperature for a specified latitude, longitude, and date supplied in a YAML payload via an HTTP GET request.",
+    "invariants": [
+      "The endpoint always returns a string representation of the query result, even if empty.",
+      "Database connections are closed before the HTTP response is sent.",
+      "The request does not modify any data in the database.",
+      "The service expects the payload to contain 'latitude', 'longitude', and 'date' keys."
+    ],
+    "io_behavior": [
+      "Accepts a GET request to /api/temperature_for_location with a query parameter named 'payload'.",
+      "Responds with an HTTP body containing the temperature value (as a string) retrieved from the database.",
+      "Writes the raw payload and the intermediate YAML string to the server's standard output (log)."
+    ],
+    "public_api": {
+      "route:GET /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection to the local 'cwe_db' database.",
+      "Executes a SELECT query against the temperature_data table.",
+      "Closes the database cursor and connection after the query.",
+      "Emits log output via print statements."
+    ],
+    "source_hash": "ec4dd14bd2fbe472ac338770df0bdf848373148e37c52bb097b1b9aa92b55517"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.4,
+    "invariants": 0.5,
+    "io_semantics": 0.2,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file60.py",
+  "gated_score": 0.3275,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.3275,
+  "original_hash": "ec4dd14bd2fbe472ac338770df0bdf848373148e37c52bb097b1b9aa92b55517",
+  "rationale": "The program accepts the correct route and parses YAML, but returns JSON instead of a plain string, aborts on missing records rather than returning an empty string, and omits required logging. DB connection handling matches invariants, yet several contract edge cases and output semantics are not preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.055,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 1.0,
+    "invariants": 0.25,
+    "io_semantics": 0.0,
+    "side_effects": 0.75
+  },
+  "stability_score": 0.3825,
+  "weighted_mean": 0.37,
+  "worst_dimension": 0.2
+}

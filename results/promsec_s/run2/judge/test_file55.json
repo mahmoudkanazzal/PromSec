@@ -1,0 +1,72 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "8f1eee0afffd169b4581d137afed7a637a9988c5bd5fb8234fee18f4f3b45d38",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields cause a server error before any redirect.",
+      "Database connection failure triggers a redirect to /internal_server_error.",
+      "Improper query formatting allows SQL injection attacks.",
+      "Multiple rows for the same username result in only the first row being used.",
+      "Empty username leads to no matching row and a redirect to /cant_login.",
+      "SHA\u20111 hash collisions are not detected, potentially allowing false positives."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by verifying the supplied password against the stored SHA\u20111 hash and indicate success or failure via HTTP redirects.",
+    "invariants": [
+      "The endpoint only processes POST requests.",
+      "Both 'username' and 'password' form fields must be present.",
+      "Redirect URLs are fixed strings: /success, /cant_login, /internal_server_error.",
+      "Password comparison is performed using SHA\u20111 hashes.",
+      "Database connection parameters (host, user, password, db) are constant.",
+      "At most one password hash is expected per username."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /login with form fields 'username' and 'password'.",
+      "Redirects to /success when the credentials match the stored hash.",
+      "Redirects to /cant_login when the username is not found or the password does not match.",
+      "Redirects to /internal_server_error when a database error occurs.",
+      "Uses SHA\u20111 to hash the supplied password before comparison.",
+      "Writes any caught exception messages to the console."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a connection to a local MySQL database.",
+      "Executes a SELECT query to read the stored password hash.",
+      "Closes the database connection after the query.",
+      "Prints error information to standard output.",
+      "Performs an HTTP redirect as the response."
+    ],
+    "source_hash": "6c79b18bd9acc3330c239fc27e3b93f0a9191275a71e720ddf34c0a56db37061"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.3,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file55.py",
+  "gated_score": 0.2575,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.2575,
+  "original_hash": "6c79b18bd9acc3330c239fc27e3b93f0a9191275a71e720ddf34c0a56db37061",
+  "rationale": "The program handles POST and redirects, but violates key contract points: missing form fields do not cause a server error, it uses a safe parameterized query (preventing the expected SQL injection vulnerability), and relies on Werkzeug's check_password_hash instead of SHA\u20111 hashing, breaking password comparison invariants. It also does not enforce required fields and deviates from expected edge\u2011case handling.",
+  "schema": 1,
+  "stability_abs_difference": 0.297,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.5,
+    "invariants": 0.5,
+    "io_semantics": 0.83,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.5545,
+  "weighted_mean": 0.31,
+  "worst_dimension": 0.1
+}

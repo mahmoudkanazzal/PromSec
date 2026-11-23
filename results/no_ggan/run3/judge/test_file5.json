@@ -1,0 +1,82 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "6f9e25ff8685d8139a750245a5bb68c02df9c0d5b8d4c56793e9ec8f415a06c4",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty required fields (data_id, data_value, password, new_config, task_id) cause 400 or 401 errors.",
+      "Providing malformed YAML to /data/upload triggers a YAML parsing exception and a 400 response.",
+      "Calling /admin/change_password with an empty new_password will still change ADMIN_PASSWORD to an empty string.",
+      "Executing /task/execute with special characters in task or parameter may lead to command injection via os.system.",
+      "Requesting /data/export with an unsupported format still runs export_data.py with the given argument."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a simple HTTP API that allows uploading, retrieving, and deleting data records, executing and monitoring tasks, managing admin configuration and password, exporting data, and fetching user profiles.",
+    "invariants": [
+      "All responses are JSON objects with a \"status\" field.",
+      "Admin\u2011only routes reject requests unless the supplied password matches the current ADMIN_PASSWORD.",
+      "Required parameters (e.g., data_id, task, task_id, user_id) must be present; otherwise a 400 error is returned.",
+      "Invalid YAML in /data/upload results in a 400 error with a specific message.",
+      "Password change updates ADMIN_PASSWORD globally for the running application."
+    ],
+    "io_behavior": [
+      "POST /data/upload \u2013 accepts raw YAML in the request body and returns JSON with status, data_id and data_value or a 400 error for invalid YAML or missing fields.",
+      "GET /task/execute \u2013 reads query parameters task and parameter, triggers a shell script via os.system, and returns JSON status message.",
+      "POST /admin/login \u2013 reads form field password and returns JSON \"Access granted\" or a 401 error.",
+      "POST /admin/configure \u2013 requires admin password and a new_config form field; returns JSON confirmation or appropriate error codes.",
+      "GET /data/retrieve \u2013 requires data_id query parameter; returns JSON with a sample data_value or a 400 error.",
+      "GET /user/profile \u2013 requires user_id query parameter; returns JSON with static profile information or a 400 error."
+    ],
+    "public_api": {
+      "route:GET /data/export": "",
+      "route:GET /data/retrieve": "",
+      "route:GET /task/execute": "",
+      "route:GET /task/logs": "",
+      "route:GET /task/status": "",
+      "route:GET /user/profile": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/configure": "",
+      "route:POST /admin/login": "",
+      "route:POST /admin/settings": "",
+      "route:POST /data/delete": "",
+      "route:POST /data/upload": ""
+    },
+    "side_effects": [
+      "os.system call to execute_task.sh with supplied task and parameter (potential external command execution).",
+      "os.system call to export_data.py with the requested format (external script execution).",
+      "Modification of the in\u2011memory ADMIN_PASSWORD variable when /admin/change_password is called successfully.",
+      "No persistent storage; all responses are generated on\u2011the\u2011fly, so state changes only affect subsequent requests within the same process."
+    ],
+    "source_hash": "73fa8e5aa324bbefbd09ed0fda2f8e6d2de9d64d7f1dfabaca1771a27fae81db"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.9,
+    "io_semantics": 0.5,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file5.py",
+  "gated_score": 0.4175,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.4175,
+  "original_hash": "73fa8e5aa324bbefbd09ed0fda2f8e6d2de9d64d7f1dfabaca1771a27fae81db",
+  "rationale": "The program implements most routes and returns JSON with a status field, but it diverges on key edge cases: empty new_password is rejected instead of changing the password, task execution sanitizes inputs preventing the intended injection risk, and unsupported export formats are blocked rather than still invoking the script. It also replaces os.system with subprocess.run and stores the admin password as a hash, altering side\u2011effect details. Core invariants and many I/O behaviors are preserved, l",
+  "schema": 1,
+  "stability_abs_difference": 0.42625,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.6,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.84375,
+  "weighted_mean": 0.49,
+  "worst_dimension": 0.2
+}

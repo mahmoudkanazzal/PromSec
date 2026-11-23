@@ -1,0 +1,65 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "d9155693fd6f9d95f2206c9ea3bb5b23d72c43a6f17fae809f357a5927f98ad9",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a server error (KeyError).",
+      "Empty strings for credentials still trigger a query and may return a redirect.",
+      "SQL injection via crafted input can bypass authentication or cause errors.",
+      "Database connection failure results in an unhandled exception (500 error).",
+      "If multiple rows match, only the first is considered (still a success).",
+      "Unicode or overly long input may cause query parsing errors."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by checking supplied credentials against a MySQL users table and redirect based on success or failure.",
+    "invariants": [
+      "The endpoint always responds with a redirect; no other content is returned.",
+      "Database connection parameters (host, user, password, db) are constant.",
+      "The query string is built by concatenating the raw 'username' and 'password' values.",
+      "A non\u2011null result from the query is treated as successful authentication."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /login with form fields 'username' and 'password'.",
+      "Returns an HTTP 302 redirect to '/' when credentials are not found.",
+      "Returns an HTTP 302 redirect to '/dashboard' when credentials match a record."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to a local MySQL server using hard\u2011coded credentials.",
+      "Executes a SELECT query that reads from the 'users' table.",
+      "Closes the database cursor/connection after the request (implicit on request end)."
+    ],
+    "source_hash": "b30096ed0fe299fe2d327a65ed18c147d00dd4e7971f82a42eb6bdc3e9f8de1d"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.4,
+    "invariants": 0.5,
+    "io_semantics": 0.9,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file49.py",
+  "gated_score": 0.42875,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.42875,
+  "original_hash": "b30096ed0fe299fe2d327a65ed18c147d00dd4e7971f82a42eb6bdc3e9f8de1d",
+  "rationale": "Redirects and basic success/failure flow match, but key contract details\u2014raw string concatenation, missing-field KeyError, and unhashed password handling\u2014are altered, breaking injection and error edge cases.",
+  "schema": 1,
+  "stability_abs_difference": 0.15538,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.4,
+    "invariants": 0.5,
+    "io_semantics": 1.0,
+    "side_effects": 0.67
+  },
+  "stability_score": 0.58413,
+  "weighted_mean": 0.505,
+  "worst_dimension": 0.2
+}

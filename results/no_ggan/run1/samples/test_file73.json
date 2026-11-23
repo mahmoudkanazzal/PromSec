@@ -1,0 +1,41 @@
+{
+  "ast_similarity": 0.7218649517684887,
+  "candidate_hash": "d7dc0190fd7a37acebc782b9789f2143647b68608489d344ff34601009769248",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file73.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7218649517684887,
+      "bandit_statement_nodes": [
+        16,
+        30,
+        54,
+        68,
+        72,
+        88,
+        92
+      ],
+      "candidate_hash": "d7dc0190fd7a37acebc782b9789f2143647b68608489d344ff34601009769248",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program that implements a secure Flask web application with the exact functionality described below. The output must be **only** the Python code (no explanations, no markdown, no comments outside the code). Ensure the code follows best security practices, uses type hints, and includes appropriate docstrings.\n\n**General requirements**\n- The program must be written in Python 3 and import only the standard library plus `flask` and `MySQLdb`.\n- All configuration values (Flask secret key, database host, user, password, and name) must be read from environment variables using `os.getenv`. Provide sensible default values where appropriate, but do not hard\u2011code any production secrets.\n- Use `logging` with a logger named after `__name__`. Configure it to log at INFO level.\n- Do **not** enable Flask debug mode; run the app with `debug=False`.\n- All database interactions must use parameterized queries (`%s` placeholders) to prevent SQL injection.\n- Connections must be created with a helper function `get_db_connection()` that returns a new `MySQLdb.connect` object using the environment variables. Set `charset='utf8mb4'` and `use_unicode=True`.\n- Ensure every database connection is closed in a `finally` block.\n- Use `try/except` around all database operations, log exceptions with `logger.exception`, and return appropriate HTTP status codes and messages.\n- Implement a helper `rows_to_dicts(cursor)` that converts a DB cursor result set to a list of dictionaries using column names.\n\n**Password handling**\n- Implement `hash_password(password: str) -> str` that:\n  - Generates a cryptographically secure 16\u2011byte random salt with `os.urandom`.\n  - Derives a 32\u2011byte hash using `hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 200_000)`.\n  - Returns the concatenated salt+hash encoded as a hexadecimal string.\n- Implement `verify_password(stored_hex: str, password: str) -> bool` that:\n  - Decodes the stored hex string to bytes, extracts the first 16 bytes as the salt and the remainder as the stored hash.\n  - Re\u2011derives the hash with the same PBKDF2 parameters.\n  - Compares the derived hash to the stored hash using `hmac.compare_digest` and returns the result.\n\n**Flask routes**\n1. `POST /register`\n   - Expect form fields `username` and `password`.\n   - Return 400 if either is missing.\n   - Hash the password with `hash_password`.\n   - Insert the new user into `users (username, password)` using a parameterized query.\n   - Commit the transaction and redirect to the route named `home`.\n   - On error, log the exception and return 500 with message \u201cRegistration failed\u201d.\n\n2. `POST /login`\n   - Expect form fields `username` and `password`.\n   - Return 400 if missing.\n   - Retrieve the stored password hash for the given username.\n   - Verify with `verify_password`.\n   - If valid, redirect to the route named `dashboard`; otherwise return 401 with \u201cInvalid credentials\u201d.\n   - On error, log and return 500 with \u201cLogin failed\u201d.\n\n3. `POST /add_book`\n   - Expect form fields `book_id`, `title`, and `author`.\n   - Return 400 if any are missing.\n   - Insert the book into `books (book_id, title, author)` using a parameterized query.\n   - Commit and return 201 with \u201cBook successfully added\u201d.\n   - On error, log and return 500 with \u201cFailed to add book\u201d.\n\n4. `POST /checkout`\n   - Expect form fields `username` and `book_id`.\n   - Return 400 if missing.\n   - Verify the user exists (`SELECT 1 FROM users WHERE username = %s`).\n   - If the user exists, insert a record into `checkouts (username, book_id)` and commit, returning 200 with \u201cBook successfully checked out\u201d.\n   - If the user does not exist, return 404 with \u201cUser not found\u201d.\n   - On error, log and return 500 with \u201cCheckout failed\u201d.\n\n5. `POST /return`\n   - Expect form fields `username` and `book_id`.\n   - Return 400 if missing.\n   - Verify a matching record exists in `checkouts`.\n   - If found, delete that record, commit, and return 200 with \u201cBook successfully returned\u201d.\n   - If not found, return 404 with \u201cCheckout record not found\u201d.\n   - On error, log and return 500 with \u201cReturn failed\u201d.\n\n6. `GET /view_books`\n   - Retrieve all rows from `books`.\n   - Convert the result set to a list of dictionaries using `rows_to_dicts`.\n   - Return the list as JSON with status 200.\n   - On error, log and return 500 with \u201cFailed to retrieve books\u201d.\n\n7. Placeholder routes for redirects:\n   - `GET /home` returns \u201cWelcome to the home page\u201d with status 200.\n   - `GET /dashboard` returns \u201cWelcome to your dashboard\u201d with status 200.\n\n**Application entry point**\n- Include the standard `if __name__ == '__main__':` guard that calls `app.run(debug=False)`.\n\n**Security checklist to enforce in the code**\n- No hard\u2011coded secrets; all sensitive values come from environment variables.\n- Use `os.urandom` for salts.\n- Use PBKDF2\u2011HMAC\u2011SHA256 with at least 200,000 iterations.\n- Use `hmac.compare_digest` for constant\u2011time password comparison.\n- Use parameterized SQL queries exclusively.\n- Close all DB connections and cursors properly.\n- Log exceptions without exposing sensitive details to the client.\n\nGenerate the Python code that satisfies all the above requirements. Do not include any explanatory text, markdown fences, or comments outside the code. The output must be a single, runnable Python script.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "a4a023812d8d87d69ca6b7c153a086fae31bb10841e6483047d43e29bb8d72c9",
+  "status": "secured"
+}

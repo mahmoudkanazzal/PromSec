@@ -1,0 +1,83 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "b04fb256b86c57f6f15d36dd41da4b3574e84227fc264a2e40450033d0c0cec0",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payloads cause a 400 error with \"Invalid YAML format\".",
+      "Missing required form or query parameters result in 400 errors with specific messages.",
+      "Providing a non\u2011integer year_published or a rating outside 1\u20115 triggers validation errors.",
+      "Attempting to change the password with an incorrect old password returns 401 Access denied.",
+      "Calling /inventory/check with empty section/location still runs the external script.",
+      "The API returns static placeholder data for book info, list, and availability; no persistent storage is used."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple library management HTTP API that allows adding, removing, querying, and updating book records, handling admin authentication, and processing auxiliary actions like inventory checks, reviews, and events.",
+    "invariants": [
+      "title, author, and isbn must be present for adding a book; otherwise a 400 error is returned.",
+      "year_published must be an integer; non\u2011int values cause a 400 error.",
+      "ISBN is required for endpoints that operate on a specific book (remove, info, update, availability, request, return).",
+      "Admin login succeeds only if password matches the current LIBRARIAN_PASSWORD and secret_key equals \"admin_secret_key_2024\".",
+      "Review submissions require rating between 1 and 5 inclusive; otherwise a 400 error.",
+      "All responses are JSON objects with a \"status\" field and appropriate additional data."
+    ],
+    "io_behavior": [
+      "POST /library/add_book expects YAML body with title, author, isbn, publisher (optional), year_published (int) and returns JSON status or error.",
+      "POST /library/remove_book expects form field isbn and returns JSON confirming removal or error.",
+      "GET /inventory/check accepts query parameters section and location, triggers a subprocess call, and returns JSON indicating the check started.",
+      "POST /admin/login expects form fields password and secret_key and returns JSON granting or denying admin access.",
+      "POST /admin/change_password expects old_password and new_password; on success updates the in\u2011memory password and returns JSON confirmation.",
+      "GET /library/book_info requires isbn query parameter and returns static JSON with sample book details."
+    ],
+    "public_api": {
+      "route:GET /api/check_availability": "",
+      "route:GET /inventory/check": "",
+      "route:GET /library/book_info": "",
+      "route:GET /library/list_books": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/login": "",
+      "route:POST /api/request_book": "",
+      "route:POST /api/return_book": "",
+      "route:POST /api/submit_event": "",
+      "route:POST /api/submit_review": "",
+      "route:POST /library/add_book": "",
+      "route:POST /library/remove_book": "",
+      "route:POST /library/update_book": ""
+    },
+    "side_effects": [
+      "Executes an external command via os.system when /inventory/check is called.",
+      "Modifies the global LIBRARIAN_PASSWORD variable when /admin/change_password succeeds."
+    ],
+    "source_hash": "79f06a718f9233fb94588d4ef4a2c9ddacb133ad2041110188b3de4c6ce1c069"
+  },
+  "dimensions": {
+    "behavior": 0.55,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.7,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file4.py",
+  "gated_score": 0.44562,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.44562,
+  "original_hash": "79f06a718f9233fb94588d4ef4a2c9ddacb133ad2041110188b3de4c6ce1c069",
+  "rationale": "Endpoints are present and basic validation works, but error messages lack required 'status' field, empty inventory checks do not run the script, password change updates a hash not the LIBRARIAN_PASSWORD variable, and wording of errors differs from the contract, leading to partial preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.04125,
+  "stability_dimensions": {
+    "behavior": 0.75,
+    "edge_cases": 0.4,
+    "invariants": 0.6,
+    "io_semantics": 0.7,
+    "side_effects": 0.2
+  },
+  "stability_score": 0.48687,
+  "weighted_mean": 0.5275,
+  "worst_dimension": 0.2
+}

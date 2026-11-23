@@ -1,0 +1,76 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "20f5438ccf110795cd78680c78b7919314d8395a2036d7cd5a07c8e80b6daf7c",
+  "compile_ok": true,
+  "confidence": 0.94,
+  "contract": {
+    "edge_cases": [
+      "Missing required fields in the POST /add_event payload",
+      "Providing an event_id that does not exist for update or delete",
+      "Empty or absent keyword/date query parameters resulting in empty result sets",
+      "Invalid JSON body or wrong data types causing a 400\u2011type error",
+      "Database file unavailable or locked, leading to request failure"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a RESTful API for creating, reading, updating, and deleting event records stored in a SQLite database.",
+    "invariants": [
+      "Each event row always contains id, name, date, and location columns",
+      "All responses are JSON-encoded and include the appropriate HTTP status code",
+      "Database connections are opened, used, committed (when needed), and closed for each request",
+      "The API does not expose raw SQL errors to the client"
+    ],
+    "io_behavior": [
+      "POST /add_event with JSON {name, date, location} \u2192 201 and JSON {\"message\":\"Event added successfully\"}",
+      "GET /search_events?keyword=\u2026 \u2192 200 and JSON array of matching events",
+      "PUT /update_event/<event_id> with JSON {name?, date?, location?} \u2192 200 and JSON {\"message\":\"Event updated successfully\"}",
+      "DELETE /delete_event/<event_id> \u2192 200 and JSON {\"message\":\"Event deleted successfully\"}",
+      "GET /get_events_by_date?date=\u2026 \u2192 200 and JSON array of events on that date"
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:DELETE /delete_event/<int:event_id>": "",
+      "route:GET /get_events_by_date": "",
+      "route:GET /search_events": "",
+      "route:POST /add_event": "",
+      "route:PUT /update_event/<int:event_id>": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the events table",
+      "Updates fields of an existing row identified by id",
+      "Deletes a row identified by id",
+      "Queries the database without modifying it",
+      "Persists data in the file events.db on the server"
+    ],
+    "source_hash": "4189069f0188b9e33c40ddff4df303aaabf6130acd7b039dbf0f45a279f5a4c5"
+  },
+  "dimensions": {
+    "behavior": 0.65,
+    "edge_cases": 0.35,
+    "invariants": 0.8,
+    "io_semantics": 0.85,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file96.py",
+  "gated_score": 0.6275,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.6275,
+  "original_hash": "4189069f0188b9e33c40ddff4df303aaabf6130acd7b039dbf0f45a279f5a4c5",
+  "rationale": "Core CRUD routes work and return correct JSON/status, but missing handling for non\u2011existent IDs, empty keyword/date queries, and raw SQL errors violate edge\u2011case and invariant requirements.",
+  "schema": 1,
+  "stability_abs_difference": 0.135,
+  "stability_dimensions": {
+    "behavior": 0.95,
+    "edge_cases": 0.5,
+    "invariants": 0.75,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.7625,
+  "weighted_mean": 0.72,
+  "worst_dimension": 0.35
+}

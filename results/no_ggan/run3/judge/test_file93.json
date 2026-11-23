@@ -1,0 +1,75 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "93d9812fad9463bb899825be2e69021e9f0ec1a067bd2f2b9062197c1f9f4b12",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing required JSON fields cause a server error (500).",
+      "Non\u2011numeric or malformed candidate_id or votes lead to SQL execution errors.",
+      "Requesting a non\u2011existent candidate id returns null JSON or may raise an error.",
+      "Database connection failures (e.g., missing file) result in 500 responses.",
+      "Extremely large vote increments could cause integer overflow or database errors."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a RESTful API to manage election candidates: register new candidates, retrieve a candidate by ID, update vote counts, and list election results.",
+    "invariants": [
+      "Each candidate row has a unique integer id.",
+      "The votes column is stored as an integer and should remain non\u2011negative.",
+      "Name and party fields are stored as text strings.",
+      "Result listings are ordered by votes in descending order.",
+      "All endpoints return JSON payloads with appropriate HTTP status codes."
+    ],
+    "io_behavior": [
+      "POST /register_candidate with JSON {\"name\":..., \"party\":...} returns 201 and a success message.",
+      "GET /get_candidate?id=ID returns 200 and the candidate row as JSON.",
+      "POST /update_votes with JSON {\"candidate_id\":..., \"votes\":...} returns 200 and a success message.",
+      "GET /get_results returns 200 and a JSON array of all candidates sorted by votes descending."
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:GET /get_candidate": "",
+      "route:GET /get_results": "",
+      "route:POST /register_candidate": "",
+      "route:POST /update_votes": ""
+    },
+    "side_effects": [
+      "Creates or updates rows in the SQLite file 'election.db'.",
+      "Inserts a new candidate record on each successful registration.",
+      "Increments the votes column for a candidate on each vote update.",
+      "Reads candidate data from the database for retrieval and result endpoints.",
+      "Sends HTTP responses over the network."
+    ],
+    "source_hash": "47679752c6580ec721a4e649dd63089f102ea9f5858a6f578e464ff2959c276d"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.4,
+    "invariants": 0.8,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file93.py",
+  "gated_score": 0.67375,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.67375,
+  "original_hash": "47679752c6580ec721a4e649dd63089f102ea9f5858a6f578e464ff2959c276d",
+  "rationale": "All required endpoints and core functionality are present with correct status codes, but error handling deviates from the contract (400 vs 500) and negative vote checks are missing, leading to partial preservation of edge cases and invariants.",
+  "schema": 1,
+  "stability_abs_difference": 0.01188,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.3,
+    "invariants": 0.6,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.66187,
+  "weighted_mean": 0.765,
+  "worst_dimension": 0.4
+}

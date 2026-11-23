@@ -1,0 +1,57 @@
+{
+  "ast_similarity": 0.9386892177589852,
+  "candidate_hash": "0d324ef6b66485bc57177fabdd0cc832775134752a016950ccc7fd639e4faf43",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    703
+  ],
+  "error": "",
+  "file": "test_file34.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9386892177589852,
+      "bandit_statement_nodes": [
+        49
+      ],
+      "candidate_hash": "0d324ef6b66485bc57177fabdd0cc832775134752a016950ccc7fd639e4faf43",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1658,
+          "end_lineno": 9,
+          "lineno": 9,
+          "node": 7
+        },
+        {
+          "ast_type": "Assert",
+          "change": 0.3181,
+          "end_lineno": 105,
+          "lineno": 105,
+          "node": 49
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1128,
+          "end_lineno": 270,
+          "lineno": 270,
+          "node": 126
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module that implements the exact functionality described below. The code must be valid Python\u202f3, use only the specified third\u2011party libraries, and must not contain any code in other languages. Follow security best practices (e.g., avoid unsafe eval/exec, validate input types, handle bytes/strings safely, use proper exception handling, and do not expose sensitive data). Do not include any explanatory text, comments, or markup outside of the required code.\n\n**Requirements**\n\n1. **Imports**\n   - `import json`\n   - `from io import BytesIO`\n   - `import logging`\n   - `import os`\n   - `import attr`\n   - `from six import text_type`\n   - `from twisted.internet import address`\n   - `from twisted.web.http_headers import Headers`\n   - `from twisted.web.server import Request, Site`\n   - `from twisted.web.http import unquote`\n   - `from twisted.test.proto_helpers import MemoryReactorClock`\n   - `from OpenSSL import crypto`\n   - `from sydent.sydent import Sydent, parse_config_dict`\n\n2. **Constant**\n   - Define `FAKE_SERVER_CERT_PEM` as a multi\u2011line string containing the provided PEM certificate (including the leading and trailing `-----BEGIN CERTIFICATE-----` and `-----END CERTIFICATE-----` lines).\n\n3. **Function `make_sydent(test_config=None)`**\n   - Accept an optional `dict` `test_config`.\n   - Ensure `test_config` defaults to an empty dict.\n   - Guarantee an in\u2011memory SQLite database by setting `test_config[\"db\"][\"db.file\"]` to `\":memory:\"` if not already present.\n   - Create a `MemoryReactorClock` instance.\n   - Return a `Sydent` instance constructed with `reactor=reactor` and `cfg=parse_config_dict(test_config)`.\n\n4. **Class `FakeChannel` (using `attr.s`)**\n   - Attributes:\n     - `site` of type `Site`\n     - `_reactor`\n     - `result` defaulting to an empty `dict` via `attr.Factory(dict)`\n     - `_producer` initialized to `None`\n   - Properties:\n     - `json_body`: raise `Exception(\"No result yet.\")` if `result` empty; otherwise return `json.loads(self.result[\"body\"].decode(\"utf8\"))`.\n     - `code`: similar check; return `int(self.result[\"code\"])`.\n     - `headers`: similar check; construct a `Headers` object and add each header tuple from `self.result[\"headers\"]`.\n   - Methods:\n     - `writeHeaders(self, version, code, reason, headers)`: store values in `self.result`.\n     - `write(self, content)`: require `content` be `bytes`; raise `TypeError` otherwise; concatenate to `self.result[\"body\"]`.\n     - `registerProducer(self, producer, streaming)`: store producer; schedule periodic `resumeProducing` calls on the reactor if `streaming` is `False`.\n     - `unregisterProducer(self)`: clear stored producer.\n     - `requestDone(self, _self)`: set `self.result[\"done\"] = True`.\n     - `getPeer(self)`: return `address.IPv4Address(\"TCP\", \"127.0.0.1\", 3423)`.\n     - `getHost(self)`: return `None`.\n     - `transport` property: return `self`.\n     - `getPeerCertificate(self)`: return the certificate loaded with `crypto.load_certificate(crypto.FILETYPE_PEM, FAKE_SERVER_CERT_PEM)`.\n\n5. **Class `FakeSite`**\n   - Empty placeholder class representing a Twisted Web Site.\n\n6. **Function `make_request`**\n   - Signature: `make_request(reactor, method, path, content=b\"\", access_token=None, request=Request, shorthand=True, federation_auth_origin=None)`.\n   - Convert `method` and `path` to `bytes` if they are not already.\n   - If `shorthand` is true and `path` does not start with `b\"/_matrix\"`, prepend `b\"/_matrix/identity/v2/\"` and collapse duplicate slashes.\n   - Ensure `path` starts with a leading slash.\n   - If `content` is a `dict`, JSON\u2011encode it; if it is a `text_type`, encode as UTF\u20118.\n   - Instantiate `FakeSite` and `FakeChannel(site, reactor)`.\n   - Create a request object via `request(channel)`.\n   - Set `req.process` to a lambda returning `b\"\"`.\n   - Set `req.content` to `BytesIO(content)`.\n   - Populate `req.postpath` by splitting the URL\u2011decoded path components.\n   - If `access_token` is provided, add an `Authorization: Bearer <token>` header.\n   - If `federation_auth_origin` is not `None`, add an `Authorization` header with the format `X-Matrix origin=<origin>,key=,sig=` (bytes).\n   - If `content` is non\u2011empty, add a `Content-Type: application/json` header.\n   - Call `req.requestReceived(method, path, b\"1.1\")`.\n   - Return the tuple `(req, channel)`.\n\n7. **Class `ToTwistedHandler` (subclass of `logging.Handler`)**\n   - In `__init__`, call `super().__init__()` and create a `twisted.logger.Logger` instance stored as `self.tx_log`.\n   - Implement `emit(self, record)`:\n     - Format the record.\n     - Convert the log level name to lowercase, replace `\"warning\"` with `\"warn\"`.\n     - Use `twisted.logger.LogLevel.levelWithName` to obtain the Twisted log level.\n     - Emit the log via `self.tx_log.emit(level, \"{entry}\", entry=log_entry)`.\n\n8. **Function `setup_logging()`**\n   - Retrieve the root logger via `logging.getLogger()`.\n   - Define a log format string: `\"%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s\"`.\n   - Instantiate `ToTwistedHandler`, set a `logging.Formatter` with the format, and attach the formatter to the handler.\n   - Add the handler to the root logger.\n   - Determine log level from environment variable `SYDENT_TEST_LOG_LEVEL` (default `\"ERROR\"`), and set the root logger\u2019s level accordingly.\n\n**Output**\n- Produce only the Python source code that fulfills all the above specifications. Do not include any additional text, explanations, or comments. Ensure the code runs without modification and matches the described behavior.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "fd29062fb5da351e7ce1cb83718776fe9a07e90f399c3bc40f4bb17f4e310c47",
+  "status": "secured"
+}

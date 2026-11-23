@@ -1,5 +1,6 @@
+# PromSec: the gGAN trained with the paper's objective selects the statements the LLM revises.
 run:
-  name: default
+  name: promsec
   root: runs
 
 data:
@@ -7,56 +8,71 @@ data:
   test_dir: data/test
   test_limit: null
 
-models:
-  pretrained_generator: models/trained_generator_cfg.pt
-  pretrained_discriminator: models/trained_discriminator_cfg.pt
-  fresh_generator: models/fresh_generator_cfg.pt
-  fresh_discriminator: models/fresh_discriminator_cfg.pt
-
 llm:
   model_env: PROMSEC_LLM_MODEL
   api_key_env: OPENAI_API_KEY
   base_url_env: PROMSEC_LLM_BASE_URL
   temperature: 0.0
-  max_retries: 2
+  max_retries: 4
   syntax_repair_attempts: 3
   cache_path: cache/llm_cache.sqlite
 
 loop:
   max_iterations: 20
-  parallel_programs: 8
+  parallel_programs: 8        # programs processed concurrently (LLM requests in flight)
 
 guidance:
+  mode: promsec               # promsec | promsec-s | none
+
+ggan:                         # PromSec gGAN (paper objective)
+  model_dir: models/promsec
+  seed: 0
+  holdout_fraction: 0.2       # program groups held out to score localization
+  epochs: 7
+  learning_rate: 0.001
+  discriminator_steps: 5
+  alpha: 1.0
+  beta: 10.0
+  lambda_adv: 0.01
+  security_margin: 0.25
+  negatives: 16
+  top_k: 5                    # statements passed to the LLM: at most top_k ...
+  min_change: 0.1             # ... whose node features change by at least min_change
+
+ggan_s:                       # PromSec-S gGAN (supervised extension)
+  model_dir: models/promsec_s
+  seed: 0
+  holdout_fraction: 0.2
+  validation_fraction: 0.15   # training groups used to pick the epoch
+  epochs: 40
+  adv_weight: 0.1
   top_k: 5
-  min_abs_change: 0.1
+  threshold: 0.5
+  leave_one_scenario_out: true
+
+training_data:
+  run_dir: runs/training_data
+  states_dir: data/states
+  training_programs: 100      # scenario-balanced subset of data/training
+  synth_per_scenario: 10      # synthesized programs per weakness scenario
+  scenarios: []               # empty: all scenarios in promsec/trainingdata.py
+  samples: 2                  # fix-and-rescan chains per program
+  rounds: 3                   # fix rounds per chain
+  temperature: 0.7
+  laaj_min: 0.6               # clean chains with gated LAAJ >= laaj_min are marked verified (informational)
+  parallel: 8
+  cpu_workers: 8
 
 judge:
   model_env: PROMSEC_JUDGE_MODEL
   api_key_env: OPENAI_API_KEY
   base_url_env: PROMSEC_JUDGE_BASE_URL
   temperature: 0.0
-  max_retries: 2
+  max_retries: 4
   stability_check: true
   calibration_limit: 4
 
-training:
-  train_from_scratch: 0
-  seed: 0
-  epochs: 7
-  learning_rate: 0.001
-  discriminator_steps: 5
-  limit: 500
-  validation_fraction: 0.1
-  resume: true
-  alpha: 1.0
-  beta: 10.0
-  lambda_adv: 0.01
-  security_margin: 0.25
-  negatives: 16
-  label_workers: 8
-
 supervisor:
-  max_training_passes: 3
   max_enforcement_passes: 3
   max_judge_passes: 3
   retry_seconds: 60

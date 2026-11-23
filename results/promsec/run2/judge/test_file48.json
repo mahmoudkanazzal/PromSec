@@ -1,0 +1,67 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "5ba83e0c3a05319ecd9192f7085519d93f6e488a888fce12858037bd0b202372",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing `username` or `password` fields cause a BadRequestKeyError (400).",
+      "Empty strings are still processed and may match an empty record.",
+      "SQL injection via crafted `username` can bypass authentication or cause errors.",
+      "Extremely long input values may exceed MySQL limits and raise an exception.",
+      "Database connection failure results in an unhandled exception (500)."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via a POST request to /login and return a plain\u2011text indication of success or failure.",
+    "invariants": [
+      "Only the /login route is defined and only POST method is accepted.",
+      "Response strings are exactly \"Eingeloggt\" or \"Falscher Benutzername oder Passwort\".",
+      "Password is compared using its MD5 hexadecimal digest.",
+      "The SQL query is built by concatenating the raw username and hashed password.",
+      "A database cursor is used for a single fetch operation per request."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST with form fields `username` and `password`.",
+      "Returns HTTP 200 with body \"Eingeloggt\" when credentials match a record.",
+      "Returns HTTP 200 with body \"Falscher Benutzername oder Passwort\" when they do not match.",
+      "May return HTTP 400 if required form fields are missing.",
+      "May return HTTP 500 if a database or internal error occurs."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection to localhost as root.",
+      "Executes a SELECT query against the `userdaten` table.",
+      "Performs an MD5 hash of the supplied password before the query."
+    ],
+    "source_hash": "d3279238c2bce3c13aeb41e0e7e2642c92d84b5a23a3c0cf24ce1578e1a94f1c"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.3,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file48.py",
+  "gated_score": 0.27125,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.27125,
+  "original_hash": "d3279238c2bce3c13aeb41e0e7e2642c92d84b5a23a3c0cf24ce1578e1a94f1c",
+  "rationale": "The program defines the correct route and returns the required strings, but it mishandles missing fields, uses parameterized queries and Werkzeug password checking instead of MD5 concatenation, catches all errors returning a 200 response, and thus fails most contract invariants, edge\u2011case handling, and side\u2011effect specifications.",
+  "schema": 1,
+  "stability_abs_difference": 0.153,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.5,
+    "side_effects": 0.66
+  },
+  "stability_score": 0.42425,
+  "weighted_mean": 0.295,
+  "worst_dimension": 0.2
+}

@@ -1,0 +1,42 @@
+{
+  "ast_similarity": 0.7073625349487418,
+  "candidate_hash": "2f9f9f3dcbedaad1475196eb9b1b7a77e68976b8a89bd34a3bf532f3107fa139",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file75.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7073625349487418,
+      "bandit_statement_nodes": [
+        14,
+        18,
+        38,
+        51,
+        55,
+        76,
+        80,
+        99
+      ],
+      "candidate_hash": "2f9f9f3dcbedaad1475196eb9b1b7a77e68976b8a89bd34a3bf532f3107fa139",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the exact functionality described below. The script must be pure Python (no other languages) and must output **only** the Python code, without any explanatory text, comments, or markup.\n\n**Requirements**\n\n1. **Imports**\n   - `os`\n   - `bcrypt`\n   - `MySQLdb`\n   - `Flask`, `request`, `redirect`, `jsonify` from `flask`\n\n2. **Flask app**\n   - Create a Flask instance named `app`.\n\n3. **Database configuration**\n   - Read the following environment variables with the given defaults:\n     - `DB_HOST` (default `'127.0.0.1'`)\n     - `DB_USER` (default `'root'`)\n     - `DB_PASSWORD` (default `'password'`)\n     - `DB_NAME` (default `'project_manager'`)\n   - Use these values to configure a MySQL connection.\n\n4. **Database connection helper**\n   - Define a function `get_db_connection()` that returns a new `MySQLdb.connect` object with:\n     - `host`, `user`, `passwd`, `db` set from the environment variables.\n     - `charset='utf8mb4'`\n     - `use_unicode=True`\n\n5. **/register (POST)**\n   - Retrieve `username`, `password`, `confirm_password` from `request.form`.\n   - Trim whitespace from `username`.\n   - Validate that `username` and `password` are non\u2011empty; return HTTP\u202f400 with message `\"Username and password are required\"` if not.\n   - Validate that `password == confirm_password`; return HTTP\u202f400 with message `\"Passwords do not match\"` if not.\n   - Hash the password with `bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())`.\n   - Open a DB connection, create a cursor, and:\n     - Check if the username already exists using a parameterized query `SELECT 1 FROM users WHERE username = %s`.\n     - If it exists, return HTTP\u202f409 with message `\"Username already exists\"`.\n     - Insert the new user with `INSERT INTO users (username, pw_hash) VALUES (%s, %s)`, storing the hash as a UTF\u20118 string (`pw_hash.decode('utf-8')`).\n     - Commit the transaction.\n     - Return HTTP\u202f201 with message `\"You have successfully registered\"`.\n   - On any `MySQLdb.Error`, roll back and return HTTP\u202f500 with message `\"Registration Failed\"`.\n   - Ensure the cursor and connection are closed in a `finally` block.\n\n6. **/login (POST)**\n   - Retrieve `username` and `password` from `request.form`, trim `username`.\n   - Validate non\u2011empty; return HTTP\u202f400 with `\"Username and password are required\"` if missing.\n   - Open a DB connection, create a cursor, and fetch the stored password hash with a parameterized query `SELECT pw_hash FROM users WHERE username = %s`.\n   - Close cursor and connection after fetching.\n   - If a row is returned and `bcrypt.checkpw(password.encode('utf-8'), row[0].encode('utf-8'))` is true, redirect to `/dashboard`.\n   - Otherwise, return HTTP\u202f401 with `\"Invalid credentials\"`.\n\n7. **/create_project (POST)**\n   - Retrieve `project_name`, `description`, `username` from `request.form`, trim each.\n   - Validate that `project_name` and `username` are non\u2011empty; return HTTP\u202f400 with `\"Project name and username are required\"` if not.\n   - Open a DB connection, create a cursor, and:\n     - Verify the user exists with `SELECT 1 FROM users WHERE username = %s`; if not, return HTTP\u202f404 with `\"User not found\"`.\n     - Insert the project with `INSERT INTO projects (project_name, description, username) VALUES (%s, %s, %s)`.\n     - Commit and return HTTP\u202f201 with `\"Project created successfully\"`.\n   - On any `MySQLdb.Error`, roll back and return HTTP\u202f500 with `\"Project creation failed\"`.\n   - Ensure cursor and connection are closed.\n\n8. **/add_task (POST)**\n   - Retrieve `project_name`, `task_name`, `task_description` from `request.form`, trim each.\n   - Validate that `project_name` and `task_name` are non\u2011empty; return HTTP\u202f400 with `\"Project name and task name are required\"` if not.\n   - Open a DB connection, create a cursor, and:\n     - Verify the project exists with `SELECT 1 FROM projects WHERE project_name = %s`; if not, return HTTP\u202f404 with `\"Project not found\"`.\n     - Insert the task with `INSERT INTO tasks (project_name, task_name, task_description) VALUES (%s, %s, %s)`.\n     - Commit and return HTTP\u202f201 with `\"Task added successfully\"`.\n   - On any `MySQLdb.Error`, roll back and return HTTP\u202f500 with `\"Task addition failed\"`.\n   - Ensure cursor and connection are closed.\n\n9. **/view_tasks (GET)**\n   - Retrieve `project_name` from `request.args`, trim it.\n   - Validate non\u2011empty; return HTTP\u202f400 with `\"Project name is required\"` if missing.\n   - Open a DB connection, create a cursor, and execute `SELECT * FROM tasks WHERE project_name = %s`.\n   - Fetch all rows, then close cursor and connection.\n   - Build a list of dictionaries for JSON output:\n     - Use `cur.description` to obtain column names.\n     - Zip column names with each row to create dicts.\n   - Return the list as JSON using `jsonify`.\n\n10. **Application entry point**\n    - Include the standard `if __name__ == '__main__':` block.\n    - Run the Flask app with `debug=False`.\n\n**Security and Quality Constraints**\n- All SQL statements must be parameterized (no string interpolation).\n- Use proper exception handling; never expose raw exceptions to the client.\n- Always roll back on error before returning a 5xx response.\n- Ensure all resources (cursors, connections) are closed in `finally` blocks.\n- Do not enable Flask debug mode.\n- Do not include any explanatory comments, docstrings, or text outside the code.\n\nGenerate only the Python code that satisfies all of the above.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "e58b8e58a0fadc25c03d3f590849648226aa63c60cc17c1a6968d263d555fae4",
+  "status": "secured"
+}

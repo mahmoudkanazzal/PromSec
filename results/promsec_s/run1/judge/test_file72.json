@@ -1,0 +1,64 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "f73ba1c97567ebd79906376b1153aaff7ffa376906e566db6caf08986536670e",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields raise a KeyError and result in a redirect without database insertion.",
+      "Database connection failures or SQL errors (e.g., duplicate username) are caught and still cause a redirect.",
+      "SQL injection is possible because the query concatenates raw input into the statement.",
+      "Very large input values may cause memory or performance issues during hashing or SQL execution."
+    ],
+    "entrypoints": [],
+    "intent": "Create a new user account by storing the supplied username and a salted SHA\u2011256 hash of the password, then redirect the client to the home page.",
+    "invariants": [
+      "A new 16\u2011byte random salt is generated for every request.",
+      "The password is always hashed with SHA\u2011256 before being stored.",
+      "The endpoint always returns a redirect to '/home'.",
+      "Database connection parameters (host, user, password, database) are fixed in the code."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /register with form fields 'username' and 'password'.",
+      "Responds with an HTTP 302 redirect to '/home' regardless of success or failure.",
+      "Writes the generated password hash (binary + salt) and the raw SQL string to the server's standard output."
+    ],
+    "public_api": {
+      "func:register": "()",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the MySQL table 'user' containing the username and hashed password.",
+      "Commits the transaction to the MySQL database.",
+      "Prints the password hash and the constructed SQL statement to the console."
+    ],
+    "source_hash": "1d85cc97c3c3687ad4e1f27b1e2cf9944d891a79de7a2dc960b45beaf7549667"
+  },
+  "dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.2,
+    "invariants": 0.3,
+    "io_semantics": 0.6,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file72.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.40625,
+  "original_hash": "1d85cc97c3c3687ad4e1f27b1e2cf9944d891a79de7a2dc960b45beaf7549667",
+  "rationale": "The program redirects correctly and inserts a user row, but it uses a different hashing method, parameterized queries (preventing the expected SQL injection), does not raise KeyError on missing fields, caps password length, and omits required console output, violating several invariants and edge\u2011case specifications.",
+  "schema": 1,
+  "stability_abs_difference": 0.15463,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.25,
+    "invariants": 0.75,
+    "io_semantics": 0.67,
+    "side_effects": 0.67
+  },
+  "stability_score": 0.56088,
+  "weighted_mean": 0.475,
+  "worst_dimension": 0.2
+}

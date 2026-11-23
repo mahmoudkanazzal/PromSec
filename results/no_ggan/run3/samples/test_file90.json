@@ -1,0 +1,39 @@
+{
+  "ast_similarity": 0.7879858657243817,
+  "candidate_hash": "9a11d1be10c488b9b63f6b8c92111881d9744765d5f06b08f5e5608d979c12a8",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file90.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7879858657243817,
+      "bandit_statement_nodes": [
+        8,
+        13,
+        23,
+        32,
+        41
+      ],
+      "candidate_hash": "9a11d1be10c488b9b63f6b8c92111881d9744765d5f06b08f5e5608d979c12a8",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3) that implements a Flask web application with the following exact functionality and security requirements:\n\n- **Imports**: `os`, `Flask`, `request`, `redirect`, `url_for` from `flask`, and `MySQLdb`.\n- **App initialization**: `app = Flask(__name__)`.\n- **Database connection helper**: Define a function `get_db_connection()` that returns a `MySQLdb.connect` object using environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`. Provide default values `'localhost'`, `'testuser'`, `'test123'`, and `'PRODUCTDB'` respectively.\n- **Routes**:\n  1. `POST /add_product`:\n     - Retrieve `name` and `price` from `request.form`, strip whitespace.\n     - If either is missing or empty, redirect back to the same endpoint.\n     - Use a secure, parameterized query to check if a product with the given name already exists. If it does, redirect back.\n     - Insert the new product with a parameterized `INSERT` statement.\n     - Commit the transaction, close cursor and connection, and redirect to `/view_products`.\n  2. `POST /update_price`:\n     - Retrieve `name` and `price` (new price) from `request.form`, strip whitespace.\n     - If either is missing or empty, return `\"Invalid input\"` with HTTP status\u202f400.\n     - Execute a parameterized `UPDATE` to set the new price for the product with the given name.\n     - Commit, close resources, and return `\"Price updated successfully\"`.\n  3. `POST /delete_product`:\n     - Retrieve `name` from `request.form`, strip whitespace.\n     - If missing or empty, return `\"Invalid input\"` with HTTP status\u202f400.\n     - Execute a parameterized `DELETE` for the product with the given name.\n     - Commit, close resources, and return `\"Product deleted successfully\"`.\n  4. `GET /search_products`:\n     - Retrieve query parameter `term` from `request.args`, strip whitespace.\n     - Construct a LIKE pattern `%{term}%`.\n     - Execute a parameterized `SELECT * FROM Products WHERE Name LIKE %s` using the pattern.\n     - Fetch all rows, close resources, and return the raw list representation as a string.\n  5. `GET /view_products`:\n     - Execute a `SELECT * FROM Products`.\n     - Fetch all rows, close resources, and return the raw list representation as a string.\n- **Database handling**: For each route, obtain a connection via `get_db_connection()`, create a cursor, perform queries inside a `try` block, and ensure both cursor and connection are closed in a `finally` block. Use parameterized queries (`%s` placeholders) exclusively to prevent SQL injection.\n- **Security**:\n  - Do not enable Flask debug mode (`debug=False`).\n  - Validate and sanitize all user inputs by stripping whitespace and checking for emptiness before database operations.\n  - Use environment variables for all database credentials; never hard\u2011code secrets.\n- **Application entry point**: Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\nOutput only the Python code, with no additional explanations, comments, or markup. Ensure the code is syntactically correct and follows the specifications exactly.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "27601feea594ef545b4981973fd012496ae91f0e9386b9bf28a423c58eae2c4d",
+  "status": "secured"
+}

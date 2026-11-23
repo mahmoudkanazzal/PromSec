@@ -1,0 +1,68 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "6f239ef566dbc4a5ca8e668bdcfabfa53e1f439cbb44c384347d5582d5357b4d",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty form fields cause a KeyError or ValueError.",
+      "Non\u2011numeric 'stock_quantity' leads to a conversion error.",
+      "Database errors (e.g., connection failure) result in an unhandled exception.",
+      "Large or malicious command strings may cause resource exhaustion or security breaches.",
+      "Absent 'username' in the session triggers a KeyError."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API with two POST endpoints: one to record or initialize a user's stock purchase in a MySQL database, and another to run a supplied shell command and return its output.",
+    "invariants": [
+      "Database connection parameters (host, user, password, db) are fixed at startup.",
+      "Flask secret key is constant for the lifetime of the process.",
+      "The /buy_order endpoint always attempts a SELECT before INSERT/UPDATE.",
+      "The response for /buy_order is always the literal strings 'updated' or 'initialized'."
+    ],
+    "io_behavior": [
+      "POST /buy_order with form fields 'stock_name', 'stock_quantity' (string) and a logged\u2011in session containing 'username' returns plain text 'updated' or 'initialized'.",
+      "POST /run_command with form field 'command' returns the raw stdout of the executed command as the HTTP response body."
+    ],
+    "public_api": {
+      "route:POST /buy_order": "",
+      "route:POST /run_command": ""
+    },
+    "side_effects": [
+      "Writes or updates a row in the MySQL table user_portfolio.",
+      "Creates a new MySQL connection for each request.",
+      "Executes an arbitrary shell command on the host OS.",
+      "Relies on Flask session data (username) stored in signed cookies."
+    ],
+    "source_hash": "e576461dff16c5a9ae90c7112659bd9a52879a53ccc7eb60a35471d13d2187b9"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.0,
+    "invariants": 1.0,
+    "io_semantics": 0.4,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file82.py",
+  "gated_score": 0.2925,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.2925,
+  "original_hash": "e576461dff16c5a9ae90c7112659bd9a52879a53ccc7eb60a35471d13d2187b9",
+  "rationale": "The program keeps the DB write logic and SELECT\u2011then\u2011INSERT/UPDATE invariant, but it changes error handling (uses aborts instead of KeyError/ValueError), restricts /run_command to a whitelist instead of executing arbitrary shell commands, and catches DB exceptions rather than letting them propagate, violating most edge\u2011case expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.24125,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.9,
+    "invariants": 1.0,
+    "io_semantics": 0.6,
+    "side_effects": 0.2
+  },
+  "stability_score": 0.53375,
+  "weighted_mean": 0.39,
+  "worst_dimension": 0.0
+}

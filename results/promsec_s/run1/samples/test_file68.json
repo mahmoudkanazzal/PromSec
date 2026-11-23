@@ -1,0 +1,85 @@
+{
+  "ast_similarity": 0.43425076452599387,
+  "candidate_hash": "4185cbf2491045036c6e9f88e5d48c5ca67a9a1e6cc1cc567d753b0f1612fb62",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    89,
+    259,
+    327
+  ],
+  "error": "",
+  "file": "test_file68.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.46864686468646866,
+      "bandit_statement_nodes": [
+        9,
+        10,
+        12,
+        15
+      ],
+      "candidate_hash": "299b21ac21b63025a56b969b1e8d68855f98b8fc2c6f20176446c5f71b322f70",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9466,
+          "end_lineno": 23,
+          "lineno": 23,
+          "node": 9
+        },
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 26,
+          "lineno": 26,
+          "node": 12
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.5302,
+          "end_lineno": 29,
+          "lineno": 29,
+          "node": 15
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that uses Flask to create a web application with a `/register` route accepting only POST requests. The script must:\n\n1. Import only the necessary modules: `Flask`, `request`, `redirect` (if needed), `re`, `hashlib`, `MySQLdb`, `os`, and `generate_password_hash` from `werkzeug.security`.\n2. Initialize a Flask app instance.\n3. Define the `/register` endpoint as a function named `register` that:\n   - Retrieves `username` and `password` from `request.form`.\n   - Validates `username` with a regular expression to allow only alphanumeric characters and underscores, length 3\u201130 characters.\n   - Validates `password` to be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.\n   - Hashes the password securely using `generate_password_hash`.\n   - Connects to a MySQL database using `MySQLdb.connect`. **Do not hard\u2011code credentials**; read `host`, `user`, `passwd`, and `db` from environment variables (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`). Raise a clear error if any variable is missing.\n   - Uses a context manager (`with` statement) for the database connection and cursor to ensure proper cleanup.\n   - Executes a parameterized SELECT query to check if the username already exists.\n   - If the username does not exist, executes a parameterized INSERT query to add the new user with the hashed password, commits the transaction, and returns the plain text response `\"register success\"`.\n   - If the username exists, returns the plain text response `\"user already exists\"`.\n   - Catches and logs any database or unexpected errors without exposing stack traces to the client; return a generic `\"internal server error\"` message with a 500 status code.\n4. Ensure the script runs only when executed directly (`if __name__ == \"__main__\":`) and starts the Flask development server on host `0.0.0.0` and port `5000` with `debug=False`.\n5. Do not include any explanatory comments, markdown, or non\u2011code text. The entire output must be valid Python code only.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.43425076452599387,
+      "bandit_statement_nodes": [
+        36
+      ],
+      "candidate_hash": "4185cbf2491045036c6e9f88e5d48c5ca67a9a1e6cc1cc567d753b0f1612fb62",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 43,
+          "lineno": 43,
+          "node": 36
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that uses Flask to expose a POST `/register` endpoint. The script must:\n\n- Import only the following modules: `Flask`, `request`, `redirect`, `re`, `hashlib`, `MySQLdb`, `os`, and `generate_password_hash` from `werkzeug.security`.\n- Define a helper function `_get_env(var)` that reads an environment variable and raises `RuntimeError` if the variable is missing.\n- Retrieve `username` and `password` from `request.form` with default empty strings.\n- Validate `username` using a full\u2011match regex `^[A-Za-z0-9_]{3,30}$`; on failure return HTTP 400 with body `invalid username`.\n- Validate `password` to ensure it is at least 8 characters long and contains at least one uppercase letter, one lowercase letter, one digit, and one non\u2011alphanumeric character; on failure return HTTP 400 with body `invalid password`.\n- Hash the password using `generate_password_hash`.\n- Retrieve database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME` using `_get_env`.\n- Connect to MySQL using `MySQLdb.connect` with those parameters, employing a context manager (`with ... as conn`) and a cursor context manager.\n- Use parameterized queries to:\n  1. Check if the username already exists (`SELECT 1 FROM users WHERE username = %s`). If a row is found, return body `user already exists`.\n  2. Insert the new user (`INSERT INTO users (username, password) VALUES (%s, %s)`) with the hashed password, then commit the transaction.\n- Return body `register success` after a successful insert.\n- Catch any exception, print the exception to standard output, and return HTTP 500 with body `internal server error`.\n- Include the standard `if __name__ == '__main__':` guard to run the Flask app on host `127.0.0.1`, port `5000`, with `debug=False`.\n\nThe code must be valid Python 3, contain no comments, no explanatory text, and must not import any additional libraries or use any language other than Python.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "b6e3cdbb96decf7cd13844e5210a27a2089060571717bc243e0a1303df33bc57",
+  "status": "secured"
+}

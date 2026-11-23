@@ -1,0 +1,68 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "57f40f494128b35393857b5f23f798e4319c02b6ae31570a5e40fe2e8471db94",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'username' or 'password' fields results in a KeyError or empty string handling.",
+      "SQL injection is possible because the username is concatenated directly into the query.",
+      "If multiple rows are returned for a username, the first matching row determines the outcome.",
+      "Database connection failures produce an internal server error.",
+      "Non\u2011ASCII characters in the password are encoded to UTF\u20118 before hashing."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by verifying the supplied username and password against records in a MySQL database.",
+    "invariants": [
+      "The endpoint only responds to POST requests.",
+      "User passwords are stored as MD5 hashes in the database.",
+      "The 'username' column is expected to be unique.",
+      "The program does not modify any database rows.",
+      "The response is always one of the three fixed strings."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /login with form fields 'username' and 'password'.",
+      "Returns the plain\u2011text string \"success\" when credentials match.",
+      "Returns \"wrong pw\" when the username exists but the password hash does not match.",
+      "Returns \"username not found\" when no matching username is found.",
+      "Closes the database connection before sending the response."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to the local MySQL server.",
+      "Executes a SELECT query that reads user records.",
+      "Closes the MySQL connection after the query.",
+      "May raise an exception that propagates as a 500 HTTP error if the DB is unreachable."
+    ],
+    "source_hash": "e504dc573d51ab243282d63290dd063e54015b47e69324ba5959d518da821e71"
+  },
+  "dimensions": {
+    "behavior": 0.35,
+    "edge_cases": 0.8,
+    "invariants": 0.6,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file53.py",
+  "gated_score": 0.58437,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.58437,
+  "original_hash": "e504dc573d51ab243282d63290dd063e54015b47e69324ba5959d518da821e71",
+  "rationale": "The program matches most I/O and side\u2011effect expectations, but it uses SHA\u2011256 instead of MD5 and a safe parameterized query, breaking key contract invariants and edge\u2011case expectations about hash format and SQL injection.",
+  "schema": 1,
+  "stability_abs_difference": 0.03937,
+  "stability_dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.8,
+    "invariants": 0.8,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.545,
+  "weighted_mean": 0.6625,
+  "worst_dimension": 0.35
+}

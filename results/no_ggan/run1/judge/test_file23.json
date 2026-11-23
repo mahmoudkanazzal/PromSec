@@ -1,0 +1,78 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "88bd657cf373315ae6fd5f0cea033fb49e798a7205ce3a9ead739b9e981a24c8",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing required YAML keys (e.g., title, isbn) leads to a server error or uncaught exception.",
+      "Malformed YAML in request bodies causes yaml.load to raise an exception, resulting in a 500 response.",
+      "Omitting the password field in /librarian_access results in access denied (401).",
+      "Providing an unknown action to /admin_panel returns a 400 with \"Invalid action\".",
+      "Empty or missing query parameters (e.g., section, type, category) still trigger the corresponding script with an empty argument.",
+      "Large or malicious input could cause the invoked scripts to behave unexpectedly, as the app does not sanitize command arguments."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple library management web API that can add, update, delete, view books, run inventory and report scripts, and perform limited admin actions via HTTP requests.",
+    "invariants": [
+      "All endpoints always respond with a JSON payload containing a \"status\" field.",
+      "Successful responses use HTTP 200; authentication failure uses 401 and invalid admin actions use 400.",
+      "YAML payloads are parsed with yaml.FullLoader; required keys (e.g., isbn) must be present for the request to succeed.",
+      "The admin_panel endpoint only accepts the actions \"backup\" or \"restore\"; any other value results in a 400 error."
+    ],
+    "io_behavior": [
+      "POST /add_book with a YAML body containing title, author, isbn, and publication_year returns a JSON object echoing those fields and a success status.",
+      "GET /run_inventory?section=NAME triggers a system call to run an inventory script for the given section and returns a JSON status message.",
+      "POST /librarian_access with form field password returns a JSON success message if the password matches the hard\u2011coded admin password, otherwise a 401 error.",
+      "POST /update_book with a YAML body containing isbn and optional new_title, new_author, new_year returns a JSON object summarizing the update request.",
+      "POST /delete_book with a YAML body containing isbn returns a JSON object confirming deletion of that ISBN.",
+      "GET /generate_reports?type=TYPE triggers a report\u2011generation script with the given type and returns a JSON status message."
+    ],
+    "public_api": {
+      "route:GET /generate_reports": "",
+      "route:GET /run_inventory": "",
+      "route:GET /view_books": "",
+      "route:POST /add_book": "",
+      "route:POST /admin_panel": "",
+      "route:POST /delete_book": "",
+      "route:POST /librarian_access": "",
+      "route:POST /update_book": ""
+    },
+    "side_effects": [
+      "Execution of external Python scripts via os.system for inventory, report generation, backup, restore, and book viewing.",
+      "Potential creation of backup or restore files performed by the invoked backup_script.py and restore_script.py.",
+      "No persistent data is stored by the Flask app itself; all state is external to the process."
+    ],
+    "source_hash": "1308832b93521f7bb6430dd40918c7597329f436d315da7bba1389c443eba676"
+  },
+  "dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.2,
+    "invariants": 0.9,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file23.py",
+  "gated_score": 0.605,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.605,
+  "original_hash": "1308832b93521f7bb6430dd40918c7597329f436d315da7bba1389c443eba676",
+  "rationale": "Core endpoints and responses match the contract, but key edge\u2011case handling (missing/invalid YAML, lack of input sanitization) and the use of safe_load instead of FullLoader, plus env\u2011based password, diverge from the specified behavior.",
+  "schema": 1,
+  "stability_abs_difference": 0.03025,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.33,
+    "invariants": 0.75,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.63525,
+  "weighted_mean": 0.74,
+  "worst_dimension": 0.2
+}

@@ -1,0 +1,35 @@
+{
+  "ast_similarity": 0.819227608874281,
+  "candidate_hash": "dac6f61e00f0319351dfec9cc5296225da6d8cb9dd3248ad6434e1b730dd8d0f",
+  "complete": true,
+  "config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    703
+  ],
+  "error": "",
+  "file": "test_file31.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.819227608874281,
+      "bandit_statement_nodes": [
+        55
+      ],
+      "candidate_hash": "dac6f61e00f0319351dfec9cc5296225da6d8cb9dd3248ad6434e1b730dd8d0f",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module (compatible with Python\u202f3.9+) that implements the exact functionality shown below. The code must be written in pure Python (no other languages) and must preserve the behavior of the original snippet while adhering to security best practices:\n\n- Use only the imports listed in the original code (json, logging, os, io.BytesIO, typing, attr, six.text_type, twisted.internet._resolver.SimpleResolverComplexifier, twisted.internet.defer.fail/succeed, twisted.internet.error.DNSLookupError, twisted.internet.interfaces.IHostnameResolver, IReactorPluggableNameResolver, IResolverSimple, twisted.internet.address, twisted.logger, twisted.web.http_headers.Headers, twisted.web.server.Request, Site, twisted.web.http.unquote, twisted.test.proto_helpers.MemoryReactorClock, OpenSSL.crypto, zope.interface.implementer, and sydent.sydent.Sydent, parse_config_dict). Do not add any additional third\u2011party dependencies.\n\n- Do **not** use dynamic code execution functions such as `eval`, `exec`, `execfile`, `compile`, or similar. All code paths must be statically analyzable.\n\n- Ensure that any data handling (e.g., JSON encoding/decoding, header manipulation, certificate loading) validates input types and handles errors gracefully, raising appropriate exceptions rather than silently failing.\n\n- For the `make_sydent` function:\n  * Accept an optional `test_config` dictionary.\n  * Work on a shallow copy of the provided dictionary to avoid mutating caller data.\n  * Ensure the in\u2011memory SQLite database configuration (`db.file = \":memory:\"`) is set if not already present.\n  * Instantiate a `ResolvingMemoryReactorClock` and return a `Sydent` instance with `reactor`, parsed configuration, and `use_tls_for_federation=False`.\n\n- Define the `FakeChannel` class using `attr.s` with the same attributes and methods as the original, preserving the semantics of:\n  * `json_body`, `code`, `headers` properties (raise a clear exception if accessed before a result is available).\n  * `writeHeaders`, `write`, `registerProducer`, `unregisterProducer`, `requestDone`, `getPeer`, `getHost`, `transport`, and `getPeerCertificate` methods.\n  * Ensure `write` asserts that content is `bytes` and concatenates correctly.\n  * In `registerProducer`, schedule production using the reactor\u2019s `callLater` without blocking, and handle both streaming and non\u2011streaming cases safely.\n  * `getPeerCertificate` must load the hard\u2011coded PEM certificate using `OpenSSL.crypto.load_certificate` and return the certificate object.\n\n- Provide a minimal `FakeSite` class placeholder.\n\n- Implement the `make_request` function with the following requirements:\n  * Accept parameters: `reactor`, `method`, `path`, `content=b\"\"`, `access_token=None`, `request=Request`, `shorthand=True`, `federation_auth_origin=None`.\n  * Convert `method` and `path` to `bytes` if they are not already, using ASCII encoding.\n  * Apply the shorthand prefix (`b\"/_matrix/identity/v2/\"`) when appropriate, ensuring no double slashes.\n  * Ensure the final path starts with a single leading slash.\n  * If `content` is a `dict`, JSON\u2011encode it to UTF\u20118 bytes; if it is a `six.text_type`, encode to UTF\u20118 bytes.\n  * Instantiate `FakeSite` and `FakeChannel`, then create a `request` object bound to the channel.\n  * Set up the request\u2019s `content` as a `BytesIO` stream, populate `postpath` by splitting and unquoting the path.\n  * Add appropriate `Authorization` and `Content-Type` headers when `access_token` or `federation_auth_origin` are provided, using safe header handling.\n  * Call `requestReceived` with the method, path, and HTTP version `b\"1.1\"`.\n  * Return a tuple `(request, channel)`.\n\n- Create a `ToTwistedHandler` logging handler subclass that forwards formatted log records to Twisted\u2019s logger:\n  * Use a class\u2011level `twisted.logger.Logger` instance.\n  * In `emit`, format the record, map the Python log level name to Twisted\u2019s level (lower\u2011case, replace \u201cwarning\u201d with \u201cwarn\u201d), and emit using `tx_log.emit`.\n\n- Implement a helper `_validate_log_level(level_name: str) -> int` that:\n  * Normalizes the input to uppercase.\n  * Returns the corresponding `logging` level if it is one of `CRITICAL, ERROR, WARNING, INFO, DEBUG, NOTSET`.\n  * Defaults to `logging.ERROR` for any unknown name.\n\n- Implement `setup_logging()` that:\n  * Retrieves the root logger.\n  * Configures a log format of `\"%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s\"`.\n  * Attaches the `ToTwistedHandler` with the formatter.\n  * Reads the environment variable `SYDENT_TEST_LOG_LEVEL` (default `\"ERROR\"`), validates it with `_validate_log_level`, and sets the root logger\u2019s level accordingly.\n  * Call `setup_logging()` at module import time.\n\n- Define `ResolvingMemoryReactorClock` as a subclass of `MemoryReactorClock` that also implements `IReactorPluggableNameResolver`:\n  * Initialize an empty `lookups` dictionary.\n  * Define an inner `FakeResolver` class implementing `IResolverSimple` with a `getHostByName(self, name, timeout=None)` method that:\n    - Returns a failed Deferred with `DNSLookupError` if `name` is not in `self.lookups`.\n    - Returns a succeeded Deferred with the corresponding IP address otherwise.\n  * Wrap `FakeResolver` with `SimpleResolverComplexifier` and assign to `self.nameResolver`.\n  * Call `super().__init__()` after setting up the resolver.\n  * Implement `installNameResolver(self, resolver: IHostnameResolver) -> IHostnameResolver` that raises `NotImplementedError`.\n\n- Ensure all classes and functions include appropriate type hints, docstrings, and adhere to PEP\u202f8 style.\n\n- The final module must be ready to be imported and used in a test suite without modification, reproducing the exact behavior of the reference implementation while following the security constraints listed above.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "1a39a4177928ac3d32e74a2ff0d447c7f6ce1c7a9a28105b4f5d40c44d317349",
+  "status": "secured"
+}

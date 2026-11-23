@@ -1,0 +1,149 @@
+{
+  "ast_similarity": 0.41456582633053224,
+  "candidate_hash": "ceae1e5736db82b4a32ac92c391ceb7bb87ed73d6ad0532ae5fa57fd03d4c4cb",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    89,
+    259
+  ],
+  "error": "",
+  "file": "test_file45.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5849802371541502,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        12
+      ],
+      "candidate_hash": "92466d45945a3b9db44ae578fe5ed1f567af0b8422d9ee16857eb5c8043798d1",
+      "cwe_count": 2,
+      "cwes": [
+        259,
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2826,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.25,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 3
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1531,
+          "end_lineno": 24,
+          "lineno": 24,
+          "node": 10
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1028,
+          "end_lineno": 26,
+          "lineno": 26,
+          "node": 12
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements the following functionality exactly as described, and ensure the code follows security best practices:\n\n- Use Flask to create a web application with a single route `/login` that only accepts POST requests.\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session` from `flask`; `os`; `hashlib` (if needed); and `MySQLdb`.\n- Initialize the Flask app with a secret key (you may set a placeholder value) and configure session handling.\n- In the `/login` view function:\n  * Retrieve `username` and `password` from `request.form`.\n  * Obtain database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, providing sensible defaults (`localhost`, `root`, `root`, `db`) if the variables are not set.\n  * Connect to the MySQL database using `MySQLdb.connect` with the obtained parameters.\n  * Use a **parameterized** SQL query to select `id`, `role`, and `password` from the `users` table where `username` matches the supplied value.\n  * Execute the query safely, fetch one row, and if a row exists:\n    - Compare the stored password with the supplied password using a direct equality check (note: indicate that this is a placeholder and should be replaced with proper hashing in production, but do not add any extra comments in the code).\n    - If the passwords match, store `id` in `session['id']` and `role` in `session['Role']`, then redirect the user to `/dashboard`.\n  * If authentication fails or any error occurs, redirect the user back to `/login`.\n  * Ensure that the database cursor and connection are closed in a `finally` block, handling any exceptions silently.\n- Include a top\u2011level comment line exactly matching: `# This file was assembled by gen.py, written by redactedAuthorFirstname redactedAuthorLastname.`\n\nAdditional requirements:\n- Do **not** hard\u2011code any credentials or secrets; use only environment variables as specified.\n- Use proper exception handling for `MySQLdb.Error` and any cleanup errors.\n- Do not include any explanatory text, markdown formatting, or comments beyond the required top\u2011level comment.\n- The output must be pure Python code, with no other language or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5606060606060606,
+      "bandit_statement_nodes": [
+        4,
+        24,
+        28
+      ],
+      "candidate_hash": "effa9ee4c9b5aa1ae6d56cc88ddd3f1fe692d197e5469d053a4165bd6b374d37",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2136,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 1
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1185,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.3938,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1318,
+          "end_lineno": 45,
+          "lineno": 45,
+          "node": 35
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/login` POST endpoint. The script must:\n\n- Import only `Flask`, `request`, `redirect`, `session` from `flask`, `getenv` from `os`, and `mysql.connector`.\n- Create a Flask app instance.\n- Load the secret key from the environment variable `FLASK_SECRET_KEY`; if it is not set, raise a `RuntimeError` with the message `'FLASK_SECRET_KEY environment variable not set'`.\n- Assign the loaded secret key to `app.secret_key`.\n- Define a route `'/login'` that accepts only the POST method.\n- Inside the view function, retrieve `username` and `password` from `request.form` using `.get` with default empty strings.\n- Read database connection parameters from environment variables: `DB_HOST` (default `'localhost'`), `DB_USER` (default `'root'`), `DB_PASS` (default `'root'`), and `DB_NAME` (default `'db'`).\n- Connect to MySQL using `mysql.connector.connect` with the retrieved parameters, handling the connection inside a `try` block.\n- Use a prepared statement with a `%s` placeholder: `SELECT id, role, password FROM users WHERE username=%s`.\n- Execute the query with the supplied `username` as a parameter tuple.\n- Fetch one row; if a row is returned and the stored password exactly matches the supplied `password`, store the user's id in `session['id']` and the role in `session['Role']`, then `redirect` to `'/dashboard'`.\n- If authentication fails or any database error occurs, `redirect` back to `'/login'`.\n- Ensure that both the cursor and the connection are closed in a `finally` block, handling any exceptions that may arise during closing.\n- Include the standard `if __name__ == '__main__':` guard that runs `app.run` with `host='127.0.0.1'`, `port=5000`, and `debug=False`.\n- The code must be valid Python 3, use parameterized queries to prevent SQL injection, fail fast if the secret key is missing, and contain no additional functionality, comments, or explanatory text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5229681978798587,
+      "bandit_statement_nodes": [
+        17,
+        26,
+        30
+      ],
+      "candidate_hash": "fc70cd6871fc4644cb6c09883fd67cb27b535c616bd7d073f94ba2845467dc88",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.9+) that implements a Flask web application with a single POST route \u201c/login\u201d. The script must:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session` from `flask`; `getenv` from `os`; `mysql.connector`; and `hmac` for constant\u2011time comparison.\n- Retrieve the Flask secret key from the environment variable `FLASK_SECRET_KEY`; if missing, raise `RuntimeError` with the message \u201cFLASK_SECRET_KEY environment variable not set\u201d.\n- Set `app.secret_key` to the retrieved secret.\n- In the \u201c/login\u201d view, read `username` and `password` from `request.form`, defaulting to empty strings.\n- Retrieve database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, providing defaults: host=`'localhost'`, user=`'root'`, password=`'root'`, database=`'db'`.\n- Establish a MySQL connection using `mysql.connector.connect` with the retrieved parameters.\n- Use a cursor to execute a **parameterized** SELECT query that fetches `id`, `role`, and `password` for the given username.\n- Compare the stored password with the supplied password using `hmac.compare_digest` to avoid timing attacks.\n- If authentication succeeds, store the user\u2019s id and role in the session with keys `'id'` and `'Role'`, then `redirect('/dashboard')`.\n- Ensure all resources (cursor, connection) are closed in a `finally` block, handling any exceptions during cleanup without suppressing the original error.\n- On any failure (no matching user, password mismatch, database error), `redirect('/login')` without exposing internal details.\n- Include a main guard that runs `app.run(host='127.0.0.1', port=5000, debug=False)`.\n\nThe code must be secure: use environment variables for secrets, parameterized queries, constant\u2011time password comparison, explicit error handling, and must not swallow exceptions silently. Do not include any additional routes, comments, or explanatory text. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.41456582633053224,
+      "bandit_statement_nodes": [
+        18,
+        29,
+        33
+      ],
+      "candidate_hash": "ceae1e5736db82b4a32ac92c391ceb7bb87ed73d6ad0532ae5fa57fd03d4c4cb",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/login` POST endpoint. The script must:\n\n- Import only the required modules: `Flask`, `request`, `redirect`, `session` from `flask`; `getenv` from `os`; `mysql.connector`; `logging`; `check_password_hash` from `werkzeug.security`.\n- Configure logging at INFO level and obtain a logger named `__name__`.\n- Retrieve the Flask secret key from the environment variable `FLASK_SECRET_KEY`; if missing, raise `RuntimeError` with a clear message.\n- Create a Flask app, set its `secret_key`, and configure session cookies to be `HttpOnly`, `SameSite='Lax'`, and `Secure=True`.\n- Retrieve database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables; if any are missing, raise `RuntimeError` with a clear message.\n- Define a `/login` route that accepts only POST requests. Inside the view:\n  * Get `username` and `password` from `request.form`, defaulting to empty strings.\n  * Open a MySQL connection using `mysql.connector.connect` with the retrieved credentials.\n  * Use a cursor to execute a parameterised query: `SELECT id, role, password FROM users WHERE username = %s`.\n  * Fetch one row; if a row exists and `check_password_hash(row[2], password)` returns `True`, store `row[0]` in `session['id']` and `row[1]` in `session['Role']`, then redirect to `/dashboard`.\n  * On any exception, log the full traceback with `logger.exception` and ensure resources are cleaned up.\n  * In a `finally` block, close the cursor and connection if they were created, logging any errors during close.\n  * If authentication fails, redirect back to `/login`.\n- Include the standard `if __name__ == '__main__':` block to run the app on `127.0.0.1:5000` with `debug=False`.\n- Ensure the code follows best security practices: use environment variables for secrets, parameterised queries, secure session settings, proper exception handling, and no hard\u2011coded credentials.\n- Output must be valid Python code only, with no additional explanation, comments, or markdown.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 4,
+  "schema": 1,
+  "selected_iteration": 4,
+  "source_hash": "82a598df24f20127548a17aeae223f565253b9c8deab6eb8a9c0ff434bc08957",
+  "status": "secured"
+}

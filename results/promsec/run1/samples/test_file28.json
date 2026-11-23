@@ -1,0 +1,116 @@
+{
+  "ast_similarity": 0.8154506437768241,
+  "candidate_hash": "e59154e304a04c826e58d51341af2d0352f4f6cc52e81df29596377487c998bb",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file28.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8451957295373665,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        28,
+        33
+      ],
+      "candidate_hash": "ab757504b4140fc0b775529373711d2e05a5826d0733dce7796e8020af07f50e",
+      "cwe_count": 2,
+      "cwes": [
+        78,
+        259
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1349,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1428,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2753,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1675,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2077,
+          "end_lineno": 43,
+          "lineno": 43,
+          "node": 28
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 script that implements a Flask web application with the exact functionality described below. The code must be in Python only, follow security best practices, and preserve the behavior of each endpoint.\n\n**General requirements**\n- Use only standard library modules and the following third\u2011party packages: `flask`, `pyyaml`.\n- Import `os`, `yaml`, `subprocess`, `re`, and `hmac` as needed.\n- Load the librarian password from the environment variable `LIBRARIAN_PASSWORD`; if it is not set, default to the placeholder string `\"change_me\"`.\n- Do not use `eval`, `exec`, or any dynamic code execution.\n- Ensure all input validation is strict and prevents injection attacks.\n- Use `yaml.safe_load` for parsing YAML.\n- Use `re.fullmatch` with the pattern `[\\w-]*` for validating alphanumeric, hyphen, and underscore strings.\n- Use `subprocess.run` with a list of arguments (no `shell=True`) to avoid shell injection.\n- Use `hmac.compare_digest` for constant\u2011time string comparisons.\n- Return JSON responses with appropriate HTTP status codes.\n- End the script with `if __name__ == \"__main__\": app.run(debug=False)`.\n\n**Endpoints**\n\n1. **POST /api/add_book**\n   - Read the raw request body, decode as UTF\u20118, and parse it as YAML using `yaml.safe_load`.\n   - Expected YAML keys: `title`, `author`, `isbn`, `publisher` (optional, default `\"Unknown\"`), `year_published` (optional, default `\"Unknown\"`).\n   - Validate that `title`, `author`, and `isbn` are non\u2011empty strings.\n   - Validate that `year_published` is an integer if provided; otherwise return a 400 error.\n   - On success, return JSON:\n     ```json\n     {\n       \"status\": \"Book added\",\n       \"title\": <title>,\n       \"author\": <author>,\n       \"isbn\": <isbn>,\n       \"publisher\": <publisher>,\n       \"year_published\": <year_published>\n     }\n     ```\n\n2. **POST /api/remove_book**\n   - Expect form field `isbn`.\n   - If missing, return 400 error.\n   - On success, return JSON `{\"status\": \"Book removed\", \"isbn\": <isbn>}`.\n\n3. **GET /api/start_inventory**\n   - Expect query parameters `section` and `location`.\n   - Validate each with `re.fullmatch(r'[\\w-]*', value)`. If either fails, return 400 error.\n   - Execute `python3 inventory_checker.py <section> <location>` using `subprocess.run` with `check=False`, redirecting both stdout and stderr to `subprocess.DEVNULL`.\n   - If the subprocess call raises an exception, return 500 error.\n   - On success, return JSON `{\"status\": \"Inventory check started\"}`.\n\n4. **POST /admin/login**\n   - Expect form fields `password` and `secret_key`.\n   - Compare `password` to `LIBRARIAN_PASSWORD` and `secret_key` to the constant string `\"admin_key_2024\"` using `hmac.compare_digest`.\n   - If both match, return JSON `{\"status\": \"Admin access granted\", \"message\": \"Welcome, Admin!\"}`.\n   - Otherwise, return 401 error with JSON `{\"status\": \"Access denied\", \"message\": \"Invalid credentials\"}`.\n\n5. **POST /admin/change_password**\n   - Expect form fields `old_password` and `new_password`.\n   - Verify `old_password` matches `LIBRARIAN_PASSWORD` using `hmac.compare_digest`.\n   - If it matches, update the global `LIBRARIAN_PASSWORD` variable to `new_password` and return JSON `{\"status\": \"Password changed successfully\"}`.\n   - Otherwise, return 401 error with JSON `{\"status\": \"Access denied\", \"message\": \"Invalid old password\"}`.\n\n6. **GET /api/book_info**\n   - Expect query parameter `isbn`.\n   - If missing, return 400 error.\n   - Return JSON with a placeholder book record:\n     ```json\n     {\n       \"status\": \"Book details\",\n       \"book_info\": {\n         \"title\": \"Sample Book\",\n         \"author\": \"Jane Doe\",\n         \"isbn\": <isbn>,\n         \"publisher\": \"Sample Publisher\",\n         \"year_published\": 2024\n       }\n     }\n     ```\n\n7. **POST /api/update_book**\n   - Expect form fields `isbn`, `new_title`, `new_author`.\n   - If `isbn` is missing, return 400 error.\n   - Return JSON:\n     ```json\n     {\n       \"status\": \"Book updated\",\n       \"isbn\": <isbn>,\n       \"new_title\": <new_title>,\n       \"new_author\": <new_author>\n     }\n     ```\n\n8. **GET /api/list_books**\n   - Expect optional query parameter `section`.\n   - Return JSON with a static list of two book dictionaries (include fields `title`, `author`, `isbn`, `publisher`, `year_published`) and echo the `section` value:\n     ```json\n     {\n       \"status\": \"Books listed\",\n       \"section\": <section>,\n       \"books\": [ ... ]\n     }\n     ```\n\n9. **POST /admin/adjust_settings**\n   - Expect form fields `password` and `new_setting`.\n   - Verify `password` matches `LIBRARIAN_PASSWORD` using `hmac.compare_digest`; if not, return 401 error.\n   - If `new_setting` is empty, return 400 error with JSON `{\"status\": \"Error\", \"message\": \"Invalid setting\"}`.\n   - On success, return JSON `{\"status\": \"Setting applied\", \"new_setting\": <new_setting>}`.\n\n10. **GET /api/check_book_availability**\n    - Expect query parameter `isbn`.\n    - If missing, return 400 error.\n    - Return JSON `{\"status\": \"Book availability\", \"isbn\": <isbn>, \"available\": true}` (placeholder availability).\n\n11. **POST /api/request_book**\n    - Expect form fields `isbn` and `user_id`.\n    - If either is missing, return 400 error.\n    - Return JSON `{\"status\": \"Book requested\", \"isbn\": <isbn>, \"user_id\": <user_id>}`.\n\n12. **POST /api/return_book**\n    - Expect form fields `isbn` and `user_id`.\n    - If either is missing, return 400 error.\n    - Return JSON `{\"status\": \"Book returned\", \"isbn\": <isbn>, \"user_id\": <user_id>}`.\n\n**Output**\n- The response should be only the Python source code implementing the above specifications, with no additional explanation, comments, or markup. Ensure the code is syntactically correct and ready to run.",
+      "syntax_repair_rounds": 1
+    },
+    {
+      "ast_similarity_to_original": 0.8154506437768241,
+      "bandit_statement_nodes": [
+        2,
+        8,
+        49
+      ],
+      "candidate_hash": "e59154e304a04c826e58d51341af2d0352f4f6cc52e81df29596377487c998bb",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.3184,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1858,
+          "end_lineno": 11,
+          "lineno": 11,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2578,
+          "end_lineno": 71,
+          "lineno": 68,
+          "node": 49
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Create a complete, self\u2011contained Python script (compatible with Python\u202f3.9+) that implements a Flask web application with the exact functionality described below. The script must:\n\n1. **Import only the following modules** (no additional third\u2011party packages):\n   - `os`\n   - `yaml`\n   - `re`\n   - `hmac`\n   - `importlib`\n   - `flask` (specifically `Flask`, `request`, `jsonify`)\n\n2. **Define the Flask app** as `app = Flask(__name__)`.\n\n3. **Read environment variables**:\n   - `LIBRARIAN_PASSWORD` with a default value of `'change_me'` if not set.\n   - `ADMIN_SECRET_KEY` with no default (may be `None`).\n\n4. **Provide a helper function** `json_error(message, status_code)` that returns a JSON response with keys `status` set to `'Error'` and `message` set to the supplied text, together with the given HTTP status code.\n\n5. **Implement the following routes** exactly as specified, preserving request methods, parameter handling, validation, and response structures:\n\n   - `POST /api/add_book`  \n     *Read raw request body as text, parse it with `yaml.safe_load`. If parsing fails or the result is not a dict, return a 400 error via `json_error`. Extract `title`, `author`, `isbn`, optional `publisher` (default `'Unknown'`), and optional `year_published` (default `'Unknown'`). Validate that `title`, `author`, and `isbn` are non\u2011empty strings; if not, return a 400 error. If `year_published` is provided and not `'Unknown'`, ensure it is an integer, otherwise return a 400 error. On success, return a JSON object with keys `status: 'Book added'` and the supplied fields, with HTTP 200.*\n\n   - `POST /api/remove_book`  \n     *Obtain `isbn` from `request.form`. If missing, return a 400 error. Respond with JSON `{'status': 'Book removed', 'isbn': isbn}` and HTTP 200.*\n\n   - `GET /api/start_inventory`  \n     *Read query parameters `section` and `location`. If either is missing, return a 400 error. Validate both against the regex pattern `r'[\\w-]*'` using `re.fullmatch`; on failure return a 400 error. Dynamically import a module named `inventory_checker` using `importlib.import_module`. If the module defines a callable `main`, invoke it with `(section, location)`. Else if it defines `run_check`, invoke that. If neither exists or any exception occurs, return a 500 error via `json_error`. On success, return JSON `{'status': 'Inventory check started'}` with HTTP 200.*\n\n   - `POST /admin/login`  \n     *Read `password` and `secret_key` from `request.form` (default empty strings). Use `hmac.compare_digest` to compare `password` with `LIBRARIAN_PASSWORD` and `secret_key` with `ADMIN_SECRET_KEY` (only if `ADMIN_SECRET_KEY` is not `None`). If both comparisons succeed, return JSON `{'status': 'Admin access granted', 'message': 'Welcome, Admin!'}` with HTTP 200. Otherwise return JSON `{'status': 'Access denied', 'message': 'Invalid credentials'}` with HTTP 401.*\n\n   - `POST /admin/change_password`  \n     *Declare `global LIBRARIAN_PASSWORD`. Read `old_password` and `new_password` from `request.form`. Verify `old_password` matches the current `LIBRARIAN_PASSWORD` using `hmac.compare_digest`. If not, return HTTP 401 with JSON `{'status': 'Access denied', 'message': 'Invalid old password'}`. If it matches, set `LIBRARIAN_PASSWORD` to `new_password` and return JSON `{'status': 'Password changed successfully'}` with HTTP 200.*\n\n   - `GET /api/book_info`  \n     *Read `isbn` from query parameters. If missing, return a 400 error. Return a JSON object with `status: 'Book details'` and a nested `book_info` dict containing static sample data: `title: 'Sample Book'`, `author: 'Jane Doe'`, `isbn` (the supplied value), `publisher: 'Sample Publisher'`, `year_published: 2024`. Respond with HTTP 200.*\n\n   - `POST /api/update_book`  \n     *Read `isbn`, `new_title`, and `new_author` from `request.form`. If `isbn` is missing, return a 400 error. Return JSON `{'status': 'Book updated', 'isbn': isbn, 'new_title': new_title, 'new_author': new_author}` with HTTP 200.*\n\n   - `GET /api/list_books`  \n     *Read optional `section` from query parameters. Return a JSON response containing `status: 'Books listed'`, the supplied `section`, and a static list `books` with two hard\u2011coded book dictionaries (as shown in the reference code). Respond with HTTP 200.*\n\n   - `POST /admin/adjust_settings`  \n     *Read `password` and `new_setting` from `request.form`. Verify `password` matches `LIBRARIAN_PASSWORD` using `hmac.compare_digest`. If not, return HTTP 401 with JSON `{'status': 'Access denied', 'message': 'Invalid credentials'}`. If `new_setting` is empty, return HTTP 400 with JSON `{'status': 'Error', 'message': 'Invalid setting'}`. Otherwise return JSON `{'status': 'Setting applied', 'new_setting': new_setting}` with HTTP 200.*\n\n   - `GET /api/check_book_availability`  \n     *Read `isbn` from query parameters. If missing, return a 400 error. Return JSON `{'status': 'Book availability', 'isbn': isbn, 'available': True}` with HTTP 200.*\n\n   - `POST /api/request_book`  \n     *Read `isbn` and `user_id` from `request.form`. If either is missing, return a 400 error. Return JSON `{'status': 'Book requested', 'isbn': isbn, 'user_id': user_id}` with HTTP 200.*\n\n   - `POST /api/return_book`  \n     *Read `isbn` and `user_id` from `request.form`. If either is missing, return a 400 error. Return JSON `{'status': 'Book returned', 'isbn': isbn, 'user_id': user_id}` with HTTP 200.*\n\n6. **Add the standard Flask entry point**:\n   ```python\n   if __name__ == '__main__':\n       app.run(debug=False)\n   ```\n\n7. **Security requirements**:\n   - Use `yaml.safe_load` (never `yaml.load`).\n   - Use `hmac.compare_digest` for all secret comparisons.\n   - Validate all external inputs (query parameters, form data, request bodies) strictly as described; reject any input that does not meet the criteria.\n   - Do not expose stack traces or internal exception details; any caught exception should result in a generic error response via `json_error`.\n   - Do not use `eval`, `exec`, or any dynamic code execution beyond the safe import of `inventory_checker` as specified.\n   - Ensure that the script contains **no comments, no explanatory text, and no markdown formatting**\u2014output only the raw Python code.\n\nProduce **only** the Python script meeting all the above specifications. Do not include any additional explanation, headings, or markup.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "57da26119eb9becbf1830dfb9351497ddbfeeaa09d2462e58b4bfbcd69099e12",
+  "status": "secured"
+}

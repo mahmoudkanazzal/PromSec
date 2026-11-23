@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "5d475d25949ed316e9c28001255bd9f6e3681750016e6557c5fdf55b8b48189c",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing required fields results in HTTP 400 with an error message.",
+      "Incorrect admin password results in HTTP 401 for login, password update, and settings endpoints.",
+      "Invalid YAML (syntax error or missing keys) causes upload_config to return HTTP 400.",
+      "Empty new_password during password update yields HTTP 400.",
+      "Providing an unsupported backup format still triggers the backup script (no validation).",
+      "Running the service execution endpoint with empty service or param still launches the script with empty arguments."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for uploading/retrieving/deleting configurations, executing services, managing admin authentication and settings, fetching user info, and triggering backups.",
+    "invariants": [
+      "ADMIN_PASSWORD is stored in memory and must match the provided password for admin\u2011only endpoints.",
+      "All endpoints return JSON objects with a \"status\" field.",
+      "Required request parameters (e.g., config_name, job_id, password) must be present; otherwise a 400/401 error is returned.",
+      "YAML payload must contain both \"config_name\" and \"config_value\" keys to be accepted."
+    ],
+    "io_behavior": [
+      "POST /config/upload \u2013 accepts raw YAML, returns JSON with config_name and config_value or 400 on invalid data.",
+      "GET /service/execute \u2013 takes query parameters service and param, starts a shell script, returns JSON status.",
+      "POST /admin/login \u2013 expects form field password, returns success JSON or 401 on mismatch.",
+      "POST /admin/update_password \u2013 requires current_password and new_password, updates in\u2011memory password, returns JSON status.",
+      "GET /config/retrieve \u2013 requires config_name query, returns JSON with a sample config value.",
+      "GET /service/status \u2013 requires job_id query, returns JSON indicating the job is running."
+    ],
+    "public_api": {
+      "func:validate_yaml": "(data)",
+      "route:GET /backup/data": "",
+      "route:GET /config/retrieve": "",
+      "route:GET /service/execute": "",
+      "route:GET /service/logs": "",
+      "route:GET /service/status": "",
+      "route:GET /user/info": "",
+      "route:POST /admin/login": "",
+      "route:POST /admin/settings": "",
+      "route:POST /admin/update_password": "",
+      "route:POST /config/delete": "",
+      "route:POST /config/upload": ""
+    },
+    "side_effects": [
+      "Executes external commands via subprocess.run for service execution and data backup.",
+      "Modifies the global ADMIN_PASSWORD variable at runtime when password is updated.",
+      "Potentially runs a bash script (run_service.sh) and a Python backup script (backup_data.py)."
+    ],
+    "source_hash": "ca794296deaf0f617845cbc23b46b9470f11520f319806dfc3be9fa9095a96a8"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.4,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file15.py",
+  "gated_score": 0.34625,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.34625,
+  "original_hash": "ca794296deaf0f617845cbc23b46b9470f11520f319806dfc3be9fa9095a96a8",
+  "rationale": "Key contract edge cases (unsupported backup format, empty service token) and invariant of JSON status fields are violated, though core endpoints and side\u2011effects exist.",
+  "schema": 1,
+  "stability_abs_difference": 0.431,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.67,
+    "invariants": 0.75,
+    "io_semantics": 0.85,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.77725,
+  "weighted_mean": 0.395,
+  "worst_dimension": 0.2
+}

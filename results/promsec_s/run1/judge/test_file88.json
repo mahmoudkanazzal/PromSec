@@ -1,0 +1,75 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "d7f0a1c9947071faa2ca1121ddecae31fb1f7181ab2643528118896fdd725ecb",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields result in a server error (unhandled KeyError).",
+      "Attempting to add a member whose name already exists returns a duplicate message.",
+      "Login with incorrect name or email returns \"Invalid credentials\".",
+      "Updating the profile of a non\u2011existent name still reports success (no row affected).",
+      "Searching with an empty term returns all member names.",
+      "Removing a non\u2011existent member still reports success (no row affected)."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple HTTP API for managing community members, allowing addition, authentication, profile updates, searching, and removal of members.",
+    "invariants": [
+      "Member names are treated as unique identifiers; duplicate names are not added.",
+      "Each stored member has an associated email address.",
+      "Database connections are opened and closed for each request.",
+      "All write operations are committed unless an exception occurs."
+    ],
+    "io_behavior": [
+      "POST /add_member with form fields 'name' and 'email' returns a plain\u2011text message indicating success, duplicate, or failure.",
+      "POST /login_member with form fields 'name' and 'email' returns \"Login successful\" or \"Invalid credentials\".",
+      "POST /update_member_profile with form fields 'name' and 'new_email' returns \"Profile updated successfully\".",
+      "GET /search_members?term=... returns a string representation of a list of matching member names.",
+      "POST /remove_member with form field 'name' returns \"Member removed successfully\"."
+    ],
+    "public_api": {
+      "route:GET /search_members": "",
+      "route:POST /add_member": "",
+      "route:POST /login_member": "",
+      "route:POST /remove_member": "",
+      "route:POST /update_member_profile": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the members table when adding a unique member.",
+      "Commits updates to a member's email address.",
+      "Deletes a member row based on name.",
+      "Reads from the members table for login checks, duplicate detection, and searches."
+    ],
+    "source_hash": "2f00a8a0eeaa9a8317ae9d6ebfc23b6a24b31f8a7b3914bd4807a398fd0ad8ff"
+  },
+  "dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.5,
+    "invariants": 1.0,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file88.py",
+  "gated_score": 0.73625,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.73625,
+  "original_hash": "2f00a8a0eeaa9a8317ae9d6ebfc23b6a24b31f8a7b3914bd4807a398fd0ad8ff",
+  "rationale": "Routes and core logic follow the contract, but edge\u2011case handling (missing fields, updates/removals of non\u2011existent members) returns handled error responses instead of the specified unhandled or success responses, and the search endpoint returns JSON rather than a plain\u2011text list representation.",
+  "schema": 1,
+  "stability_abs_difference": 0.08788,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.33,
+    "invariants": 1.0,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.64837,
+  "weighted_mean": 0.815,
+  "worst_dimension": 0.5
+}

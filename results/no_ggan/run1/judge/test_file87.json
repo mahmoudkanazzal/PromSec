@@ -1,0 +1,75 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "5c9fd2eb0fa6751ab041477f8c5e36423db4b0b44452900b965ecbd4090bafbf",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required form parameters results in a server error (unhandled KeyError).",
+      "Registering a username that already exists returns a duplicate\u2011username message.",
+      "Empty search term returns all usernames because the LIKE pattern becomes '%%'.",
+      "Database errors during INSERT cause a rollback and a generic failure message.",
+      "Extremely long input values may exceed database column limits or cause request timeouts."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a basic user\u2011management HTTP API that allows clients to register, log in, update email, search usernames, and delete accounts via a MySQL backend.",
+    "invariants": [
+      "All endpoints use the same MySQL host, user, password, and database.",
+      "Every request creates a cursor, executes a single SQL statement, then closes cursor and connection.",
+      "Responses are plain text (or stringified list) with no JSON or HTML formatting.",
+      "No authentication or session management is performed beyond the supplied username/password fields."
+    ],
+    "io_behavior": [
+      "POST /register with form fields username and password returns a plain\u2011text message indicating success, duplicate username, or registration failure.",
+      "POST /login with form fields username and password returns \"Login successful\" or \"Invalid credentials\".",
+      "POST /update_profile with form fields username and email returns \"Profile updated successfully\".",
+      "GET /search_users?term=... returns the string representation of a list of matching usernames.",
+      "POST /delete_account with form field username returns \"Account deleted successfully\"."
+    ],
+    "public_api": {
+      "route:GET /search_users": "",
+      "route:POST /delete_account": "",
+      "route:POST /login": "",
+      "route:POST /register": "",
+      "route:POST /update_profile": ""
+    },
+    "side_effects": [
+      "Each request opens a new MySQL connection using fixed credentials and closes it before responding.",
+      "Successful registration inserts a new row into the users table.",
+      "Successful profile update modifies the email column for the given username.",
+      "Account deletion removes the row for the supplied username.",
+      "Database commits are performed on successful writes; a rollback occurs on registration errors."
+    ],
+    "source_hash": "e736b28ab6a9cb96dc6b61defd2475b82d94a9935a882c8c823b4c8adcca5700"
+  },
+  "dimensions": {
+    "behavior": 0.75,
+    "edge_cases": 0.4,
+    "invariants": 1.0,
+    "io_semantics": 0.85,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file87.py",
+  "gated_score": 0.69437,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.69437,
+  "original_hash": "e736b28ab6a9cb96dc6b61defd2475b82d94a9935a882c8c823b4c8adcca5700",
+  "rationale": "All required routes exist and mostly follow the contract, with correct plain\u2011text messages and proper DB commits/rollbacks. Search endpoint returns a comma\u2011separated string instead of a list representation, and missing form fields are handled gracefully rather than causing an unhandled KeyError, violating two edge\u2011case expectations. Other invariants and side\u2011effects are fully preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.21251,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.8,
+    "invariants": 0.95,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.90688,
+  "weighted_mean": 0.7925,
+  "worst_dimension": 0.4
+}

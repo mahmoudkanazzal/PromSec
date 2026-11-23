@@ -1,0 +1,71 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "4fd333b36196ef2893b2db2595cc7a6fc538b5a94977f6a8b654b25ca11d2701",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed YAML in /upload_readings leads to a server error (exception).",
+      "Absent station_id, temperature, or humidity keys cause a KeyError and a 500 response.",
+      "Omitting the token or providing a wrong token in /station_login returns 401.",
+      "Providing an empty or unknown report_type still triggers the external command.",
+      "Very large request bodies may cause performance degradation or timeouts.",
+      "If the external command fails or is unavailable, the client still receives a success JSON."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a web API for weather stations to authenticate, upload sensor readings, and trigger generation of weather reports.",
+    "invariants": [
+      "The authentication token is fixed to the constant STATION_ACCESS_TOKEN.",
+      "All responses are JSON objects with a \"status\" field.",
+      "Successful upload always echoes back the submitted station_id.",
+      "The /generate_report endpoint always returns a 200 status regardless of command success.",
+      "Invalid authentication always results in HTTP 401."
+    ],
+    "io_behavior": [
+      "POST /upload_readings with a YAML body containing station_id, temperature, and humidity returns JSON {\"status\":\"Readings uploaded\",\"station\":<station_id>}.",
+      "GET /generate_report?type=<report_type> returns JSON {\"status\":\"Report generation started\"}.",
+      "POST /station_login with form field token returns JSON {\"status\":\"Station authenticated\"} on success or {\"status\":\"Authentication failed\"} with HTTP 401 on failure."
+    ],
+    "public_api": {
+      "route:GET /generate_report": "",
+      "route:POST /station_login": "",
+      "route:POST /upload_readings": ""
+    },
+    "side_effects": [
+      "Executes the external command \"./weather_report_tool <report_type>\" via os.system when /generate_report is called.",
+      "Consumes request payloads and form data from the client.",
+      "Produces HTTP responses that can be observed by the client."
+    ],
+    "source_hash": "84b5fd0ba12110f538cec75a93c53872e6e27f6ee431bb39b626d0fbb5af98d0"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.3,
+    "io_semantics": 0.4,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file21.py",
+  "gated_score": 0.295,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.295,
+  "original_hash": "84b5fd0ba12110f538cec75a93c53872e6e27f6ee431bb39b626d0fbb5af98d0",
+  "rationale": "The program implements the main routes but deviates from the contract on error handling, response formats, and edge\u2011case behavior; generate_report validates report types and returns errors instead of always succeeding, and upload_readings returns 400 instead of 500 on malformed input, violating several invariants and edge\u2011case expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.07,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.2,
+    "invariants": 0.3,
+    "io_semantics": 0.5,
+    "side_effects": 0.7
+  },
+  "stability_score": 0.365,
+  "weighted_mean": 0.36,
+  "worst_dimension": 0.1
+}

@@ -1,0 +1,73 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "99108004965c767953444bdc4dfea7adffe485f4de593ee7b80ac62e935fa0a3",
+  "compile_ok": true,
+  "confidence": 0.8,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and a 500 error.",
+      "Providing a non\u2011byte password string may raise a TypeError in hashlib.sha256.",
+      "Very long usernames or passwords could exceed database column limits or cause performance issues.",
+      "SQL injection is possible because the code interpolates values directly into SQL strings.",
+      "Database connection failures result in unhandled exceptions and 500 responses.",
+      "If the INSERT succeeds but the subsequent redirect is omitted, the client receives no explicit response body."
+    ],
+    "entrypoints": [],
+    "intent": "Provide a user registration endpoint that creates a new account with a unique username and stores a SHA\u2011256 hash of the supplied password in a MySQL database, redirecting the client based on success or failure.",
+    "invariants": [
+      "Usernames must be unique; duplicate usernames are never inserted.",
+      "Passwords are never stored in plain text; only their SHA\u2011256 hash is persisted.",
+      "Each request opens a fresh database cursor and closes it before completing.",
+      "The endpoint only responds to POST requests; other methods are not handled.",
+      "The redirect URL for duplicate usernames is always './register'.",
+      "Database credentials and host are fixed constants in the source code."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /register with form fields 'username' and 'password'.",
+      "Returns an HTTP redirect (302) to './register' when the username already exists.",
+      "Intended to return an HTTP redirect to a login page after successful registration (though the code omits the explicit redirect).",
+      "If required form fields are missing, the request raises a server error (KeyError).",
+      "If the password hashing fails (e.g., non\u2011bytes input), the request raises a server error.",
+      "All responses are plain HTTP redirects without a response body."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Executes a SELECT query against the MySQL 'User' table to check for existing usernames.",
+      "Inserts a new row into the 'User' table with the provided username and hashed password when the username is new.",
+      "Commits the transaction to persist the new user record.",
+      "Opens and then closes a MySQL database connection for each request.",
+      "Potentially logs errors or stack traces to the server console on exceptions.",
+      "May trigger database connection pooling or resource usage on the host."
+    ],
+    "source_hash": "e82f97abc9451d6afee5108e6b9a64a8d93a919f73c3c0c31b37c04b3b5b72d6"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.3,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file66.py",
+  "gated_score": 0.33875,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.33875,
+  "original_hash": "e82f97abc9451d6afee5108e6b9a64a8d93a919f73c3c0c31b37c04b3b5b72d6",
+  "rationale": "The program deviates from the contract in key ways: missing fields are handled with a redirect instead of a KeyError/500, it uses Werkzeug's generate_password_hash instead of a raw SHA\u2011256 hash, and reads DB credentials from environment rather than fixed constants; however it still performs the required SELECT/INSERT, commits, and closes connections, and redirects on duplicate usernames.",
+  "schema": 1,
+  "stability_abs_difference": 0.1125,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.5,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.45125,
+  "weighted_mean": 0.385,
+  "worst_dimension": 0.2
+}

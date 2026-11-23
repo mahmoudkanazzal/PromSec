@@ -1,0 +1,80 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "46cb109f90b332fdd8532b85ee5e0dae166b04d84cec8a8e5f76d5e3c4b1fa16",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Malformed or non\u2011YAML request bodies raise an uncaught exception, resulting in a 500 internal server error.",
+      "Providing an empty 'section' or 'type' query parameter still triggers the external script with an empty argument.",
+      "Submitting a POST form without the expected fields (e.g., missing 'password' or 'action') leads to default empty strings and may cause denial or 400 responses.",
+      "Using an incorrect librarian password returns a 401 status without revealing the correct password.",
+      "If the external script invoked by os.system fails or is missing, the endpoint still returns a success JSON, hiding the failure."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a REST\u2011like HTTP API for basic library management operations such as adding, updating, deleting books and members, triggering inventory/report scripts, and performing admin backup/restore actions.",
+    "invariants": [
+      "All endpoints return a JSON object with a 'status' key.",
+      "Required identifiers (title/author/isbn for books, name/id for members) must be present; otherwise a 400 error is returned.",
+      "Librarian access is granted only when the exact hard\u2011coded password matches.",
+      "YAML payloads are parsed with yaml.FullLoader; missing keys default to empty strings unless explicitly accessed.",
+      "GET endpoints treat missing query parameters as empty strings and still invoke the corresponding script."
+    ],
+    "io_behavior": [
+      "POST /add_book \u2013 accepts a YAML payload, returns JSON with book details or 400 on missing title/author/isbn.",
+      "GET /run_inventory \u2013 reads 'section' query param, runs inventory_script.py, returns JSON status.",
+      "POST /librarian_access \u2013 reads form field 'password', returns JSON grant/deny and 401 on failure.",
+      "POST /update_book \u2013 accepts YAML with isbn and optional new fields, returns JSON with updated info or 400 if isbn missing.",
+      "GET /generate_reports \u2013 reads 'type' query param, runs report_generator.py, returns JSON status.",
+      "POST /admin_panel \u2013 reads form field 'action' (backup/restore), runs corresponding script, returns JSON status or 400 on invalid action."
+    ],
+    "public_api": {
+      "route:GET /generate_reports": "",
+      "route:GET /run_inventory": "",
+      "route:GET /view_books": "",
+      "route:POST /add_book": "",
+      "route:POST /add_member": "",
+      "route:POST /admin_panel": "",
+      "route:POST /delete_book": "",
+      "route:POST /librarian_access": "",
+      "route:POST /update_book": "",
+      "route:POST /update_member": ""
+    },
+    "side_effects": [
+      "Executes external Python scripts via os.system for inventory, report generation, backup, restore, and book view.",
+      "Potentially creates or modifies files/logs produced by those external scripts.",
+      "No persistent storage is modified by the Flask app itself; responses are generated from request data only."
+    ],
+    "source_hash": "289c03ce0525752ca513e1fac47268bf5c4aef9eeca6d6f2d1a2747263347a19"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.1,
+    "invariants": 0.3,
+    "io_semantics": 0.85,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file25.py",
+  "gated_score": 0.4675,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.4675,
+  "original_hash": "289c03ce0525752ca513e1fac47268bf5c4aef9eeca6d6f2d1a2747263347a19",
+  "rationale": "Core endpoints and JSON responses are present, but key contract details diverge: malformed YAML is caught (not 500), empty query params are rejected (script not invoked), script failures return errors (not hidden), password is env\u2011based not hard\u2011coded, yaml.FullLoader is not used, and extra validation alters expected behavior.",
+  "schema": 1,
+  "stability_abs_difference": 0.0775,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.8,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.545,
+  "weighted_mean": 0.59,
+  "worst_dimension": 0.1
+}

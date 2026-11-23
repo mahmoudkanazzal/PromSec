@@ -1,0 +1,88 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "3e05dea8e3c94b6cf6b921dd1a3e97bff385147f365ef2cf428621f62f2c9d20",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payloads in /api/add_book or /api/submit_review trigger a 400 error.",
+      "Missing required form or query parameters (e.g., isbn, user_id, password) result in 400 or 401 responses.",
+      "Providing a non\u2011integer year_published or a rating outside 1\u20115 leads to validation failure.",
+      "Changing the admin password affects subsequent admin endpoints but does not persist after server restart.",
+      "Calling /api/start_inventory with empty section or location still runs the script with empty arguments.",
+      "If the external inventory_checker.py script fails, the API still returns a 200 success message (no error propagation)."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple HTTP API for library operations such as adding, removing, querying, and managing books, handling admin authentication, and submitting reviews.",
+    "invariants": [
+      "A book must include non\u2011empty title, author, and isbn fields; otherwise the request is rejected.",
+      "year_published must be an integer; any other type causes a 400 error.",
+      "Review rating must be an integer between 1 and 5 inclusive.",
+      "Admin actions require the current LIBRARIAN_PASSWORD and, for login, the fixed secret_key \"admin_key_2024\".",
+      "All successful responses are JSON objects with a \"status\" key describing the operation.",
+      "HTTP status codes follow the pattern: 200 for success, 400 for client\u2011side validation errors, 401 for authentication failures."
+    ],
+    "io_behavior": [
+      "POST /api/add_book with YAML body \u2192 JSON response (200 on success, 400 on malformed YAML or missing/invalid fields).",
+      "POST /api/remove_book with form field isbn \u2192 JSON response (200 on success, 400 if isbn missing).",
+      "GET /api/start_inventory?section=&location= \u2192 launches inventory_checker.py via OS command and returns JSON (200).",
+      "POST /admin/login with form fields password and secret_key \u2192 JSON response (200 if both match, 401 otherwise).",
+      "POST /admin/change_password with old_password and new_password \u2192 updates password and returns JSON (200 on success, 401 on wrong old password).",
+      "GET /api/book_info?isbn= \u2192 JSON with static sample book data (200, 400 if isbn missing)."
+    ],
+    "public_api": {
+      "route:GET /api/book_info": "",
+      "route:GET /api/check_book_availability": "",
+      "route:GET /api/list_books": "",
+      "route:GET /api/start_inventory": "",
+      "route:POST /admin/adjust_settings": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/login": "",
+      "route:POST /api/add_book": "",
+      "route:POST /api/remove_book": "",
+      "route:POST /api/request_book": "",
+      "route:POST /api/return_book": "",
+      "route:POST /api/submit_review": "",
+      "route:POST /api/update_book": ""
+    },
+    "side_effects": [
+      "Calling /api/start_inventory executes an external Python script using os.system.",
+      "Successful /admin/change_password mutates the in\u2011memory LIBRARIAN_PASSWORD variable for the running process.",
+      "Admin login does not persist any session; it only returns a JSON message.",
+      "All endpoints are stateless except for the password change; no database writes are performed.",
+      "The server may log requests internally (Flask default), but no external files are created.",
+      "No persistent changes are made to book records; responses are generated from hard\u2011coded data."
+    ],
+    "source_hash": "4c83867f20dee938bab2830444ab8449dd3b9d42f7abb916aa3f793ef44631a6"
+  },
+  "dimensions": {
+    "behavior": 0.65,
+    "edge_cases": 0.6,
+    "invariants": 0.85,
+    "io_semantics": 0.7,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file29.py",
+  "gated_score": 0.67875,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.67875,
+  "original_hash": "4c83867f20dee938bab2830444ab8449dd3b9d42f7abb916aa3f793ef44631a6",
+  "rationale": "Most endpoints follow the contract, but start_inventory rejects empty arguments and returns 500 on script failure, violating edge\u2011case expectations; secret key handling differs from fixed value; otherwise validation, responses, and password mutation align.",
+  "schema": 1,
+  "stability_abs_difference": 0.00125,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.5,
+    "invariants": 0.6,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.68,
+  "weighted_mean": 0.705,
+  "worst_dimension": 0.6
+}

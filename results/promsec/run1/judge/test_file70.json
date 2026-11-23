@@ -1,0 +1,77 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "b6b7846603afbf0ef7c206cce33336991cb9e5e3cc350354bd31befccadaa614",
+  "compile_ok": true,
+  "confidence": 0.94,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields (e.g., username or password) result in a server error or a generic failure response.",
+      "Attempting to register with a username that already exists triggers a redirect to /login instead of creating a new account.",
+      "Login with an incorrect password or a non\u2011existent username returns \"Invalid credentials\".",
+      "Creating a project for a username that does not exist returns \"User not found\".",
+      "Adding a task to a project name that does not exist returns \"Project not found\".",
+      "Viewing tasks for a project name that is not provided or does not exist yields an empty JSON array."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API that lets clients register and log in users, create projects for registered users, add tasks to existing projects, and retrieve tasks for a given project.",
+    "invariants": [
+      "Usernames are unique; duplicate registration attempts are rejected.",
+      "Passwords are never stored in plain text; they are stored as a SHA\u2011256 hash of a per\u2011user random salt concatenated with the password.",
+      "Each task must belong to a project that already exists in the projects table.",
+      "Each project must be associated with a username that exists in the users table.",
+      "The 'salt' value stored for a user is the hexadecimal representation of a 16\u2011byte random value."
+    ],
+    "io_behavior": [
+      "POST /register with 'username' and 'password' returns a 307 redirect to /login if the username already exists, otherwise returns the plain text message \"Registration successful\".",
+      "POST /login with 'username' and 'password' returns a 307 redirect to /dashboard on successful authentication, otherwise returns the plain text message \"Invalid credentials\".",
+      "POST /project/create with 'username' and 'project_name' returns \"Project created successfully\" when the user exists, otherwise returns \"User not found\".",
+      "POST /task/add with 'project_name', 'task_name', and 'task_description' returns \"Task added successfully\" when the project exists, otherwise returns \"Project not found\".",
+      "GET /tasks/view?project_name=XYZ returns a JSON array of objects each containing 'task_name' and 'task_description' for the specified project."
+    ],
+    "public_api": {
+      "route:GET /tasks/view": "",
+      "route:POST /login": "",
+      "route:POST /project/create": "",
+      "route:POST /register": "",
+      "route:POST /task/add": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the users table on successful registration.",
+      "Inserts a new row into the projects table when a project is created for an existing user.",
+      "Inserts a new row into the tasks table when a task is added to an existing project.",
+      "Updates the MySQL database with each successful write operation (registration, project creation, task addition).",
+      "Issues HTTP redirects (307) for successful registration and login flows."
+    ],
+    "source_hash": "6d4e51f8cfe78b6dadd8dc3e30ee24aee6e08732d4bad4f640760688e2a3b5cd"
+  },
+  "dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.85,
+    "invariants": 1.0,
+    "io_semantics": 0.85,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file70.py",
+  "gated_score": 0.92313,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.92313,
+  "original_hash": "6d4e51f8cfe78b6dadd8dc3e30ee24aee6e08732d4bad4f640760688e2a3b5cd",
+  "rationale": "The program matches the contract on routing, redirects, responses, database writes, and security invariants, but deviates on the view\u2011tasks edge case by returning a 400 error when project_name is omitted instead of an empty JSON array.",
+  "schema": 1,
+  "stability_abs_difference": 0.05401,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.67,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.86912,
+  "weighted_mean": 0.9475,
+  "worst_dimension": 0.85
+}

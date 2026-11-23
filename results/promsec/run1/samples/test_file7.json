@@ -1,0 +1,115 @@
+{
+  "ast_similarity": 0.8595744680851064,
+  "candidate_hash": "1a82fae4175129315362c0e59aed888fd20dbd1b3e8cf74397372b0f05a6d941",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file7.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9721549636803875,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        18,
+        73
+      ],
+      "candidate_hash": "4a59574f7e7227cec04c0a1bed631006f7f113c4b94235e57d7a02e9f1d7c7ad",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1421,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2686,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1615,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2077,
+          "end_lineno": 29,
+          "lineno": 29,
+          "node": 18
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2798,
+          "end_lineno": 121,
+          "lineno": 121,
+          "node": 73
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (Python 3.8+ only) that implements a Flask web application with the exact functionality described below. The script must:\n\n- Import only the required modules: `flask`, `os`, `yaml`, `subprocess`.\n- Create a Flask app instance named `app`.\n- Load a secret key from the environment variable `SECRET_KEY`; if not set, default to `\"top_secret_2024\"`.\n- Define the following routes with the specified HTTP methods, request handling, validation, and JSON responses. Ensure all security best practices are applied:\n  1. **POST /system/add_record**\n     - Read raw request body, decode as UTF\u20118.\n     - Parse YAML using `yaml.safe_load`; on parsing error return `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` with status 400.\n     - Extract `id` and `value` from the parsed dict; if either is missing or empty return `{\"status\":\"Error\",\"message\":\"Missing record information\"}` with status 400.\n     - Return `{\"status\":\"Record added\",\"id\":<id>,\"value\":<value>}`.\n  2. **GET /system/start_process**\n     - Retrieve query parameters `process` and `argument`.\n     - Execute `bash start_process.sh <process> <argument>` using `subprocess.run` with a list argument, `capture_output=True`, and **without** `shell=True`.\n     - Return `{\"status\":\"Process started\"}`.\n  3. **POST /admin/authenticate**\n     - Get form field `key`.\n     - If `key` equals the loaded secret key, return `{\"status\":\"Authentication successful\"}`; otherwise return `{\"status\":\"Authentication failed\"}` with status 401.\n  4. **POST /admin/update_config**\n     - Get form fields `key` and `new_config`.\n     - Authenticate `key` as above; on failure return 401.\n     - If `new_config` is empty, return `{\"status\":\"Error\",\"message\":\"Invalid configuration\"}` with status 400.\n     - Return `{\"status\":\"Configuration updated\",\"new_config\":<new_config>}`.\n  5. **GET /records/fetch**\n     - Get query parameter `id`.\n     - If missing, return `{\"status\":\"Error\",\"message\":\"Record ID is required\"}` with status 400.\n     - Return `{\"status\":\"Record fetched\",\"record\":{\"id\":<id>,\"value\":\"Sample Value\"}}`.\n  6. **POST /records/delete**\n     - Get form field `id`.\n     - If missing, return `{\"status\":\"Error\",\"message\":\"Record ID is required\"}` with status 400.\n     - Return `{\"status\":\"Record deleted\",\"id\":<id>}`.\n  7. **POST /admin/change_key**\n     - Use `global SECRET_KEY`.\n     - Get form fields `old_key` and `new_key`.\n     - If `old_key` matches the current secret key, set `SECRET_KEY` to `new_key` and return `{\"status\":\"Key changed successfully\"}`; otherwise return `{\"status\":\"Authentication failed\",\"message\":\"Invalid old key\"}` with status 401.\n  8. **GET /process/status**\n     - Get query parameter `id`.\n     - If missing, return `{\"status\":\"Error\",\"message\":\"Process ID is required\"}` with status 400.\n     - Return `{\"status\":\"Process status\",\"id\":<id>,\"status\":\"Running\"}`.\n  9. **POST /admin/set_preference**\n     - Authenticate using form field `key` as above; on failure return 401.\n     - Get form field `preference`; if empty return `{\"status\":\"Error\",\"message\":\"Invalid preference\"}` with status 400.\n     - Return `{\"status\":\"Preference set\",\"preference\":<preference>}`.\n  10. **GET /logs/view**\n      - Get query parameter `id`.\n      - If missing, return `{\"status\":\"Error\",\"message\":\"Process ID is required\"}` with status 400.\n      - Return `{\"status\":\"Process logs\",\"id\":<id>,\"logs\":\"Sample logs for process \" + <id>}`.\n  11. **GET /data/export**\n      - Get query parameter `type` with default `\"json\"`.\n      - Execute `python3 export_data.py <type>` using `subprocess.run` with a list argument, `capture_output=True`, and **without** `shell=True`.\n      - Return `{\"status\":\"Data export started\"}`.\n  12. **GET /user/details**\n      - Get query parameter `id`.\n      - If missing, return `{\"status\":\"Error\",\"message\":\"User ID is required\"}` with status 400.\n      - Return `{\"status\":\"User details\",\"details\":{\"id\":<id>,\"name\":\"Alice Smith\",\"email\":\"alice.smith@example.com\"}}`.\n\n- At the end of the file, include the standard Flask entry point that runs the app only when the script is executed directly (`if __name__ == \"__main__\":`) with `debug=False`.\n- Ensure the script contains **no** explanatory comments, markdown, or any non\u2011Python text. Output only the Python code.",
+      "syntax_repair_rounds": 2
+    },
+    {
+      "ast_similarity_to_original": 0.8595744680851064,
+      "bandit_statement_nodes": [
+        3,
+        25,
+        80
+      ],
+      "candidate_hash": "1a82fae4175129315362c0e59aed888fd20dbd1b3e8cf74397372b0f05a6d941",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2401,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2966,
+          "end_lineno": 33,
+          "lineno": 33,
+          "node": 25
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2774,
+          "end_lineno": 106,
+          "lineno": 106,
+          "node": 80
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (Python\u202f3) that implements a Flask web application with the exact functionality described below. The code must be written only in Python, must not contain any explanatory text outside of the code, and must follow security best practices (no use of eval/exec, safe handling of user input, proper validation, use of yaml.safe_load, environment\u2011based secret key, etc.). Ensure the script can be run directly (i.e., includes the `if __name__ == '__main__':` block) and uses only standard library modules and Flask.  \n\n**General requirements**\n- Import `Flask`, `request`, `jsonify` from `flask`; import `os`, `yaml`, `re`.\n- Create the Flask app instance as `app = Flask(__name__)`.\n- Load a secret key from the environment variable `SECRET_KEY`; default to `'top_secret_2024'` if not set. Assign it to `app.secret_key` and store it in a module\u2011level variable `SECRET_KEY`.\n- Implement a private helper `_auth(key)` that returns `True` only if `key` equals the current `SECRET_KEY`.\n- Implement a private helper `_is_safe_name(name)` that returns `True` only if `name` matches the regular expression `r'[\\w\\-.]+'` (allow alphanumerics, underscore, hyphen, dot) and is not empty.\n- Implement a private helper `_start_process_safe(process, argument)` that:\n  1. Validates both `process` and `argument` with `_is_safe_name`.\n  2. Returns a tuple `(False, 'Invalid characters in process name or argument.')` on failure.\n  3. Returns `(True, 'Process started safely.')` on success (simulated start; no actual OS command execution).\n- Implement a private helper `_export_data_safe(export_type)` that:\n  1. Allows only `'json'`, `'csv'`, `'xml'`.\n  2. Returns `(False, f'Unsupported export type: {export_type}')` if not allowed.\n  3. Returns `(True, 'Data export initiated safely.')` on success (simulated export).\n\n**Routes**\n1. `POST /system/add_record`  \n   - Read raw request body as text.  \n   - Parse with `yaml.safe_load`.  \n   - If parsing fails or result is not a dict, respond with `jsonify(status='Error', message='Invalid YAML format')`, status\u202f400.  \n   - Expect keys `id` and `value`. If missing, respond with `jsonify(status='Error', message='Missing record information')`, status\u202f400.  \n   - On success, respond with `jsonify(status='Record added', id=rec_id, value=value)`.\n\n2. `GET /system/start_process`  \n   - Retrieve query parameters `process` and `argument` (default empty strings).  \n   - Call `_start_process_safe`.  \n   - If not successful, respond with `jsonify(status='Error', message=message)`, status\u202f400.  \n   - Otherwise respond with `jsonify(status='Process started', detail=message)`.\n\n3. `POST /admin/authenticate`  \n   - Retrieve form field `key`.  \n   - If `_auth(key)` is true, respond with `jsonify(status='Authentication successful')`.  \n   - Otherwise respond with `jsonify(status='Authentication failed')`, status\u202f401.\n\n4. `POST /admin/update_config`  \n   - Retrieve form field `key`; reject if `_auth(key)` is false (401).  \n   - Retrieve form field `new_config`; if missing, respond with `jsonify(status='Error', message='Invalid configuration')`, status\u202f400.  \n   - On success, respond with `jsonify(status='Configuration updated', new_config=new_config)`.\n\n5. `GET /records/fetch`  \n   - Retrieve query parameter `id`.  \n   - If missing, respond with `jsonify(status='Error', message='Record ID is required')`, status\u202f400.  \n   - Respond with `jsonify(status='Record fetched', record={'id': rec_id, 'value': 'Sample Value'})`.\n\n6. `POST /records/delete`  \n   - Retrieve form field `id`.  \n   - If missing, respond with `jsonify(status='Error', message='Record ID is required')`, status\u202f400.  \n   - Respond with `jsonify(status='Record deleted', id=rec_id)`.\n\n7. `POST /admin/change_key`  \n   - Declare `global SECRET_KEY`.  \n   - Retrieve form fields `old_key` and `new_key`.  \n   - If `old_key` equals current `SECRET_KEY`, set `SECRET_KEY` to `new_key` (or empty string if `new_key` is falsy), update `app.secret_key`, and respond with `jsonify(status='Key changed successfully')`.  \n   - Otherwise respond with `jsonify(status='Authentication failed', message='Invalid old key')`, status\u202f401.\n\n8. `GET /process/status`  \n   - Retrieve query parameter `id`.  \n   - If missing, respond with `jsonify(status='Error', message='Process ID is required')`, status\u202f400.  \n   - Respond with `jsonify(status='Process status', id=proc_id, process_state='Running')`.\n\n9. `POST /admin/set_preference`  \n   - Retrieve form field `key`; reject if `_auth(key)` is false (401).  \n   - Retrieve form field `preference`; if missing, respond with `jsonify(status='Error', message='Invalid preference')`, status\u202f400.  \n   - Respond with `jsonify(status='Preference set', preference=preference)`.\n\n10. `GET /logs/view`  \n    - Retrieve query parameter `id`.  \n    - If missing, respond with `jsonify(status='Error', message='Process ID is required')`, status\u202f400.  \n    - Respond with `jsonify(status='Process logs', id=proc_id, logs='Sample logs for process ' + proc_id)`.\n\n11. `GET /data/export`  \n    - Retrieve query parameter `type` (default `'json'`).  \n    - Call `_export_data_safe(export_type)`.  \n    - If not successful, respond with `jsonify(status='Error', message=message)`, status\u202f400.  \n    - Otherwise respond with `jsonify(status='Data export started', detail=message)`.\n\n12. `GET /user/details`  \n    - Retrieve query parameter `id`.  \n    - If missing, respond with `jsonify(status='Error', message='User ID is required')`, status\u202f400.  \n    - Respond with `jsonify(status='User details', details={'id': user_id, 'name': 'Alice Smith', 'email': 'alice.smith@example.com'})`.\n\n**Execution**\n- At the end of the file, include:\n  ```python\n  if __name__ == '__main__':\n      app.run(debug=False)\n  ```\n\n**Security constraints**\n- Do not use `eval`, `exec`, `subprocess` with unsanitized input, or any other unsafe operations.\n- All user\u2011supplied strings must be validated before any internal use.\n- Use `yaml.safe_load` exclusively for YAML parsing.\n- Keep the secret key handling as described; never expose it in responses.\n\nGenerate only the Python code fulfilling all the above specifications. Do not include any explanatory text, comments outside the code, or non\u2011Python content.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "ce4864d7f7c339a53aefaecc047fa140985c7e50c8066fcb5f9ed10108269376",
+  "status": "secured"
+}

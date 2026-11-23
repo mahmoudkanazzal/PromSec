@@ -1,0 +1,80 @@
+{
+  "ast_similarity": 0.7010309278350515,
+  "candidate_hash": "157d6e3b8407d2e94efc9e254b375c29472403a5249a982666bc3d6eb8bcba9e",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    78
+  ],
+  "error": "",
+  "file": "test_file62.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7527675276752768,
+      "bandit_statement_nodes": [
+        2
+      ],
+      "candidate_hash": "c9679de40473c6c21d8e6adaa81f53880f62b2da6b8aadbd7d9a7126b2a73c88",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2448,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.2184,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 3
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.177,
+          "end_lineno": 8,
+          "lineno": 8,
+          "node": 4
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 script that implements a Flask web service with the following exact behavior and security requirements:\n\n- The script must start with a proper shebang (`#!/usr/bin/env python3`) and import only the necessary modules: `flask.Flask`, `flask.request`, `os`, `MySQLdb`, and `json`.\n- Create a Flask app instance named `app`.\n- Define a single route at `/api/temperature_for_location` that only accepts GET requests.\n- The route must read a query\u2011string parameter named `payload`. If the parameter is missing, return the plain text response `ERROR: No payload` with HTTP status code 400.\n- Parse the `payload` value as JSON. If parsing fails, return `ERROR: Invalid JSON payload` with HTTP status code 400.\n- Extract the keys `latitude`, `longitude`, and `datetime` from the parsed JSON. If any of these keys are missing, return `ERROR: Missing required fields` with HTTP status code 400.\n- Establish a MySQL connection using `MySQLdb.connect` with credentials taken **exclusively** from the environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`. If any required environment variable is absent, return `ERROR: Database configuration missing` with HTTP status code 500.\n- Use a context manager (`with` statement) for the database connection and cursor to guarantee proper cleanup, even on exceptions.\n- Execute a **parameterized** SQL query that selects all columns from the `temperature` table where the `datetime` column matches the supplied `datetime` value. Do not concatenate strings or use f\u2011strings for the query.\n- If the query returns no rows, respond with `No matching location found.` and HTTP status code 404.\n- If a row is found, extract the temperature value from the third column (index 2) and return it as a plain\u2011text response with HTTP status code 200.\n- All error handling must catch only expected exceptions (e.g., `MySQLdb.Error`, `KeyError`, `json.JSONDecodeError`) and return a generic error message without exposing stack traces or internal details. Use appropriate HTTP status codes (400 for client errors, 500 for server errors).\n- Ensure the Flask app runs only when the script is executed directly (`if __name__ == \"__main__\":`) and listen on host `0.0.0.0` and port `5000`.\n- The final code must be pure Python, contain no comments, no explanatory text, and must not import or use any language other than Python.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.7010309278350515,
+      "bandit_statement_nodes": [
+        35
+      ],
+      "candidate_hash": "157d6e3b8407d2e94efc9e254b375c29472403a5249a982666bc3d6eb8bcba9e",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.319,
+          "end_lineno": 44,
+          "lineno": 44,
+          "node": 35
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program that meets the following requirements exactly:\n\n- Use only the standard library and the third\u2011party packages **Flask**, **MySQLdb**, and **json**.\n- Create a Flask application instance named `app`.\n- Define a single route at **/api/temperature_for_location** that accepts only **GET** requests.\n- The route must read a query\u2011string parameter named `payload`. If the parameter is missing, return the plain text response `ERROR: No payload` with HTTP status **400**.\n- Parse `payload` as JSON. If parsing fails, return `ERROR: Invalid JSON payload` with status **400**.\n- Expect the JSON object to contain the keys `latitude`, `longitude`, and `datetime`. If any are missing, return `ERROR: Missing required fields` with status **400**.\n- Retrieve the database connection parameters `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME` from environment variables using `os.getenv`. If any are missing, return `ERROR: Database configuration missing` with status **500**.\n- Connect to the MySQL database using `MySQLdb.connect` with the retrieved credentials. Use a **context manager** (`with` statement) for both the connection and the cursor to ensure proper cleanup.\n- Execute a **parameterized** SQL query: `SELECT * FROM temperature WHERE datetime = %s`, passing the `datetime` value from the JSON payload as the sole parameter to prevent SQL injection.\n- Fetch a single row with `cursor.fetchone()`. If no row is returned, respond with `No matching location found.` and status **404**.\n- If a row is found, extract the temperature value from the third column (index\u202f2) and return it as a plain\u2011text string with status **200**.\n- Catch any `MySQLdb.Error` exceptions during the database operation and return `ERROR: Database query failed` with status **500**.\n- At the bottom of the file, include a `if __name__ == \"__main__\":` block that:\n  - Reads `FLASK_RUN_HOST` and `FLASK_RUN_PORT` from environment variables, defaulting to `'127.0.0.1'` and `'5000'` respectively.\n  - Converts the port to an integer.\n  - Calls `app.run(host=run_host, port=run_port)`.\n\nAdditional security and quality constraints:\n\n- Do **not** include any comments, docstrings, or explanatory text in the generated code.\n- Do **not** import or use any modules other than those explicitly listed.\n- Ensure all external inputs (query parameters, JSON fields, environment variables) are validated as described and never concatenated directly into SQL strings.\n- Use only plain\u2011text responses (no HTML or JSON responses) as specified.\n- The script must be executable as a standalone program (`#!/usr/bin/env python3` as the first line) and must not contain any extraneous code or output.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "ae4325c3c4083066963ec9e246397c503ca804a818fc22d148025686388c28c6",
+  "status": "secured"
+}

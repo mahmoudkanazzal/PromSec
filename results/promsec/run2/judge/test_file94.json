@@ -1,0 +1,80 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "0721a73ec58112b44f5a785a91dff464b9fc4e3da5d702f9608c8f4b442967f1",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required JSON fields cause a server error (KeyError).",
+      "Providing a non\u2011numeric or missing id in /get_book leads to a SQL error or empty result.",
+      "Negative or non\u2011integer values for copies in /update_copies may produce incorrect counts.",
+      "SQL injection is possible because query strings are built via string interpolation.",
+      "Requesting a non\u2011existent book id returns null JSON rather than a 404.",
+      "Very large request bodies may exhaust memory or degrade performance."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a simple HTTP API for managing a library catalog stored in a SQLite database, allowing clients to add books, retrieve a specific book, update copy counts, and list all books.",
+    "invariants": [
+      "Each book row has a unique integer id primary key.",
+      "The copies column is expected to hold an integer value.",
+      "All endpoint responses are JSON-encoded.",
+      "HTTP status codes are fixed: 201 for add, 200 for other successful calls.",
+      "Database connections are always closed after handling a request.",
+      "The catalog is ordered alphabetically by title in /get_catalog."
+    ],
+    "io_behavior": [
+      "POST /add_book with JSON {\"title\":..., \"author\":...} returns 201 and a success message in JSON.",
+      "GET /get_book?id=ID returns 200 and the requested row as JSON.",
+      "POST /update_copies with JSON {\"book_id\":..., \"copies\":...} returns 200 and a success message in JSON.",
+      "GET /get_catalog returns 200 and an array of [title, author, copies] rows in JSON.",
+      "All responses are sent over HTTP with appropriate status codes.",
+      "The server runs as a Flask app listening on the default port."
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:GET /get_book": "",
+      "route:GET /get_catalog": "",
+      "route:POST /add_book": "",
+      "route:POST /update_copies": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the books table when /add_book is called.",
+      "Updates the copies column of an existing row when /update_copies is called.",
+      "Reads rows from the books table for /get_book and /get_catalog.",
+      "Creates or modifies the file library.db on the filesystem.",
+      "Opens a network socket to accept HTTP requests.",
+      "Closes the SQLite connection after each request."
+    ],
+    "source_hash": "e073dd9a61e0cb410dcefad0439b1bca1f2d3d6f7cbd533ee88fe43dc93f9972"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.9,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file94.py",
+  "gated_score": 0.455,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.455,
+  "original_hash": "e073dd9a61e0cb410dcefad0439b1bca1f2d3d6f7cbd533ee88fe43dc93f9972",
+  "rationale": "Core API functions and invariants are preserved, but edge\u2011case handling diverges from the contract (validation prevents KeyError, blocks SQL injection, returns 404 instead of null, etc.), reducing overall behavior and edge\u2011case scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.30213,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.33,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.75713,
+  "weighted_mean": 0.54,
+  "worst_dimension": 0.2
+}

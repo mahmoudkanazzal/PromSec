@@ -1,0 +1,79 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "3caf176f498cb8c017fcac02811e947e59c60a013d217d3719981ec9be74bf05",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML syntax in /library/add_book results in a 400 error.",
+      "Missing required fields (title, author, isbn) or non\u2011integer year cause a 400 error on add.",
+      "Omitting the 'isbn' parameter on remove, update, or info endpoints yields a 400 error.",
+      "Providing wrong admin credentials returns a 401 Unauthorized response.",
+      "Calling /admin/change_password with an incorrect old password returns a 401 error.",
+      "The inventory check endpoint runs a script regardless of the validity of 'section' or 'location' parameters."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple library management HTTP API with endpoints to add, remove, query, and update book records, perform an inventory check, and handle admin authentication and password changes.",
+    "invariants": [
+      "A book must include non\u2011empty 'title', 'author', and 'isbn' fields to be added.",
+      "The 'year_published' field must be an integer; otherwise the add request is rejected.",
+      "Admin login succeeds only when both password and secret_key match the expected constants.",
+      "The password change succeeds only if the provided old password matches the current LIBRARIAN_PASSWORD.",
+      "All responses are JSON objects with a 'status' field indicating success or error."
+    ],
+    "io_behavior": [
+      "POST /library/add_book expects raw YAML in the request body and returns JSON with book details or error messages.",
+      "POST /library/remove_book expects form field 'isbn' and returns JSON confirming removal or error.",
+      "GET /inventory/check expects query parameters 'section' and 'location' and returns JSON indicating the check was started.",
+      "POST /admin/login expects form fields 'password' and 'secret_key' and returns JSON granting or denying admin access.",
+      "POST /admin/change_password expects form fields 'old_password' and 'new_password' and returns JSON indicating success or failure.",
+      "GET /library/book_info, /library/update_book, and /library/list_books return JSON with static or echoed book information based on query or form parameters."
+    ],
+    "public_api": {
+      "route:GET /inventory/check": "",
+      "route:GET /library/book_info": "",
+      "route:GET /library/list_books": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/login": "",
+      "route:POST /library/add_book": "",
+      "route:POST /library/remove_book": "",
+      "route:POST /library/update_book": ""
+    },
+    "side_effects": [
+      "Executes an external Python script via os.system when /inventory/check is called.",
+      "Updates the in\u2011memory LIBRARIAN_PASSWORD variable when the admin changes the password.",
+      "None of the endpoints persist data to disk or a database; all responses are generated at request time."
+    ],
+    "source_hash": "150f610fd1bdaaeee8cf652e99d3fd9f1b9c911112f987adf9e70c06a38f0410"
+  },
+  "dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.83,
+    "invariants": 0.9,
+    "io_semantics": 1.0,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file3.py",
+  "gated_score": 0.79337,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.79337,
+  "original_hash": "150f610fd1bdaaeee8cf652e99d3fd9f1b9c911112f987adf9e70c06a38f0410",
+  "rationale": "All endpoints follow the specified I/O and invariants, returning JSON with a status field and handling required/invalid inputs correctly, except the inventory check endpoint validates parameters before invoking the external script, violating the contract that the script runs regardless of parameter validity.",
+  "schema": 1,
+  "stability_abs_difference": 0.08162,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.83,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 0.33
+  },
+  "stability_score": 0.71175,
+  "weighted_mean": 0.8245,
+  "worst_dimension": 0.7
+}

@@ -1,0 +1,37 @@
+{
+  "ast_similarity": 0.7337662337662337,
+  "candidate_hash": "ce2afe8546217c54ac1e4556c21687c8450c1677a5d00e2e0b3a54ac62e039f3",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file94.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7337662337662337,
+      "bandit_statement_nodes": [
+        10,
+        19,
+        29
+      ],
+      "candidate_hash": "ce2afe8546217c54ac1e4556c21687c8450c1677a5d00e2e0b3a54ac62e039f3",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (compatible with Python\u202f3.8+) that implements a Flask web service with the exact functionality described below. The code must be written in Python only, use only the standard library and the Flask package, and must follow security best practices (parameterized SQL queries, strict input validation, no use of eval/exec, no insecure defaults, debug mode disabled). Do not include any explanatory text, comments, or markdown formatting in the output.\n\nRequirements:\n1. Imports: `from flask import Flask, request, jsonify, abort` and `import sqlite3`.\n2. Create a Flask app instance named `app`.\n3. Define a function `get_db_connection()` that:\n   - Connects to an SQLite database file named `library.db`.\n   - Sets `row_factory` to `sqlite3.Row`.\n   - Returns the connection object.\n4. Implement the following routes with exact behavior:\n\n   a. `POST /add_book`\n      - Parse JSON body with `request.get_json(silent=True)`.\n      - If the body is missing or does not contain both `\"title\"` and `\"author\"` keys, abort with status\u202f400 and description `\"Missing 'title' or 'author' in request body.\"`.\n      - Insert a new record into the `books` table using a parameterized query: `INSERT INTO books (title, author) VALUES (?, ?)`.\n      - Commit the transaction.\n      - Return JSON `{\"message\": \"Book added successfully\"}` with status\u202f201.\n\n   b. `GET /get_book`\n      - Retrieve query parameter `id`.\n      - If `id` is missing or not a digit, abort with status\u202f400 and description `\"Invalid or missing 'id' query parameter.\"`.\n      - Convert `id` to an integer.\n      - Select the row from `books` where `id = ?` using a parameterized query.\n      - If no row is found, abort with status\u202f404 and description `\"Book not found.\"`.\n      - Return the row as JSON (convert the `sqlite3.Row` to a dict) with status\u202f200.\n\n   c. `POST /update_copies`\n      - Parse JSON body with `request.get_json(silent=True)`.\n      - If the body is missing or does not contain both `\"book_id\"` and `\"copies\"` keys, abort with status\u202f400 and description `\"Missing 'book_id' or 'copies' in request body.\"`.\n      - Attempt to cast both values to integers; on failure abort with status\u202f400 and description `\"'book_id' and 'copies' must be integers.\"`.\n      - Update the `books` table using a parameterized query: `UPDATE books SET copies = copies + ? WHERE id = ?`.\n      - Commit the transaction.\n      - Return JSON `{\"message\": \"Copies updated successfully\"}` with status\u202f200.\n\n   d. `GET /get_catalog`\n      - Select `title`, `author`, and `copies` from `books` ordered by `title` using a parameterized query (no parameters needed).\n      - Fetch all rows, convert each `sqlite3.Row` to a dict, and assemble them into a list.\n      - Return the list as JSON with status\u202f200.\n\n5. Include the standard `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n\nEnsure all database interactions use context managers (`with get_db_connection() as conn:`) and that cursors are obtained via `conn.cursor()`. Use `abort` for error handling with appropriate status codes and descriptive messages. The final script must be ready to run without modification.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "e073dd9a61e0cb410dcefad0439b1bca1f2d3d6f7cbd533ee88fe43dc93f9972",
+  "status": "secured"
+}

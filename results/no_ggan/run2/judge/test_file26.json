@@ -1,0 +1,71 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "34b29dcabe4df51de644f2d4fdfcc12f8faa7217653c4e70924a2515b2904256",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Malformed YAML in /add_new_book results in a 400 error with an error message.",
+      "Missing required keys in the parsed YAML triggers an unhandled exception (likely a 500 error).",
+      "Omitting the password field or providing a wrong value returns a 401 response.",
+      "Providing an empty or specially crafted \"section\" value to /execute_inventory may lead to command injection or a no\u2011op command.",
+      "Very large request bodies may cause performance degradation or be rejected by the underlying web server."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a Flask\u2011based HTTP API that allows clients to add a new book record, trigger an inventory script, and obtain admin access via a hard\u2011coded password.",
+    "invariants": [
+      "Every successful endpoint response includes a \"status\" field in the JSON body.",
+      "The /add_new_book endpoint expects YAML with keys \"title\", \"author\", and \"isbn\" and echoes them back unchanged.",
+      "The /admin_access check is a plain string equality against the hard\u2011coded password.",
+      "The server runs with debug mode disabled (debug=False)."
+    ],
+    "io_behavior": [
+      "POST /add_new_book with a YAML body \u2192 JSON response containing status, title, author, isbn (400 on malformed YAML).",
+      "GET /execute_inventory?section=VALUE \u2192 JSON response confirming inventory start.",
+      "POST /admin_access with form field password \u2192 JSON response granting or denying admin access (401 on failure).",
+      "All responses are returned with HTTP status codes and a JSON payload.",
+      "The server listens on the default Flask host/port when executed as a script."
+    ],
+    "public_api": {
+      "route:GET /execute_inventory": "",
+      "route:POST /add_new_book": "",
+      "route:POST /admin_access": ""
+    },
+    "side_effects": [
+      "os.system launches an external Python script (run_inventory.py) with the supplied section argument.",
+      "The external script may read/write files, produce console output, or modify system state (observable only via its own effects).",
+      "Flask may log request details to stdout/stderr depending on the environment."
+    ],
+    "source_hash": "19be0f99e4a6c9bdd8b028896bbe6cf6e30805b399f5ebcca3514b27b30e234d"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.4,
+    "invariants": 0.5,
+    "io_semantics": 0.4,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file26.py",
+  "gated_score": 0.41625,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.41625,
+  "original_hash": "19be0f99e4a6c9bdd8b028896bbe6cf6e30805b399f5ebcca3514b27b30e234d",
+  "rationale": "Endpoints exist and return JSON with status, but password is read from env instead of hard\u2011coded, missing\u2011field errors return 400 instead of 500, section parameter is overly sanitized preventing the intended injection edge case, and book fields are stripped, violating the \"unchanged\" invariant.",
+  "schema": 1,
+  "stability_abs_difference": 0.21375,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.3,
+    "invariants": 0.5,
+    "io_semantics": 0.95,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.63,
+  "weighted_mean": 0.455,
+  "worst_dimension": 0.3
+}

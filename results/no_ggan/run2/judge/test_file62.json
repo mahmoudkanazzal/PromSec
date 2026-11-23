@@ -1,0 +1,71 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "695e30392865641ed4c8d18734bce674116d2dbabff1a5279c03b9c9941f29b8",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing 'payload' query parameter results in the response 'ERROR: No payload'.",
+      "Malformed YAML or missing required keys raises an exception that propagates as an error message.",
+      "Database connection failure returns the exception's message string.",
+      "SELECT query returns no rows, causing the response 'No matching location found.'.",
+      "Any unexpected exception during query execution returns the exception's message.",
+      "The latitude and longitude values are ignored by the query, so mismatched coordinates do not affect the result."
+    ],
+    "entrypoints": [],
+    "intent": "Provide the temperature value for a given datetime (and nominally location) via an HTTP GET request to /api/temperature_for_location.",
+    "invariants": [
+      "The endpoint must be reachable via HTTP GET at /api/temperature_for_location.",
+      "The environment variables DB_HOST, DB_USER, DB_PASS, and DB_NAME must be defined for a successful DB connection.",
+      "The 'payload' query parameter, if present, must be valid YAML containing the keys 'latitude', 'longitude', and 'datetime'.",
+      "The database must contain a table named 'temperature' with at least three columns where the third column holds the temperature value.",
+      "The response is always a plain\u2011text string (either a temperature, an error message, or an exception message).",
+      "Database connections are always closed before the function returns."
+    ],
+    "io_behavior": [
+      "Accepts a query parameter named 'payload' containing a YAML document.",
+      "Parses the YAML to extract 'latitude', 'longitude', and 'datetime' fields.",
+      "Queries a MySQL database for a row in the 'temperature' table matching the supplied datetime.",
+      "Returns the temperature value (as a string) from the matching row in the HTTP response body.",
+      "Returns plain\u2011text error messages when payload is missing, malformed, or when no matching row is found.",
+      "Returns the exception message as plain text if a database connection or query error occurs."
+    ],
+    "public_api": {
+      "route:GET /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to the MySQL server using credentials from environment variables.",
+      "Executes a SELECT statement against the 'temperature' table.",
+      "Closes the database cursor and connection after the query.",
+      "May log or expose exception messages in the HTTP response."
+    ],
+    "source_hash": "ae4325c3c4083066963ec9e246397c503ca804a818fc22d148025686388c28c6"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.4,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file62.py",
+  "gated_score": 0.38,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.38,
+  "original_hash": "ae4325c3c4083066963ec9e246397c503ca804a818fc22d148025686388c28c6",
+  "rationale": "The program implements the endpoint and DB query but returns JSON instead of plain\u2011text, uses different error messages, adds extra validation, and masks exception messages, violating most contract edge\u2011case and invariant specifications.",
+  "schema": 1,
+  "stability_abs_difference": 0.04125,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.3,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.42125,
+  "weighted_mean": 0.44,
+  "worst_dimension": 0.2
+}

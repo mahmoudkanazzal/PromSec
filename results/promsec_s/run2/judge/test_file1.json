@@ -1,0 +1,69 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "3e9a4dd27eec75feb916a88397170a68925565d1b2032579813bbb0e444c200f",
+  "compile_ok": true,
+  "confidence": 0.7,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields raise a KeyError and abort the request.",
+      "Concatenating a bytes salt with a string password may raise a TypeError in Python 3.",
+      "The raw salt bytes are interpolated into an SQL string, potentially causing malformed queries.",
+      "SQL injection is possible because the username is inserted into the query via string formatting.",
+      "Database connection or query failures are not caught, leading to a 500 error.",
+      "On successful registration the response body is empty, which may be confusing to clients."
+    ],
+    "entrypoints": [],
+    "intent": "Handle user registration by creating a new account when a POST request with username and password is received.",
+    "invariants": [
+      "Usernames are unique; duplicate usernames trigger a redirect instead of insertion.",
+      "Passwords are stored as SHA\u2011256(salt + password) hex digests.",
+      "A random 16\u2011byte salt is stored alongside each password hash.",
+      "The 'account_created' column is always set to 1 for new rows."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST to /register with form fields 'username' and 'password'.",
+      "If the username already exists, responds with an HTTP 307 redirect to /login.",
+      "If the username is new, inserts a record into the MySQL users table and returns an implicit 200 OK with no body.",
+      "Generates a 16\u2011byte random salt for each registration attempt."
+    ],
+    "public_api": {
+      "func:register": "()",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Creates a new MySQL connection to localhost as root.",
+      "Executes a SELECT query to check for existing usernames.",
+      "Executes an INSERT query to store username, hashed password, salt, and a constant account_created flag.",
+      "Commits the transaction and closes the database connection.",
+      "May cause an HTTP redirect response to the client."
+    ],
+    "source_hash": "91acf2a5aef5bcd370c6a3200ba7ebb3820f83aa24caea6ae6604f49f50bfecf"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.0,
+    "invariants": 0.6,
+    "io_semantics": 0.6,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file1.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.3525,
+  "original_hash": "91acf2a5aef5bcd370c6a3200ba7ebb3820f83aa24caea6ae6604f49f50bfecf",
+  "rationale": "Core registration flow is present, but missing-field handling, response codes/body, account_created flag, and all listed edge\u2011case failures differ from the contract.",
+  "schema": 1,
+  "stability_abs_difference": 0.1025,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.5,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.455,
+  "weighted_mean": 0.47,
+  "worst_dimension": 0.0
+}

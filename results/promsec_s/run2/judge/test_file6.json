@@ -1,0 +1,85 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "a8964a79b8eb968af761818b8e08aaf77b01bce7fd55a51ac7107cb71a698c4d",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "POST /task/create with malformed YAML triggers a 400 error.",
+      "Missing required fields (e.g., task_id, task_description, password) result in 400 or 401 errors depending on the endpoint.",
+      "Providing an empty string for task_name or task_param still launches the shell script, potentially with unintended arguments.",
+      "Changing the admin password to an empty string allows any subsequent admin request with an empty password to succeed.",
+      "Unsupported export format in /task/export defaults to \"csv\" but still runs the script, which may fail silently.",
+      "Concurrent requests that modify ADMIN_PASSWORD can cause race conditions, as the password is stored in a simple global variable."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a lightweight HTTP API for creating, retrieving, updating, deleting, and managing tasks, with admin\u2011only configuration endpoints protected by a password.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" field.",
+      "Admin\u2011only routes reject requests unless the supplied password matches the current ADMIN_PASSWORD.",
+      "Required parameters (e.g., task_id, task_description, password) must be present; otherwise a 400 error is returned.",
+      "YAML parsing must succeed; otherwise a 400 error with \"Invalid YAML format\" is returned.",
+      "The Flask app runs without debug mode, exposing only the defined routes."
+    ],
+    "io_behavior": [
+      "POST /task/create \u2013 accepts raw YAML in the request body, parses it, and returns JSON containing the supplied task_id and task_description.",
+      "GET /task/execute \u2013 reads query parameters task_name and task_param, launches a shell script via os.system, and returns a JSON acknowledgement.",
+      "POST /admin/login \u2013 reads form field password and returns JSON indicating access granted or denied.",
+      "POST /admin/configure, /admin/settings \u2013 require correct admin password and a non\u2011empty new_config or new_setting form field, then return a JSON confirmation.",
+      "GET /task/retrieve, /task/status, /task/logs \u2013 require a task_id query parameter and return JSON with placeholder task data, status, or logs.",
+      "POST /task/delete, /task/update, /task/assign \u2013 require form fields (task_id, etc.) and return JSON confirming the operation."
+    ],
+    "public_api": {
+      "route:GET /task/execute": "",
+      "route:GET /task/export": "",
+      "route:GET /task/logs": "",
+      "route:GET /task/retrieve": "",
+      "route:GET /task/status": "",
+      "route:GET /user/profile": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/configure": "",
+      "route:POST /admin/login": "",
+      "route:POST /admin/settings": "",
+      "route:POST /task/assign": "",
+      "route:POST /task/create": "",
+      "route:POST /task/delete": "",
+      "route:POST /task/update": ""
+    },
+    "side_effects": [
+      "os.system is invoked in /task/execute to run \"sh execute_task.sh\" with supplied arguments.",
+      "os.system is invoked in /task/export to run \"python3 export_tasks.py\" with the requested format.",
+      "Changing ADMIN_PASSWORD via /admin/change_password updates an in\u2011memory global variable for the running process.",
+      "No persistent storage is used; all state changes exist only for the lifetime of the process."
+    ],
+    "source_hash": "6f7f42fcdfeb992e9bbe8a2cc5e9fd37dda5914349e632e695f6397675f28c28"
+  },
+  "dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.4,
+    "invariants": 0.3,
+    "io_semantics": 0.4,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file6.py",
+  "gated_score": 0.27,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.27,
+  "original_hash": "6f7f42fcdfeb992e9bbe8a2cc5e9fd37dda5914349e632e695f6397675f28c28",
+  "rationale": "The program implements many required routes and basic validation, but deviates from the contract: error responses lack the required \"status\" field, YAML error message differs, admin routes use different JSON keys, and crucial side\u2011effects (os.system calls) are omitted. Some edge cases are handled, others (empty task params, unsupported export format) are not, leading to partial preservation across dimensions.",
+  "schema": 1,
+  "stability_abs_difference": 0.33875,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.6,
+    "invariants": 0.5,
+    "io_semantics": 0.8,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.60875,
+  "weighted_mean": 0.36,
+  "worst_dimension": 0.0
+}

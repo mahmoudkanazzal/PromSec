@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "356a7c0e0e6e9c374927f0f77102579aafb55fcf17dd5b1d679439fbefa264fe",
+  "compile_ok": true,
+  "confidence": 0.92,
+  "contract": {
+    "edge_cases": [
+      "Missing required parameters (e.g., id, key, new_config) result in 400 or 401 responses.",
+      "Invalid YAML in /system/add_record triggers a 400 error with an \"Invalid YAML format\" message.",
+      "Providing an incorrect admin key to any /admin/* endpoint returns 401 Authentication failed.",
+      "Changing the secret key to an empty string via /admin/change_key effectively locks out future admin actions.",
+      "Calling /system/start_process or /data/export with empty arguments still invokes the underlying shell commands, possibly causing errors."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple HTTP API for managing records, processes, configuration, and user data, with basic authentication for admin actions.",
+    "invariants": [
+      "All admin\u2011only endpoints require the current SECRET_KEY supplied as a form field.",
+      "Endpoints return JSON with a \"status\" field and appropriate HTTP status codes (200 for success, 400 for client errors, 401 for auth failures).",
+      "Record\u2011related endpoints require both \"id\" and \"value\" (add) or at least \"id\" (fetch/delete).",
+      "YAML payload must be parseable; otherwise a 400 error is returned.",
+      "The Flask app runs with debug disabled and does not expose internal variables beyond the defined JSON responses."
+    ],
+    "io_behavior": [
+      "POST /system/add_record \u2013 accepts raw YAML, returns JSON with status and echoed id/value or 400 on parse/validation error.",
+      "GET /system/start_process \u2013 reads query parameters process and argument, triggers a shell script via os.system, returns JSON status.",
+      "POST /admin/authenticate \u2013 expects form field key, returns success JSON or 401 on mismatch.",
+      "POST /admin/update_config \u2013 requires valid admin key and new_config field, returns JSON confirmation or error codes.",
+      "GET /records/fetch \u2013 requires id query, returns JSON with a sample record or 400 if missing.",
+      "POST /records/delete \u2013 requires id form field, returns JSON confirming deletion or 400 if missing."
+    ],
+    "public_api": {
+      "route:GET /data/export": "",
+      "route:GET /logs/view": "",
+      "route:GET /process/status": "",
+      "route:GET /records/fetch": "",
+      "route:GET /system/start_process": "",
+      "route:GET /user/details": "",
+      "route:POST /admin/authenticate": "",
+      "route:POST /admin/change_key": "",
+      "route:POST /admin/set_preference": "",
+      "route:POST /admin/update_config": "",
+      "route:POST /records/delete": "",
+      "route:POST /system/add_record": ""
+    },
+    "side_effects": [
+      "os.system call to execute \"bash start_process.sh <process> <argument>\" in /system/start_process.",
+      "os.system call to run \"python3 export_data.py <type>\" in /data/export.",
+      "Potential modification of the in\u2011memory SECRET_KEY via /admin/change_key."
+    ],
+    "source_hash": "ce4864d7f7c339a53aefaecc047fa140985c7e50c8066fcb5f9ed10108269376"
+  },
+  "dimensions": {
+    "behavior": 0.88,
+    "edge_cases": 0.8,
+    "invariants": 1.0,
+    "io_semantics": 0.95,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file7.py",
+  "gated_score": 0.87725,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.87725,
+  "original_hash": "ce4864d7f7c339a53aefaecc047fa140985c7e50c8066fcb5f9ed10108269376",
+  "rationale": "All required endpoints exist, input validation and JSON responses match the contract, and external commands are invoked, but the admin change_key endpoint rejects empty keys (contract expects allowing it) and uses subprocess.run instead of os.system, causing slight deviations.",
+  "schema": 1,
+  "stability_abs_difference": 0.04475,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.6,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.8325,
+  "weighted_mean": 0.903,
+  "worst_dimension": 0.8
+}

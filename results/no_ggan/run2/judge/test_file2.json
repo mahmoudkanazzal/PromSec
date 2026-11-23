@@ -1,0 +1,82 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "c787731722f0b7c48db2143ca5727568b44142b77c079b1441aa7dc17fca6cf8",
+  "compile_ok": true,
+  "confidence": 0.75,
+  "contract": {
+    "edge_cases": [
+      "Invalid or malformed YAML in /config/upload triggers a 400 error.",
+      "Missing config_name or config_value in the uploaded YAML results in a 400 error.",
+      "Omitting required query/form fields (e.g., token, task, config_name) yields a 400 or 401 error.",
+      "Providing an incorrect admin token returns a 401 Unauthorized response.",
+      "Attempting to update the token with an empty new_token returns a 400 error.",
+      "Calling /task/execute or /backup/data with special characters may affect the underlying shell command."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a set of HTTP endpoints for uploading/retrieving/deleting configurations, executing tasks, managing admin authentication tokens, and fetching user or task information.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" field.",
+      "Admin\u2011protected routes require the request token to equal the current SECRET_TOKEN.",
+      "Required parameters (e.g., config_name, task, user_id) must be present; otherwise a 400 error is returned.",
+      "YAML payloads are parsed with yaml.FullLoader; parsing failures produce a 400 error.",
+      "Token updates succeed only when the supplied current_token matches the stored SECRET_TOKEN."
+    ],
+    "io_behavior": [
+      "POST /config/upload \u2013 accepts raw YAML, returns JSON with config_name and config_value or error.",
+      "GET /task/execute \u2013 reads query parameters task and param, starts a shell script, returns JSON status.",
+      "POST /admin/verify \u2013 checks form token against secret, returns verification JSON.",
+      "POST /admin/update_token \u2013 validates current token, updates in\u2011memory token, returns JSON.",
+      "GET /config/retrieve \u2013 requires config_name query, returns example config JSON.",
+      "GET /user/profile \u2013 requires user_id query, returns static profile JSON"
+    ],
+    "public_api": {
+      "route:GET /backup/data": "",
+      "route:GET /config/retrieve": "",
+      "route:GET /task/execute": "",
+      "route:GET /task/logs": "",
+      "route:GET /task/status": "",
+      "route:GET /user/profile": "",
+      "route:POST /admin/settings": "",
+      "route:POST /admin/update_token": "",
+      "route:POST /admin/verify": "",
+      "route:POST /config/delete": "",
+      "route:POST /config/upload": ""
+    },
+    "side_effects": [
+      "os.system call to run \"sh execute_task.sh <task> <param>\".",
+      "os.system call to run \"python3 backup_data.py <format>\".",
+      "Modification of the global SECRET_TOKEN variable at runtime.",
+      "Potential execution of external scripts (execute_task.sh, backup_data.py)."
+    ],
+    "source_hash": "7d880d6e183f6046022b31df25f287bd639a6d249de095d83cc40451caa8ff19"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.7,
+    "invariants": 0.4,
+    "io_semantics": 0.5,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file2.py",
+  "gated_score": 0.54625,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.54625,
+  "original_hash": "7d880d6e183f6046022b31df25f287bd639a6d249de095d83cc40451caa8ff19",
+  "rationale": "The program implements most required routes and checks, but deviates from the contract by using yaml.safe_load instead of yaml.FullLoader and by returning error objects without a \"status\" field, violating the invariant that all responses contain a status. It also uses subprocess.run rather than os.system, though the side\u2011effects are similar. Edge cases are largely handled, but special\u2011character handling is stricter than specified.",
+  "schema": 1,
+  "stability_abs_difference": 0.29625,
+  "stability_dimensions": {
+    "behavior": 0.95,
+    "edge_cases": 0.85,
+    "invariants": 0.7,
+    "io_semantics": 0.95,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.8425,
+  "weighted_mean": 0.595,
+  "worst_dimension": 0.4
+}

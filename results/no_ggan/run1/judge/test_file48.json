@@ -1,0 +1,73 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "5b3e364bc04cf1e208c78ddd9a848ea3c751e9c02fc6b6cfb7b5f71d788e3d29",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and result in a 500 error.",
+      "Empty strings for username or password still produce a query and may return \"Falscher Benutzername oder Passwort\".",
+      "Extremely long input values may exceed MySQL field limits or cause query truncation.",
+      "Non\u2011ASCII characters in the password affect the MD5 hash calculation depending on encoding.",
+      "Database connection failure results in an unhandled exception (500 error).",
+      "SQL syntax errors from special characters in the username (e.g., quotes) may raise a database exception."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by checking the supplied username and password against records in a MySQL database.",
+    "invariants": [
+      "The endpoint only responds to POST requests; other methods are ignored.",
+      "The response is always one of the two fixed strings, never containing user\u2011supplied data.",
+      "The password is always hashed with MD5 before being compared to the stored value.",
+      "Database connection parameters (host, user, password, db) are constant.",
+      "The SQL query format remains unchanged for each request.",
+      "The Flask application runs in a single\u2011process context unless otherwise configured."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to the /login path with form fields 'username' and 'password'.",
+      "Computes the MD5 hash of the provided password.",
+      "Queries the MySQL database for a row matching the given username and hashed password.",
+      "Returns the plain\u2011text response \"Eingeloggt\" when a matching record is found.",
+      "Returns the plain\u2011text response \"Falscher Benutzername oder Passwort\" when no match is found.",
+      "Closes the database cursor/connection after the query (implicit when request ends)."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to a local MySQL server.",
+      "Executes a SELECT statement on the 'userdaten' table.",
+      "Consumes CPU cycles for MD5 hashing and query processing.",
+      "May log connection attempts in MySQL server logs.",
+      "Potentially triggers MySQL authentication failures if credentials are wrong.",
+      "No file system or external service modifications beyond the database read."
+    ],
+    "source_hash": "d3279238c2bce3c13aeb41e0e7e2642c92d84b5a23a3c0cf24ce1578e1a94f1c"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.4,
+    "invariants": 0.2,
+    "io_semantics": 0.5,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file48.py",
+  "gated_score": 0.3575,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.3575,
+  "original_hash": "d3279238c2bce3c13aeb41e0e7e2642c92d84b5a23a3c0cf24ce1578e1a94f1c",
+  "rationale": "The program deviates from the contract by not using MD5 hashing, not querying with both username and hashed password, and handling missing fields without raising KeyError; however, it preserves POST handling, fixed responses, and similar side effects.",
+  "schema": 1,
+  "stability_abs_difference": 0.03,
+  "stability_dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.3,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.3875,
+  "weighted_mean": 0.41,
+  "worst_dimension": 0.2
+}

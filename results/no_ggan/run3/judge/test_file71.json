@@ -1,0 +1,68 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "16382f361efad9d49e4b292ad19a08ccadba9ac5b35d13a308c0faba585ed74e",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields cause a KeyError or 400\u2011type error.",
+      "Database insertion failures (e.g., duplicate username) raise an exception and abort the request.",
+      "Extremely long usernames or passwords may exceed column limits and cause DB errors.",
+      "If the MySQL server is unreachable, the endpoint fails to respond successfully.",
+      "Using SHA\u20111 may be considered weak; hash collisions are theoretically possible."
+    ],
+    "entrypoints": [],
+    "intent": "Register a new user by storing a salted SHA\u20111 hash of their password in a MySQL database.",
+    "invariants": [
+      "Both 'username' and 'password' must be present in the POST data.",
+      "Password is never stored in plain text; only its SHA\u20111 hash with a random salt is saved.",
+      "The inserted record always includes created_at and updated_at timestamps set to NOW().",
+      "Database credentials (host, user, password, db) are fixed and used for every request."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /register with form fields 'username' and 'password'.",
+      "Generates a 16\u2011byte random salt and computes SHA\u20111(username+salt).",
+      "Inserts the username, hashed password, salt, and timestamps into the users table.",
+      "Commits the transaction and returns an HTTP redirect (e.g., 302) to the main page.",
+      "If required fields are missing or a database error occurs, the server returns an error response."
+    ],
+    "public_api": {
+      "func:register": "()",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Creates a new MySQL connection for each request.",
+      "Writes a new row to the users table in the database.",
+      "Commits the transaction, persisting the data.",
+      "Generates a random salt (internal state, not exposed)."
+    ],
+    "source_hash": "359bf4558a37b043a9986e5d5ee7d208b47b107dbde69c7955862c1fa79105c7"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.5,
+    "invariants": 0.9,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file71.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.6725,
+  "original_hash": "359bf4558a37b043a9986e5d5ee7d208b47b107dbde69c7955862c1fa79105c7",
+  "rationale": "The program follows the main registration flow, validates required fields, stores a salted hash, and commits to MySQL, preserving most side\u2011effects and I/O semantics. However it deviates from the contract by using PBKDF2\u2011SHA256 instead of a salted SHA\u20111 of the username+salt, and it pre\u2011validates username length, preventing the DB\u2011error edge case. These differences lower the behavior and edge\u2011case scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.17,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.9,
+    "invariants": 1.0,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.8425,
+  "weighted_mean": 0.73,
+  "worst_dimension": 0.5
+}

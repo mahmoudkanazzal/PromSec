@@ -1,0 +1,82 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "71db5d8099af827534488d9a8c224f2bb39d7dc48a28bf7ccc3543eb67c10620",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Invalid or malformed YAML in /user/add triggers a 400 error.",
+      "Missing required fields (id, name, key, task, argument, new_config, preference) result in 400 or 401 responses.",
+      "Providing an incorrect admin key leads to authentication failure (401).",
+      "Changing the secret key to an empty string via /admin/change_key is allowed but locks out further admin actions.",
+      "Calling task\u2011related endpoints with empty task or argument still runs the shell command with empty arguments."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a REST\u2011like API for managing users, triggering tasks, and performing admin operations such as authentication, configuration updates, and key changes.",
+    "invariants": [
+      "All responses are JSON objects with a \"status\" field.",
+      "Admin\u2011protected routes require the current SECRET_KEY supplied as a form field.",
+      "Required parameters (e.g., id, key, task) must be non\u2011empty; otherwise a 400 error is returned.",
+      "Successful operations return HTTP 200; authentication failures return 401; validation errors return 400."
+    ],
+    "io_behavior": [
+      "POST /user/add \u2013 accepts raw YAML in the body, returns JSON with user id and name or 400 on parse/validation error.",
+      "GET /system/start_task \u2013 reads query parameters task and argument, runs a shell script, returns JSON status.",
+      "POST /admin/authenticate \u2013 reads form field key, returns JSON success or 401 failure.",
+      "POST /admin/update_config \u2013 requires valid key and new_config form fields, returns JSON status or error codes.",
+      "GET /user/fetch, /user/details, /user/delete \u2013 read id from query or form, return JSON with user data or error.",
+      "Various task endpoints (/task/status, /task/execute, /task/logs, /logs/view, /data/export) \u2013 read parameters, may invoke external commands, always respond with JSON."
+    ],
+    "public_api": {
+      "route:GET /data/export": "",
+      "route:GET /logs/view": "",
+      "route:GET /system/start_task": "",
+      "route:GET /task/execute": "",
+      "route:GET /task/logs": "",
+      "route:GET /task/status": "",
+      "route:GET /user/details": "",
+      "route:GET /user/fetch": "",
+      "route:POST /admin/authenticate": "",
+      "route:POST /admin/change_key": "",
+      "route:POST /admin/set_preference": "",
+      "route:POST /admin/update_config": "",
+      "route:POST /user/add": "",
+      "route:POST /user/delete": ""
+    },
+    "side_effects": [
+      "Calls to os.system execute external scripts (start_task.sh, execute_task.sh, export_data.py).",
+      "POST /admin/change_key updates the in\u2011memory SECRET_KEY variable.",
+      "No persistent storage is used; all responses are generated at request time."
+    ],
+    "source_hash": "1ef5b7c7771f2d9799a1475311356c10cf924731da431f8408647e90727c54ac"
+  },
+  "dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 1.0,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file8.py",
+  "gated_score": 1.0,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 1.0,
+  "original_hash": "1ef5b7c7771f2d9799a1475311356c10cf924731da431f8408647e90727c54ac",
+  "rationale": "The program implements all listed routes, returns JSON with a status field, enforces admin key checks, handles malformed YAML and missing fields with 400/401, allows empty task arguments, updates the in\u2011memory secret key, and invokes external scripts as specified.",
+  "schema": 1,
+  "stability_abs_difference": 0.07563,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.9,
+    "invariants": 0.95,
+    "io_semantics": 0.95,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.92437,
+  "weighted_mean": 1.0,
+  "worst_dimension": 1.0
+}

@@ -15,6 +15,10 @@ class SecurityAnalysisError(RuntimeError):
     """Security analysis did not complete successfully."""
 
 
+class AnalysisInterrupted(SecurityAnalysisError):
+    """Bandit was terminated by a signal (stop, Ctrl-C, kill): an interruption, not a property of the program."""
+
+
 def run_bandit(code: str, require_compile: bool = True) -> dict:
     """Run Bandit on ``code`` and return its validated JSON report."""
     validate_python_source(code, require_compile=require_compile)
@@ -30,6 +34,8 @@ def run_bandit(code: str, require_compile: bool = True) -> dict:
             [executable, "-f", "json", tmp_name],
             capture_output=True, text=True, check=False, timeout=120,
         )
+        if result.returncode < 0:
+            raise AnalysisInterrupted(f"Bandit was terminated by signal {-result.returncode}")
         if result.returncode not in (0, 1):
             raise SecurityAnalysisError(f"Bandit exited with status {result.returncode}: {result.stderr.strip()}")
         try:

@@ -7,6 +7,7 @@ import json
 import os
 import tempfile
 from pathlib import Path
+from typing import Any
 
 
 def sha256_text(text: str) -> str:
@@ -26,6 +27,17 @@ def atomic_write_text(path: str | Path, text: str) -> None:
     finally:
         if os.path.exists(tmp):
             os.unlink(tmp)
+
+
+def rounded(value: Any, digits: int = 4) -> Any:
+    """``value`` with every float rounded to ``digits`` decimals (for reports)."""
+    if isinstance(value, float):
+        return round(value, digits)
+    if isinstance(value, dict):
+        return {k: rounded(v, digits) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [rounded(v, digits) for v in value]
+    return value
 
 
 def atomic_write_json(path: str | Path, value: object) -> None:

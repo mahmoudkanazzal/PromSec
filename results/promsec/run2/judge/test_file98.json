@@ -1,0 +1,74 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "0867662c027e58db65e8833ce9227533f55d260c3a9beed205ff49fd323886be",
+  "compile_ok": true,
+  "confidence": 0.8,
+  "contract": {
+    "edge_cases": [
+      "Missing required JSON fields cause a server error (500)",
+      "Non\u2011numeric poll_id or option_id in requests may trigger SQL errors",
+      "Empty title or empty options list creates a poll with no meaningful data",
+      "Duplicate votes from the same voter_id are not prevented",
+      "Very large input strings may exceed SQLite limits and cause failures",
+      "SQL injection payloads can alter database behavior or cause errors"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for creating polls, recording votes, and retrieving poll results using a SQLite backend.",
+    "invariants": [
+      "poll_id returned by /create_poll uniquely identifies the newly created poll",
+      "Each option row stores the poll_id it belongs to",
+      "Vote rows reference existing poll_id and option_id values",
+      "GET /get_results always returns a JSON list ordered by option id",
+      "All HTTP responses are JSON and include the appropriate status code"
+    ],
+    "io_behavior": [
+      "POST /create_poll with JSON {title, options} \u2192 201 response with JSON {message, poll_id}",
+      "POST /vote with JSON {poll_id, option_id, voter_id} \u2192 200 response with JSON {message}",
+      "GET /get_results?poll_id=ID \u2192 200 response with JSON array of {option_text, vote_count}"
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:GET /get_results": "",
+      "route:POST /create_poll": "",
+      "route:POST /vote": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the polls table",
+      "Inserts rows into the options table for each provided option",
+      "Inserts a row into the votes table for each vote",
+      "Commits changes to the SQLite file voting.db",
+      "Persists poll, option, and vote data across requests"
+    ],
+    "source_hash": "cb74b9aedccb24444e80858bad4d052615ee38524c155193f1a527b08f91a887"
+  },
+  "dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.2,
+    "invariants": 0.75,
+    "io_semantics": 0.95,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file98.py",
+  "gated_score": 0.635,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.635,
+  "original_hash": "cb74b9aedccb24444e80858bad4d052615ee38524c155193f1a527b08f91a887",
+  "rationale": "Core API endpoints and persistence work as specified, but the program validates inputs (returning 400) instead of allowing the contract's error cases (500), does not guarantee result ordering, and prevents SQL injection, diverging from several listed edge\u2011case expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.14875,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.6,
+    "invariants": 0.6,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.78375,
+  "weighted_mean": 0.78,
+  "worst_dimension": 0.2
+}

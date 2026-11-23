@@ -1,0 +1,69 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "22c7c4f83b00aee1a9d17e7fc40e519fadda74e2378946b4f07efe0474f6f051",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'payload' query parameter causes a parsing error.",
+      "Malformed YAML leads to a yaml.load exception.",
+      "Absent latitude, longitude, or date keys raise a KeyError.",
+      "No matching row in the database causes fetchone() to return None, leading to a TypeError.",
+      "Database connection failure results in an exception and no HTTP response.",
+      "Unexpected data types (e.g., non\u2011numeric latitude) may cause the query to fail."
+    ],
+    "entrypoints": [],
+    "intent": "Return the temperature for a specified latitude, longitude, and date supplied in a YAML payload via an HTTP GET request.",
+    "invariants": [
+      "The endpoint path and HTTP method are fixed (/api/temperature_for_location, GET).",
+      "The payload must be valid YAML containing the keys 'latitude', 'longitude', and 'date'.",
+      "Database query uses parameterized placeholders, preventing SQL syntax alteration.",
+      "The temperature is always returned as a string representation of the numeric value.",
+      "A successful request always results in exactly one temperature value being returned."
+    ],
+    "io_behavior": [
+      "Accepts a GET request to /api/temperature_for_location with a 'payload' query parameter containing YAML.",
+      "Parses the YAML to extract latitude, longitude, and date.",
+      "Queries a MySQL database for a matching temperature record.",
+      "Responds with the temperature value as a plain\u2011text string in the HTTP response body.",
+      "Writes the extracted latitude, longitude, and date to the server's standard output (log)."
+    ],
+    "public_api": {
+      "route:GET /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Opens a connection to a local MySQL database.",
+      "Executes a SELECT query against the temperatures table.",
+      "Closes the database cursor when the request finishes (implicit on connection teardown).",
+      "Prints request data to the console (stdout)."
+    ],
+    "source_hash": "feadbd807376c4203d264d5b124013b8fa5e0e9fe545fae11c6f503748cfce63"
+  },
+  "dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.4,
+    "invariants": 0.5,
+    "io_semantics": 0.3,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file59.py",
+  "gated_score": 0.42,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.42,
+  "original_hash": "feadbd807376c4203d264d5b124013b8fa5e0e9fe545fae11c6f503748cfce63",
+  "rationale": "Core query works but returns JSON instead of plain\u2011text, logs via app.logger not stdout, and handles missing rows and payload errors with aborts rather than the specified exceptions, breaking several contract invariants and edge\u2011case expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.2125,
+  "stability_dimensions": {
+    "behavior": 0.65,
+    "edge_cases": 0.85,
+    "invariants": 0.7,
+    "io_semantics": 0.55,
+    "side_effects": 0.6
+  },
+  "stability_score": 0.6325,
+  "weighted_mean": 0.46,
+  "worst_dimension": 0.3
+}

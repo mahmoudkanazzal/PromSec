@@ -1,0 +1,387 @@
+{
+  "ast_similarity": 0.5662650602409639,
+  "candidate_hash": "bbe113181777a3066e0fc93bee98b9daf64d0db8e99035236cd3a59a5d0b746c",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 1,
+  "cwe_count_before": 3,
+  "cwes_after": [
+    703
+  ],
+  "cwes_before": [
+    78,
+    89,
+    259
+  ],
+  "error": "",
+  "file": "test_file86.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5662650602409639,
+      "bandit_statement_nodes": [
+        2,
+        7,
+        14
+      ],
+      "candidate_hash": "bbe113181777a3066e0fc93bee98b9daf64d0db8e99035236cd3a59a5d0b746c",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9993,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9999,
+          "end_lineno": 17,
+          "lineno": 14,
+          "node": 7
+        },
+        {
+          "ast_type": "Assign",
+          "change": 1.0,
+          "end_lineno": 29,
+          "lineno": 29,
+          "node": 14
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a secure Python 3 script that implements a Flask web application with the following exact functionality:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session` from `flask`; `os`; `MySQLdb`.\n- Create a Flask app instance named `app`.\n- Define a function `get_db_connection()` that returns a MySQLdb connection using the environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`, defaulting to `'localhost'`, `'root'`, `'root'`, and `'db'` respectively if the variables are not set.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Creates a cursor.\n  - Executes a parameterized INSERT query to add `username` and `message` into a table named `messages` with columns `username` and `content`.\n  - Commits the transaction.\n  - Closes the database connection.\n  - Handles any database errors securely without exposing sensitive information.\n- Define a route `/post` that accepts only POST requests and:\n  - Retrieves `username` from the Flask session safely, returning a 401 error if the key is missing.\n  - Retrieves `message` from `request.form` safely, returning a 400 error if the key is missing or empty.\n  - Calls `insert_user_message_in_db(username, message)`.\n  - Redirects the client to `'/'` after successful insertion.\n- Ensure the code follows security best practices:\n  - Use parameterized queries to prevent SQL injection.\n  - Validate and sanitize input data.\n  - Do not expose stack traces or internal errors to the client.\n  - Close all resources properly.\n- Do not include any comments, docstrings, or explanatory text in the output.\n- Output only the complete Python code, with no additional formatting, markdown, or surrounding text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5222222222222223,
+      "bandit_statement_nodes": [
+        22,
+        25
+      ],
+      "candidate_hash": "3126481af6839ac66b50d18cd41a210aa0fcc62afc32f403d33c8013b5ddcad6",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other languages) that implements the described Flask web application with secure coding practices and identical functionality to the reference code below. Follow these strict requirements:\n\n1. **Imports**: Only import `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; import `os`; import `MySQLdb`. Do not import any additional modules.\n\n2. **Application setup**:\n   - Create a Flask app instance named `app`.\n   - Set `app.secret_key` to the value of the environment variable `SECRET_KEY`; if not set, default to the literal string `\"change-me\"`.\n\n3. **Database connection**:\n   - Define a function `get_db_connection()` that reads the following environment variables with the given defaults:\n     - `DB_HOST` \u2192 default `\"localhost\"`\n     - `DB_USER` \u2192 default `\"root\"`\n     - `DB_PASS` \u2192 default `\"root\"`\n     - `DB_NAME` \u2192 default `\"db\"`\n   - Return a `MySQLdb.connect` object using those values and `charset='utf8mb4'`.\n   - Do not expose credentials or connection details in the code.\n\n4. **Message insertion**:\n   - Define a function `insert_user_message_in_db(username, message)` that:\n     - Obtains a connection via `get_db_connection()`.\n     - Uses a cursor to execute a **parameterized** SQL statement that inserts `username` and `message` into a table named `messages` with columns `username` and `content`.\n     - Commits the transaction on success.\n     - Closes the cursor and connection in all cases.\n     - Implements robust error handling:\n       - Catches `MySQLdb.Error`.\n       - Rolls back the transaction if an error occurs.\n       - Silently handles any secondary errors during rollback or close.\n       - Returns `True` on successful insertion, `False` on any failure.\n\n5. **Route handling**:\n   - Create a route `'/post'` that accepts only `POST` requests.\n   - Inside the view function `post_message()`:\n     - Retrieve the current username from `session` using the key `'username'`. If missing, abort with HTTP 401.\n     - Retrieve the posted message from `request.form` using the key `'message'`. If missing or empty, abort with HTTP 400.\n     - Call `insert_user_message_in_db(username, message)`. If it returns `False`, abort with HTTP 500.\n     - On success, redirect the client to `'/'`.\n\n6. **Security considerations**:\n   - Use only parameterized queries to prevent SQL injection.\n   - Do not log or print sensitive information.\n   - Ensure the secret key is never hard\u2011coded beyond the fallback default.\n   - Close all database resources properly to avoid leaks.\n\n7. **Output**:\n   - Provide only the Python source code that fulfills all the above specifications.\n   - Do not include any comments, explanatory text, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        20,
+        24,
+        28
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Generate a complete, functional Python script that implements a Flask web application with the following exact specifications and security requirements:\n\n- Use only the Python standard library and the packages `flask` and `MySQLdb`.\n- Import exactly: `from flask import Flask, request, redirect, session, abort`, `import os`, `import MySQLdb`.\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `SECRET_KEY`; if the variable is not set, default to the string `'change-me'`.\n- Define a function `get_db_connection()` that:\n  * Retrieves database connection parameters from environment variables: `DB_HOST` (default `'localhost'`), `DB_USER` (default `'root'`), `DB_PASS` (default `'root'`), and `DB_NAME` (default `'db'`).\n  * Returns a `MySQLdb` connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  * Obtains a connection via `get_db_connection()`.\n  * Creates a cursor and executes a **parameterized** SQL statement to insert the `username` and `message` into a table named `messages` with columns `username` and `content`.\n  * Commits the transaction and returns `True` on success.\n  * Catches any `MySQLdb.Error`, attempts to roll back the transaction if a connection exists, and returns `False`.\n  * In a `finally` block, safely closes the cursor and connection if they were created, suppressing any exceptions during cleanup.\n- Define a route `@app.route('/post', methods=['POST'])` with a view function `post_message()` that:\n  * Retrieves `username` from the Flask session; if missing, abort with HTTP status 401.\n  * Retrieves `message` from `request.form`; if missing, abort with HTTP status 400.\n  * Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  * On success, redirects the client to `'/'`.\n- Include the standard entry point guard:\n  ```python\n  if __name__ == '__main__':\n      app.run()\n  ```\n- Ensure the code follows security best practices: no hard\u2011coded credentials, use of environment variables for secrets, use of parameterized queries to prevent SQL injection, proper error handling without exposing internal details, and guaranteed cleanup of database resources.\n- Output **only** the Python code, with no additional explanations, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 5,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 6,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 7,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 8,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 9,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 10,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 11,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 12,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 13,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 14,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 15,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 16,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 17,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 18,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 19,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.501779359430605,
+      "bandit_statement_nodes": [
+        22,
+        26,
+        30
+      ],
+      "candidate_hash": "6bc63b021fd153e74ada38ad45821da2aedb3e7512838f5b664da9c11d40e024",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 20,
+      "optimized_prompt": "Write a complete, functional Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session`, `abort` from `flask`; `os`; and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `SECRET_KEY`. If the variable is not set, default to the string `\"change-me\"`.\n- Define a function `get_db_connection()` that:\n  - Retrieves database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, defaulting respectively to `\"localhost\"`, `\"root\"`, `\"root\"`, and `\"db\"` if not provided.\n  - Returns a MySQLdb connection using these parameters, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a function `insert_user_message_in_db(username, message)` that:\n  - Obtains a database connection via `get_db_connection()`.\n  - Uses a cursor to execute a **parameterized** SQL INSERT statement: `INSERT INTO messages (username, content) VALUES (%s, %s)`.\n  - Commits the transaction on success and returns `True`.\n  - Catches any `MySQLdb.Error`, rolls back the transaction if a connection exists, and returns `False`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Define a route `/post` that accepts only `POST` requests and:\n  - Retrieves the current `username` from the Flask session; if missing, abort with HTTP status 401.\n  - Retrieves the `message` from `request.form`; if missing, abort with HTTP status 400.\n  - Calls `insert_user_message_in_db(username, message)`; if it returns `False`, abort with HTTP status 500.\n  - On success, redirects the client to `/`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with default settings.\n- The entire output must be **only** the Python code described above, with no additional explanatory text, comments, or markdown formatting. Ensure the code follows best security practices (use of environment variables, parameterized queries, proper resource cleanup) and retains the exact functionality specified.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 20,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "fa8139466766f50de1cf3e82becfde48623437f0868aca195be8f4ddfd3ea9c2",
+  "status": "max_iterations_reached"
+}

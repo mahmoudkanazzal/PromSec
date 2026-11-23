@@ -1,0 +1,67 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "8a4cb550c8cb141424d59628f7b0b3e171fa709b0628662e6ceddccfc68a9d4a",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a server error (KeyError).",
+      "Empty strings for username or password are accepted and processed.",
+      "A username containing SQL metacharacters can lead to injection because queries are concatenated.",
+      "Database connection failures raise an exception and result in a 500 error.",
+      "Extremely long input values may exceed query length limits or cause performance issues.",
+      "Registering an already\u2011existing username returns \"user already exists\"."
+    ],
+    "entrypoints": [],
+    "intent": "Handle HTTP POST requests to /register by creating a new user account and storing the username with a SHA\u20111 hashed password in a MySQL database.",
+    "invariants": [
+      "Usernames are unique in the 'user' table.",
+      "Passwords are stored only as SHA\u20111 hashes of the supplied password.",
+      "The endpoint always returns one of the two exact response strings.",
+      "Database connection parameters (host, user, password, db) are fixed in the code."
+    ],
+    "io_behavior": [
+      "Accepts a POST request with form fields 'username' and 'password'.",
+      "Returns the plain\u2011text response \"register success\" when a new user is created.",
+      "Returns the plain\u2011text response \"user already exists\" when the username is already present.",
+      "Responds with HTTP 200 and the response body containing one of the above messages."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Opens a connection to a MySQL server.",
+      "Executes a SELECT query to check for existing usernames.",
+      "Executes an INSERT query and commits the transaction to add a new user record.",
+      "Sends network traffic to the database server."
+    ],
+    "source_hash": "b6e3cdbb96decf7cd13844e5210a27a2089060571717bc243e0a1303df33bc57"
+  },
+  "dimensions": {
+    "behavior": 0.1,
+    "edge_cases": 0.0,
+    "invariants": 0.0,
+    "io_semantics": 0.1,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file68.py",
+  "gated_score": 0.15375,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.15375,
+  "original_hash": "b6e3cdbb96decf7cd13844e5210a27a2089060571717bc243e0a1303df33bc57",
+  "rationale": "The program performs the required DB operations but deviates from the contract on all observable behavior: it returns JSON with different status codes, rejects empty fields, prevents SQL injection, uses a different password hash, and does not emit the exact plain\u2011text responses, violating edge\u2011case handling, invariants, and I/O semantics.",
+  "schema": 1,
+  "stability_abs_difference": 0.1475,
+  "stability_dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.25,
+    "invariants": 0.25,
+    "io_semantics": 0.2,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.30125,
+  "weighted_mean": 0.205,
+  "worst_dimension": 0.0
+}

@@ -1,0 +1,83 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "06f8e268727874d4d15cbc8faf16b8a191c591eaa62b2075f9fe9c8890627eb4",
+  "compile_ok": true,
+  "confidence": 0.8,
+  "contract": {
+    "edge_cases": [
+      "Providing malformed YAML to /data/upload triggers a YAML parsing error and a 400 response.",
+      "Calling /task/execute or /data/export with empty or malicious arguments still invokes the shell command.",
+      "Attempting to change the admin password with an incorrect old password returns 401 Access denied.",
+      "Omitting required parameters (e.g., data_id, task, user_id) yields a 400 error.",
+      "Using an incorrect admin password on protected routes returns 401 Access denied.",
+      "Changing ADMIN_PASSWORD affects all subsequent admin authentication until the server restarts."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple HTTP API for uploading, retrieving, deleting data, managing admin authentication and configuration, and triggering external tasks or exports via shell scripts.",
+    "invariants": [
+      "ADMIN_PASSWORD must match the stored value for any admin\u2011protected endpoint.",
+      "All required request fields (e.g., data_id, data_value, password) must be non\u2011empty for successful responses.",
+      "Responses are always JSON objects with a 'status' field and appropriate additional data.",
+      "Invalid YAML in /data/upload results in a 400 error with a specific error message.",
+      "Missing required query or form parameters result in a 400 error with a descriptive message."
+    ],
+    "io_behavior": [
+      "POST /data/upload \u2013 accepts raw YAML in the request body and returns JSON with the extracted data_id and data_value.",
+      "GET /task/execute \u2013 reads 'task' and 'parameter' query strings, starts a shell script, and returns a JSON status message.",
+      "POST /admin/login \u2013 checks a form\u2011encoded password and returns JSON indicating access granted or denied.",
+      "POST /admin/configure \u2013 requires admin password and a new_config field; returns JSON confirming the update.",
+      "GET /data/retrieve \u2013 requires a data_id query parameter and returns JSON with a sample data_value.",
+      "POST /admin/change_password \u2013 changes the in\u2011memory admin password when the old password matches."
+    ],
+    "public_api": {
+      "route:GET /data/export": "",
+      "route:GET /data/retrieve": "",
+      "route:GET /task/execute": "",
+      "route:GET /task/logs": "",
+      "route:GET /task/status": "",
+      "route:GET /user/profile": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/configure": "",
+      "route:POST /admin/login": "",
+      "route:POST /admin/settings": "",
+      "route:POST /data/delete": "",
+      "route:POST /data/upload": ""
+    },
+    "side_effects": [
+      "os.system call to execute 'sh execute_task.sh' with supplied arguments.",
+      "os.system call to run 'python3 export_data.py' with the requested format.",
+      "Modification of the global ADMIN_PASSWORD variable when the password is changed.",
+      "Potential creation of subprocesses that may affect the host environment."
+    ],
+    "source_hash": "73fa8e5aa324bbefbd09ed0fda2f8e6d2de9d64d7f1dfabaca1771a27fae81db"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.5,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file5.py",
+  "gated_score": 0.35375,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.35375,
+  "original_hash": "73fa8e5aa324bbefbd09ed0fda2f8e6d2de9d64d7f1dfabaca1771a27fae81db",
+  "rationale": "The program implements most routes and basic validation, but deviates from the contract on key points: it does not allow password changes, does not mutate ADMIN_PASSWORD, validates task names (preventing execution with malicious/empty args), returns error fields instead of a uniform 'status', and uses subprocess.run instead of os.system. Consequently, several edge\u2011case and invariant requirements are unmet.",
+  "schema": 1,
+  "stability_abs_difference": 0.25575,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.5,
+    "invariants": 0.8,
+    "io_semantics": 0.83,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.6095,
+  "weighted_mean": 0.405,
+  "worst_dimension": 0.2
+}

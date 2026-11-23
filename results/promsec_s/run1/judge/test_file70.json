@@ -1,0 +1,77 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "7504defab5b2973c376624bb482b9686c866c4f31823c684d0e060ee72c11c31",
+  "compile_ok": true,
+  "confidence": 0.92,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields (e.g., username or password) results in a server error or undefined response.",
+      "Login with an incorrect password returns \"Invalid credentials\" without a redirect.",
+      "Attempting to create a project for a non\u2011existent user returns \"User not found\".",
+      "Adding a task to a project name that does not exist returns \"Project not found\".",
+      "Viewing tasks without providing a 'project_name' query parameter yields an empty JSON array or error.",
+      "Duplicate project names are allowed because the code does not enforce uniqueness."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for user registration, login, project creation, and task management.",
+    "invariants": [
+      "Usernames are unique; a second registration with the same username never creates a new record.",
+      "Passwords are never stored in plain text; they are stored as SHA\u2011256(salt\u2016password).",
+      "Each task must belong to a project that already exists in the 'projects' table.",
+      "Projects can only be created for usernames that already exist in the 'users' table.",
+      "Database connections are closed after each request."
+    ],
+    "io_behavior": [
+      "POST /register with 'username' and 'password' returns a redirect to /login on duplicate usernames or a plain text success message on new registration.",
+      "POST /login with 'username' and 'password' returns a redirect to /dashboard on valid credentials or a plain text error on failure.",
+      "POST /project/create with 'username' and 'project_name' returns a plain text success message if the user exists, otherwise an error message.",
+      "POST /task/add with 'project_name', 'task_name', and 'task_description' returns a plain text success message if the project exists, otherwise an error message.",
+      "GET /tasks/view?project_name=... returns a JSON array of task objects (name and description) for the specified project."
+    ],
+    "public_api": {
+      "route:GET /tasks/view": "",
+      "route:POST /login": "",
+      "route:POST /project/create": "",
+      "route:POST /register": "",
+      "route:POST /task/add": ""
+    },
+    "side_effects": [
+      "Inserts a new user record with hashed password and random salt into the 'users' table.",
+      "Creates a new project row linked to an existing user in the 'projects' table.",
+      "Adds a new task row linked to an existing project in the 'tasks' table.",
+      "Commits database transactions for registration, project creation, and task addition.",
+      "Issues HTTP 307 redirects for successful login and duplicate\u2011user registration attempts."
+    ],
+    "source_hash": "6d4e51f8cfe78b6dadd8dc3e30ee24aee6e08732d4bad4f640760688e2a3b5cd"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 1.0,
+    "invariants": 1.0,
+    "io_semantics": 0.5,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file70.py",
+  "gated_score": 0.77375,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.77375,
+  "original_hash": "6d4e51f8cfe78b6dadd8dc3e30ee24aee6e08732d4bad4f640760688e2a3b5cd",
+  "rationale": "Program matches most contract requirements, handling redirects, error messages, and database side\u2011effects correctly, and respects edge cases. The only deviation is the JSON field names in /tasks/view, which differ from the expected 'name'/'description' schema, lowering IO semantics.",
+  "schema": 1,
+  "stability_abs_difference": 0.20625,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 1.0,
+    "invariants": 1.0,
+    "io_semantics": 0.95,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.98,
+  "weighted_mean": 0.865,
+  "worst_dimension": 0.5
+}

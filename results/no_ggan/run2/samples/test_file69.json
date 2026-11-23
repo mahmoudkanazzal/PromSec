@@ -1,0 +1,51 @@
+{
+  "ast_similarity": 0.4728132387706856,
+  "candidate_hash": "6bd458b5df7920cf4b736a0eb8a8eff8c428f1cb6c9fc68a5fb338e7fe3277a1",
+  "complete": true,
+  "config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file69.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6802721088435374,
+      "bandit_statement_nodes": [
+        18,
+        23
+      ],
+      "candidate_hash": "e2f253a9b1ec181868d35ed409b92e35027378cb1def9d9f6b02c3cda7c77ecc",
+      "cwe_count": 1,
+      "cwes": [
+        259
+      ],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/register` endpoint handling POST requests. The script must import `Flask`, `request`, `redirect`, `jsonify`, `re`, `hashlib`, `MySQLdb`, `os`, and `datetime`. Define a `USERNAME_PATTERN` using a regular expression that only allows word characters. Implement a `get_db_connection()` function that returns a `MySQLdb` connection to a local MySQL server (`host='localhost'`, `user='root'`, `passwd=''`, `db='testdb'`, `charset='utf8mb4'`) and include a comment that production credentials should be sourced from environment variables. In the `register` view, retrieve `username` and `password` from `request.form`, strip whitespace, validate that both are present and that `username` matches the pattern, returning JSON error responses with status 400 for validation failures. Generate a 16\u2011byte random salt with `os.urandom`, hash the password using `hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100_000)` and convert both the hash and the salt to hex strings. Use a `try/except/finally` block: obtain a DB connection, create a cursor, check for an existing username with a parameterized `SELECT` query, redirect to `/login` with code 307 if found, otherwise `INSERT` the new user with `username`, hashed password, salt, and `datetime.utcnow()` for `account_created` using a parameterized `INSERT` query, commit the transaction, and close the connection in `finally`. On `MySQLdb.Error` return a JSON error with status 500. After successful registration return a JSON message with status 201. Ensure all database interactions use parameterized queries to prevent SQL injection, avoid hard\u2011coded secrets, and include appropriate error handling. The code must be valid Python 3, contain no extraneous output, and be ready to run.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4728132387706856,
+      "bandit_statement_nodes": [
+        9
+      ],
+      "candidate_hash": "6bd458b5df7920cf4b736a0eb8a8eff8c428f1cb6c9fc68a5fb338e7fe3277a1",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a secure Python 3 script that implements a Flask web application with a `/register` route handling only POST requests. The script must:\n\n- Import only the following modules: `os`, `re`, `hashlib`, `datetime` (specifically `datetime` and `timezone`), `MySQLdb`, and Flask components `Flask`, `request`, `redirect`, `jsonify`.\n- Define a Flask app instance named `app`.\n- Declare a compiled regular expression `USERNAME_PATTERN` that matches only word characters (`\\w`) with a length between 1 and 30 characters.\n- Set a constant `MIN_PASSWORD_LENGTH` to 8.\n- Implement a function `get_db_connection()` that creates and returns a MySQL connection using `MySQLdb.connect`. All connection parameters (`host`, `user`, `passwd`, `db`, `charset`, `use_unicode`) must be read from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` with sensible defaults (`localhost`, `app_user`, empty password, `testdb`, `utf8mb4`, `True`). Do not hard\u2011code any credentials.\n- In the `/register` view:\n  - Accept both JSON (`application/json`) and form\u2011encoded (`application/x-www-form-urlencoded`) payloads.\n  - Extract `username` and `password` fields, stripping whitespace.\n  - Return a JSON error with HTTP 400 if either field is missing.\n  - Validate `username` against `USERNAME_PATTERN`; on failure return a JSON error with HTTP 400.\n  - Enforce that `password` length is at least `MIN_PASSWORD_LENGTH`; on failure return a JSON error with HTTP 400.\n  - Generate a cryptographically strong 16\u2011byte salt using `os.urandom`.\n  - Compute a password hash with `hashlib.pbkdf2_hmac` using SHA\u2011256, the generated salt, the UTF\u20118 encoded password, and 100,000 iterations.\n  - Convert both the salt and hash to hexadecimal strings.\n  - Open a database connection via `get_db_connection()`, obtain a cursor, and:\n    * Execute a parameterized SELECT to check if the username already exists. If it does, redirect the client to `/login` with HTTP status 307.\n    * Execute a parameterized INSERT to store `username`, `password_hash`, `salt`, and the current UTC timestamp (with timezone info) into a table `users` with columns `username`, `password_hash`, `salt`, `account_created`.\n    * Commit the transaction.\n  - On successful insertion, return a JSON success message with HTTP 201.\n  - Catch any `MySQLdb.Error`, log it internally if desired, and return a generic JSON error with HTTP 500 without exposing details.\n  - Ensure the cursor and connection are closed in a `finally` block.\n- Include a `if __name__ == '__main__':` block that runs the Flask app with `app.run()`. Add a comment indicating that in production a WSGI server and HTTPS should be used, but do not implement them.\n- Ensure the entire code is valid Python, contains no code in any other language, and follows security best practices (environment\u2011based credentials, input validation, parameterized queries, strong password hashing, proper error handling).",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "e74543c04541d3dcdf19b2647e08c7219671da9ae93285ddd645be4d5f294202",
+  "status": "secured"
+}

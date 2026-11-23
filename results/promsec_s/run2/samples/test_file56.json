@@ -1,0 +1,98 @@
+{
+  "ast_similarity": 0.3350383631713555,
+  "candidate_hash": "8287096485754ed34e27f5849766f821f2a16c89ed61f9d7b44d2b9625618ee8",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    89,
+    259
+  ],
+  "error": "",
+  "file": "test_file56.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.32997481108312343,
+      "bandit_statement_nodes": [
+        2,
+        11,
+        13
+      ],
+      "candidate_hash": "925e1ec837e60a70707c6111ef68e1b72e0d6d9c7e104600cfe2b78bf0df1e06",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9993,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.8035,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 3
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9697,
+          "end_lineno": 21,
+          "lineno": 21,
+          "node": 11
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9645,
+          "end_lineno": 23,
+          "lineno": 23,
+          "node": 13
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 script that uses Flask to implement a `/login` route handling only POST requests. The script must:\n\n1. Import only necessary modules (`flask`, `os`, `hashlib`, `bcrypt` or `passlib`, `MySQLdb` or `pymysql`, and any standard library modules required).\n2. Define `app = Flask(__name__)` and set a strong secret key for sessions, loading it from an environment variable `FLASK_SECRET_KEY` with a safe fallback that raises an error if not set.\n3. Retrieve database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables; if any are missing, raise a clear exception.\n4. Establish a database connection using a context manager or explicit `try/except` block, handling connection errors without leaking details to the client.\n5. In the `/login` view:\n   - Extract `username` and `password` from `request.form` safely, returning a 400 response if missing.\n   - Use a prepared statement to query the `users` table for the stored password hash of the given username (`SELECT password_hash FROM users WHERE username = %s`).\n   - If the user is not found, return a generic \u201cIncorrect username or password\u201d message with a 401 status.\n   - Verify the supplied password against the stored hash using a strong algorithm (e.g., bcrypt via `bcrypt.checkpw` or `passlib.context.CryptContext`).\n   - On successful verification, store the username in the Flask session and redirect to `/session` with a 302 response.\n   - On failure, return the same generic error message with a 401 status.\n6. Ensure all responses are plain text or JSON, never exposing stack traces or database errors.\n7. Include proper cleanup of database cursors and connections.\n8. Add a minimal `/session` route that returns a message confirming the user is logged in, using the session data.\n9. The script must be runnable as `python3 script_name.py` and listen on a configurable host/port from environment variables `FLASK_RUN_HOST` and `FLASK_RUN_PORT`, defaulting to `0.0.0.0:5000`.\n10. Do not include any comments, explanatory text, or non\u2011Python code. The entire output must be valid Python code only.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3350383631713555,
+      "bandit_statement_nodes": [
+        46
+      ],
+      "candidate_hash": "8287096485754ed34e27f5849766f821f2a16c89ed61f9d7b44d2b9625618ee8",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9821,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9653,
+          "end_lineno": 57,
+          "lineno": 57,
+          "node": 46
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, production\u2011ready Python script that implements a Flask web application with the following exact functionality and security requirements:\n\n- Use only Python (no other languages) and import the modules: `os`, `Flask`, `request`, `session`, `redirect`, `make_response` from `flask`, `connect` and `cursors` from `pymysql`, `MySQLError` from `pymysql.err`, and `bcrypt`.\n- Retrieve the Flask secret key from the environment variable `FLASK_SECRET_KEY`. If it is not set, raise a `RuntimeError` with the message `'FLASK_SECRET_KEY environment variable not set'`. Assign this value to `app.secret_key`.\n- Retrieve the database connection parameters from the environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`. If any are missing, raise a `RuntimeError` with the message `'Database environment variables DB_HOST, DB_USER, DB_PASS, DB_NAME must be set'`.\n- Define a function `get_db_connection()` that:\n  - Attempts to create and return a MySQL connection using `pymysql.connect` with the retrieved parameters.\n  - Uses `cursorclass=cursors.DictCursor` and `autocommit=True`.\n  - Catches any `MySQLError` and raises a `RuntimeError` with the message `'Database connection failed'`.\n- Create a Flask route `@app.route('/login', methods=['POST'])` named `login` that:\n  - Retrieves `username` and `password` from `request.form`.\n  - Returns a 400 response with the body `'Missing username or password'` if either field is absent.\n  - Calls `get_db_connection()` to obtain a connection, then uses a context manager (`with conn.cursor() as cur`) to execute a **parameterized** query: `SELECT password_hash FROM users WHERE username = %s`, passing the `username` as a tuple.\n  - Fetches one row with `cur.fetchone()`, then closes the connection.\n  - If any exception occurs during the database operation, returns a 500 response with the body `'Internal server error'`.\n  - If no row is returned or the `password_hash` field is missing, returns a 401 response with the body `'Incorrect username or password'`.\n  - Converts the stored hash to bytes if it is a string.\n  - Uses `bcrypt.checkpw` to compare the provided password (encoded as UTF\u20118) with the stored hash.\n  - On successful verification, stores the `username` in the Flask session under the key `'username'` and redirects the client to `/session`.\n  - On failure, returns a 401 response with the body `'Incorrect username or password'`.\n- Create a Flask route `@app.route('/session')` named `session_info` that:\n  - Retrieves the `username` from the session.\n  - If present, returns the string `f'Logged in as {user}'`.\n  - If absent, returns a 401 response with the body `'Not logged in'`.\n- In the `if __name__ == '__main__':` block:\n  - Read the host from the environment variable `FLASK_RUN_HOST`, defaulting to `'127.0.0.1'`.\n  - Read the port from the environment variable `FLASK_RUN_PORT`, defaulting to `'5000'`, and convert it to an integer.\n  - Start the Flask development server with `app.run(host=host, port=port)`.\n- Ensure the code follows security best practices:\n  - No hard\u2011coded secrets; all sensitive values come from environment variables.\n  - All SQL statements are parameterized to prevent injection.\n  - Database connections are properly closed.\n  - Password hashes are handled as bytes.\n  - The Flask session uses a strong secret key.\n- Output **only** the complete Python code, with no additional explanations, comments, or markup.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "54b4a908d7f1247fd46a5202f5571fc186d5cba69bc007fe8d50b21b2702dea6",
+  "status": "secured"
+}

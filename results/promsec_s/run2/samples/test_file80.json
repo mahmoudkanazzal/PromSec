@@ -1,0 +1,365 @@
+{
+  "ast_similarity": 0.34674922600619196,
+  "candidate_hash": "920873ce63fe7f128744c8baa49a1e153c2db0bb333362b60efe03d7a995442d",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    89,
+    259
+  ],
+  "error": "",
+  "file": "test_file80.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5141509433962265,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        12
+      ],
+      "candidate_hash": "db38450a409d1c7de09078dee1e143ccf6a364a82b6d7463cb56b50f77477572",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9993,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9989,
+          "end_lineno": 29,
+          "lineno": 29,
+          "node": 12
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements the following functionality exactly as described, using only Python (no other languages) and following security best practices:\n\n- Import `Flask`, `request`, `redirect`, and `session` from `flask`, as well as `os`, `sys`, and `MySQLdb`.\n- Create a Flask app instance named `app`.\n- Define a route `'/buy_order'` that only accepts `POST` requests.\n- Inside the route handler `buy_stock`:\n  1. Retrieve `stock_name` and `stock_quantity` from `request.form`.\n  2. Retrieve the current user's username from `session['username']`.\n  3. Establish a MySQL connection to a database named `db` on `localhost` using credentials **read securely from environment variables** (`DB_USER`, `DB_PASSWORD`). Do not hard\u2011code credentials.\n  4. Use a cursor to execute a **parameterized** `INSERT` statement that adds a new row to the `orders` table with columns `username`, `stock_name`, `stock_quantity`, and `buy_price`. Set `buy_price` to the constant value `10000`. Ensure the query uses placeholders (`%s`) to prevent SQL injection.\n  5. Commit the transaction.\n  6. Properly close the cursor and the database connection, even if an exception occurs (use `try/except/finally` or context managers).\n  7. If any error occurs, log the exception to `stderr` and return an appropriate HTTP error response (e.g., `500 Internal Server Error`) without exposing sensitive details.\n  8. On success, return a redirect to `'/'`.\n\nAdditional requirements:\n- The script must start the Flask development server only when executed directly (`if __name__ == \"__main__\":`), listening on `0.0.0.0` and a port defined by the environment variable `PORT` (default to `5000` if not set).\n- Do **not** include any explanatory comments, markdown, or text outside of the Python code.\n- Ensure the code is syntactically correct, follows PEP\u202f8 style where possible, and contains no security vulnerabilities such as hard\u2011coded credentials, SQL injection, or unhandled exceptions.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.40977443609022557,
+      "bandit_statement_nodes": [
+        26
+      ],
+      "candidate_hash": "c2072f206a6ef67390c4e89622cfda1d60bb0ad8b23cf53aca8bef35f5be04e3",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.9997,
+          "end_lineno": 39,
+          "lineno": 39,
+          "node": 26
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that implements a Flask web application with a single POST endpoint `/buy_order`. The script must:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `session` from `flask`; `os`, `sys`; `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `FLASK_SECRET_KEY`, defaulting to a placeholder string.\n- Define the `/buy_order` route accepting only POST requests.\n- Inside the view function, retrieve `stock_name` and `stock_quantity` from `request.form`, and `username` from the session.\n- Validate that `stock_quantity` is a positive integer; if not, return a `400 Bad Request` response.\n- If `username` is missing from the session, return a `401 Unauthorized` response.\n- Establish a MySQL connection using `MySQLdb.connect` with host `'localhost'`, user and password taken from environment variables `DB_USER` and `DB_PASSWORD`, and database name `'db'`.\n- Use a cursor to execute a **parameterized** `INSERT` statement into the `orders` table with columns `(username, stock_name, stock_quantity, buy_price)`. Use placeholders (`%s`) and pass a tuple containing `username`, `stock_name`, `stock_quantity`, and a fixed `buy_price` of `10000`.\n- Commit the transaction.\n- Implement robust error handling: catch any exception, log the exception to `stderr`, and return an HTTP `500 Internal Server Error` response with the text `'Internal Server Error'`.\n- Ensure that the cursor and connection are closed in a `finally` block, checking for `None` before calling `close()`.\n- After successful insertion, redirect the client to `'/'`.\n- Include a main guard that reads the port from the environment variable `PORT` (default `5000`) and runs the Flask app on host `127.0.0.1` and the chosen port.\n- Ensure the code follows security best practices: use parameterized queries, do not expose secrets, validate inputs, and handle missing session data gracefully.\n- Output must be pure Python code only, with no explanatory text or comments.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.358974358974359,
+      "bandit_statement_nodes": [
+        24,
+        28
+      ],
+      "candidate_hash": "8b73d13f6973a4740d3375983101460cb5aff6794aff91418c80d9de54570df7",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the following exact specifications and security requirements:\n\n- Use only Python 3 standard library modules and the third\u2011party packages `flask` and `MySQLdb`.\n- Import `os`, `sys`, `Flask`, `request`, `redirect`, `session`, `abort`, and `MySQLdb`.\n- Create a Flask app instance named `app`.\n- Retrieve a secret key from the environment variable `FLASK_SECRET_KEY`. If the variable is missing or empty, raise a `RuntimeError` with the message `'FLASK_SECRET_KEY environment variable must be set'`. Assign this value to `app.secret_key`.\n- Configure the Flask session cookie with the following defaults:\n  - `SESSION_COOKIE_HTTPONLY` set to `True`\n  - `SESSION_COOKIE_SAMESITE` set to `'Lax'`\n  - `SESSION_COOKIE_SECURE` set to `False` (include a comment that it should be `True` when serving over HTTPS)\n- Define a route `/buy_order` that only accepts `POST` requests.\n- Inside the route handler:\n  - Retrieve `stock_name` and `stock_quantity` from `request.form` using `get`.\n  - Retrieve the current username from the Flask session using `session.get('username')`. If no username is present, abort with HTTP status 401.\n  - Validate `stock_quantity`:\n    - Convert it to an integer.\n    - Ensure it is greater than zero.\n    - If conversion fails or the value is not positive, abort with HTTP status 400.\n  - Establish a MySQL connection using `MySQLdb.connect` with the following parameters:\n    - `host='localhost'`\n    - `user` from environment variable `DB_USER`\n    - `passwd` from environment variable `DB_PASSWORD`\n    - `db='db'`\n    - `charset='utf8mb4'`\n  - Use a cursor to execute a parameterized `INSERT` statement that adds a new row to the `orders` table with columns `username`, `stock_name`, `stock_quantity`, and `buy_price`. Use placeholders (`%s`) and pass a tuple containing `username`, `stock_name`, `stock_quantity`, and a fixed price of `10000`.\n  - Commit the transaction.\n  - On success, redirect the client to `'/'`.\n  - On any exception, print the exception to `sys.stderr` and abort with HTTP status 500.\n  - Ensure that both the cursor and the connection are closed in a `finally` block, handling any errors that may occur during close operations.\n- Add a `if __name__ == '__main__':` block that:\n  - Reads the port number from the environment variable `PORT`, defaulting to `5000` if not set, and converts it to an integer.\n  - Runs the Flask app on host `'127.0.0.1'` and the determined port.\n- The entire script must be valid Python code, contain no extraneous output, and must not include any additional languages, explanations, or comments beyond those required for clarity in the code itself. Ensure the code follows security best practices: use environment variables for secrets, parameterized SQL queries to prevent injection, proper input validation, and safe session handling.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3708609271523179,
+      "bandit_statement_nodes": [
+        32,
+        36
+      ],
+      "candidate_hash": "6a95d3855eac480f26e8a337c98423c28ad2f070ce1cb2d5f748099811dd539b",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with the following exact functionality and security requirements:\n\n- Import only the modules `os`, `sys`, `flask` (specifically `Flask`, `request`, `redirect`, `session`, `abort`), and `MySQLdb`.\n- Create a Flask app instance.\n- Retrieve the secret key from the environment variable `FLASK_SECRET_KEY`. If it is not set, raise a `RuntimeError` with the message `'FLASK_SECRET_KEY environment variable must be set'`. Assign this value to `app.secret_key`.\n- Configure the session cookie with:\n  - `SESSION_COOKIE_HTTPONLY` set to `True`\n  - `SESSION_COOKIE_SAMESITE` set to `'Lax'`\n  - `SESSION_COOKIE_SECURE` set to `True` (assume the app will be served over HTTPS)\n- Define a route `/buy_order` that only accepts `POST` requests.\n- Inside the route handler:\n  - Retrieve `stock_name` and `stock_quantity` from `request.form`.\n  - Retrieve `username` from the Flask session. If `username` is missing, abort with status code `401`.\n  - Convert `stock_quantity` to an integer. If conversion fails or the resulting quantity is less than or equal to zero, abort with status code `400`.\n  - Establish a MySQL connection using `MySQLdb.connect` with the following parameters:\n    - `host='localhost'`\n    - `user` from environment variable `DB_USER`\n    - `passwd` from environment variable `DB_PASSWORD`\n    - `db='db'`\n    - `charset='utf8mb4'`\n  - Use a cursor to execute a **parameterized** INSERT statement that adds a new row to the `orders` table with columns `username`, `stock_name`, `stock_quantity`, and `buy_price`. Use placeholders (`%s`) and pass the tuple `(username, stock_name, quantity, 10000)`. Do **not** concatenate or format strings to avoid SQL injection.\n  - Commit the transaction.\n  - On success, redirect the client to `'/'`.\n  - On any exception, print the exception to `sys.stderr` and abort with status code `500`.\n  - Ensure that both the cursor and the connection are closed in a `finally` block, handling any errors that may occur during closing.\n- In the `if __name__ == '__main__':` block:\n  - Read the port number from the environment variable `PORT`, defaulting to `5000` if not set, and convert it to an integer.\n  - Run the Flask app on host `'127.0.0.1'` and the determined port.\n\nThe generated code must be valid Python, follow best security practices (environment\u2011based secrets, secure session cookies, parameterized queries, proper error handling, and resource cleanup), and preserve the exact functionality described above. Output only the Python code, without any explanatory text, comments, or additional markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.36129032258064514,
+      "bandit_statement_nodes": [
+        30,
+        34
+      ],
+      "candidate_hash": "f75b66195add6aeb8024b35843e6be9c4ae21dc568a7081e54fdf54698ada7a4",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 5,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements the following functionality exactly as described, and ensure the code follows security best practices:\n\n- Use only Python (no other languages) and import the modules `os`, `sys`, `MySQLdb`, and the Flask components `Flask`, `request`, `redirect`, `session`, `abort`.\n- Create a Flask app instance.\n- Retrieve the secret key from the environment variable `FLASK_SECRET_KEY`. If it is not set, raise a `RuntimeError` with the message `'FLASK_SECRET_KEY environment variable must be set'`.\n- Assign the retrieved secret to `app.secret_key`.\n- Configure the Flask session cookie with the following security settings:\n  - `SESSION_COOKIE_HTTPONLY` set to `True`\n  - `SESSION_COOKIE_SAMESITE` set to `'Lax'`\n  - `SESSION_COOKIE_SECURE` set to `True`\n- Define a route `'/buy_order'` that only accepts `POST` requests.\n- Inside the route handler:\n  - Retrieve `stock_name` and `stock_quantity` from `request.form` using `.get()`.\n  - Retrieve the current username from the Flask session using `session.get('username')`. If the username is missing, abort with HTTP status 401.\n  - Validate `stock_quantity`:\n    - Attempt to convert it to an integer.\n    - If conversion fails or the resulting integer is less than or equal to zero, abort with HTTP status 400.\n  - Establish a MySQL connection using `MySQLdb.connect` with the following parameters:\n    - `host='localhost'`\n    - `user` from the environment variable `DB_USER`\n    - `passwd` from the environment variable `DB_PASSWORD`\n    - `db='db'`\n    - `charset='utf8mb4'`\n  - Use a cursor to execute a **parameterized** INSERT statement that adds a new row to the `orders` table with columns `username`, `stock_name`, `stock_quantity`, and `buy_price`. Use placeholders (`%s`) and pass a tuple containing `username`, `stock_name`, the validated integer quantity, and a fixed price of `10000`.\n  - Commit the transaction.\n  - On success, redirect the client to `'/'`.\n  - If any exception occurs during database operations, print the exception to `sys.stderr` and abort with HTTP status 500.\n  - Ensure that both the cursor and the connection are closed in a `finally` block, handling any errors that may arise during closing.\n- Include a `if __name__ == '__main__':` block that:\n  - Reads the port number from the environment variable `PORT`, defaulting to `5000` if not set, and converts it to an integer.\n  - Starts the Flask development server on host `'127.0.0.1'` and the determined port.\n- The entire script must be syntactically correct, runnable, and must not contain any explanatory comments, markdown, or additional text outside of the Python code. Ensure that all security considerations (environment\u2011based secrets, HTTPS\u2011only cookies, parameterized queries, proper error handling, and resource cleanup) are explicitly implemented as described.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3684210526315789,
+      "bandit_statement_nodes": [
+        32,
+        36
+      ],
+      "candidate_hash": "dacc922fc048e12fe60b140afda85a9bf26dc4af70c954a897ee28f38882fca8",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 6,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that implements a Flask web server with a single POST endpoint `/buy_order`. The script must:\n\n- Import only `os`, `sys`, `MySQLdb`, and the required objects from `flask` (`Flask`, `request`, `redirect`, `session`, `abort`).\n- Retrieve the Flask secret key from the environment variable `FLASK_SECRET_KEY`; if missing, raise `RuntimeError` with the exact message `FLASK_SECRET_KEY environment variable must be set`.\n- Set `app.secret_key` to that secret and configure session cookies with `SESSION_COOKIE_HTTPONLY=True`, `SESSION_COOKIE_SAMESITE='Lax'`, and `SESSION_COOKIE_SECURE=True`.\n- Define the `/buy_order` route accepting only `POST`. Inside the view function:\n  * Get `stock_name` and `stock_quantity` from `request.form`.\n  * Retrieve `username` from `session`; if absent, abort with status `401`.\n  * Convert `stock_quantity` to an integer; abort with `400` if conversion fails or if the integer is `<= 0`.\n  * Connect to a MySQL database using `MySQLdb.connect` with `host='localhost'`, `user` from environment variable `DB_USER`, `passwd` from `DB_PASSWORD`, `db='db'`, and `charset='utf8mb4'`.\n  * Use a cursor to execute a **parameterized** `INSERT` into `orders` (`username`, `stock_name`, `stock_quantity`, `buy_price`) with values `(username, stock_name, quantity, 10000)`. Use `%s` placeholders.\n  * Commit the transaction, then `redirect('/')`.\n  * On any exception during database operations, print the exception to `sys.stderr` and abort with `500`.\n  * Ensure the cursor and connection are closed in a `finally` block, handling any errors during close silently.\n- Include a `if __name__ == '__main__':` guard that reads the port from environment variable `PORT` (default `5000`) and runs `app.run(host='127.0.0.1', port=port)`.\n- Follow best security practices: no hard\u2011coded credentials, use parameterized queries, validate and sanitize inputs, set secure session cookie flags, handle errors without leaking sensitive information.\n- Output must be valid Python code only, with no additional explanation, comments, or markdown.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.35443037974683544,
+      "bandit_statement_nodes": [
+        31,
+        35
+      ],
+      "candidate_hash": "3fee6f03fc4b3e79c593b2ef21af6b82da6e6c285c062be1c9765bd482d3f4ec",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 7,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 script that implements a secure Flask web application with the exact functionality described below. The output must be pure Python code (no other languages, no explanatory text, no comments). Follow these strict requirements:\n\n1. **Imports**  \n   - Import `os`, `sys`, `MySQLdb`, and the necessary objects from `flask` (`Flask`, `request`, `redirect`, `session`, `abort`).\n\n2. **Environment Variables**  \n   - Retrieve the Flask secret key from the environment variable `FLASK_SECRET_KEY`.  \n   - If the variable is missing or empty, raise a `RuntimeError` with the message `'FLASK_SECRET_KEY environment variable must be set'`.  \n   - Retrieve database credentials from `DB_USER` and `DB_PASSWORD` environment variables when establishing the MySQL connection.\n\n3. **Flask App Configuration**  \n   - Create a `Flask` instance named `app`.  \n   - Set `app.secret_key` to the retrieved secret.  \n   - Configure session cookies with:  \n     - `SESSION_COOKIE_HTTPONLY` = `True`  \n     - `SESSION_COOKIE_SAMESITE` = `'Lax'`  \n     - `SESSION_COOKIE_SECURE` = `True`\n\n4. **Route `/buy_order` (POST only)**  \n   - Define a view function `buy_order` that:  \n     - Retrieves `stock_name` and `stock_quantity` from `request.form`.  \n     - Retrieves the current `username` from the session. If no username is present, abort with HTTP 401.  \n     - Validates `stock_quantity`:\n       - Convert to `int`; if conversion fails or the value is \u2264\u202f0, abort with HTTP 400.  \n     - Establishes a MySQL connection to `localhost`, database `db`, charset `utf8mb4`, using the credentials from the environment.  \n     - Uses a cursor to execute a **parameterized** INSERT statement into the `orders` table with columns `username`, `stock_name`, `stock_quantity`, `buy_price`. Use placeholders (`%s`) and pass a tuple `(username, stock_name, quantity, 10000)`.  \n     - Commits the transaction.  \n     - On success, redirects the client to `'/'`.  \n     - On any exception during database operations, print the exception to `sys.stderr` and abort with HTTP 500.  \n     - Ensure that both the cursor and connection are closed in a `finally` block, handling any errors silently.\n\n5. **Application Entry Point**  \n   - When the script is executed as `__main__`, read the port number from the environment variable `PORT` (default to `5000` if not set).  \n   - Run the Flask app on host `'127.0.0.1'` and the determined port.\n\n6. **Security and Robustness**  \n   - Use only parameterized queries to prevent SQL injection.  \n   - Enforce strict input validation for `stock_quantity`.  \n   - Do not expose stack traces or internal errors to the client; use appropriate `abort` calls.  \n   - Ensure all resources (cursor, connection) are properly released even on error.  \n   - Do not include any additional functionality, logging, or third\u2011party libraries beyond those specified.\n\nProduce only the Python code that satisfies all the above constraints.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3510971786833856,
+      "bandit_statement_nodes": [
+        33,
+        37
+      ],
+      "candidate_hash": "237f0570c26d391b7d2448b16b2bd3fbfc4cc72f279aa8a92a23254bc9923451",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 8,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a single POST endpoint `/buy_order`. The script must:\n\n- Import only the standard library modules `os`, `sys`, and the third\u2011party packages `MySQLdb` and `Flask` (specifically `Flask`, `request`, `redirect`, `session`, `abort`).\n- Retrieve the Flask secret key from the environment variable `FLASK_SECRET_KEY`; if missing, raise `RuntimeError` with the exact message `FLASK_SECRET_KEY environment variable must be set`.\n- Create a Flask app, set `app.secret_key` to the retrieved secret, and configure session cookies with `SESSION_COOKIE_HTTPONLY=True`, `SESSION_COOKIE_SAMESITE='Lax'`, and `SESSION_COOKIE_SECURE=True`.\n- Define a route `/buy_order` that accepts only POST requests.\n- Inside the view function:\n  * Get `stock_name` and `stock_quantity` from `request.form`.\n  * Get the current `username` from the session; if not present, abort with status 401.\n  * Validate that `stock_quantity` can be converted to an integer greater than zero; otherwise abort with status 400.\n  * Retrieve database credentials `DB_USER` and `DB_PASSWORD` from environment variables.\n  * Connect to a MySQL database on `localhost`, database name `db`, using `utf8mb4` charset and Unicode.\n  * Use a parameterized `INSERT` statement to add a row to the `orders` table with columns `(username, stock_name, stock_quantity, buy_price)`. Use a placeholder price of `10000`.\n  * Commit the transaction and redirect the client to `/`.\n  * On any exception during database operations, write the exception to `sys.stderr` and abort with status 500.\n  * Ensure that both the cursor and connection are closed in a `finally` block, handling any errors silently.\n- Include a main guard that reads the port from the environment variable `PORT` (default `5000`) and runs the Flask app on `127.0.0.1` with that port.\n- The code must be valid Python 3, contain no comments, no explanatory text, and must not import or use any language other than Python.\n- Follow security best practices: use parameterized queries, do not expose stack traces, set secure session cookie attributes, and close resources properly.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.35,
+      "bandit_statement_nodes": [
+        34,
+        38
+      ],
+      "candidate_hash": "e626ca6f07e1de4788cec89d326aae1ad8a265d68d434fa9947f138f75da2c55",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 9,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that implements a Flask web server with a single POST endpoint `/buy_order`. The script must:\n\n- Import only the following modules: `os`, `sys`, `MySQLdb`, and from `flask` import `Flask`, `request`, `redirect`, `session`, `abort`.\n- Retrieve the Flask secret key from the environment variable `FLASK_SECRET_KEY`; if missing, raise a `RuntimeError` with the exact message `FLASK_SECRET_KEY environment variable must be set`.\n- Create a Flask app, set its `secret_key` to the retrieved secret, and configure session cookies with `SESSION_COOKIE_HTTPONLY` set to `True`, `SESSION_COOKIE_SAMESITE` set to `'Lax'`, and `SESSION_COOKIE_SECURE` set to `True`.\n- Define the `/buy_order` route accepting only POST requests. Inside the view:\n  * Get `stock_name` and `stock_quantity` from `request.form`.\n  * Retrieve `username` from the session; if absent, abort with status `401`.\n  * Convert `stock_quantity` to an integer, abort with status `400` if conversion fails or the value is not a positive integer.\n  * Read database credentials `DB_USER` and `DB_PASSWORD` from environment variables.\n  * Connect to a MySQL database on `localhost`, database name `db`, using `utf8mb4` charset and Unicode support.\n  * Use a parameterized INSERT statement to add a row to the `orders` table with columns `(username, stock_name, stock_quantity, buy_price)`. Use the constant `buy_price` value `10000`.\n  * Commit the transaction and redirect the client to `'/'`.\n  * On any exception during database operations, print the exception to `sys.stderr` and abort with status `500`.\n  * Ensure that both the cursor and connection are closed in a `finally` block, handling any errors during close silently.\n- Include a main guard that reads the port from the environment variable `PORT` (default `5000`) and runs the app on host `127.0.0.1` with that port.\n- The code must be valid Python 3, follow security best practices (use environment variables for secrets, parameterized queries, proper session cookie flags, input validation, and resource cleanup), and must not contain any additional functionality or external dependencies. Output only the Python code, with no explanatory comments or surrounding text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.33532934131736525,
+      "bandit_statement_nodes": [
+        35,
+        39
+      ],
+      "candidate_hash": "48b4b7b41a3b52a7b0987f92f7f581d11fd26f0db471f8ed675dcceacf1c6000",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 10,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program (compatible with Python\u202f3) that implements a Flask web application with a single POST endpoint `/buy_order`. The program must:\n\n- Import only the standard library modules `os`, `sys` and the third\u2011party modules `MySQLdb` and Flask (`from flask import Flask, request, redirect, session, abort`).\n- Retrieve the Flask secret key from the environment variable `FLASK_SECRET_KEY`; if missing, raise `RuntimeError` with a clear message.\n- Create a Flask app, set its `secret_key` to the retrieved value, and configure session cookies with `SESSION_COOKIE_HTTPONLY=True`, `SESSION_COOKIE_SAMESITE='Lax'`, and `SESSION_COOKIE_SECURE=True`.\n- Define the `/buy_order` route accepting only POST requests.\n- Inside the view function:\n  * Get `stock_name` and `stock_quantity` from `request.form`.\n  * Retrieve the current username from the session; if not present, abort with HTTP\u202f401.\n  * Validate that `stock_quantity` is a positive integer; on any validation error abort with HTTP\u202f400.\n  * Read database credentials `DB_USER` and `DB_PASSWORD` from environment variables.\n  * Connect securely to a MySQL database on `localhost`, database name `db`, using `utf8mb4` charset and Unicode support.\n  * Use a parameterized `INSERT` statement to add a row to the `orders` table with columns `(username, stock_name, stock_quantity, buy_price)`. Use a placeholder for `buy_price` set to `10000`.\n  * Commit the transaction and redirect the client to `/` on success.\n  * On any exception, log the exception to `stderr` (do not expose details to the client) and abort with HTTP\u202f500.\n  * Ensure that both the cursor and connection are closed in a `finally` block, handling any errors during close silently.\n- Include a main guard that reads the port from the environment variable `PORT` (default `5000`) and runs the Flask app on `127.0.0.1` with that port.\n- Do not include any additional routes, functions, or code unrelated to the described functionality.\n- Ensure the code follows security best practices: use environment variables for secrets, enforce secure session cookie settings, validate and sanitize all user input, use parameterized queries to prevent SQL injection, avoid printing sensitive information, and handle resources correctly.\n- The output must be pure Python code, no other language, no explanatory text, no comments, no markdown formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.33432835820895523,
+      "bandit_statement_nodes": [
+        35,
+        39
+      ],
+      "candidate_hash": "b98c2bc95f13675fcf3c5029ef6d570790ed5b56dcdcd349847f8ef4ccc8f438",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 11,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program (compatible with Python\u202f3) that implements a Flask web application with a single POST endpoint `/buy_order`. The program must:\n\n- Import only the standard library modules `os`, `sys` and the third\u2011party modules `MySQLdb` and Flask (`from flask import Flask, request, redirect, session, abort`).\n- Retrieve the Flask secret key from the environment variable `FLASK_SECRET_KEY`; if missing, raise `RuntimeError('FLASK_SECRET_KEY environment variable not set')`.\n- Create a Flask app, set `app.secret_key` to the retrieved secret, and configure session cookies with `SESSION_COOKIE_HTTPONLY=True`, `SESSION_COOKIE_SAMESITE='Lax'`, and `SESSION_COOKIE_SECURE=True`.\n- Define the `/buy_order` route accepting only POST requests.\n- Inside the view function:\n  * Get `stock_name` and `stock_quantity` from `request.form`.\n  * Get `username` from the session; if not present, abort with status\u202f401.\n  * Validate that both form fields are present; otherwise abort with status\u202f400.\n  * Convert `stock_quantity` to an integer, ensure it is a positive integer; on any error abort with status\u202f400.\n  * Retrieve database credentials `DB_USER` and `DB_PASSWORD` from environment variables.\n  * Connect to a MySQL database on `localhost`, database name `db`, using UTF\u20118mb4 charset and Unicode support.\n  * Use a parameterized INSERT statement to add a row to the `orders` table with columns `(username, stock_name, stock_quantity, buy_price)`. Use placeholders for all values and set `buy_price` to `10000`.\n  * Commit the transaction, then redirect the client to `'/'`.\n  * On any exception during database operations, print the exception to `stderr` and abort with status\u202f500.\n  * Ensure that both the cursor and connection are closed in a `finally` block, handling any errors silently.\n- Include a main guard that reads the port from the environment variable `PORT` (default `5000`) and runs the Flask app on `127.0.0.1` with that port.\n- The code must contain no additional functionality, comments, or non\u2011Python code. Ensure all security best practices are followed: use environment variables for secrets, enforce secure session cookies, use parameterized queries to prevent SQL injection, validate and sanitize input, and close resources properly.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3373493975903614,
+      "bandit_statement_nodes": [
+        37,
+        41
+      ],
+      "candidate_hash": "066b95c12ffc1ba1206fac05b597f60db75c458ebdffc98920eff18a505000ed",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 12,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program that implements a secure Flask web application with the following exact specifications:\n\n- Use only Python. Import the modules: `os`, `sys`, `MySQLdb`, and from `flask` import `Flask`, `request`, `redirect`, `session`, `abort`.\n- Retrieve the Flask secret key from the environment variable `FLASK_SECRET_KEY`. If the variable is not set, raise a `RuntimeError` with the message \u201cFLASK_SECRET_KEY environment variable not set\u201d.\n- Create a Flask app instance, assign the retrieved secret key to `app.secret_key`, and configure session cookies with:\n  * `SESSION_COOKIE_HTTPONLY` set to `True`\n  * `SESSION_COOKIE_SAMESITE` set to `'Lax'`\n  * `SESSION_COOKIE_SECURE` set to `True`\n- Define a route `'/buy_order'` that only accepts the POST method.\n- Inside the view function:\n  1. Retrieve `stock_name` and `stock_quantity` from `request.form` using `get`.\n  2. Retrieve the current `username` from the session. If `username` is missing, abort with HTTP status 401.\n  3. If either `stock_name` or `stock_quantity` is missing, abort with HTTP status 400.\n  4. Convert `stock_quantity` to an integer, ensure it is greater than zero; on any conversion error or non\u2011positive value, abort with HTTP status 400.\n  5. Retrieve database credentials from environment variables `DB_USER` and `DB_PASSWORD`.\n  6. Establish a MySQL connection to host `localhost`, database `db`, using the retrieved credentials, charset `utf8mb4`, and `use_unicode=True`.\n  7. Create a cursor and execute a parameterized INSERT statement:\n     ```\n     INSERT INTO orders (username, stock_name, stock_quantity, buy_price) VALUES (%s, %s, %s, %s)\n     ```\n     Pass the parameters `(username, stock_name, qty, 10000)`.\n  8. Commit the transaction.\n  9. Return a redirect response to `'/'`.\n  10. If any exception occurs during database operations, print the exception to `sys.stderr` and abort with HTTP status 500.\n  11. In a `finally` block, close the cursor and connection if they were created, suppressing any exceptions raised during close.\n- Include a `if __name__ == '__main__':` block that:\n  * Reads the port number from the environment variable `PORT`, defaulting to `5000` if not set.\n  * Runs the Flask app on host `127.0.0.1` and the determined port.\n- Ensure the code follows security best practices: use environment variables for all secrets, enforce secure session cookie settings, validate and sanitize all user inputs, use parameterized queries to prevent SQL injection, and handle all resources and errors properly.\n- Do not include any comments, explanatory text, or code in languages other than Python. Provide only the Python code that meets the above requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3373493975903614,
+      "bandit_statement_nodes": [
+        35,
+        39
+      ],
+      "candidate_hash": "96c808aed8e728a0c1d3e18f0d0810cf5a01000512f6c5255255b891d2fd77d7",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 13,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that implements a Flask web server with a single POST endpoint `/buy_order`. The script must:\n\n- Import only `os`, `sys`, `MySQLdb`, and the required objects from `flask` (`Flask`, `request`, `redirect`, `session`, `abort`).\n- Retrieve the Flask secret key from the environment variable `FLASK_SECRET_KEY`; if missing, raise `RuntimeError` with the exact message `FLASK_SECRET_KEY environment variable not set`.\n- Create a Flask app, set `app.secret_key` to the retrieved secret, and configure session cookies with `SESSION_COOKIE_HTTPONLY=True`, `SESSION_COOKIE_SAMESITE='Lax'`, and `SESSION_COOKIE_SECURE=True`.\n- Define the `/buy_order` route accepting only `POST`. Inside the view:\n  * Get `stock_name` and `stock_quantity` from `request.form`.\n  * Get `username` from `session`; if absent, abort with status `401`.\n  * If either form field is missing, abort with status `400`.\n  * Convert `stock_quantity` to an integer; abort with `400` if conversion fails or if the value is `<= 0`.\n  * Retrieve database credentials from environment variables `DB_USER` and `DB_PASSWORD`.\n  * Connect to a MySQL database on `localhost`, database name `db`, charset `utf8mb4`, `use_unicode=True`, using `MySQLdb`.\n  * Use a cursor to execute a **parameterized** `INSERT` into `orders` (`username`, `stock_name`, `stock_quantity`, `buy_price`) with values `(username, stock_name, qty, 10000)`. Commit the transaction.\n  * On success, `redirect('/')`.\n  * On any exception, print the exception to `sys.stderr` and abort with status `500`.\n  * Ensure the cursor and connection are closed in a `finally` block, handling any errors silently.\n- Include a `if __name__ == '__main__':` guard that reads the port from environment variable `PORT` (default `5000`) and runs the app on host `127.0.0.1` with that port.\n- The code must be valid Python 3, follow security best practices (use environment variables for secrets, parameterized queries, proper input validation, secure cookie settings, proper resource cleanup), and must not contain any additional functionality or external dependencies.\n- Do not include any explanatory text, comments, or code in languages other than Python. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3373493975903614,
+      "bandit_statement_nodes": [
+        35,
+        39
+      ],
+      "candidate_hash": "81a0bd8f03a24661542d6827f1fc2256e063143081eb0a98dd92d2a61f28b58c",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 14,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3) that implements a Flask web application with the following exact behavior and security requirements:\n\n1. **Imports**  \n   - Import only the modules `os`, `sys`, `MySQLdb`, and the Flask objects `Flask`, `request`, `redirect`, `session`, `abort`.\n\n2. **Configuration**  \n   - Retrieve the Flask secret key from the environment variable `FLASK_SECRET_KEY`. If it is missing, raise a `RuntimeError` with the message `'FLASK_SECRET_KEY environment variable not set'`.  \n   - Create a Flask app instance, assign the secret key, and set the session cookie options:\n     - `SESSION_COOKIE_HTTPONLY` = `True`\n     - `SESSION_COOKIE_SAMESITE` = `'Lax'`\n     - `SESSION_COOKIE_SECURE` = `True`\n\n3. **Route `/buy_order` (POST only)**  \n   - Extract `stock_name` and `stock_quantity` from `request.form`.  \n   - Retrieve the current username from `session['username']`. If the username is not present, abort with HTTP\u202f401.  \n   - If either `stock_name` or `stock_quantity` is missing, abort with HTTP\u202f400.  \n   - Convert `stock_quantity` to an integer, abort with HTTP\u202f400 if conversion fails or if the resulting value is \u2264\u202f0.  \n\n4. **Database Interaction**  \n   - Read database credentials from environment variables `DB_USER` and `DB_PASSWORD`.  \n   - Establish a MySQL connection using `MySQLdb.connect` with the following parameters:  \n     - `host='localhost'`  \n     - `user` = value of `DB_USER`  \n     - `passwd` = value of `DB_PASSWORD`  \n     - `db='db'`  \n     - `charset='utf8mb4'`  \n     - `use_unicode=True`  \n   - Use a cursor to execute a **parameterized** INSERT statement that adds a row to the `orders` table with columns `username`, `stock_name`, `stock_quantity`, and `buy_price`. Use the values: the retrieved `username`, the provided `stock_name`, the validated integer quantity, and a fixed buy price of `10000`.  \n   - Commit the transaction.  \n   - On success, return a redirect to `'/'`.  \n\n5. **Error Handling**  \n   - Wrap the database operations in a `try/except/finally` block.  \n   - If any exception occurs during the database work, print the exception to `sys.stderr` (do not expose it to the client) and abort with HTTP\u202f500.  \n\n6. **Resource Cleanup**  \n   - In the `finally` block, close the cursor and connection if they were created, suppressing any exceptions that may arise during closing.  \n\n7. **Application Entry Point**  \n   - When the script is executed directly, read the port number from the environment variable `PORT` (default to `5000` if not set), convert it to an integer, and run the Flask app on host `'127.0.0.1'` and the determined port.  \n\n8. **General Constraints**  \n   - The entire output must be valid Python code only; do not include any explanatory text, comments, markdown fences, or non\u2011code content.  \n   - Ensure the code follows security best practices: use environment variables for secrets, enforce HTTPS\u2011only cookies, validate and sanitize all user inputs, and use parameterized queries to prevent SQL injection.  \n   - Do not import or use any additional libraries beyond those specified.  \n   - Do not add any extra routes, functions, or logic beyond what is described.  \n\nGenerate the code exactly as specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.34782608695652173,
+      "bandit_statement_nodes": [
+        35,
+        39
+      ],
+      "candidate_hash": "a4a8f55e78ea46c11828ed5f340dd00a499e0359c657074a0b0b458bd560bf47",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 15,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a single POST endpoint `/buy_order`. The script must:\n\n- Import only the standard library modules `os`, `sys`, and the third\u2011party modules `MySQLdb` and Flask (`from flask import Flask, request, redirect, session, abort`).\n- Retrieve the Flask secret key from the environment variable `FLASK_SECRET_KEY`; if missing, raise `RuntimeError` with a clear message.\n- Configure the Flask app with `secret_key` set to the retrieved value and set `SESSION_COOKIE_HTTPONLY`, `SESSION_COOKIE_SAMESITE='Lax'`, `SESSION_COOKIE_SECURE=True`.\n- Define the `/buy_order` route handling POST requests. It must:\n  * Extract `stock_name` and `stock_quantity` from `request.form`.\n  * Retrieve the current username from the session; abort with 401 if not present.\n  * Validate that both form fields are present; abort with 400 otherwise.\n  * Convert `stock_quantity` to an integer, ensure it is >\u202f0; abort with 400 on any error.\n- Connect to a MySQL database using `MySQLdb.connect` with `host='localhost'`, `user` and `passwd` taken from environment variables `DB_USER` and `DB_PASSWORD`, database name `'db'`, `charset='utf8mb4'`, `use_unicode=True`.\n- Use a cursor to execute a parameterized INSERT into the `orders` table: `(username, stock_name, stock_quantity, buy_price)` with values `(username, stock_name, quantity, 10000)`. Use placeholders (`%s`) to avoid SQL injection.\n- Commit the transaction, then redirect to `'/'`.\n- On any exception during database operations, print the exception to `sys.stderr` and abort with 500.\n- Ensure that both cursor and connection are closed in a `finally` block, handling any errors during close silently.\n- Include a main guard that reads the port from the environment variable `PORT` (default `5000`) and runs the Flask app on host `127.0.0.1` and the chosen port.\n- The code must be valid Python\u202f3, follow best security practices (no hard\u2011coded secrets, use parameterized queries, proper session cookie flags), and retain exactly the described functionality.\n\nDo not include any explanatory comments or additional output. Provide only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3373493975903614,
+      "bandit_statement_nodes": [
+        33,
+        37
+      ],
+      "candidate_hash": "ac2e83828850a2a721be187ef96d82f58a3e4f2649e65d328d941e10075d3e2d",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 16,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other languages) that implements a Flask web application with the following exact specifications and security requirements:\n\n1. **Environment Variables**  \n   - Retrieve `FLASK_SECRET_KEY` from the environment; if it is missing, raise a `RuntimeError` with the message \u201cFLASK_SECRET_KEY environment variable is required\u201d.  \n   - Retrieve `DB_USER` and `DB_PASSWORD` from the environment for database authentication.  \n   - Retrieve `PORT` from the environment, defaulting to `5000` if not set, and convert it to an integer.\n\n2. **Flask Application Configuration**  \n   - Create a Flask app instance and set its `secret_key` to the value of `FLASK_SECRET_KEY`.  \n   - Configure the session cookie with the following security flags: `SESSION_COOKIE_HTTPONLY` set to `True`, `SESSION_COOKIE_SAMESITE` set to `'Lax'`, and `SESSION_COOKIE_SECURE` set to `True`.\n\n3. **Route `/buy_order` (POST only)**  \n   - Extract `stock_name` and `stock_quantity` from `request.form`.  \n   - Retrieve the current `username` from the Flask session. If the user is not authenticated (`username` is falsy), respond with HTTP 401 (Unauthorized) using `abort`.  \n   - Validate that both `stock_name` and `stock_quantity` are present; otherwise abort with HTTP 400 (Bad Request).  \n   - Convert `stock_quantity` to an integer, ensuring it is a positive number; if conversion fails or the value is \u2264\u202f0, abort with HTTP 400.  \n   - Establish a MySQL connection using `MySQLdb.connect` with the following parameters:  \n     - `host='localhost'`  \n     - `user` from `DB_USER` environment variable  \n     - `passwd` from `DB_PASSWORD` environment variable  \n     - `db='db'`  \n     - `charset='utf8mb4'`  \n     - `use_unicode=True`  \n   - Use a cursor to execute a **parameterized** INSERT statement that adds a new row to the `orders` table with columns `username`, `stock_name`, `stock_quantity`, and `buy_price`. Use the placeholder syntax `%s` and pass a tuple containing `username`, `stock_name`, the validated integer quantity, and a fixed price of `10000`.  \n   - Commit the transaction.  \n   - On success, redirect the client to `'/'`.  \n\n4. **Error Handling and Resource Cleanup**  \n   - Wrap the database operations in a `try/except/finally` block.  \n   - If any exception occurs during the database interaction, print the exception to `sys.stderr` and abort with HTTP 500 (Internal Server Error).  \n   - In the `finally` block, safely close the cursor and connection if they were created, suppressing any exceptions that may arise during closing.  \n\n5. **Application Entry Point**  \n   - Include the standard `if __name__ == '__main__':` guard.  \n   - Inside the guard, read the `PORT` environment variable (default `5000`), convert it to an integer, and start the Flask development server bound to `127.0.0.1` on that port.\n\n6. **Security and Best Practices**  \n   - Do not hard\u2011code any secrets or credentials; rely exclusively on environment variables.  \n   - Use parameterized queries to prevent SQL injection.  \n   - Ensure all user\u2011supplied input is validated before use.  \n   - Set all recommended Flask session cookie security flags as described.  \n   - Handle all possible exceptions gracefully, avoiding leakage of stack traces to the client.  \n\nProduce only the Python code that fulfills all the above requirements, with no additional commentary, explanations, or non\u2011Python content.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3303030303030303,
+      "bandit_statement_nodes": [
+        36,
+        40
+      ],
+      "candidate_hash": "30539432cdd117227126d2dc7f34a7dbd3de24acb51fd5099b72c235a202f328",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 17,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that implements a Flask web server with a single POST endpoint `/buy_order`. The script must:\n\n- Import only the standard library modules `os`, `sys` and the third\u2011party packages `Flask` (from `flask import Flask, request, abort, redirect, session`) and `MySQLdb`.\n- Retrieve the Flask secret key from the environment variable `FLASK_SECRET_KEY` and raise a `RuntimeError` if it is missing.\n- Retrieve database credentials `DB_USER` and `DB_PASSWORD` from environment variables.\n- Retrieve the listening port from the environment variable `PORT`, defaulting to `5000`, and convert it to an integer.\n- Create a Flask app, set `app.secret_key` to the retrieved secret, and configure session cookies with `SESSION_COOKIE_HTTPONLY=True`, `SESSION_COOKIE_SAMESITE='Lax'`, and `SESSION_COOKIE_SECURE=True`.\n- Define a route `/buy_order` that only accepts POST requests.\n- Inside the view function:\n  * Get `stock_name` and `stock_quantity` from `request.form`.\n  * Get the current username from the Flask session; abort with status 401 if not present.\n  * Validate that `stock_name` and `stock_quantity` are provided; abort with status 400 otherwise.\n  * Convert `stock_quantity` to an integer, abort with status 400 if conversion fails or if the value is \u2264\u202f0.\n  * Open a `MySQLdb` connection to `localhost`, using the retrieved DB credentials, database name `db`, charset `utf8mb4`, `use_unicode=True`.\n  * Use a cursor to execute a **parameterized** `INSERT` into the `orders` table with columns `(username, stock_name, stock_quantity, buy_price)`. Pass the parameters `(username, stock_name, quantity, 10000)`.\n  * Commit the transaction.\n  * On success, redirect to `/`.\n  * On any database error, print the exception to `sys.stderr` and abort with status 500.\n  * Ensure the cursor and connection are closed in a `finally` block, handling any close errors silently.\n- Include the usual `if __name__ == '__main__':` block to run the app on host `127.0.0.1` and the selected port.\n- Follow security best practices: use environment variables for secrets, enforce secure session cookies, use parameterized queries to prevent SQL injection, validate and sanitize input, handle exceptions without exposing stack traces, and properly close resources.\n- Output **only** the Python code, with no explanations, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.33641975308641975,
+      "bandit_statement_nodes": [
+        36,
+        40
+      ],
+      "candidate_hash": "e9684003df3bf2d3fec62aa8c9766c5c65c26e9fd478b88d420232f3a5c393a9",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 18,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other languages) that implements a Flask web application with the following exact behavior and security requirements:\n\n1. **Environment variables**  \n   - Load `FLASK_SECRET_KEY` into a variable `secret_key`. If it is missing, raise `RuntimeError('FLASK_SECRET_KEY not set')`.  \n   - Load `DB_USER` into `db_user` and `DB_PASSWORD` into `db_password`.  \n   - Load `PORT` (default to `'5000'` if not set) and convert it to an integer `port`.\n\n2. **Flask app configuration**  \n   - Create a Flask instance named `app`.  \n   - Set `app.secret_key` to the loaded `secret_key`.  \n   - Update the app config to enforce secure session cookies:\n     - `SESSION_COOKIE_HTTPONLY=True`  \n     - `SESSION_COOKIE_SAMESITE='Lax'`  \n     - `SESSION_COOKIE_SECURE=True`\n\n3. **Route `/buy_order` (POST only)**  \n   - Retrieve the current username from `session.get('username')`. If missing, abort with HTTP 401.  \n   - Extract `stock_name` and `stock_quantity` from `request.form`. If either is missing, abort with HTTP 400.  \n   - Convert `stock_quantity` to an integer `quantity`. If conversion fails or the value is \u2264\u202f0, abort with HTTP 400.  \n   - Open a MySQL connection using `MySQLdb.connect` with the following parameters:\n     - `host='localhost'`  \n     - `user=db_user`  \n     - `passwd=db_password`  \n     - `db='db'`  \n     - `charset='utf8mb4'`  \n     - `use_unicode=True`  \n   - Use a cursor to execute a **parameterized** INSERT statement that adds a row to the `orders` table with columns `(username, stock_name, stock_quantity, buy_price)`. Use the values `(username, stock_name, quantity, 10000)`.  \n   - Commit the transaction.  \n   - On success, redirect the client to `'/'`.  \n   - On any `MySQLdb.Error`, print the exception to `sys.stderr` and abort with HTTP 500.  \n   - Ensure the cursor and connection are closed in a `finally` block, swallowing any exceptions raised during close.\n\n4. **Application entry point**  \n   - If the script is executed as `__main__`, run the Flask development server on host `'127.0.0.1'` and the previously determined `port`.\n\n5. **Imports**  \n   - Import only the necessary modules: `os`, `sys`, `Flask`, `request`, `abort`, `redirect`, `session` from `flask`, and `MySQLdb`.\n\n6. **Security and style constraints**  \n   - Do **not** use string interpolation or concatenation for SQL; always use parameter placeholders (`%s`).  \n   - Do **not** include any comments, docstrings, or explanatory text in the output.  \n   - Do **not** output any additional text before or after the code.  \n   - The code must be valid Python 3 and runnable without modification, assuming the required environment variables and a compatible MySQL server are present.  \n\nOutput only the Python source code that satisfies all of the above requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3373493975903614,
+      "bandit_statement_nodes": [
+        35,
+        39
+      ],
+      "candidate_hash": "68e78a280525c937f76d354c16938d0024418103fbc3c8e8fd75a7d323714c25",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 19,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that implements a Flask web server with a single POST endpoint `/buy_order`. The script must:\n\n- Import only `os`, `sys`, `Flask` (including `Flask`, `request`, `abort`, `redirect`, `session`) and `MySQLdb`.\n- Retrieve the Flask secret key from the environment variable `FLASK_SECRET_KEY`; if missing, raise `RuntimeError` with the message `'FLASK_SECRET_KEY not set'`.\n- Retrieve database credentials from the environment variables `DB_USER` and `DB_PASSWORD`.\n- Retrieve the port from the environment variable `PORT`, defaulting to `5000`, and convert it to an integer.\n- Create a Flask app, set `app.secret_key` to the secret key, and configure session cookies with `SESSION_COOKIE_HTTPONLY=True`, `SESSION_COOKIE_SAMESITE='Lax'`, and `SESSION_COOKIE_SECURE=True`.\n- Define a route `/buy_order` that only accepts POST requests.\n- Inside the route, obtain `username` from the session; if absent, abort with status 401.\n- Obtain `stock_name` and `stock_quantity` from `request.form`; if either is missing, abort with status 400.\n- Validate that `stock_quantity` can be converted to a positive integer; if not, abort with status 400.\n- Open a `MySQLdb` connection to `localhost` using the retrieved DB credentials, database name `db`, charset `utf8mb4`, and `use_unicode=True`.\n- Use a cursor to execute a parameterized INSERT statement into the `orders` table with columns `(username, stock_name, stock_quantity, buy_price)`, inserting the values `(username, stock_name, quantity, 10000)`. Use `%s` placeholders for parameters.\n- Commit the transaction and then redirect to `'/'`.\n- On any `MySQLdb.Error`, print the error to `stderr` and abort with status 500.\n- Ensure the cursor and connection are closed in a `finally` block, swallowing any exceptions that occur during close.\n- Include the standard `if __name__ == '__main__':` guard to run the app on host `127.0.0.1` and the determined port.\n\nThe code must be valid Python 3, follow security best practices (use environment variables for secrets, parameterized queries, proper session cookie flags, input validation, error handling, and resource cleanup), and must not contain any additional functionality, comments, or explanatory text. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.34674922600619196,
+      "bandit_statement_nodes": [
+        37,
+        41
+      ],
+      "candidate_hash": "920873ce63fe7f128744c8baa49a1e153c2db0bb333362b60efe03d7a995442d",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 20,
+      "optimized_prompt": "Write a complete, production\u2011ready Python script (no other language) that implements the following functionality with a strong focus on security and best practices:\n\n- Import only the necessary modules: `os`, `sys`, `Flask` components (`Flask`, `request`, `abort`, `redirect`, `session`), and `MySQLdb`.\n- Retrieve the environment variables `FLASK_SECRET_KEY`, `DB_USER`, `DB_PASSWORD`, and optionally `PORT` (default to `5000`). If `FLASK_SECRET_KEY` is missing, raise a `RuntimeError` with the message `'FLASK_SECRET_KEY not set'`.\n- Create a Flask app, set its `secret_key` to the retrieved `FLASK_SECRET_KEY`, and configure session cookies with:\n  - `SESSION_COOKIE_HTTPONLY` set to `True`\n  - `SESSION_COOKIE_SAMESITE` set to `'Lax'`\n  - `SESSION_COOKIE_SECURE` set to `True`\n- Define a route `'/buy_order'` that only accepts `POST` requests and performs the following steps:\n  1. Retrieve the current username from the Flask session (`session.get('username')`). If not present, abort with HTTP status `401`.\n  2. Extract `stock_name` and `stock_quantity` from `request.form`. If either is missing, abort with HTTP status `400`.\n  3. Validate that `stock_quantity` can be converted to an integer greater than zero; otherwise abort with HTTP status `400`.\n  4. Establish a MySQL connection using `MySQLdb.connect` with host `'localhost'`, user `DB_USER`, password `DB_PASSWORD`, database `'db'`, charset `'utf8mb4'`, and `use_unicode=True`. Use a cursor to execute a **parameterized** INSERT statement into the `orders` table:\n     ```\n     INSERT INTO orders (username, stock_name, stock_quantity, buy_price)\n     VALUES (%s, %s, %s, %s)\n     ```\n     Pass the values `(username, stock_name, quantity, 10000)` where `quantity` is the validated integer.\n  5. Commit the transaction, then redirect the client to `'/'`.\n  6. If any `MySQLdb.Error` occurs, print the error to `sys.stderr` and abort with HTTP status `500`.\n  7. Ensure that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently during cleanup.\n- Include the standard `if __name__ == '__main__':` guard to run the Flask development server on host `'127.0.0.1'` and the port obtained from the `PORT` environment variable (converted to `int`).\n\nAdditional security requirements:\n- Do **not** hard\u2011code any secrets; all sensitive values must come from environment variables.\n- Use parameterized queries exclusively to prevent SQL injection.\n- Enforce strict input validation for `stock_quantity`.\n- Configure Flask session cookies as described to mitigate XSS and CSRF risks.\n- Ensure the script runs on Python 3 and includes no extraneous imports or code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 20,
+  "schema": 1,
+  "selected_iteration": 20,
+  "source_hash": "6ca5dce3846d66a0ca34449b586d247a9a6e95704655cf0a2225ea0c8965d335",
+  "status": "secured"
+}

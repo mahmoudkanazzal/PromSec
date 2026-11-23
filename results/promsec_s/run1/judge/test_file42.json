@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "0e619e761070f6f04acb28c6dafa1b34409f70a2e31525923165202c74ce69ae",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields cause a server error (KeyError).",
+      "Attempting to register an already\u2011existing username returns a specific duplicate message.",
+      "Checking out with a non\u2011existent username returns a 'User not found' message.",
+      "Returning a book that was never checked out returns a 'Checkout record not found' message.",
+      "Database errors (e.g., connection loss) result in generic failure messages after a rollback."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple web API for user registration, book checkout, and book return in a library system.",
+    "invariants": [
+      "Usernames are unique; duplicate registration attempts are rejected.",
+      "A checkout record must exist before it can be returned.",
+      "Each request opens a fresh database connection that is closed before the response is sent.",
+      "Successful operations always result in a committed transaction; failures trigger a rollback."
+    ],
+    "io_behavior": [
+      "POST /register with form fields 'username' and 'password' returns a plain\u2011text message indicating success, duplicate username, or failure.",
+      "POST /checkout with form fields 'username' and 'book_id' returns a plain\u2011text message indicating success, user not found, or failure.",
+      "POST /return with form fields 'username' and 'book_id' returns a plain\u2011text message indicating success, missing checkout record, or failure."
+    ],
+    "public_api": {
+      "route:POST /checkout": "",
+      "route:POST /register": "",
+      "route:POST /return": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the 'users' table on successful registration.",
+      "Inserts a new row into the 'checkouts' table on successful checkout.",
+      "Deletes the corresponding row from the 'checkouts' table on successful return.",
+      "Commits or rolls back the database transaction depending on success or error."
+    ],
+    "source_hash": "e881625b1382fb99257852b9393da006d617bd99661d0afea64e23efc68587d0"
+  },
+  "dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.6,
+    "invariants": 0.9,
+    "io_semantics": 1.0,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file42.py",
+  "gated_score": 0.78,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.78,
+  "original_hash": "e881625b1382fb99257852b9393da006d617bd99661d0afea64e23efc68587d0",
+  "rationale": "Routes and messages match the contract and most invariants/side\u2011effects are upheld, but missing form fields do not raise KeyError and rollback is implicit, so edge\u2011case handling is only partially preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.1475,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.8,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.9275,
+  "weighted_mean": 0.84,
+  "worst_dimension": 0.6
+}

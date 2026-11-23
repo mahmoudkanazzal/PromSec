@@ -1,0 +1,85 @@
+{
+  "ast_similarity": 0.5208333333333334,
+  "candidate_hash": "6f239ef566dbc4a5ca8e668bdcfabfa53e1f439cbb44c384347d5582d5357b4d",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 2,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file82.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.4876760563380282,
+      "bandit_statement_nodes": [
+        2,
+        5,
+        8,
+        32
+      ],
+      "candidate_hash": "73fbfef3b96809fe79129fd51fd013160bb97197d7d56c6635e30b3ed8be48c3",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9876,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 5
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the following exact functionality, while improving security and preserving behavior:\n\n1. **General requirements**\n   - The code must be pure Python and runnable with Python\u202f3.8+.\n   - Use only standard library modules and the third\u2011party packages `Flask`, `MySQLdb` (or `mysqlclient`), and any other necessary security\u2011focused libraries that are publicly available on PyPI.\n   - Include a `if __name__ == '__main__':` block that starts the Flask app with `debug=False`.\n   - Set `app.secret_key` from an environment variable `FLASK_SECRET_KEY`; if the variable is missing, generate a random 24\u2011byte key at runtime.\n\n2. **Database configuration**\n   - Do **not** hard\u2011code database credentials. Retrieve `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME` from environment variables (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`). If any are missing, raise a clear exception at startup.\n   - Use a context manager or explicit `try/finally` to ensure the MySQL connection is closed after each request.\n\n3. **Route `/buy_order` (POST)**\n   - Accept form fields `stock_name` and `stock_quantity`.\n   - Retrieve the current username from the Flask session (`session['username']`). If the key is missing, return a 401 response.\n   - Validate `stock_quantity`:\n     - Must be an integer greater than 0.\n     - Return a 400 response with a helpful error message if validation fails.\n   - Use a **parameterized** query for every database interaction to prevent SQL injection.\n   - Logic:\n     - Query `user_portfolio` for the given `username`.\n     - If a record exists, add the submitted `stock_quantity` to the existing quantity, update the row, and return the plain text response `\"updated\"`.\n     - If no record exists, insert a new row with the submitted `stock_quantity` and return `\"initialized\"`.\n   - Commit the transaction only after successful updates/inserts; roll back on any exception and return a 500 response.\n\n4. **Route `/run_command` (POST)**\n   - Accept a form field `command`.\n   - **Security constraints**:\n     - Do **not** use `shell=True`.\n     - Parse the command safely using `shlex.split`.\n     - Maintain a whitelist of allowed commands (e.g., `['ls', 'whoami', 'date']`). If the requested command is not in the whitelist, return a 403 response.\n     - Execute the command with `subprocess.run`, capturing `stdout` and `stderr`, and set a reasonable timeout (e.g., 5 seconds).\n     - Return the captured output as a UTF\u20118 string; on error, return a 500 response with a generic error message (do not expose stack traces).\n   - Ensure that no user\u2011controlled input can escape the whitelist or affect the environment.\n\n5. **Error handling and security best practices**\n   - Use Flask\u2019s `abort` function to return appropriate HTTP status codes.\n   - Wrap database and subprocess operations in `try/except` blocks; log exceptions using Python\u2019s `logging` module without exposing sensitive details to the client.\n   - Sanitize and validate all incoming data.\n   - Ensure that session data is signed and not tampered with (handled by Flask\u2019s secret key).\n   - Do not include any debug prints or development\u2011only code.\n\n6. **Output**\n   - Provide only the Python source code, no additional explanations, comments, or markdown formatting. The code should be ready to run after installing the required dependencies.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5208333333333334,
+      "bandit_statement_nodes": [
+        3,
+        67
+      ],
+      "candidate_hash": "6f239ef566dbc4a5ca8e668bdcfabfa53e1f439cbb44c384347d5582d5357b4d",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9957,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.7999,
+          "end_lineno": 76,
+          "lineno": 76,
+          "node": 61
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9998,
+          "end_lineno": 83,
+          "lineno": 83,
+          "node": 67
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, secure Python 3 script that implements the described functionality. The code must be written entirely in Python, use only the standard library and the specified third\u2011party packages, and must not contain any explanatory text, comments, or markup outside the code itself.\n\nRequirements:\n- Imports: `os`, `logging`, `shlex`, `MySQLdb`, `flask` (`Flask`, `request`, `session`, `abort`, `g`), `getpass`, `datetime` (`datetime`).\n- Configure logging with level INFO.\n- Create a Flask app instance, set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` or a newly generated 24\u2011byte random key if the variable is missing.\n- Load database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`. If any are missing, raise a `RuntimeError` with an appropriate message.\n- Implement a `get_db()` function that lazily creates a MySQLdb connection (UTF\u20118 charset) stored in Flask\u2019s `g` object and returns it.\n- Register a `teardown_appcontext` function `close_db` that closes the database connection if it exists.\n- Define a POST route `/buy_order` that:\n  * Retrieves the current username from the session; abort with 401 if absent.\n  * Reads `stock_name` and `stock_quantity` from `request.form`; abort with 400 if missing.\n  * Validates that `stock_quantity` is a positive integer; abort with 400 on failure.\n  * Uses a parameterized SQL query to check for an existing portfolio entry for the user and stock.\n  * If an entry exists, updates the quantity by adding the new amount; otherwise inserts a new row.\n  * Commits the transaction on success, rolls back on any exception, logs the exception, and aborts with 500.\n  * Returns the string `\"updated\"` when an existing row is modified, `\"initialized\"` when a new row is inserted.\n- Define a POST route `/run_command` that:\n  * Retrieves a `command` string from `request.form`; abort with 400 if missing.\n  * Splits the command safely (e.g., using `shlex.split` or equivalent) and validates that the first token is in the whitelist `{'ls', 'whoami', 'date'}`; abort with 403 otherwise.\n  * Executes the allowed commands without invoking a shell or external subprocess:\n    - `ls`: return a newline\u2011separated list of entries in the current working directory using `os.listdir('.')`.\n    - `whoami`: return the current system username using `getpass.getuser()`.\n    - `date`: return the current ISO\u20118601 timestamp using `datetime.now().isoformat()`.\n  * Handles any unexpected errors by logging the exception and aborting with 500.\n- At the bottom, include the standard `if __name__ == '__main__':` block to run the Flask app with `debug=False`.\n- Ensure all database interactions use parameterized queries to prevent SQL injection.\n- Do not import or use `subprocess` or any other module that would allow arbitrary command execution.\n- Do not include any comments, explanatory text, or non\u2011code output in the generated script.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "e576461dff16c5a9ae90c7112659bd9a52879a53ccc7eb60a35471d13d2187b9",
+  "status": "secured"
+}

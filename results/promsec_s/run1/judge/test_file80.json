@@ -1,0 +1,66 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "6c3884bd3309aa17c4764204c4fd6253f174acc601265c10441fa5c0ec9c1f8c",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing stock_name, stock_quantity, or username in the session raises a server error",
+      "Database connection failures raise an exception and abort the request",
+      "Non\u2011numeric stock_quantity is accepted and stored as\u2011is",
+      "Large input values may cause SQL errors or overflow",
+      "If the orders table does not exist, the insert fails",
+      "SQL injection strings are passed directly to the query (behavior depends on DB configuration)"
+    ],
+    "entrypoints": [],
+    "intent": "Handle a POST request to record a stock purchase order and redirect the client.",
+    "invariants": [
+      "The inserted buy_price is always the constant 10000",
+      "All received values are stored exactly as supplied (no validation)",
+      "A database commit follows every successful insert",
+      "The response is always a redirect to the root path"
+    ],
+    "io_behavior": [
+      "Accepts a POST request to /buy_order with form fields stock_name and stock_quantity",
+      "Retrieves the current user's username from the session",
+      "Returns an HTTP 302 redirect response to '/'",
+      "Rejects non\u2011POST methods with Flask's default 405 response"
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection to localhost as root",
+      "Inserts a new row into the orders table",
+      "Commits the transaction, persisting the order"
+    ],
+    "source_hash": "6ca5dce3846d66a0ca34449b586d247a9a6e95704655cf0a2225ea0c8965d335"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.6,
+    "io_semantics": 0.5,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file80.py",
+  "gated_score": 0.34375,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.34375,
+  "original_hash": "6ca5dce3846d66a0ca34449b586d247a9a6e95704655cf0a2225ea0c8965d335",
+  "rationale": "The program deviates from the contract on missing/invalid inputs, validation, and SQL handling, but it does perform the required redirect, MySQL insert, and commit.",
+  "schema": 1,
+  "stability_abs_difference": 0.1525,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.49625,
+  "weighted_mean": 0.425,
+  "worst_dimension": 0.1
+}

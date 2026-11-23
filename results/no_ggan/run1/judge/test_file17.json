@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "f63d92b022b4ccaeeccd690ff32c13fff8d9d312bfd493e5020d2ead608939f0",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'content' field causes a YAML parsing error.",
+      "Malformed YAML or missing 'title'/'body' keys leads to a server exception.",
+      "Omitting the 'type' query parameter results in an empty argument passed to the script.",
+      "Providing an incorrect admin password returns a 401 response.",
+      "The generate_report.sh script may fail or produce side effects not reflected in the HTTP response."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple web service with three endpoints: create a blog post from YAML content, generate a report by invoking a shell script, and authenticate an admin using a hard\u2011coded password.",
+    "invariants": [
+      "A POST to /create_post must include a 'content' field that parses as YAML with 'title' and 'body' keys.",
+      "A GET to /generate_report always returns a message regardless of the script's exit status.",
+      "Admin login succeeds only when the supplied password exactly matches the hard\u2011coded ADMIN_PASSWORD.",
+      "Each endpoint only accepts the HTTP method declared (POST for create_post and admin_login, GET for generate_report)."
+    ],
+    "io_behavior": [
+      "POST /create_post with form field 'content' returns a success string containing the post title.",
+      "GET /generate_report with query parameter 'type' returns a message indicating the requested report type.",
+      "POST /admin_login with form field 'password' returns a success message or a 401 error.",
+      "All endpoints respond with plain text HTTP responses."
+    ],
+    "public_api": {
+      "route:GET /generate_report": "",
+      "route:POST /admin_login": "",
+      "route:POST /create_post": ""
+    },
+    "side_effects": [
+      "The /create_post endpoint stores the parsed post data (implementation omitted).",
+      "The /generate_report endpoint executes the external script generate_report.sh with the supplied type argument.",
+      "The server may log requests and errors via Flask's default logging."
+    ],
+    "source_hash": "b2bd06c70a1e9957f5bda8685f64368788573f32345a6eab82c15ec5cef5484a"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.3,
+    "invariants": 0.4,
+    "io_semantics": 0.5,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file17.py",
+  "gated_score": 0.36375,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.36375,
+  "original_hash": "b2bd06c70a1e9957f5bda8685f64368788573f32345a6eab82c15ec5cef5484a",
+  "rationale": "The program implements the three endpoints and returns correct success messages, but deviates from the contract on several key points: admin password is read from env instead of hard\u2011coded, error handling for missing/invalid YAML and missing 'type' parameter differs from expected exceptions, generate_report aborts on script failure contrary to always\u2011return behavior, and the create_post side\u2011effect of storing data is omitted.",
+  "schema": 1,
+  "stability_abs_difference": 0.31187,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.4,
+    "invariants": 0.75,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.67562,
+  "weighted_mean": 0.385,
+  "worst_dimension": 0.3
+}

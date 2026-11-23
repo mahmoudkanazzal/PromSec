@@ -1,0 +1,72 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "41dd4f20342d68ccb47601d3e7de95ad8bda2661106b309dc84818a91927441b",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields raise a server error (KeyError).",
+      "An empty password hashes to a known SHA\u20111 value, which may unintentionally authenticate if stored.",
+      "SQL injection is possible via crafted 'username' values.",
+      "Multiple rows with the same username cause only the first row to be used.",
+      "Database connection failures produce a 500 error response.",
+      "Non\u2011ASCII characters in username or password may cause encoding issues."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via POST /login and return a welcome message on success or a failure message otherwise.",
+    "invariants": [
+      "Response is always a simple string, never JSON or HTML.",
+      "Successful authentication requires exact SHA\u20111 hash equality.",
+      "Only the first row returned for a username is considered.",
+      "Database credentials (root/root) are fixed and used for every request.",
+      "No data is written or modified in the database.",
+      "Each request results in exactly one response string."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /login with form fields 'username' and 'password'.",
+      "Reads the 'username' and 'password' values from the request body.",
+      "Executes a SELECT query against a local MySQL database for the given username.",
+      "Compares the stored SHA\u20111 password hash with the SHA\u20111 hash of the supplied password.",
+      "Returns plain\u2011text \"Welcome <username>!\" when the hashes match.",
+      "Returns plain\u2011text \"Login failed!\" for any mismatch or missing user."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to the local MySQL server.",
+      "Performs a read\u2011only SELECT query on the 'user' table.",
+      "Creates a database cursor and fetches results.",
+      "May log connection or query errors to the server console.",
+      "Consumes CPU and memory resources for hashing and DB access."
+    ],
+    "source_hash": "a1ecab2d254217bc6498996cd220a7dc8d9961ae33e3974a0681928247d3b1d9"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file47.py",
+  "gated_score": 0.50375,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.50375,
+  "original_hash": "a1ecab2d254217bc6498996cd220a7dc8d9961ae33e3974a0681928247d3b1d9",
+  "rationale": "Main authentication flow works, but uses SHA\u2011256 instead of SHA\u20111, defaults missing fields to empty strings instead of raising KeyError, and prevents SQL injection, breaking several edge\u2011case and invariant specifications.",
+  "schema": 1,
+  "stability_abs_difference": 0.037,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.33,
+    "invariants": 0.67,
+    "io_semantics": 0.83,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.54075,
+  "weighted_mean": 0.605,
+  "worst_dimension": 0.2
+}

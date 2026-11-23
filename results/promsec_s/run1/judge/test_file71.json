@@ -1,0 +1,65 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "eb0395f69d3f6a549e715f942e68c0f8bd63a7101ec6f5299ffd085db83711e1",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields raise a KeyError and abort the request.",
+      "Attempting to register a username that already exists may cause a SQL integrity error.",
+      "Database connection failures raise an exception and prevent registration.",
+      "Extremely long input values may exceed column limits or cause performance issues.",
+      "Non\u2011ASCII characters in the password may affect the SHA1 hash if not properly encoded."
+    ],
+    "entrypoints": [],
+    "intent": "Register a new user by storing a hashed password and salt in a MySQL database via a web request.",
+    "invariants": [
+      "Database connection parameters (host, user, password, database) are fixed in the code.",
+      "Password hashing always uses SHA1 over the raw password concatenated with the generated salt.",
+      "The endpoint only processes POST requests; other HTTP methods are ignored.",
+      "Each inserted record includes 'created_at' and 'updated_at' set to NOW()."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /register with form fields 'username' and 'password'.",
+      "Returns an HTTP redirect response (typically 302) to the main page after successful registration.",
+      "If required fields are missing or a database error occurs, the request results in an error status code."
+    ],
+    "public_api": {
+      "func:register": "()",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Creates a new 16\u2011byte random salt for each registration.",
+      "Inserts a row into the MySQL 'users' table containing username, SHA1 hash, salt, and timestamps.",
+      "Commits the transaction, persisting the new user record."
+    ],
+    "source_hash": "359bf4558a37b043a9986e5d5ee7d208b47b107dbde69c7955862c1fa79105c7"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.4,
+    "invariants": 0.3,
+    "io_semantics": 0.5,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file71.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.36875,
+  "original_hash": "359bf4558a37b043a9986e5d5ee7d208b47b107dbde69c7955862c1fa79105c7",
+  "rationale": "Key contract violations: missing fields do not raise KeyError, password hashing uses PBKDF2\u2011SHA256 instead of SHA1, and DB credentials are read from env vars rather than fixed. Success flow and side\u2011effects (salt, insert, commit) match, but overall behavior and invariants are only partially preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.1125,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.6,
+    "side_effects": 0.7
+  },
+  "stability_score": 0.48125,
+  "weighted_mean": 0.425,
+  "worst_dimension": 0.2
+}

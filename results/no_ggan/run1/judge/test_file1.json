@@ -1,0 +1,67 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "98da7c991df837661d61b3d95863e36686ac4092541522f6bc29decb91f25d0e",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and result in a 500 response.",
+      "Extremely long input values may exceed database column limits and cause insertion failures.",
+      "The raw binary salt is interpolated into an SQL string, which can lead to malformed queries or data truncation.",
+      "The username is inserted via string formatting, making the endpoint vulnerable to SQL injection.",
+      "If the database connection fails, the request will result in a 500 error."
+    ],
+    "entrypoints": [],
+    "intent": "Create a new user account when a client POSTs a username and password to the /register endpoint.",
+    "invariants": [
+      "Usernames are stored uniquely; duplicate usernames trigger a redirect instead of insertion.",
+      "Passwords are never stored in plain text; they are stored as SHA\u2011256(salt + password).",
+      "A non\u2011null salt value is always stored alongside each password hash.",
+      "The 'account_created' column is always set to the integer 1 for new users."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /register with form fields 'username' and 'password'.",
+      "If the username already exists, responds with an HTTP 307 redirect to /login.",
+      "If the username is new, returns a default 200 OK response with an empty body.",
+      "May raise a 500 error if required form fields are missing or an internal exception occurs."
+    ],
+    "public_api": {
+      "func:register": "()",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Generates a 16\u2011byte random salt for each registration attempt.",
+      "Queries the MySQL 'users' table to check for an existing username.",
+      "Inserts a new row into the 'users' table containing the username, hashed password, salt, and a fixed account_created flag.",
+      "Commits the transaction and closes the database connection."
+    ],
+    "source_hash": "91acf2a5aef5bcd370c6a3200ba7ebb3820f83aa24caea6ae6604f49f50bfecf"
+  },
+  "dimensions": {
+    "behavior": 0.1,
+    "edge_cases": 0.3,
+    "invariants": 0.2,
+    "io_semantics": 0.2,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file1.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.19375,
+  "original_hash": "91acf2a5aef5bcd370c6a3200ba7ebb3820f83aa24caea6ae6604f49f50bfecf",
+  "rationale": "The implementation deviates from the contract in many key aspects: it validates inputs and returns 400/409/201 instead of the specified 500/307/200 responses, uses parameterized queries and PBKDF2 hashing rather than raw string interpolation and SHA\u2011256(salt+password), stores a datetime flag instead of integer 1, and thus fails most invariants and edge\u2011case expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.15812,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.2,
+    "invariants": 0.25,
+    "io_semantics": 0.2,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.35187,
+  "weighted_mean": 0.225,
+  "worst_dimension": 0.1
+}

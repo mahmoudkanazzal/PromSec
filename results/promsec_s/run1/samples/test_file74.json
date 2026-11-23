@@ -1,0 +1,362 @@
+{
+  "ast_similarity": 0.48372093023255813,
+  "candidate_hash": "059042f7e98ea8ef236d6e1345108cb83a403faebb48874a0d94664112117006",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 1,
+  "cwe_count_before": 1,
+  "cwes_after": [
+    703
+  ],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file74.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.48372093023255813,
+      "bandit_statement_nodes": [
+        14
+      ],
+      "candidate_hash": "059042f7e98ea8ef236d6e1345108cb83a403faebb48874a0d94664112117006",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.5593,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9974,
+          "end_lineno": 30,
+          "lineno": 30,
+          "node": 14
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python 3 script that implements a Flask web application with a `/register` endpoint handling only POST requests. The script must:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `re`, `MySQLdb` (or an equivalent MySQL connector), `os`, `bcrypt`, and any standard library modules required for security or logging.\n- Retrieve all database connection parameters (host, user, password, database name) from environment variables; do not hard\u2011code any credentials.\n- Use context managers (`with` statements) for opening and closing the MySQL connection and cursor to ensure resources are always released.\n- Validate the incoming form data:\n  - `username` must match the regular expression `^[A-Za-z0-9_]{3,30}$`.\n  - `password` must be at least 8 characters long.\n  - `confirm_password` must be present and exactly match `password`.\n  - Return a clear error message if any validation fails.\n- Hash the password securely with `bcrypt`, using `bcrypt.gensalt()` and encoding the password as UTF\u20118.\n- Use fully parameterized SQL statements for all database interactions to prevent SQL injection.\n- Check whether the username already exists; if it does, return a message indicating the username is taken.\n- If the username is available, insert the new user with the hashed password, commit the transaction, and return a success message.\n- Implement robust error handling:\n  - Catch database errors, roll back the transaction if needed, and return a generic \u201cRegistration Failed\u201d message without exposing internal details.\n  - Log exceptions to a server\u2011side log file (do not include sensitive information in the HTTP response).\n- Ensure the Flask app runs only when the script is executed directly (`if __name__ == \"__main__\":`), listening on a configurable host and port obtained from environment variables or defaulting to `127.0.0.1:5000`.\n- Include any necessary import statements, configuration, and a brief comment at the top stating the purpose of the script (no additional explanatory text outside the script).",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.491725768321513,
+      "bandit_statement_nodes": [
+        39,
+        44
+      ],
+      "candidate_hash": "d16c7ed30d94af48203edc7353206f9a7d6feadde5c58e9e9008ccc38fb26191",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (Python\u202f3) that implements a secure user registration endpoint using Flask. The script must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `re`, `logging`, `Flask`, `request`, `jsonify` from `flask`, `mysql.connector`, and `bcrypt`.\n- Configure logging to write INFO level messages to a file named `app.log` with the format `'%(asctime)s %(levelname)s %(message)s'`.\n- Create a Flask app instance.\n- Retrieve the following environment variables: `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `FLASK_HOST` (default `'127.0.0.1'`), and `FLASK_PORT` (default `'5000'` converted to int).\n- Define a compiled regular expression `USERNAME_REGEX` that matches usernames consisting of 3\u201130 characters, allowing only letters, numbers, and underscores (`r'^[A-Za-z0-9_]{3,30}$'`).\n- Implement a function `get_db_connection()` that returns a MySQL connection using the retrieved DB credentials, with `autocommit=False`.\n- Define a route `/register` that accepts only POST requests and performs the following steps:\n  1. Extract `username`, `password`, and `confirm_password` from `request.form`, stripping whitespace from `username`.\n  2. Validate `username` against `USERNAME_REGEX`; if invalid, return JSON `{'error': 'Invalid username format'}` with status 400.\n  3. Ensure `password` is at least 8 characters; if not, return JSON `{'error': 'Password must be at least 8 characters'}` with status 400.\n  4. Verify `password` equals `confirm_password`; if not, return JSON `{'error': 'Passwords do not match'}` with status 400.\n  5. Open a database connection via `get_db_connection()`. Within a transaction:\n     - Check if the username already exists (`SELECT 1 FROM users WHERE username = %s`). If it does, return JSON `{'error': 'Username already taken'}` with status 409.\n     - Hash the password using `bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())`.\n     - Insert the new user (`INSERT INTO users (username, password_hash) VALUES (%s, %s)`) with the hashed password.\n     - Commit the transaction.\n  6. On success, return JSON `{'message': 'Registration successful'}` with status 201.\n- Include comprehensive error handling:\n  - Catch `mysql.connector.Error` as `db_err`, log the exception with `logging.exception(\"Database error during registration\")`, roll back the transaction if the connection is still open, and return JSON `{'error': 'Registration Failed'}` with status 500.\n  - Catch any other `Exception`, log it with `logging.exception(\"Unexpected error during registration\")`, and return the same 500 JSON response.\n  - In a `finally` block, close the database connection if it is still open, suppress any exceptions during close.\n- Add the standard `if __name__ == '__main__':` block to run the Flask app using the retrieved `FLASK_HOST` and `FLASK_PORT`.\n\nThe output must be **only** the Python code described above\u2014no explanatory text, no comments, no markdown formatting, and no additional output. Ensure the code is secure, follows best practices, and matches the functionality specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.491725768321513,
+      "bandit_statement_nodes": [
+        40,
+        45
+      ],
+      "candidate_hash": "b9b87131d34c291175dbf5fb020a73f4158ba0a0d63104605bc392e874959632",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, secure Python program (no other language) that implements a Flask web service with a `/register` endpoint for user registration. The program must:\n\n- Use `from __future__ import annotations`.\n- Import only the following modules: `os`, `re`, `logging`, `flask` (specifically `Flask`, `request`, `jsonify`), `mysql.connector`, and `bcrypt`.\n- Configure logging to write INFO level messages to a file named `app.log` with the format `'%(asctime)s %(levelname)s %(message)s'`.\n- Create a Flask app instance.\n- Read the following configuration values from environment variables: `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `FLASK_HOST` (default `'127.0.0.1'`), and `FLASK_PORT` (default `5000` as an integer).\n- Define a compiled regular expression `USERNAME_REGEX` that matches usernames consisting of 3 to 30 characters, allowing only letters, numbers, and underscores.\n- Implement a function `get_db_connection()` that returns a MySQL connection using the environment variables, with `autocommit=False`.\n- Implement the `/register` route handling POST requests:\n  - Retrieve `username`, `password`, and `confirm_password` from `request.form`, stripping whitespace from `username`.\n  - Validate `username` against `USERNAME_REGEX`; on failure return JSON `{'error': 'Invalid username format'}` with status 400.\n  - Ensure `password` is at least 8 characters; on failure return JSON `{'error': 'Password must be at least 8 characters'}` with status 400.\n  - Verify `password` equals `confirm_password`; on failure return JSON `{'error': 'Passwords do not match'}` with status 400.\n  - Open a database connection using `get_db_connection()`. Use a cursor and a parameterized query to check if the username already exists; if it does, return JSON `{'error': 'Username already taken'}` with status 409.\n  - Hash the password with `bcrypt.hashpw` using a generated salt (`bcrypt.gensalt()`), encoding the password as UTF\u20118.\n  - Insert the new user with a parameterized query into a table `users` with columns `username` and `password_hash`.\n  - Commit the transaction and return JSON `{'message': 'Registration successful'}` with status 201.\n  - On any `mysql.connector.Error`, log the exception with `logging.exception`, roll back the transaction if possible, and return JSON `{'error': 'Registration Failed'}` with status 500.\n  - On any other exception, log the exception with `logging.exception` and return JSON `{'error': 'Registration Failed'}` with status 500.\n  - Ensure the database connection is closed in a `finally` block, handling any errors silently.\n- Add the standard `if __name__ == '__main__':` block to run the Flask app using the host and port from the environment variables.\n\nThe generated code must be exactly the described functionality, follow security best practices (use parameterized queries, proper error handling, environment\u2011based configuration, password hashing, input validation, and resource cleanup), and contain **no explanatory text, comments, or markup**\u2014output only the Python source code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.47706422018348627,
+      "bandit_statement_nodes": [
+        40,
+        45
+      ],
+      "candidate_hash": "976181e22751feecaa2c9bc8b1b796435c1b48e302d86e162d5a1b7644cc024b",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/register` POST endpoint. The script must:\n\n- Use `from __future__ import annotations`.\n- Import only the following modules: `os`, `re`, `logging`, `Flask` (from `flask import Flask, request, jsonify`), `mysql.connector`, `bcrypt`.\n- Configure logging to write INFO level messages to a file named `app.log` with timestamp, level, and message.\n- Read database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and Flask host/port (`FLASK_HOST` default `127.0.0.1`, `FLASK_PORT` default `5000`) from environment variables.\n- Define a compiled regular expression `USERNAME_REGEX` that allows alphanumeric characters and underscores, length 3\u201130.\n- Provide a function `get_db_connection()` that returns a MySQL connection with `autocommit=False` using the environment variables.\n- Create a Flask app instance.\n- Implement the `/register` route handling POST requests:\n  * Retrieve `username`, `password`, `confirm_password` from `request.form`, strip whitespace from `username`.\n  * Validate `username` against `USERNAME_REGEX`; if invalid return JSON error with status 400.\n  * Enforce password minimum length 8; if not, return JSON error with status 400.\n  * Ensure `password` and `confirm_password` match; if not, return JSON error with status 400.\n  * Open a DB connection, check if `username` already exists using a parameterized SELECT; if exists return JSON error with status 409.\n  * Hash the password with bcrypt using `bcrypt.hashpw` and `bcrypt.gensalt()`.\n  * Insert the new user with a parameterized INSERT of `username` and `password_hash`.\n  * Commit the transaction and return JSON success message with status 201.\n  * On any MySQL error, log the exception, rollback if possible, and return JSON error with status 500.\n  * On any other exception, log the exception and return JSON error with status 500.\n  * Ensure the DB connection is closed in a finally block, handling any close errors silently.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app with the configured host and port.\n\nThe code must be secure: use parameterized queries, never log passwords or hashes, handle exceptions without exposing internal details, and close resources properly. Do not include any explanatory text, comments, or markdown. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.47706422018348627,
+      "bandit_statement_nodes": [
+        41,
+        45,
+        50
+      ],
+      "candidate_hash": "332bccda4c53db0e644f38edc0049c9e630872db098d817178202527bd0c3def",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 5,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program that implements a user registration endpoint using Flask and MySQL. The program must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `re`, `logging`, `flask` (specifically `Flask`, `request`, `jsonify`), `mysql.connector`, and `bcrypt`.\n- Configure logging to write INFO level messages to a file named `app.log` with the format `%(asctime)s %(levelname)s %(message)s`.\n- Read database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and Flask host/port (`FLASK_HOST`, `FLASK_PORT`) from environment variables, providing defaults for host (`127.0.0.1`) and port (`5000`).\n- Compile a username regular expression that allows only word characters and length between 3 and 30.\n- Define a function `get_db_connection()` that returns a MySQL connection with `autocommit=False`.\n- Create a Flask app instance.\n- Implement a POST route at `/register` that:\n  * Retrieves `username`, `password`, and `confirm_password` from `request.form`, stripping whitespace from the username.\n  * Validates the username against the compiled regex; returns JSON error with status 400 if invalid.\n  * Ensures the password is at least 8 characters; returns JSON error with status 400 if not.\n  * Checks that `password` and `confirm_password` match; returns JSON error with status 400 if they differ.\n  * Uses a try/except/finally block to:\n    - Open a DB connection and a dictionary cursor.\n    - Perform a parameterized SELECT to check if the username already exists; if so, return JSON error with status 409.\n    - Hash the password securely with `bcrypt.hashpw` using a generated salt.\n    - Insert the new user with a parameterized INSERT using the hashed password.\n    - Commit the transaction and return JSON success message with status 201.\n    - On any `mysql.connector.Error`, log the full exception, roll back the transaction if possible, and return a generic JSON error with status 500.\n    - On any other exception, log the full exception and return a generic JSON error with status 500.\n    - In the finally clause, close the cursor and connection safely, ignoring any errors during close.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app with the configured host and port.\n- Ensure all database interactions use parameterized queries to prevent SQL injection.\n- Ensure no secrets are printed or logged; only generic error messages are returned to the client.\n- The entire code must be valid Python, not any other language, and must retain the exact functionality described.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4748858447488584,
+      "bandit_statement_nodes": [
+        41,
+        45,
+        50
+      ],
+      "candidate_hash": "3bfddd21d50b07f5b6ae9730df714d4efd1e9d814a2aa14c7cbbc3337e03b9d8",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 6,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program (compatible with Python\u202f3.9+) that implements a Flask web application with a `/register` endpoint for user registration. The program must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `re`, `logging`, `Flask`, `request`, `jsonify`, `mysql.connector`, `bcrypt`.\n- Configure logging to write INFO\u2011level messages to a file named `app.log` with timestamp, level, and message.\n- Read database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and Flask host/port (`FLASK_HOST` default `127.0.0.1`, `FLASK_PORT` default `5000`) from environment variables.\n- Define a compiled regular expression `USERNAME_REGEX` that matches usernames consisting of 3 to 30 word characters (`^\\w{3,30}$`).\n- Provide a function `get_db_connection()` that returns a MySQL connection with `autocommit=False`, using the environment variables.\n- Create a Flask app instance.\n- Implement a POST `/register` route that:\n  * Retrieves `username`, `password`, and `confirm_password` from `request.form`, stripping whitespace from `username`.\n  * Validates `username` against `USERNAME_REGEX`; if invalid, returns JSON `{'error': 'Invalid username'}` with HTTP\u202f400.\n  * Ensures `password` length is at least 8 characters; otherwise returns JSON `{'error': 'Password must be at least 8 characters'}` with HTTP\u202f400.\n  * Checks that `password` and `confirm_password` match; otherwise returns JSON `{'error': 'Passwords do not match'}` with HTTP\u202f400.\n  * Opens a database connection and cursor (`dictionary=True`) inside a try block.\n  * Checks if the username already exists using a parameterized SELECT; if so, returns JSON `{'error': 'Username already exists'}` with HTTP\u202f409.\n  * Hashes the password using `bcrypt.hashpw` with a generated salt, encoding the password as UTF\u20118.\n  * Inserts the new user with `username` and `password_hash` into the `users` table using a parameterized INSERT.\n  * Commits the transaction and returns JSON `{'message': 'User registered successfully'}` with HTTP\u202f201.\n  * Catches `mysql.connector.Error`, logs the exception with stack trace, rolls back the transaction if possible, and returns JSON `{'error': 'Internal server error'}` with HTTP\u202f500.\n  * Catches any other `Exception`, logs it, and returns JSON `{'error': 'Internal server error'}` with HTTP\u202f500.\n  * In a finally block, safely closes the cursor and connection, ignoring any errors during close.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app with the host and port from the environment variables.\n- Ensure all database queries use parameterized statements to prevent SQL injection.\n- Use only secure practices: never log passwords, use bcrypt for hashing, handle all exceptions, and close resources properly.\n- Do not include any additional functionality, comments, or explanatory text. Output only the Python code as described.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.48259860788863107,
+      "bandit_statement_nodes": [
+        41,
+        45
+      ],
+      "candidate_hash": "bd1cb26a8fd8b5dd85223f421b4ba3346cf84f830ed05aabe85943df2e40d549",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 7,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program that implements a user registration API using Flask, MySQL, and bcrypt. The program must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: os, re, logging, Flask, request, jsonify, mysql.connector, bcrypt.\n- Configure logging to write INFO level messages to a file named `app.log` with timestamp, level, and message.\n- Read database connection parameters (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME) and Flask host/port (FLASK_HOST default 127.0.0.1, FLASK_PORT default 5000) from environment variables using `os.getenv`.\n- Compile a regular expression `USERNAME_REGEX` that matches usernames of 3 to 30 word characters.\n- Define a function `get_db_connection()` that returns a MySQL connection with autocommit disabled, using the environment variables.\n- Create a Flask app instance.\n- Define a route `/register` that accepts only POST requests.\n- Inside the route, retrieve `username`, `password`, and `confirm_password` from `request.form`, strip whitespace from username.\n- Validate the username against `USERNAME_REGEX`; if invalid return JSON error with status 400.\n- Ensure password length is at least 8 characters; otherwise return JSON error 400.\n- Ensure password and confirm_password match; otherwise return JSON error 400.\n- Open a database connection and cursor (dictionary=True) inside a try block.\n- Check if the username already exists using a parameterized SELECT query; if it does, return JSON error with status 409.\n- Hash the password using `bcrypt.hashpw` with a generated salt, encoding the password as UTF\u20118.\n- Insert the new user with a parameterized INSERT query storing the username and password hash.\n- Commit the transaction and return JSON success message with status 201.\n- On any MySQL error, log the exception, roll back the transaction if a connection exists, and return JSON error with status 500.\n- On any other exception, log the exception and return JSON error with status 500.\n- In a finally block, close the cursor and connection safely, ignoring any errors during close.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app with the configured host and port.\n- Ensure no passwords or sensitive data are logged, use parameterized queries to prevent SQL injection, and follow best practices for error handling and resource cleanup.\n- The code must be valid Python 3 code and must not contain any comments or explanatory text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4748858447488584,
+      "bandit_statement_nodes": [
+        41,
+        45
+      ],
+      "candidate_hash": "7f72a4a7661e3aebbd62f4657762820286354064ed62b76925cebd352a422c55",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 8,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.9+ and using only standard library modules plus the third\u2011party packages `flask`, `mysql-connector-python`, and `bcrypt`) that implements a secure user registration endpoint. The program must:\n\n1. Begin with `from __future__ import annotations`.\n2. Import the following modules in this exact order: `os`, `re`, `logging`, `Flask`, `request`, `jsonify` from `flask`, `mysql.connector`, and `bcrypt`.\n3. Configure logging to write INFO\u2011level messages to a file named `app.log` with the format `'%(asctime)s %(levelname)s %(message)s'`.\n4. Retrieve the following configuration values from environment variables:\n   - `DB_HOST`\n   - `DB_USER`\n   - `DB_PASSWORD`\n   - `DB_NAME`\n   - `FLASK_HOST` (default to `'127.0.0.1'` if not set)\n   - `FLASK_PORT` (default to `5000` if not set, and convert to `int`).\n5. Compile a regular expression `USERNAME_REGEX` that matches usernames consisting of 3 to 30 word characters (`^\\w{3,30}$`).\n6. Define a function `get_db_connection()` that returns a new MySQL connection using the retrieved DB credentials, with `autocommit=False`.\n7. Create a Flask app instance named `app`.\n8. Define a route `/register` that accepts only POST requests and performs the following steps:\n   - Extract `username`, `password`, and `confirm_password` from `request.form`, stripping whitespace from `username`.\n   - Validate `username` against `USERNAME_REGEX`; on failure return JSON `{'error': 'Invalid username'}` with HTTP 400.\n   - Ensure `password` is at least 8 characters; on failure return JSON `{'error': 'Password must be at least 8 characters long'}` with HTTP 400.\n   - Verify that `password` and `confirm_password` match; on failure return JSON `{'error': 'Passwords do not match'}` with HTTP 400.\n   - Open a database connection and cursor (use `dictionary=True` for the cursor).\n   - Use a parameterized query to check if the username already exists; if it does, return JSON `{'error': 'Username already exists'}` with HTTP 409.\n   - Hash the password with `bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())`.\n   - Insert the new user with a parameterized `INSERT` statement storing `username` and the hashed password.\n   - Commit the transaction and return JSON `{'message': 'User registered successfully'}` with HTTP 201.\n   - On any `mysql.connector.Error`, log the exception with `logging.exception('Database error during registration')`, roll back the transaction if a connection exists, and return JSON `{'error': 'Database error'}` with HTTP 500.\n   - On any other exception, log the exception with `logging.exception('Unexpected error during registration')` and return JSON `{'error': 'Internal server error'}` with HTTP 500.\n   - In a `finally` block, close the cursor and connection safely, ignoring any errors during close.\n9. Include the standard `if __name__ == '__main__':` block that runs the Flask app using the `FLASK_HOST` and `FLASK_PORT` values.\n\nAdditional requirements:\n- Use only parameterized queries; never concatenate user input into SQL strings.\n- Do not include any comments, docstrings, or explanatory text in the generated code.\n- Do not output any additional text before or after the code; the response must consist solely of the Python program described above.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4781609195402299,
+      "bandit_statement_nodes": [
+        41,
+        45
+      ],
+      "candidate_hash": "88ee98f3d785754e2f984da83ace9deb22edadf520b8ea18ed361e0123499af9",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 9,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that implements a Flask web service with a `/register` endpoint. The program must:\n\n- Use `from __future__ import annotations`.\n- Import only the following modules: `os`, `re`, `logging`, `Flask` (from `flask import Flask, request, jsonify`), `mysql.connector`, `bcrypt`.\n- Configure logging to write INFO level messages to a file named `app.log` with format `%(asctime)s %(levelname)s %(message)s`.\n- Read database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and Flask host/port (`FLASK_HOST` default `127.0.0.1`, `FLASK_PORT` default `5000`) from environment variables.\n- Compile a regular expression `USERNAME_REGEX` that matches usernames consisting of 3\u201130 word characters (`^\\w{3,30}$`).\n- Define a function `get_db_connection()` that returns a MySQL connection with autocommit disabled.\n- Create a Flask app instance.\n- Implement a POST `/register` route that:\n  * Retrieves `username`, `password`, `confirm_password` from `request.form`, stripping whitespace from `username`.\n  * Validates `username` against `USERNAME_REGEX`; returns JSON error with status 400 if invalid.\n  * Enforces password length of at least 8 characters; returns JSON error with status 400 if not.\n  * Checks that `password` and `confirm_password` match; returns JSON error with status 400 if they do not.\n  * Uses a try/except/finally block:\n    - Obtains a DB connection via `get_db_connection()` and a cursor with `dictionary=True`.\n    - Executes a parameterized SELECT to check if the username already exists; if it does, returns JSON error with status 409.\n    - Hashes the password with `bcrypt.hashpw` using a generated salt.\n    - Executes a parameterized INSERT to store the username and hashed password.\n    - Commits the transaction and returns JSON success message with status 201.\n    - On `mysql.connector.Error`, logs the exception, rolls back the transaction if a connection exists, and returns JSON error with status 500.\n    - On any other Exception, logs the exception and returns JSON error with status 500.\n    - In the finally block, safely close the cursor and connection, ignoring any errors during close.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with the configured host and port.\n\nThe code must be secure: use only parameterized queries, never log passwords, handle all exceptions, close all resources, and must run under Python 3. Ensure the script contains no extraneous functionality, no additional imports, and no comments. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.46846846846846846,
+      "bandit_statement_nodes": [
+        41,
+        45
+      ],
+      "candidate_hash": "2aa1a0d2899951c801f05acf84fb82e0c874e53038adc4fa6fbda4c81f784866",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 10,
+      "optimized_prompt": "Write a complete, production\u2011ready Python program (compatible with Python\u202f3.11+) that implements a user registration endpoint using Flask and MySQL, matching the exact functionality of the reference code below. The generated code must:\n\n1. Begin with `from __future__ import annotations`.\n2. Import only the following modules: `os`, `re`, `logging`, `flask.Flask`, `flask.request`, `flask.jsonify`, `mysql.connector`, and `bcrypt`.\n3. Configure logging to write INFO\u2011level messages to a file named `app.log` using the format `'%(asctime)s %(levelname)s %(message)s'`.\n4. Retrieve database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and Flask host/port (`FLASK_HOST`, `FLASK_PORT`) from environment variables, providing defaults for `FLASK_HOST` (`'127.0.0.1'`) and `FLASK_PORT` (`5000`). Convert `FLASK_PORT` to an integer.\n5. Compile a regular expression `USERNAME_REGEX` that matches usernames consisting of 3 to 30 word characters (`^\\w{3,30}$`).\n6. Define a function `get_db_connection()` that returns a MySQL connection with `autocommit=False`, using the environment\u2011derived credentials.\n7. Create a Flask app instance.\n8. Implement a route `@app.route('/register', methods=['POST'])` with a function `register()` that:\n   - Retrieves `username`, `password`, and `confirm_password` from `request.form`, stripping whitespace from `username`.\n   - Validates `username` against `USERNAME_REGEX`; on failure, returns JSON `{'error': 'Invalid username'}` with HTTP 400.\n   - Ensures `password` is present and at least 8 characters; on failure, returns JSON `{'error': 'Password must be at least 8 characters long'}` with HTTP 400.\n   - Checks that `password` equals `confirm_password`; on mismatch, returns JSON `{'error': 'Passwords do not match'}` with HTTP 400.\n   - Opens a database connection and cursor (`dictionary=True`), then:\n     * Executes a parameterized SELECT to check if the username already exists; if found, returns JSON `{'error': 'Username already exists'}` with HTTP 409.\n     * Hashes the password securely using `bcrypt.hashpw` with a generated salt (`bcrypt.gensalt()`), encoding the password as UTF\u20118.\n     * Executes a parameterized INSERT to store `username` and the binary password hash.\n     * Commits the transaction and returns JSON `{'message': 'User registered successfully'}` with HTTP 201.\n   - Catches `mysql.connector.Error`, logs the full exception stack with `logging.exception('Database error')`, rolls back the transaction if a connection exists, and returns JSON `{'error': 'Internal server error'}` with HTTP 500.\n   - Catches any other exception, logs it with `logging.exception('Unexpected error')`, and returns the same 500 JSON response.\n   - In a `finally` block, safely closes the cursor and connection, suppressing any secondary errors.\n9. Include the standard `if __name__ == '__main__':` guard that runs `app.run(host=FLASK_HOST, port=FLASK_PORT)`.\n10. Ensure all database interactions use parameterized queries to prevent SQL injection.\n11. Do not include any comments, explanatory text, or markup in the output. The code must be pure Python and must not contain any non\u2011Python language fragments.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.45217391304347826,
+      "bandit_statement_nodes": [
+        41,
+        45
+      ],
+      "candidate_hash": "5a9137a55603a33b56f2f3c1ba2a583810a5c1e30c45587811e107c78a179323",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 11,
+      "optimized_prompt": "Generate a complete, secure Python script (compatible with Python\u202f3.8+) that implements a Flask web application with a `/register` POST endpoint. The script must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `re`, `logging`, `flask` (specifically `Flask`, `request`, `jsonify`), `mysql.connector`, and `bcrypt`.\n- Configure logging to write INFO\u2011level messages to a file named `app.log` using the format `'%(asctime)s %(levelname)s %(message)s'`.\n- Retrieve database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and Flask host/port (`FLASK_HOST`, `FLASK_PORT`) from environment variables, providing defaults for `FLASK_HOST` (`'127.0.0.1'`) and `FLASK_PORT` (`5000`). Convert `FLASK_PORT` to an integer.\n- Compile a regular expression `USERNAME_REGEX` that matches usernames consisting of 3 to 30 word characters (`^\\w{3,30}$`).\n- Define a function `get_db_connection()` that returns a MySQL connection using `mysql.connector.connect` with the retrieved credentials, `autocommit=False`, and proper error handling.\n- Create a Flask app instance.\n- Implement the `/register` route accepting only POST requests. Inside the handler:\n  - Extract `username`, `password`, and `confirm_password` from `request.form`, stripping whitespace from `username`.\n  - Validate `username` against `USERNAME_REGEX`; on failure return JSON `{'error': 'Invalid username'}` with status 400.\n  - Ensure `password` is non\u2011empty and at least 8 characters; on failure return JSON `{'error': 'Password must be at least 8 characters long'}` with status 400.\n  - Verify `password` equals `confirm_password`; on mismatch return JSON `{'error': 'Passwords do not match'}` with status 400.\n  - Open a database connection and cursor (`dictionary=True`). Use parameterized queries to:\n    1. Check if the username already exists (`SELECT id FROM users WHERE username = %s`). If a row is found, return JSON `{'error': 'Username already exists'}` with status 409.\n    2. Hash the password securely with `bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())`.\n    3. Insert the new user (`INSERT INTO users (username, password_hash) VALUES (%s, %s)`) using the hashed password.\n  - Commit the transaction and return JSON `{'message': 'User registered successfully'}` with status 201.\n  - On any `mysql.connector.Error`, log the exception with `logging.exception('Database error')`, roll back the transaction if a connection exists, and return JSON `{'error': 'Internal server error'}` with status 500.\n  - On any other exception, log with `logging.exception('Unexpected error')` and return the same 500 JSON response.\n  - In a `finally` block, close the cursor and connection safely, suppressing any secondary errors.\n- Add the standard `if __name__ == '__main__':` block to run the Flask app with the retrieved host and port.\n\nThe generated code must be valid Python, contain no additional functionality, comments, or explanatory text, and must follow security best practices: use environment variables for secrets, parameterized SQL statements, proper password hashing, comprehensive error handling, and resource cleanup. Ensure the code is ready to run as\u2011is.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.45414847161572053,
+      "bandit_statement_nodes": [
+        44,
+        48
+      ],
+      "candidate_hash": "3c2dc56ab16e0451a960cdf7de02112f76b17cc7a09804d469b07330422e9563",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 12,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (compatible with Python\u202f3.11) that implements a Flask web application with a `/register` endpoint for user registration. The script must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `re`, `logging`, `Flask`, `request`, `jsonify`, `mysql.connector`, `bcrypt`.\n- Configure logging to write INFO\u2011level messages to a file named `app.log` with timestamp, level, and message.\n- Read database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and Flask host/port (`FLASK_HOST` default `127.0.0.1`, `FLASK_PORT` default `5000`) from environment variables using `os.getenv`.\n- Compile a regular expression `USERNAME_REGEX` that allows alphanumeric characters and underscores, length 3\u201130 (`r'^\\w{3,30}$'`).\n- Define a function `get_db_connection()` that returns a MySQL connection with `autocommit=False`, handling connection errors by logging the exception and re\u2011raising.\n- Create a Flask app instance.\n- Implement a POST `/register` route that:\n  * Retrieves `username`, `password`, `confirm_password` from `request.form`, stripping whitespace from `username`.\n  * Validates `username` against `USERNAME_REGEX`; returns JSON error 400 if invalid.\n  * Validates `password` is at least 8 characters; returns JSON error 400 if not.\n  * Checks `password` and `confirm_password` match; returns JSON error 400 if not.\n  * Uses a parameterized query to check if the username already exists; if so, returns JSON error 409.\n  * Hashes the password with bcrypt using `bcrypt.hashpw` and `bcrypt.gensalt`.\n  * Inserts the new user with a parameterized INSERT query, storing the password hash.\n  * Commits the transaction and returns JSON success message with status 201.\n  * Handles MySQL errors by logging, rolling back if a connection exists, and returning JSON error 500.\n  * Catches any other exceptions, logs them, and returns JSON error 500.\n  * Ensures the cursor and connection are closed in a `finally` block, swallowing any close errors.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app with the host and port from the environment variables.\n\nThe code must be secure: use prepared statements, never log sensitive data, enforce input validation, and properly manage resources. Do not include any comments, explanatory text, or code in languages other than Python. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.45021645021645024,
+      "bandit_statement_nodes": [
+        46,
+        50
+      ],
+      "candidate_hash": "6dfdc5b0af60dea8831bc200f77f85475e697be6ac004375b1b8918c9b906811",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 13,
+      "optimized_prompt": "Write a complete, production\u2011ready Python program (compatible with Python\u202f3.9+ and using `from __future__ import annotations`) that implements a user registration endpoint with the following exact specifications:\n\n1. **Imports**  \n   - `os`, `re`, `logging` from the standard library.  \n   - `Flask`, `request`, `jsonify` from `flask`.  \n   - `mysql.connector`.  \n   - `bcrypt`.\n\n2. **Logging**  \n   - Configure a logger that writes to a file named `app.log` with level `INFO`.  \n   - Use the format `'%(asctime)s %(levelname)s %(message)s'`.\n\n3. **Configuration via environment variables**  \n   - `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (required).  \n   - `FLASK_HOST` defaulting to `'127.0.0.1'`.  \n   - `FLASK_PORT` defaulting to `5000` (as an integer).\n\n4. **Username validation**  \n   - Compile a regular expression `USERNAME_REGEX` that matches strings of 3 to 30 word characters (`^\\w{3,30}$`).\n\n5. **Database connection helper**  \n   - Define `get_db_connection()` that attempts to create a MySQL connection with the supplied environment variables, sets `autocommit=False`, returns the connection object, logs any `mysql.connector.Error` with `logging.exception`, and re\u2011raises the exception.\n\n6. **Flask application**  \n   - Instantiate a Flask app named `app`.\n\n7. **`/register` route** (POST only) with the following logic, wrapped in a top\u2011level `try/except` that logs unexpected errors and returns a generic 500 JSON response:\n   - Retrieve `username`, `password`, and `confirm_password` from `request.form`. Strip whitespace from `username`.\n   - Validate `username` against `USERNAME_REGEX`; on failure return JSON `{'error': 'Invalid username'}` with status 400.\n   - Ensure `password` length is at least 8 characters; on failure return JSON `{'error': 'Password must be at least 8 characters'}` with status 400.\n   - Verify `password` equals `confirm_password`; on mismatch return JSON `{'error': 'Passwords do not match'}` with status 400.\n   - Open a database connection via `get_db_connection()` and obtain a cursor.\n   - Use a parameterized query to check if the username already exists (`SELECT 1 FROM users WHERE username = %s`). If a row is found, return JSON `{'error': 'Username already exists'}` with status 409.\n   - Hash the password securely with `bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())`.\n   - Insert the new user with a parameterized `INSERT INTO users (username, password_hash) VALUES (%s, %s)`.\n   - Commit the transaction, then return JSON `{'message': 'User registered successfully'}` with status 201.\n   - On any `mysql.connector.Error`, log the exception, roll back the transaction if a connection exists, and return JSON `{'error': 'Internal server error'}` with status 500.\n   - Ensure the cursor and connection are closed in a `finally` block, swallowing any secondary exceptions.\n\n8. **Application entry point**  \n   - Include the standard `if __name__ == '__main__':` block that runs `app.run(host=FLASK_HOST, port=FLASK_PORT)`.\n\nAdditional requirements:\n- Use only Python; do not include any code in other languages.\n- Do not add any comments, docstrings, or explanatory text inside the generated code.\n- Do not output any surrounding narrative, markdown fences, or additional formatting\u2014output only the raw Python code that fulfills the specifications above.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.45021645021645024,
+      "bandit_statement_nodes": [
+        47,
+        51
+      ],
+      "candidate_hash": "d70dc003e38916d678f3af0f949bfc5cfd1917f84a4c3984bfd77979c834cca1",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 14,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (Python\u202f3) that implements a Flask web application with a `/register` endpoint for user registration. The script must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `re`, `logging`, `flask.Flask`, `flask.request`, `flask.jsonify`, `mysql.connector`, and `bcrypt`.\n- Configure logging to write INFO level messages to a file named `app.log` using the format `'%(asctime)s %(levelname)s %(message)s'`.\n- Read the following environment variables: `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `FLASK_HOST` (default `'127.0.0.1'`), and `FLASK_PORT` (default `'5000'` converted to int).\n- Compile a regular expression `USERNAME_REGEX` that matches usernames consisting of 3 to 30 word characters (`^\\w{3,30}$`).\n- Define a function `get_db_connection()` that:\n  - Attempts to create a MySQL connection using the environment variables.\n  - Sets `autocommit` to `False`.\n  - Returns the connection object.\n  - Logs any `mysql.connector.Error` with a stack trace and re\u2011raises the exception.\n- Create a Flask app instance.\n- Implement the `/register` route accepting only POST requests that:\n  - Retrieves `username`, `password`, and `confirm_password` from `request.form`, stripping whitespace from `username`.\n  - Validates `username` against `USERNAME_REGEX`; on failure returns JSON `{'error': 'Invalid username'}` with status 400.\n  - Ensures `password` length is at least 8 characters; on failure returns JSON `{'error': 'Password must be at least 8 characters'}` with status 400.\n  - Checks that `password` and `confirm_password` match; on failure returns JSON `{'error': 'Passwords do not match'}` with status 400.\n  - Opens a database connection via `get_db_connection()` and creates a cursor.\n  - Executes a parameterized query `SELECT 1 FROM users WHERE username = %s` to check for existing username.\n  - If a record exists, returns JSON `{'error': 'Username already exists'}` with status 409.\n  - Hashes the password using `bcrypt.hashpw` with `bcrypt.gensalt()` and stores the resulting hash.\n  - Inserts the new user with a parameterized query `INSERT INTO users (username, password_hash) VALUES (%s, %s)`.\n  - Commits the transaction and returns JSON `{'message': 'User registered successfully'}` with status 201.\n  - Catches any `mysql.connector.Error`, logs the exception with a stack trace, rolls back the transaction if a connection exists, and returns JSON `{'error': 'Internal server error'}` with status 500.\n  - Ensures the cursor and connection are closed in a `finally` block, suppressing any exceptions during close.\n- Wrap the entire route logic in a top\u2011level `try/except` that logs unexpected exceptions and returns JSON `{'error': 'Internal server error'}` with status 500.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app using the host and port from the environment variables.\n- Do not include any comments, explanatory text, or markdown in the output\u2014output only the raw Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.45021645021645024,
+      "bandit_statement_nodes": [
+        46,
+        50
+      ],
+      "candidate_hash": "ba8b4d04e8c67c8da612f46037c904b6aac4a06d1005bc96fa4a51111a1ff0b3",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 15,
+      "optimized_prompt": "Write a complete, production\u2011ready Python 3 program that implements a user registration endpoint using Flask and MySQL, matching the exact functionality of the reference code below. The generated code must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `re`, `logging`, `flask` (specifically `Flask`, `request`, `jsonify`), `mysql.connector`, and `bcrypt`.\n- Configure logging to write INFO\u2011level messages to a file named `app.log` with the format `'%(asctime)s %(levelname)s %(message)s'`.\n- Retrieve database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and Flask server settings (`FLASK_HOST`, `FLASK_PORT`) from environment variables, providing defaults for `FLASK_HOST` (`'127.0.0.1'`) and `FLASK_PORT` (`5000`), converting the port to an integer.\n- Compile a regular expression `USERNAME_REGEX` that matches usernames consisting of 3 to 30 word characters (`^\\w{3,30}$`).\n- Define a function `get_db_connection()` that:\n  * Attempts to create a MySQL connection using the retrieved environment variables.\n  * Sets `autocommit` to `False`.\n  * Returns the connection object.\n  * Logs any `mysql.connector.Error` with a stack trace and re\u2011raises the exception.\n- Create a Flask app instance.\n- Register a route `/register` that accepts only POST requests and performs the following steps:\n  1. Extract `username`, `password`, and `confirm_password` from `request.form`, stripping whitespace from `username`.\n  2. Validate `username` against `USERNAME_REGEX`; on failure return JSON `{'error': 'Invalid username'}` with HTTP 400.\n  3. Ensure `password` is at least 8 characters; on failure return JSON `{'error': 'Password must be at least 8 characters'}` with HTTP 400.\n  4. Verify `password` equals `confirm_password`; on failure return JSON `{'error': 'Passwords do not match'}` with HTTP 400.\n  5. Open a database connection via `get_db_connection()` and obtain a cursor.\n  6. Check if the username already exists using a parameterized query `SELECT 1 FROM users WHERE username = %s`; if a row is found, return JSON `{'error': 'Username already exists'}` with HTTP 409.\n  7. Hash the password securely with `bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())`.\n  8. Insert the new user with a parameterized query `INSERT INTO users (username, password_hash) VALUES (%s, %s)`.\n  9. Commit the transaction and return JSON `{'message': 'User registered successfully'}` with HTTP 201.\n  10. On any `mysql.connector.Error`, log the exception with a stack trace, roll back the transaction if a connection exists, and return JSON `{'error': 'Internal server error'}` with HTTP 500.\n  11. Ensure the cursor and connection are closed in a `finally` block, suppressing any secondary errors.\n- Wrap the entire route logic in a top\u2011level `try/except` that catches unexpected exceptions, logs them, and returns JSON `{'error': 'Internal server error'}` with HTTP 500.\n- Include the standard `if __name__ == '__main__':` guard to run the Flask app with `app.run(host=FLASK_HOST, port=FLASK_PORT)`.\n- Do **not** include any comments, docstrings, or explanatory text in the output; output **only** the Python code.\n- Ensure the code is secure: use parameterized SQL queries, proper password hashing, thorough input validation, and comprehensive error handling as described.\n- Do not output any additional text, explanations, or markup. The response must be a single, self\u2011contained Python script.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4444444444444444,
+      "bandit_statement_nodes": [
+        47,
+        51
+      ],
+      "candidate_hash": "9147256b50c7d5953bdcf1e078f5cf983066d56defdd1292c89ba28467c8adae",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 16,
+      "optimized_prompt": "Generate a secure Python 3 program that implements a Flask web application with a `/register` POST endpoint. The script must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `re`, `logging`, `Flask`, `request`, `jsonify`, `mysql.connector`, `bcrypt`.\n- Configure logging to write INFO level messages to `app.log` with timestamp, level, and message.\n- Read database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and Flask host/port (`FLASK_HOST` default `'127.0.0.1'`, `FLASK_PORT` default `5000`) from environment variables.\n- Compile a username regex `r'^\\w{3,30}$'`.\n- Define a function `get_db_connection()` that returns a MySQL connection with autocommit disabled, handling connection errors by logging and re\u2011raising.\n- Create a Flask app instance.\n- Implement a `/register` route accepting POST requests that:\n  * Retrieves `username`, `password`, `confirm_password` from `request.form`, stripping whitespace from `username`.\n  * Validates `username` against the regex, ensures `password` length is at least 8 characters, and checks that `password` matches `confirm_password`; returns appropriate JSON error responses with status codes 400 or 409.\n  * Uses `get_db_connection()` to obtain a connection, creates a cursor, checks if the username already exists using a parameterized query.\n  * If the username does not exist, hashes the password with bcrypt (`bcrypt.hashpw` and `bcrypt.gensalt()`), stores the username and hash with a parameterized INSERT, commits the transaction, and returns a success JSON response with status 201.\n  * Handles MySQL errors by logging, rolling back, and returning a 500 JSON error.\n  * Ensures the cursor and connection are closed in a finally block, swallowing any close errors.\n- Wrap the entire route logic in a top\u2011level try/except to catch unexpected errors, log them, and return a 500 JSON error.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app with the host and port from environment variables.\n- Do not include any comments, explanatory text, or code in any language other than Python. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.44349680170575695,
+      "bandit_statement_nodes": [
+        46,
+        50,
+        55
+      ],
+      "candidate_hash": "0034f67d6f7fdbef4377b34cc15bdbfdf767fb438c5bb444ab8607d6a79f92c2",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 17,
+      "optimized_prompt": "Generate a complete, production\u2011ready Python 3 script (no other language) that implements a Flask web application with a `/register` POST endpoint. The script must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `re`, `logging`, `flask.Flask`, `flask.request`, `flask.jsonify`, `mysql.connector`, and `bcrypt`.\n- Configure logging to write INFO level messages to a file named `app.log` with the format `'%(asctime)s %(levelname)s %(message)s'`.\n- Read the following environment variables: `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `FLASK_HOST` (default `'127.0.0.1'`), and `FLASK_PORT` (default `'5000'` converted to int).\n- Compile a regular expression `USERNAME_REGEX` that matches usernames consisting of 3 to 30 word characters (`^\\w{3,30}$`).\n- Define a function `get_db_connection()` that creates and returns a MySQL connection using `mysql.connector.connect` with the read environment variables, sets `autocommit=False`, and logs any connection errors before re\u2011raising the exception.\n- Create a Flask app instance.\n- Implement the `/register` route handling POST requests with the following logic:\n  1. Retrieve `username`, `password`, and `confirm_password` from `request.form`, stripping whitespace from `username`.\n  2. Validate `username` against `USERNAME_REGEX`; on failure return JSON `{'error': 'Invalid username'}` with status 400.\n  3. Ensure `password` length is at least 8 characters; on failure return JSON `{'error': 'Password too short'}` with status 400.\n  4. Verify `password` equals `confirm_password`; on failure return JSON `{'error': 'Passwords do not match'}` with status 400.\n  5. Open a database connection via `get_db_connection()`, obtain a cursor, and execute a parameterized query to check if the username already exists (`SELECT 1 FROM users WHERE username = %s LIMIT 1`). If a row is found, return JSON `{'error': 'Username already exists'}` with status 409.\n  6. Hash the password using `bcrypt.hashpw` with `bcrypt.gensalt()`, encoding the password as UTF\u20118.\n  7. Insert the new user with a parameterized `INSERT INTO users (username, password_hash) VALUES (%s, %s)` statement, commit the transaction, and return JSON `{'message': 'User registered successfully'}` with status 201.\n  8. On any `mysql.connector.Error`, log the error, attempt a rollback if a connection exists, and return JSON `{'error': 'Database error'}` with status 500.\n  9. Ensure the cursor and connection are closed in a `finally` block, handling any exceptions silently.\n- Wrap the entire route logic in a top\u2011level `try/except` that logs unexpected exceptions and returns JSON `{'error': 'Internal server error'}` with status 500.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app using the `FLASK_HOST` and `FLASK_PORT` values.\n\nThe generated code must be secure (use parameterized queries, proper password hashing, thorough input validation, and robust error handling) and must preserve the exact functionality described above. Output only the Python code, without any additional explanation or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.44924406047516197,
+      "bandit_statement_nodes": [
+        46,
+        50,
+        55
+      ],
+      "candidate_hash": "18e20c77776c9e8dcaf26d7acca6f598f980ea9181873d7307d4e036622cc0ef",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 18,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program (compatible with Python\u202f3.9+) that implements a Flask web service with a `/register` POST endpoint. The program must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `re`, `logging`, `Flask`, `request`, `jsonify`, `mysql.connector`, `bcrypt`.\n- Configure logging to write INFO level messages to a file named `app.log` with timestamp, level, and message.\n- Read database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and Flask host/port (`FLASK_HOST` default `'127.0.0.1'`, `FLASK_PORT` default `5000`) from environment variables using `os.getenv`.\n- Compile a username regex: `USERNAME_REGEX = re.compile(r'^\\w{3,30}$')`.\n- Define a function `get_db_connection()` that returns a MySQL connection with `autocommit=False`, handling connection errors by logging and re\u2011raising.\n- Create a Flask app instance.\n- Implement the `/register` route handling POST requests:\n  * Retrieve `username`, `password`, `confirm_password` from `request.form`, stripping whitespace from `username`.\n  * Validate `username` against `USERNAME_REGEX`; if invalid return JSON error with status\u202f400.\n  * Ensure `password` length is at least 8 characters; otherwise return JSON error with status\u202f400.\n  * Ensure `password` equals `confirm_password`; otherwise return JSON error with status\u202f400.\n  * Obtain a MySQL connection via `get_db_connection()` and create a cursor.\n  * Check if the username already exists using a parameterized `SELECT` query; if it does, return JSON error with status\u202f409.\n  * Hash the password using `bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())`.\n  * Insert the new user with a parameterized `INSERT` query, commit the transaction, and return JSON success with status\u202f201.\n  * On any MySQL error, log the error, roll back the transaction if possible, and return JSON error with status\u202f500.\n  * Ensure the cursor and connection are closed in a `finally` block, handling any exceptions silently.\n- Wrap the entire route logic in a top\u2011level `try/except` to catch unexpected exceptions, log them, and return JSON error with status\u202f500.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app using the host and port variables.\n- Do not include any comments, explanatory text, or code in languages other than Python. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4792626728110599,
+      "bandit_statement_nodes": [
+        46,
+        50
+      ],
+      "candidate_hash": "8e35c55ef4c784baf2d5180fba6e4c8af3b7d39d62463e89b7cc00bfe22335e6",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 19,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that implements a Flask web service with a `/register` endpoint. The program must:\n\n- Use `from __future__ import annotations`.\n- Import only the following modules: `os`, `re`, `logging`, `flask` (Flask, request, jsonify), `mysql.connector`, `bcrypt`.\n- Configure logging to write INFO level messages to a file named `app.log` with format `%(asctime)s %(levelname)s %(message)s`.\n- Read database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and Flask host/port (`FLASK_HOST`, `FLASK_PORT`) from environment variables, providing defaults for host (`127.0.0.1`) and port (`5000`).\n- Compile a username validation regex that allows 3\u201130 word characters.\n- Define a function `get_db_connection()` that returns a MySQL connection with `autocommit=False`, handling connection errors by logging and re\u2011raising.\n- Create a Flask app instance.\n- Implement a POST `/register` route that:\n  * Retrieves `username`, `password`, `confirm_password` from `request.form`, stripping whitespace from username.\n  * Validates username against the regex, returns JSON error 400 if invalid.\n  * Enforces password length \u2265\u202f8, returns JSON error 400 if not.\n  * Checks that password and confirm_password match, returns JSON error 400 if not.\n  * Uses `get_db_connection()` to obtain a connection, creates a cursor, and checks if the username already exists using a parameterized query; if it does, returns JSON error 409.\n  * Hashes the password with `bcrypt.hashpw` using a generated salt.\n  * Inserts the new user with a parameterized INSERT query, commits the transaction, and returns JSON success message with status 201.\n  * Handles any MySQL errors by logging, rolling back the transaction if needed, and returning JSON error 500.\n  * Ensures the cursor and connection are closed in a finally block, swallowing any close errors.\n  * Catches any unexpected exceptions, logs them, and returns JSON error 500.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app with the configured host and port.\n- Ensure the code follows security best practices: use prepared statements, never log sensitive data, use strong password hashing, validate all inputs, and properly manage resources.\n- Output only the Python code, with no additional explanation, comments, or markup. The code must be valid Python and must not contain any code in other languages.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4482758620689655,
+      "bandit_statement_nodes": [
+        43,
+        46
+      ],
+      "candidate_hash": "0c06e13fe9eb3bbb9cea08a8d6e72f7d2ce57502531c4ad38f992a88715e8a22",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 20,
+      "optimized_prompt": "Write a complete, secure Python 3 program (no other language) that implements a Flask web application with a `/register` endpoint for user registration. The code must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `re`, `logging`, `Flask`, `request`, `jsonify` from `flask`, `mysql.connector`, and `bcrypt`.\n- Configure logging to write INFO level messages to a file named `app.log` with the format `'%(asctime)s %(levelname)s %(message)s'`.\n- Retrieve database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and Flask host/port (`FLASK_HOST`, `FLASK_PORT`) from environment variables, providing defaults for `FLASK_HOST` (`'127.0.0.1'`) and `FLASK_PORT` (`5000`), converting the port to an integer.\n- Compile a regular expression `USERNAME_REGEX` that matches usernames consisting of 3 to 30 word characters (`^\\w{3,30}$`).\n- Define a function `get_db_connection()` that creates and returns a MySQL connection using `mysql.connector.connect` with the retrieved parameters, sets `autocommit=False`, and logs an error then re\u2011raises any connection exception.\n- Create a Flask app instance.\n- Implement a route `@app.route('/register', methods=['POST'])` with a function `register()` that:\n  1. Retrieves `username`, `password`, and `confirm_password` from `request.form`, stripping whitespace from `username`.\n  2. Validates `username` against `USERNAME_REGEX`; on failure returns JSON `{'error': 'Invalid username'}` with status 400.\n  3. Ensures `password` length is at least 8 characters; on failure returns JSON `{'error': 'Password must be at least 8 characters'}` with status 400.\n  4. Checks that `password` equals `confirm_password`; on mismatch returns JSON `{'error': 'Passwords do not match'}` with status 400.\n  5. Obtains a database connection via `get_db_connection()`, creates a cursor, and:\n     - Executes a parameterized query to check if the username already exists (`SELECT 1 FROM users WHERE username = %s`). If a row is found, returns JSON `{'error': 'Username already exists'}` with status 409.\n     - Hashes the password using `bcrypt.hashpw` with `bcrypt.gensalt()`.\n     - Inserts the new user with a parameterized query (`INSERT INTO users (username, password_hash) VALUES (%s, %s)`), passing the username and the hashed password.\n     - Commits the transaction and returns JSON `{'message': 'User registered successfully'}` with status 201.\n  6. Catches any `mysql.connector.Error`, logs an error, rolls back the transaction, and returns JSON `{'error': 'Database error'}` with status 500.\n  7. In a `finally` block, safely closes the cursor and connection, ignoring any exceptions during close.\n  8. Wraps the entire handler in a broad `except Exception` that logs an unexpected error and returns JSON `{'error': 'Internal server error'}` with status 500.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app with the retrieved host and port.\n\nThe program must not contain any comments, explanatory text, or non\u2011code output. Ensure all database interactions use parameterized queries to prevent SQL injection, handle all exceptions as specified, and maintain the exact functionality described. Do not add any additional features or output.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 20,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "06e708a7b4ad639efd4a0d86556d5374fa58ed79501c414b2611df3f8bd5c195",
+  "status": "max_iterations_reached"
+}

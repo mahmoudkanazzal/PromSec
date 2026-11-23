@@ -1,0 +1,71 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "a5877103a973421feff68bbed8646bc6358ea02a4b2e38f90b240b8e4b863b85",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a server error (KeyError).",
+      "SQL injection is possible because the username is interpolated directly into the query.",
+      "Non\u2011byte password input may raise a TypeError when hashing.",
+      "Database connection failures raise exceptions and result in a 500 error.",
+      "If multiple rows exist for the same username, only the first fetched row is used.",
+      "An empty username results in no match and a redirect to /wrong."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by verifying the supplied username and password against stored credentials and redirect the client accordingly.",
+    "invariants": [
+      "The route only handles POST requests; other methods are not defined.",
+      "Only read\u2011only SELECT queries are performed; no data is modified.",
+      "The response is always a redirect to either /success or /wrong.",
+      "Password comparison uses MD5 hashing of the raw password string.",
+      "Database connection parameters are hard\u2011coded and unchanged.",
+      "Username lookup is performed exactly as provided (case\u2011sensitive)."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /login with form fields 'username' and 'password'.",
+      "Queries the MySQL 'usr' table for a row matching the given username.",
+      "Computes the MD5 hash of the provided password.",
+      "If the hash matches the stored password hash, returns an HTTP 302 redirect to /success.",
+      "If the username is not found or the hash does not match, returns an HTTP 302 redirect to /wrong.",
+      "Always returns a redirect response (either /success or /wrong)."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a connection to a local MySQL database (host=localhost, user=root, passwd=root).",
+      "Executes SELECT statements against the 'usr' table.",
+      "Sends an HTTP redirect response to the client.",
+      "May generate MySQL connection logs on the server."
+    ],
+    "source_hash": "8c96e5cf69da3fbe6e443e3be1ae77760b89a8ba49a54a5c0f8a5c0c0d9d3d82"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.2,
+    "io_semantics": 0.5,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file52.py",
+  "gated_score": 0.3125,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.3125,
+  "original_hash": "8c96e5cf69da3fbe6e443e3be1ae77760b89a8ba49a54a5c0f8a5c0c0d9d3d82",
+  "rationale": "The candidate preserves the route, POST handling, and always returns a redirect, but it deviates from the contract on key points: it uses bcrypt instead of MD5, employs parameterized queries (preventing the expected SQL injection), defaults missing fields to empty strings rather than raising KeyError, and encodes passwords to bytes avoiding the TypeError edge case. DB credentials are not hard\u2011coded as specified. Consequently, core behavior, invariants, and edge\u2011case handling are largely broken, ",
+  "schema": 1,
+  "stability_abs_difference": 0.18988,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.5,
+    "invariants": 0.5,
+    "io_semantics": 0.67,
+    "side_effects": 0.75
+  },
+  "stability_score": 0.50238,
+  "weighted_mean": 0.35,
+  "worst_dimension": 0.2
+}

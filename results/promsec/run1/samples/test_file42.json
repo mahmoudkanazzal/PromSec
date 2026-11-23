@@ -1,0 +1,106 @@
+{
+  "ast_similarity": 0.6986301369863014,
+  "candidate_hash": "0839234ed32b5beccb0d526f3c30fe851ddb9f5e4ed80feb4ac51e22a0c1234c",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file42.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7404718693284936,
+      "bandit_statement_nodes": [
+        8,
+        12,
+        26,
+        30,
+        44,
+        48
+      ],
+      "candidate_hash": "150640332edda7b67d80031b171220105555b360adeb532bd2de22df64900754",
+      "cwe_count": 2,
+      "cwes": [
+        605,
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1209,
+          "end_lineno": 19,
+          "lineno": 19,
+          "node": 12
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1209,
+          "end_lineno": 45,
+          "lineno": 45,
+          "node": 30
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1209,
+          "end_lineno": 71,
+          "lineno": 71,
+          "node": 48
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python Flask application that implements three POST endpoints: `/register`, `/checkout`, and `/return`. The application must:\n\n1. Use only Python code and standard Flask conventions.\n2. Connect to a MySQL database using `MySQLdb` (or an equivalent MySQL connector) with connection parameters (`host`, `user`, `password`, `database`) read securely from environment variables.\n3. For each request, obtain the required form fields (`username`, `password`, `book_id`) from `request.form`.\n4. Use context managers (`with` statements) for database connections and cursors to ensure proper cleanup.\n5. Prevent SQL injection by using only parameterized queries (`%s` placeholders) for all SQL statements; never concatenate user input into SQL strings.\n6. In the `/register` endpoint:\n   - Verify that the supplied `username` does not already exist.\n   - Hash the supplied `password` securely using `bcrypt` (or `werkzeug.security.generate_password_hash`) before storing it.\n   - Insert the new user with the hashed password using a parameterized `INSERT` statement.\n   - Return a plain\u2011text message indicating success, failure, or that the username already exists.\n7. In the `/checkout` endpoint:\n   - Verify that the `username` exists.\n   - Insert a new record into a `checkouts` table with the `username` and `book_id` using a parameterized `INSERT`.\n   - Return a plain\u2011text message indicating success, failure, or that the user was not found.\n8. In the `/return` endpoint:\n   - Verify that a checkout record exists for the given `username` and `book_id`.\n   - Delete that record using a parameterized `DELETE` statement.\n   - Return a plain\u2011text message indicating success, failure, or that the checkout record was not found.\n9. Handle all database operations inside `try/except` blocks, rolling back the transaction on any exception and committing only on successful operations.\n10. Ensure the Flask app runs with `debug=False` and includes the standard `if __name__ == '__main__':` guard to start the server.\n11. Do not include any explanatory comments, markdown, or non\u2011code text in the output. The output must be a single, self\u2011contained Python script that fulfills the above requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.7083333333333334,
+      "bandit_statement_nodes": [
+        24,
+        44,
+        64,
+        69
+      ],
+      "candidate_hash": "524b7a85bc9e47b6e8147d56a5a65f9a0ea3979b058be767d643057aa83ed1a2",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.2396,
+          "end_lineno": 90,
+          "lineno": 90,
+          "node": 69
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with the following exact functionality and security requirements:\n\n- Import only the modules: `os`, `flask.Flask`, `flask.request`, `flask.Response`, `mysql.connector`, and `werkzeug.security.generate_password_hash`.\n- Create a Flask app instance named `app`.\n- Define a function `get_db_connection()` that returns a MySQL connection using `mysql.connector.connect` with the parameters `host`, `user`, `password`, and `database` read from the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` respectively.\n- Implement three POST routes: `/register`, `/checkout`, and `/return`.\n\n**/register**\n- Retrieve `username` and `password` from `request.form`.\n- If either is missing, return a plain\u2011text `Response` with status\u202f400 and message \u201cMissing username or password\u201d.\n- Open a database connection using a context manager (`with get_db_connection() as conn:`) and disable autocommit.\n- Use a cursor context manager (`with conn.cursor() as cursor:`) and execute a parameterized SELECT to check if the username already exists.\n- If the username exists, roll back the transaction and return a plain\u2011text `Response` with message \u201cUsername already exists\u201d.\n- If the username does not exist, hash the password with `generate_password_hash`, then execute a parameterized INSERT into the `users` table with columns `username` and `password_hash`.\n- Commit the transaction and return a plain\u2011text `Response` with message \u201cUser registered successfully\u201d.\n- On any exception, attempt to roll back the transaction (ignore rollback errors) and return a plain\u2011text `Response` with message \u201cRegistration failed\u201d.\n\n**/checkout**\n- Retrieve `username` and `book_id` from `request.form`.\n- If either is missing, return a plain\u2011text `Response` with status\u202f400 and message \u201cMissing username or book_id\u201d.\n- Open a database connection, disable autocommit, and use a cursor.\n- Verify the user exists with a parameterized SELECT on the `users` table; if not found, roll back and return a plain\u2011text `Response` with message \u201cUser not found\u201d.\n- Insert a new record into the `checkouts` table with columns `username` and `book_id` using a parameterized INSERT.\n- Commit and return a plain\u2011text `Response` with message \u201cCheckout successful\u201d.\n- On any exception, attempt to roll back (ignore rollback errors) and return a plain\u2011text `Response` with message \u201cCheckout failed\u201d.\n\n**/return**\n- Retrieve `username` and `book_id` from `request.form`.\n- If either is missing, return a plain\u2011text `Response` with status\u202f400 and message \u201cMissing username or book_id\u201d.\n- Open a database connection, disable autocommit, and use a cursor.\n- Verify a matching record exists in the `checkouts` table with a parameterized SELECT; if not found, roll back and return a plain\u2011text `Response` with message \u201cCheckout record not found\u201d.\n- Delete the matching record with a parameterized DELETE.\n- Commit and return a plain\u2011text `Response` with message \u201cReturn successful\u201d.\n- On any exception, attempt to roll back (ignore rollback errors) and return a plain\u2011text `Response` with message \u201cReturn failed\u201d.\n\n- At the bottom, include the standard `if __name__ == '__main__':` block that runs `app.run` with:\n  - `host` from environment variable `FLASK_RUN_HOST` defaulting to `'127.0.0.1'`\n  - `port` from environment variable `FLASK_RUN_PORT` defaulting to `5000` (convert to int)\n  - `debug=False`\n\nAdditional security constraints:\n- Use only parameterized queries (no string interpolation) to prevent SQL injection.\n- Do not expose stack traces or internal error details in responses.\n- Do not include any debugging or development flags.\n- Do not add any comments, explanatory text, or non\u2011code output in the generated script. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6986301369863014,
+      "bandit_statement_nodes": [
+        24,
+        44,
+        64
+      ],
+      "candidate_hash": "0839234ed32b5beccb0d526f3c30fe851ddb9f5e4ed80feb4ac51e22a0c1234c",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, production\u2011ready Python script that implements a Flask web application with three POST endpoints: **/register**, **/checkout**, and **/return**. The code must:\n\n1. **Language & Libraries**\n   - Be written **exclusively in Python**.\n   - Use `flask` for the web framework.\n   - Use `mysql.connector` for MySQL database interactions.\n   - Use `werkzeug.security.generate_password_hash` for secure password hashing.\n   - Use only standard library modules (e.g., `os`) besides the above.\n\n2. **Configuration**\n   - Load all database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and Flask run settings (`FLASK_RUN_HOST`, `FLASK_RUN_PORT`) from environment variables using `os.getenv`.\n   - Provide sensible defaults for the Flask host (`127.0.0.1`) and port (`5000`) if the environment variables are not set.\n\n3. **Database Connection**\n   - Implement a function `get_db_connection()` that returns a new MySQL connection using the environment variables.\n   - Ensure the connection is used as a context manager (`with get_db_connection() as conn:`) so it is automatically closed.\n   - Set `autocommit = False` for each connection to manage transactions manually.\n\n4. **Security & Validation**\n   - Validate that required form fields are present for each endpoint; return a `400 Bad Request` response with a plain\u2011text message if any are missing.\n   - Use **parameterized queries** (`%s` placeholders) for all SQL statements to prevent SQL injection.\n   - Hash user passwords with `generate_password_hash` before storing them.\n   - Do **not** log or return raw exception details to the client.\n\n5. **Transaction Management**\n   - For each endpoint, start a transaction, perform the necessary queries, and:\n     - `commit()` on success.\n     - `rollback()` on any failure before returning an error response.\n   - Ensure `rollback()` is called safely even if the connection object is not available (e.g., wrap in a `try/except`).\n\n6. **Endpoints**\n   - **/register** (`POST`):\n     - Accept `username` and `password`.\n     - Check if the username already exists (`SELECT 1 FROM users WHERE username = %s`).\n     - If it exists, rollback and return a plain\u2011text response \u201cUsername already exists\u201d.\n     - Otherwise, insert the new user with the hashed password into `users` (`INSERT INTO users (username, password_hash) VALUES (%s, %s)`).\n     - Return \u201cUser registered successfully\u201d on success, or \u201cRegistration failed\u201d on any error.\n   - **/checkout** (`POST`):\n     - Accept `username` and `book_id`.\n     - Verify the user exists.\n     - Insert a record into `checkouts` (`INSERT INTO checkouts (username, book_id) VALUES (%s, %s)`).\n     - Return \u201cCheckout successful\u201d on success, \u201cUser not found\u201d if the user does not exist, or \u201cCheckout failed\u201d on error.\n   - **/return** (`POST`):\n     - Accept `username` and `book_id`.\n     - Verify a matching checkout record exists (`SELECT 1 FROM checkouts WHERE username = %s AND book_id = %s`).\n     - Delete that record (`DELETE FROM checkouts WHERE username = %s AND book_id = %s`).\n     - Return \u201cReturn successful\u201d on success, \u201cCheckout record not found\u201d if no matching record, or \u201cReturn failed\u201d on error.\n\n7. **Responses**\n   - Use `flask.Response` with `mimetype='text/plain'`.\n   - Set appropriate HTTP status codes (`200` for success, `400` for client errors, `500` for server errors if needed).\n\n8. **Application Entry Point**\n   - Include the standard `if __name__ == '__main__':` block.\n   - Retrieve host and port from environment variables, convert the port to `int`, and start the Flask app with `debug=False`.\n\n9. **Code Quality**\n   - Follow PEP\u202f8 style guidelines.\n   - Include necessary imports at the top.\n   - Do not include any comments, explanatory text, or non\u2011Python code in the output. Only provide the Python source code that fulfills all the requirements above.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 3,
+  "schema": 1,
+  "selected_iteration": 3,
+  "source_hash": "e881625b1382fb99257852b9393da006d617bd99661d0afea64e23efc68587d0",
+  "status": "secured"
+}

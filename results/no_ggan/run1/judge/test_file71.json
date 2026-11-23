@@ -1,0 +1,68 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "b5af8849303a0ac01added08cf17e5415e2cd5a9bf64beddbfe2bbecf2441452",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' form fields.",
+      "Database connection failure or query execution error.",
+      "SQL injection risk due to direct string formatting of the INSERT statement.",
+      "Attempt to register a username that already exists (unique\u2011key violation).",
+      "Extremely long input values that may exceed column size limits.",
+      "Failure to generate a random salt (e.g., OS entropy exhaustion)."
+    ],
+    "entrypoints": [],
+    "intent": "Register a new user via an HTTP POST request and persist the credentials in a MySQL database.",
+    "invariants": [
+      "Exactly one user record is created per successful request.",
+      "The stored password field contains the SHA\u20111 hash of password+salt.",
+      "The generated salt is stored alongside the hash.",
+      "Created_at and updated_at timestamps are set to the current time.",
+      "Database connection parameters (host, user, password, db) remain constant."
+    ],
+    "io_behavior": [
+      "Accepts a POST request to /register with form fields 'username' and 'password'.",
+      "Returns an HTTP redirect response (to the main page) on successful registration.",
+      "Returns an HTTP error response if required fields are missing or a database error occurs."
+    ],
+    "public_api": {
+      "func:register": "()",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Generates a 16\u2011byte random salt for each registration.",
+      "Computes a SHA\u20111 hash of the password concatenated with the salt.",
+      "Inserts a new row into the 'users' table of the MySQL database.",
+      "Commits the transaction, making the new user record permanent."
+    ],
+    "source_hash": "359bf4558a37b043a9986e5d5ee7d208b47b107dbde69c7955862c1fa79105c7"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.5,
+    "invariants": 0.8,
+    "io_semantics": 1.0,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file71.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.66875,
+  "original_hash": "359bf4558a37b043a9986e5d5ee7d208b47b107dbde69c7955862c1fa79105c7",
+  "rationale": "The program fulfills most I/O and side\u2011effect requirements, but deviates from the invariant of using a SHA\u20111 hash, lacks explicit handling for unique\u2011key violations, extremely long inputs, and salt\u2011generation failures, leading to partial preservation of the contract.",
+  "schema": 1,
+  "stability_abs_difference": 0.09625,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.8,
+    "invariants": 0.6,
+    "io_semantics": 1.0,
+    "side_effects": 0.75
+  },
+  "stability_score": 0.765,
+  "weighted_mean": 0.725,
+  "worst_dimension": 0.5
+}

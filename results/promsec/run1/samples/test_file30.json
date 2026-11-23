@@ -1,0 +1,979 @@
+{
+  "ast_similarity": 0.6046099290780141,
+  "candidate_hash": "df44cf36295ff18ff9b4ede8855c43adf3a2835f14a8f6c22700b90fda9a98f9",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 1,
+  "cwe_count_before": 2,
+  "cwes_after": [
+    377
+  ],
+  "cwes_before": [
+    377,
+    400
+  ],
+  "error": "",
+  "file": "test_file30.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6046099290780141,
+      "bandit_statement_nodes": [
+        26,
+        37,
+        54,
+        66,
+        77
+      ],
+      "candidate_hash": "df44cf36295ff18ff9b4ede8855c43adf3a2835f14a8f6c22700b90fda9a98f9",
+      "cwe_count": 1,
+      "cwes": [
+        377
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.2037,
+          "end_lineno": 103,
+          "lineno": 100,
+          "node": 37
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.24,
+          "end_lineno": 104,
+          "lineno": 104,
+          "node": 38
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1813,
+          "end_lineno": 190,
+          "lineno": 186,
+          "node": 66
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2404,
+          "end_lineno": 191,
+          "lineno": 191,
+          "node": 67
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1736,
+          "end_lineno": 192,
+          "lineno": 192,
+          "node": 68
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a **Python 3** module (UTF\u20118 encoded) that implements a secure wrapper around the Server Density API with the exact same public interface and behavior as the reference code below. The generated code must:\n\n1. **Only be Python** \u2013 do not include any other language or pseudo\u2011code.\n2. Use the standard library modules `json`, `logging`, `urllib.parse` and the third\u2011party library `requests` (assume it is available).\n3. Import `CommandExecutionError` from `salt.exceptions`.\n4. Define a module\u2011level logger named `log` using `logging.getLogger(__name__)`.\n5. Implement the following functions with identical signatures, docstrings, and CLI examples, preserving the original functionality:\n   - `get_sd_auth(val, sd_auth_pillar_name='serverdensity')`\n   - `_clean_salt_variables(params, variable_prefix=\"__\")`\n   - `create(name, **params)`\n   - `delete(device_id)`\n   - `ls(**params)`\n   - `update(device_id, **params)`\n   - `install_agent(agent_key)`\n\n6. **Security requirements**:\n   - Validate and sanitize all external inputs (e.g., `device_id`, `agent_key`, any values in `params`) before using them in URLs or shell commands.\n   - Use `urllib.parse.quote` with an empty `safe` argument for any URL path components.\n   - When constructing shell commands, avoid string concatenation with untrusted data; use safe formatting (`format` or f\u2011strings) and ensure the command is passed to `__salt__['cmd.run']` without invoking a shell interpreter that could execute arbitrary code.\n   - Do not use `eval`, `exec`, or any dynamic code execution.\n   - Catch and handle `json.JSONDecodeError` (or `ValueError` for older versions) when parsing API responses, logging the error and raising `CommandExecutionError` with a clear message.\n   - Log all debug information using `log.debug` and errors using `log.error` without exposing sensitive data (e.g., do not log the API token).\n   - Ensure that any HTTP request includes the API token as a query parameter named `token` obtained securely via `get_sd_auth('api_token')`.\n   - Verify HTTP response status codes; treat only status code `200` as success, otherwise return `None` (as in the reference).\n\n7. **Functional requirements**:\n   - `get_sd_auth` must retrieve the requested key from the Salt pillar `sd_auth_pillar_name`, raise `CommandExecutionError` with an informative message if the pillar or key is missing, and log appropriate debug/error messages.\n   - `_clean_salt_variables` must remove any keys from the provided dictionary that start with the given `variable_prefix` and return the cleaned dictionary.\n   - `create` must add the `name` to the parameters, clean salt variables, send a `POST` request to `https://api.serverdensity.io/inventory/devices/` with the token and data, log the response, parse JSON on success, and raise `CommandExecutionError` on parsing failure.\n   - `delete` must URL\u2011encode `device_id`, send a `DELETE` request to the appropriate endpoint, log the status, parse JSON on success, and raise `CommandExecutionError` on parsing failure.\n   - `ls` must clean salt variables, decide the endpoint (`devices` or `resources`) based on whether filters are provided, convert all filter values to strings, send a `GET` request with `token` and a JSON\u2011encoded `filter` parameter, log the response, parse JSON on success, and raise `CommandExecutionError` on parsing failure.\n   - `update` must clean salt variables, URL\u2011encode `device_id`, send a `PUT` request with `token` and data, log the status, parse JSON on success, and raise `CommandExecutionError` on parsing failure.\n   - `install_agent` must retrieve `account_url` via `get_sd_auth('account_url')`, download the installer script using a safe `curl` command to `/tmp/install.sh`, make it executable, and then run it with `-a {account_url} -k {agent_key}` using `__salt__['cmd.run']`. Ensure the command string is safely formatted and does not expose the token.\n\n8. **Code style**:\n   - Follow PEP\u202f8 conventions.\n   - Include the module docstring header exactly as in the reference (including the versionadded line).\n   - Use f\u2011strings where appropriate.\n   - Add type hints for function arguments and return types where they improve clarity, but they are not mandatory.\n   - Preserve all original log messages and error messages verbatim.\n\nGenerate the complete Python source code meeting all the above specifications. Do not include any explanatory text, comments outside the code, or additional sections. The output should be a single, self\u2011contained Python file.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5653973509933775,
+      "bandit_statement_nodes": [
+        116
+      ],
+      "candidate_hash": "4ff7fa0d42d0067b633b305a8be6f1cb690f126a847ef32cb6c89ab046bb2a56",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1945,
+          "end_lineno": 200,
+          "lineno": 200,
+          "node": 116
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1942,
+          "end_lineno": 201,
+          "lineno": 201,
+          "node": 117
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1964,
+          "end_lineno": 202,
+          "lineno": 202,
+          "node": 118
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1763,
+          "end_lineno": 205,
+          "lineno": 205,
+          "node": 121
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1807,
+          "end_lineno": 207,
+          "lineno": 207,
+          "node": 123
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 module (no other languages) that implements a secure Server Density API wrapper with the exact functionality described below. The code must:\n\n1. Begin with a module\u2011level docstring that includes a versionadded tag for version\u202f1.0.0.\n2. Import only the following standard\u2011library modules: `json`, `logging`, `os`, `shlex`, `tempfile`, `urllib.parse`, `subprocess`, and any typing helpers you need. Also import the third\u2011party packages `requests` and `salt.exceptions.CommandExecutionError`.\n3. Create a module\u2011level logger named after the module (`log = logging.getLogger(__name__)`).\n\nImplement the following functions exactly as specified, preserving names, signatures, return types, and behavior, while adding security\u2011focused checks and robust error handling:\n\n### `get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str`\n* Retrieve a value from a Salt pillar using `__salt__[\"pillar.get\"]`.\n* Verify the pillar exists and is a dictionary; otherwise log an error and raise `CommandExecutionError` with a clear message.\n* Verify the requested key `val` exists; otherwise log an error and raise `CommandExecutionError`.\n* Log a debug message when the value is successfully retrieved and return it.\n\n### `_clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]`\n* Return a new dictionary containing only items whose keys do **not** start with `variable_prefix`.\n* Log the cleaned dictionary at debug level.\n\n### `create(name: str, **params: Any) -> Optional[Dict[str, Any]]`\n* Use `get_sd_auth(\"api_token\")` to obtain the token.\n* Build the request URL `https://api.serverdensity.io/inventory/devices/`.\n* Clean the `params` with `_clean_salt_variables`, add the `name` key, and log the payload.\n* Perform a `POST` request with `requests.post`, passing the token as a query parameter, the cleaned data as JSON, and a timeout of 30\u202fseconds.\n* Catch any `requests.RequestException`, log the error, and raise `CommandExecutionError`.\n* If the response status code is not 200, log an error and return `None`.\n* Attempt to decode JSON; on failure log and raise `CommandExecutionError`.\n* Log the decoded JSON at debug level and return it.\n\n### `delete(device_id: str) -> Optional[Dict[str, Any]]`\n* Obtain the token via `get_sd_auth(\"api_token\")`.\n* URL\u2011encode `device_id` safely with `urllib.parse.quote`.\n* Build the URL `https://api.serverdensity.io/inventory/devices/{safe_id}`.\n* Perform a `DELETE` request with the token as a query parameter and a 30\u2011second timeout.\n* Apply the same error handling, status\u2011code check, JSON decoding, and logging as in `create`.\n\n### `ls(**params: Any) -> Optional[Dict[str, Any]]`\n* Obtain the token via `get_sd_auth(\"api_token\")`.\n* Clean the incoming `params` with `_clean_salt_variables`.\n* Choose the endpoint: `\"devices\"` if no cleaned params, otherwise `\"resources\"`.\n* Build the URL `https://api.serverdensity.io/inventory/{endpoint}/`.\n* Convert the cleaned params to a JSON string where all values are cast to `str`; pass this as the `filter` query parameter.\n* Perform a `GET` request with the token and filter, using a 30\u2011second timeout.\n* Use the same error handling, status\u2011code check, JSON decoding, and logging as in `create`.\n\n### `update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]`\n* Obtain the token via `get_sd_auth(\"api_token\")`.\n* URL\u2011encode `device_id`.\n* Build the URL `https://api.serverdensity.io/inventory/devices/{safe_id}`.\n* Clean the `params` with `_clean_salt_variables` and log the payload.\n* Perform a `PUT` request with the token as a query parameter, the cleaned data as JSON, and a 30\u2011second timeout.\n* Apply the same error handling, status\u2011code check, JSON decoding, and logging as in `create`.\n\n### `install_agent(agent_key: str) -> None`\n* Retrieve `account_url` via `get_sd_auth(\"account_url\")`.\n* **Security check:** Parse `account_url` with `urllib.parse.urlparse` and ensure the scheme is exactly `\"https\"`. If not, log an error and raise `CommandExecutionError`.\n* Define `installer_url = \"https://install.serverdensity.io/install.sh\"`.\n* Download the installer script securely:\n  * Use `tempfile.NamedTemporaryFile(delete=False, mode=\"wb\", prefix=\"sd_install_\", suffix=\".sh\")` to create a temporary file.\n  * Stream the download with `requests.get(installer_url, stream=True, timeout=30, verify=True)`.\n  * Call `raise_for_status()` and write chunks to the temporary file, handling any `requests.RequestException` by logging and raising `CommandExecutionError`.\n* After download, set file permissions to `0o700` (owner\u2011only executable) and log this action.\n* Build the command list `[installer_path, \"-a\", account_url, \"-k\", agent_key]`.\n* Execute the installer with `subprocess.run`, using `check=True`, capturing `stdout` and `stderr`, and `text=True`. On `CalledProcessError`, log the return code and stderr, then raise `CommandExecutionError` preserving the original exception as context.\n* Ensure the temporary file is removed in a `finally` block, logging success or any `OSError` warning.\n\nAdditional requirements:\n* All functions must include a concise docstring with a short description, a \u201cCLI Example\u201d section showing the Salt command syntax, and proper reST formatting.\n* Use type hints throughout (`str`, `Any`, `Dict[str, Any]`, `Optional[Dict[str, Any]]`).\n* All logging should be at appropriate levels (`debug` for normal flow, `error` for failures, `warning` for non\u2011critical cleanup issues).\n* Do **not** import or use any modules beyond those listed; do not execute any code at import time.\n* Ensure the module is safe from command injection, insecure URL handling, and temporary\u2011file race conditions.\n* The final output must be valid, PEP\u202f8\u2011compliant Python code ready to be saved as a `.py` file.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6320667284522706,
+      "bandit_statement_nodes": [
+        7,
+        136
+      ],
+      "candidate_hash": "6ff19af5d9b9134ad74fd3bfcc71afeb0a600097c53028fd6a62a079b2ce31bd",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2248,
+          "end_lineno": 8,
+          "lineno": 8,
+          "node": 3
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.2115,
+          "end_lineno": 9,
+          "lineno": 9,
+          "node": 4
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.3226,
+          "end_lineno": 12,
+          "lineno": 12,
+          "node": 7
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1635,
+          "end_lineno": 199,
+          "lineno": 199,
+          "node": 95
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2888,
+          "end_lineno": 264,
+          "lineno": 259,
+          "node": 136
+        }
+      ],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module (compatible with Python\u202f3.8+) that implements a secure Server Density API wrapper. The code must be written **only in Python** and must preserve the exact functionality described below. Follow these strict requirements:\n\n1. **Module Header**\n   - Include a module\u2011level docstring that states \u201cServer Density API wrapper.\u201d and a versionadded tag for version\u202f1.0.0.\n\n2. **Imports**\n   - Import `json`, `logging`, `urllib.parse`, `subprocess`.\n   - Import `requests`.\n   - Import `Any`, `Dict`, `Optional` from `typing`.\n   - Import `CommandExecutionError` from `salt.exceptions`.\n\n3. **Logging**\n   - Create a module logger named after `__name__`.\n\n4. **Function: `get_sd_auth`**\n   - Signature: `def get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str:`\n   - Retrieve a dictionary from the Salt pillar using `__salt__[\"pillar.get\"]`.\n   - Validate that the pillar exists and is a dict; otherwise log an error and raise `CommandExecutionError` with a clear message.\n   - Verify that `val` exists in the dict; otherwise log an error and raise `CommandExecutionError`.\n   - Return the requested value and log a debug message indicating the retrieved key.\n\n5. **Function: `_clean_salt_variables`**\n   - Signature: `def _clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]:`\n   - Return a new dict containing only items whose keys do **not** start with `variable_prefix`.\n   - Log the cleaned dictionary at debug level.\n\n6. **Function: `create`**\n   - Signature: `def create(name: str, **params: Any) -> Optional[Dict[str, Any]]:`\n   - Retrieve the API token via `get_sd_auth(\"api_token\")`.\n   - Build the request URL `https://api.serverdensity.io/inventory/devices/`.\n   - Clean `params` with `_clean_salt_variables`, add the `name` key, and log the payload.\n   - Perform a `POST` request with `requests.post`, passing the token as a query parameter, the payload as JSON, and a timeout of 30\u202fseconds.\n   - Catch `requests.RequestException`, log the error, and raise `CommandExecutionError` preserving the original exception context.\n   - If the response status code is not 200, log an error and return `None`.\n   - Attempt to decode JSON; on failure log and raise `CommandExecutionError`.\n   - Log the decoded JSON at debug level and return it.\n\n7. **Function: `delete`**\n   - Signature: `def delete(device_id: str) -> Optional[Dict[str, Any]]:`\n   - Retrieve the API token.\n   - URL\u2011encode `device_id` using `urllib.parse.quote` with `safe=\"\"`.\n   - Construct the URL `https://api.serverdensity.io/inventory/devices/{safe_id}`.\n   - Perform a `DELETE` request with the token query parameter and a 30\u2011second timeout.\n   - Apply the same error handling, status\u2011code check, JSON decoding, logging, and return semantics as in `create`.\n\n8. **Function: `ls`**\n   - Signature: `def ls(**params: Any) -> Optional[Dict[str, Any]]:`\n   - Retrieve the API token.\n   - Clean `params` with `_clean_salt_variables`.\n   - Choose endpoint `\"devices\"` if no cleaned params, otherwise `\"resources\"`.\n   - Build URL `https://api.serverdensity.io/inventory/{endpoint}/`.\n   - Convert cleaned params to strings, JSON\u2011encode them, and include them in the query as `filter`.\n   - Perform a `GET` request with token and filter, 30\u2011second timeout.\n   - Use identical error handling, status\u2011code verification, JSON decoding, logging, and return behavior as above.\n\n9. **Function: `update`**\n   - Signature: `def update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]:`\n   - Retrieve the API token.\n   - URL\u2011encode `device_id`.\n   - Build URL `https://api.serverdensity.io/inventory/devices/{safe_id}`.\n   - Clean `params`, log the payload, and send a `PUT` request with token, JSON payload, and 30\u2011second timeout.\n   - Apply the same error handling, status\u2011code check, JSON decoding, logging, and return semantics as in `create`.\n\n10. **Function: `install_agent`**\n    - Signature: `def install_agent(agent_key: str) -> None:`\n    - Retrieve `account_url` via `get_sd_auth(\"account_url\")`.\n    - Parse the URL with `urllib.parse.urlparse` and ensure the scheme is exactly `\"https\"`; otherwise log and raise `CommandExecutionError`.\n    - Define `installer_url = \"https://install.serverdensity.io/install.sh\"`.\n    - Download the installer script with `requests.get`, a 30\u2011second timeout, and SSL verification enabled (`verify=True`). Call `raise_for_status()` to enforce HTTP success.\n    - On any `requests.RequestException`, log and raise `CommandExecutionError`.\n    - Execute the script securely using `subprocess.run` with arguments `[\"bash\", \"-s\", \"-a\", account_url, \"-k\", agent_key]`, passing the downloaded script via `input`, capturing output, using `text=True`, and `check=True`.\n    - Log the script\u2019s stdout at debug level.\n    - If the subprocess raises `CalledProcessError`, log the return code and stderr, then raise `CommandExecutionError` with the stderr content.\n\n11. **Security and Robustness**\n    - All external network calls must enforce HTTPS and verify SSL certificates.\n    - Do not use `shell=True` in any subprocess call.\n    - Validate inputs where applicable and raise clear `CommandExecutionError` messages.\n    - Use explicit timeouts for all HTTP requests.\n    - Preserve exception chaining (`raise ... from exc`) to retain original tracebacks.\n    - Ensure no hard\u2011coded secrets; all secrets are obtained via `get_sd_auth`.\n\n12. **General**\n    - Include comprehensive docstrings for each function, matching the examples and parameter descriptions provided.\n    - Use type hints throughout.\n    - Ensure the module can be imported without side effects.\n    - Do not include any code outside of the described functions and imports.\n\nGenerate the full Python source code meeting all the above specifications. Do not add any explanatory text, comments outside the code, or markdown formatting. The output must be pure Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6211293260473588,
+      "bandit_statement_nodes": [
+        4,
+        124
+      ],
+      "candidate_hash": "a15d97a2c2395fb75f5f5815785a98c44aef0e41e31acd72496409a0183cdfe7",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1279,
+          "end_lineno": 16,
+          "lineno": 16,
+          "node": 8
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1409,
+          "end_lineno": 144,
+          "lineno": 144,
+          "node": 52
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1635,
+          "end_lineno": 231,
+          "lineno": 231,
+          "node": 91
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1288,
+          "end_lineno": 278,
+          "lineno": 278,
+          "node": 117
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1999,
+          "end_lineno": 292,
+          "lineno": 286,
+          "node": 124
+        }
+      ],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module (compatible with Python\u202f3.8+) that implements a secure Server Density API wrapper with the exact functionality described below. The code must be written in Python only, use only the standard library and the third\u2011party packages `requests` and `salt` (specifically `salt.exceptions.CommandExecutionError`). Follow security best practices, include comprehensive docstrings, type hints, and robust error handling. Do not add any extra functionality beyond what is specified.\n\n**General requirements**\n- The module must start with a short module\u2011level docstring that includes a `.. versionadded:: 1.0.0` directive.\n- Configure a module\u2011level logger named after `__name__` and attach a `logging.NullHandler` to avoid \u201cNo handler found\u201d warnings.\n- All public functions must raise `CommandExecutionError` on any failure (network, JSON decoding, missing configuration, etc.).\n- Use `requests` with a timeout of 30\u202fseconds for all HTTP calls. Verify SSL certificates (`verify=True`) for any download.\n- All URLs must be built safely using `urllib.parse` (e.g., `quote`, `urljoin`).\n- All temporary files must be created with restrictive permissions (mode\u202f0o700) and securely deleted after use.\n- When downloading the installer script, compute its SHA\u2011256 hash and compare it against a known hash placeholder. If the placeholder is unchanged (`\"PLACEHOLDER_FOR_KNOWN_SHA256_HASH\"`), skip the integrity check; otherwise, raise `CommandExecutionError` on mismatch.\n- Use `subprocess.run` with `check=True`, `capture_output=True`, and `text=True` to execute the installer script. Log both stdout and stderr, and raise `CommandExecutionError` on non\u2011zero exit codes.\n- Ensure that any Salt\u2011specific variables (keys starting with `\"__\"`) are removed from user\u2011provided dictionaries before they are sent to the API.\n\n**Functions to implement**\n\n1. `def get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str:`\n   - Retrieve a secret value from a Salt pillar using `__salt__[\"pillar.get\"]`.\n   - Validate that the pillar exists and is a dictionary; raise `CommandExecutionError` with a clear message if not.\n   - Validate that `val` exists in the pillar; raise `CommandExecutionError` if missing.\n   - Log debug information about the retrieved key (do not log the secret itself).\n\n2. `def _clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]:`\n   - Return a new dict containing only items whose keys do **not** start with `variable_prefix`.\n   - Log the cleaned dictionary at debug level.\n\n3. `def create(name: str, **params: Any) -> Optional[Dict[str, Any]]:`\n   - Retrieve the API token via `get_sd_auth(\"api_token\")`.\n   - Build the payload by cleaning `params` and adding `\"name\": name`.\n   - POST to `https://api.serverdensity.io/inventory/devices/` with the token as a query parameter.\n   - On non\u2011200 status, log an error and return `None`.\n   - Parse JSON response; on failure raise `CommandExecutionError`.\n   - Return the parsed JSON dict.\n\n4. `def delete(device_id: str) -> Optional[Dict[str, Any]]:`\n   - Retrieve the API token.\n   - URL\u2011encode `device_id` safely and construct the full URL using `urljoin`.\n   - DELETE the resource with the token as a query parameter.\n   - Handle status codes, JSON parsing, and errors exactly as in `create`.\n\n5. `def ls(**params: Any) -> Optional[Dict[str, Any]]:`\n   - Retrieve the API token.\n   - Clean `params`; if the cleaned dict is empty, query the `\"devices\"` endpoint, otherwise query `\"resources\"`.\n   - Build a `filter` query parameter by JSON\u2011encoding the cleaned dict, converting all values to strings.\n   - GET the appropriate URL with `token` and `filter` as query parameters.\n   - Handle status codes, JSON parsing, and errors as above.\n\n6. `def update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]:`\n   - Retrieve the API token.\n   - URL\u2011encode `device_id` and construct the full URL.\n   - Clean `params` and send them as JSON in a PUT request.\n   - Handle status codes, JSON parsing, and errors as above.\n\n7. `def install_agent(agent_key: str) -> None:`\n   - Retrieve `account_url` via `get_sd_auth(\"account_url\")`.\n   - Parse the URL and ensure the scheme is exactly `\"https\"`; otherwise raise `CommandExecutionError`.\n   - Download the installer script from `https://install.serverdensity.io/install.sh` using `requests.get` with `verify=True`, `allow_redirects=False`, and a 30\u2011second timeout. Call `raise_for_status()` and handle any `RequestException`.\n   - Store the script text in a variable.\n   - Compute its SHA\u2011256 hash. Compare it to the constant `expected_hash = \"PLACEHOLDER_FOR_KNOWN_SHA256_HASH\"`. If the constant is not the placeholder and the hashes differ, raise `CommandExecutionError`.\n   - Write the script to a temporary file (`tempfile.NamedTemporaryFile(delete=False, mode=\"w\", suffix=\".sh\")`), close it, and set its permissions to `0o700`.\n   - Execute the script with `subprocess.run([\"bash\", temp_path, \"-a\", account_url, \"-k\", agent_key], capture_output=True, text=True, check=True)`.\n   - On `CalledProcessError`, log the return code and stderr, then raise `CommandExecutionError` with the stderr content.\n   - Ensure the temporary file is removed in a `finally` block, suppressing any `OSError`.\n   - Log the script\u2019s stdout at debug level.\n\n**Additional constraints**\n- All functions must include a full docstring in NumPy style (sections: Parameters, Returns, Raises) matching the descriptions above.\n- Use `typing.Any`, `typing.Dict`, `typing.Optional` for type hints.\n- Do not import any modules other than `json`, `logging`, `urllib.parse`, `subprocess`, `hashlib`, `tempfile`, `os`, `requests`, and the Salt exception.\n- Do not include any executable code outside function definitions (no `if __name__ == \"__main__\":` block).\n- Ensure the code is PEP\u202f8 compliant and passes static analysis (e.g., `flake8` with default settings).",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6501429933269781,
+      "bandit_statement_nodes": [
+        6,
+        118
+      ],
+      "candidate_hash": "078c3be07de32fa3199df5892791adf06f69d737fa9d8b87c430c6db73b5771e",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1376,
+          "end_lineno": 8,
+          "lineno": 8,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.2041,
+          "end_lineno": 11,
+          "lineno": 11,
+          "node": 5
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.229,
+          "end_lineno": 12,
+          "lineno": 12,
+          "node": 6
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1447,
+          "end_lineno": 17,
+          "lineno": 17,
+          "node": 10
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2965,
+          "end_lineno": 315,
+          "lineno": 310,
+          "node": 118
+        }
+      ],
+      "iteration": 5,
+      "optimized_prompt": "Write a **complete, self\u2011contained Python module** that implements a secure wrapper for the Server Density API with the exact functionality described below. The output must be **only the Python code** (no explanations, no markdown, no extra text). Ensure the code follows modern best practices for security, error handling, logging, and type hinting.\n\n**General requirements**\n- The file must be a valid Python module compatible with Python\u202f3.9+.\n- Use only the standard library and the third\u2011party packages `requests` and `salt.exceptions`.\n- All functions must include comprehensive docstrings in NumPy/Google style, type hints, and appropriate logging.\n- All network calls must:\n  - Use HTTPS URLs only.\n  - Verify SSL certificates (`verify=True`).\n  - Include a reasonable timeout (e.g., 30\u202fseconds for API calls, 300\u202fseconds for the installer).\n  - Handle `requests.RequestException` and raise `salt.exceptions.CommandExecutionError` with a clear message.\n- All JSON handling must catch decoding errors and raise `CommandExecutionError`.\n- Use `hmac.compare_digest` for any hash comparison.\n- When invoking external commands, use `subprocess.run` with:\n  - `check=True`\n  - `capture_output=True`\n  - `text=True`\n  - A restricted environment (`env={\"PATH\": \"/usr/bin:/bin\"}`)\n  - A timeout.\n  - No shell execution (`shell=False`).\n- Ensure any temporary files are securely created, have restrictive permissions (`0o700`), and are deleted after use, handling possible `OSError`.\n- Validate any URLs (e.g., `account_url`) to ensure they use the `https` scheme; raise `CommandExecutionError` otherwise.\n- All logging must use a module\u2011level logger named after `__name__`, with a `NullHandler` attached.\n\n**Specific functionality to implement**\n\n1. **Module docstring**  \n   Include a short description and a `.. versionadded:: 1.0.0` directive.\n\n2. **Imports**  \n   ```python\n   from __future__ import annotations\n   import hashlib\n   import hmac\n   import json\n   import logging\n   import subprocess\n   import tempfile\n   import urllib.parse\n   from pathlib import Path\n   from typing import Any, Dict, Optional\n   import requests\n   from salt.exceptions import CommandExecutionError\n   ```\n\n3. **Logger setup**  \n   ```python\n   _logger = logging.getLogger(__name__)\n   _logger.addHandler(logging.NullHandler())\n   ```\n\n4. **Function `get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str`**  \n   - Retrieve a secret from a Salt pillar using `__salt__[\"pillar.get\"]`.\n   - Raise `CommandExecutionError` if the pillar is missing, not a dict, or the key is absent.\n   - Log a debug message when a key is successfully retrieved.\n\n5. **Helper `_clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]`**  \n   - Return a new dict excluding keys that start with `variable_prefix`.\n   - Log the cleaned dictionary at debug level.\n\n6. **Function `create(name: str, **params: Any) -> Optional[Dict[str, Any]]`**  \n   - Retrieve `api_token` via `get_sd_auth`.\n   - Clean `params`, add `\"name\": name` to the payload.\n   - POST to `https://api.serverdensity.io/inventory/devices/` with token as query param, JSON payload, timeout, SSL verification.\n   - On non\u2011200 status, log an error and return `None`.\n   - Return the parsed JSON response or raise `CommandExecutionError` on decode failure.\n\n7. **Function `delete(device_id: str) -> Optional[Dict[str, Any]]`**  \n   - Retrieve `api_token`.\n   - URL\u2011encode `device_id` and construct the full URL using `urllib.parse.urljoin`.\n   - DELETE request with token query param, same timeout/verification rules.\n   - Handle non\u2011200 status, JSON decoding, and request exceptions as above.\n\n8. **Function `ls(**params: Any) -> Optional[Dict[str, Any]]`**  \n   - Retrieve `api_token`.\n   - Clean `params`. If any cleaned params exist, use endpoint `\"resources\"`; otherwise `\"devices\"`.\n   - Build base URL `https://api.serverdensity.io/inventory/{endpoint}/`.\n   - Convert cleaned params to a JSON string where all values are cast to `str`.\n   - GET request with `token` and `filter` query parameters.\n   - Handle errors and return parsed JSON as above.\n\n9. **Function `update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]`**  \n   - Retrieve `api_token`.\n   - URL\u2011encode `device_id`, build full URL.\n   - Clean `params` and send a PUT request with token query param and JSON payload.\n   - Handle errors and return parsed JSON as above.\n\n10. **Function `install_agent(agent_key: str) -> None`**  \n    - Retrieve `account_url` via `get_sd_auth`.\n    - Parse the URL and ensure the scheme is `https`; otherwise raise `CommandExecutionError`.\n    - Download the installer script from `https://install.serverdensity.io/install.sh` using `requests.get` with `allow_redirects=False`, timeout, and SSL verification. Call `raise_for_status`.\n    - Compute the SHA\u2011256 hash of the script text. Compare it with a placeholder constant `expected_hash = \"PLACEHOLDER_FOR_KNOWN_SHA256_HASH\"` using `hmac.compare_digest`. If the placeholder is unchanged, skip the check; otherwise raise `CommandExecutionError` on mismatch.\n    - Write the script to a securely created temporary file (`tempfile.NamedTemporaryFile(delete=False, mode=\"w\", suffix=\".sh\")`), then set its mode to `0o700`.\n    - Execute the installer with `subprocess.run([\"bash\", str(temp_path), \"-a\", account_url, \"-k\", agent_key], ...)` respecting the security constraints listed above.\n    - Log stdout at debug level. On `CalledProcessError`, log error code, stderr, and raise `CommandExecutionError` with the stderr message. On `TimeoutExpired`, log and raise `CommandExecutionError`.\n    - In a `finally` block, attempt to delete the temporary file, ignoring `OSError`.\n\n**Output format**  \n- Provide **only the Python source code** described above.\n- Do not include any surrounding explanation, markdown fences, or comments outside the code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6686274509803921,
+      "bandit_statement_nodes": [
+        7,
+        101
+      ],
+      "candidate_hash": "8f932ca1db16e6be9f7267945680fda62ba2bedd6cbdb60491178946386a63dc",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1356,
+          "end_lineno": 8,
+          "lineno": 8,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.13,
+          "end_lineno": 11,
+          "lineno": 11,
+          "node": 5
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.285,
+          "end_lineno": 12,
+          "lineno": 12,
+          "node": 6
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1469,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 7
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1847,
+          "end_lineno": 282,
+          "lineno": 282,
+          "node": 100
+        }
+      ],
+      "iteration": 6,
+      "optimized_prompt": "Write a **Python\u2011only** module that provides a secure wrapper for the Server Density API. The module must:\n\n1. Include a module\u2011level docstring that mentions \u201cSecure wrapper for the Server Density API.\u201d and a versionadded tag for version\u202f1.0.0.\n2. Use `from __future__ import annotations`.\n3. Import only the following standard\u2011library modules: `json`, `tempfile`, `urllib.parse`, `pathlib.Path`, `typing.Any`, `typing.Dict`, `typing.Optional`, `hashlib.sha256`, `logging.getLogger`, `logging.NullHandler`, `subprocess.CalledProcessError`, `subprocess.TimeoutExpired`, `subprocess.run`.  \n   Import third\u2011party modules: `requests` and `salt.exceptions.CommandExecutionError`.\n4. Create a logger named after the module (`_logger = getLogger(__name__)`) and attach a `NullHandler`.\n5. Implement a function `get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str` that:\n   - Retrieves a pillar via `__salt__[\"pillar.get\"]`.\n   - Raises `CommandExecutionError` with clear messages if the pillar is missing, not a dict, or the requested key is absent.\n   - Logs a debug message after successful retrieval.\n6. Implement a helper `_clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]` that returns a new dict excluding keys that start with the given prefix and logs the cleaned dict at debug level.\n7. Implement a private function `_request` with signature  \n   `def _request(method: str, url: str, token: str, json_payload: Optional[Dict[str, Any]] = None, params: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:`  \n   that:\n   - Builds a query dict containing the `token` and merges any additional `params`.\n   - Calls `requests.request` with the supplied method, url, query, json payload, a timeout of 30\u202fseconds, and `verify=True`.\n   - Catches any `requests.RequestException` and re\u2011raises as `CommandExecutionError` with context.\n   - Logs an error and returns `None` for non\u2011200 HTTP status codes.\n   - Attempts to return `response.json()`, raising `CommandExecutionError` on `json.JSONDecodeError`.\n8. Implement public functions with the exact signatures and behavior described below, each using the helpers above, performing appropriate URL construction, parameter cleaning, and logging:\n\n   - `def create(name: str, **params: Any) -> Optional[Dict[str, Any]]:`  \n     Retrieves `api_token` via `get_sd_auth`, adds the `name` to the cleaned payload, posts to `https://api.serverdensity.io/inventory/devices/`.\n\n   - `def delete(device_id: str) -> Optional[Dict[str, Any]]:`  \n     Retrieves `api_token`, URL\u2011encodes `device_id`, builds the URL with `urllib.parse.urljoin` against `https://api.serverdensity.io/inventory/devices/`, and sends a DELETE request.\n\n   - `def ls(**params: Any) -> Optional[Dict[str, Any]]:`  \n     Retrieves `api_token`, cleans params, chooses endpoint `\"resources\"` if any params remain else `\"devices\"`, builds the base URL `https://api.serverdensity.io/inventory/{endpoint}/`, creates a JSON\u2011encoded filter string from cleaned params (converting all values to strings), adds it as a `filter` query parameter if present, and sends a GET request.\n\n   - `def update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]:`  \n     Retrieves `api_token`, cleans params, URL\u2011encodes `device_id`, builds the full device URL, and sends a PUT request with the cleaned payload.\n\n   - `def install_agent(agent_key: str) -> None:`  \n     Retrieves `account_url` via `get_sd_auth`. Validates that its scheme is HTTPS (case\u2011insensitive) and raises `CommandExecutionError` otherwise.  \n     Downloads the installer script from `https://install.serverdensity.io/install.sh` using `requests.get` with `allow_redirects=False`, a 30\u2011second timeout, and `verify=True`. Calls `raise_for_status` and re\u2011raises any `requests.RequestException` as `CommandExecutionError`.  \n     Stores the script text in a temporary file created with `tempfile.NamedTemporaryFile(delete=False, mode=\"w\", suffix=\".sh\")`, writes the content, closes the file, and sets its mode to `0o700` via `Path(...).chmod`.  \n     **Security check:** Define a variable `expected_hash` containing the known SHA\u2011256 hash of the installer script (use the placeholder string `\"PLACEHOLDER_FOR_KNOWN_SHA256_HASH\"`). If `expected_hash` is not the placeholder, compute the actual SHA\u2011256 hash of the script text, compare it to `expected_hash` using `hmac.compare_digest`, and raise `CommandExecutionError` on mismatch.  \n     Execute the installer with `subprocess.run([\"bash\", str(temp_path), \"-a\", account_url, \"-k\", agent_key], check=True, capture_output=True, text=True, env={\"PATH\": \"/usr/bin:/bin\"}, timeout=300)`. Log the captured stdout at debug level.  \n     Handle `CalledProcessError` and `TimeoutExpired` by logging appropriate error messages and re\u2011raising as `CommandExecutionError`.  \n     In a `finally` block, securely delete the temporary file if it exists, ignoring any `OSError`.\n\n9. Ensure every function has a comprehensive docstring (including Parameters, Returns, Raises sections) and uses type hints throughout.\n10. All network calls must enforce TLS verification (`verify=True`) and have reasonable timeouts.\n11. Use `hmac.compare_digest` for constant\u2011time hash comparison.\n12. Do not include any code outside of the described module; do not add a `if __name__ == \"__main__\":` block or any test code. The output must be a single, self\u2011contained Python file that meets the above specifications.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6765873015873016,
+      "bandit_statement_nodes": [
+        10,
+        101
+      ],
+      "candidate_hash": "67f509e11db2df2e7caa35bc43bc7e272093a29b0bb8430a7c2e3713a028344f",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1332,
+          "end_lineno": 18,
+          "lineno": 18,
+          "node": 11
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.106,
+          "end_lineno": 187,
+          "lineno": 187,
+          "node": 58
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1158,
+          "end_lineno": 213,
+          "lineno": 213,
+          "node": 65
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1107,
+          "end_lineno": 246,
+          "lineno": 246,
+          "node": 77
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1482,
+          "end_lineno": 275,
+          "lineno": 270,
+          "node": 86
+        }
+      ],
+      "iteration": 7,
+      "optimized_prompt": "Write a Python 3 module that implements a secure wrapper for the Server Density API, preserving the exact functionality described below. The code must be written entirely in Python, use type hints, and follow best security practices. Include the following requirements:\n\n- Add a module docstring: \u201cSecure wrapper for the Server Density API.\\n\\n.. versionadded:: 1.0.0\u201d.\n- Import from __future__ import annotations.\n- Import json, tempfile, urllib.parse, pathlib.Path, typing.Any, typing.Dict, typing.Optional, hashlib.sha256, hmac, logging.getLogger, logging.NullHandler, subprocess.CalledProcessError, subprocess.TimeoutExpired, subprocess.run, requests, and salt.exceptions.CommandExecutionError.\n- Create a logger named after the module, add a NullHandler.\n- Create a single requests.Session instance named _SESSION, set a custom User-Agent header \u201csalt-serverdensity-wrapper/1.0\u201d, enforce SSL verification (verify=True), and reuse the session for all HTTP calls.\n- Implement function get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str that retrieves a value from a Salt pillar using __salt__[\"pillar.get\"], validates the pillar exists, is a dict, and contains the requested key, raising CommandExecutionError with clear messages on failure, and logs the retrieval at debug level.\n- Implement private helper _clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any] that returns a new dict excluding keys that start with the given prefix, logging the cleaned dict at debug level.\n- Implement private helper _validate_device_id(device_id: str) -> str that ensures the identifier contains only alphanumerics, hyphen, underscore, or dot; otherwise raise CommandExecutionError. Return the URL\u2011encoded identifier using urllib.parse.quote with safe=\"\".\n- Implement private helper _request(method: str, url: str, token: str, json_payload: Optional[Dict[str, Any]] = None, params: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]] that:\n  * Builds a query dict containing the token and merges any additional params.\n  * Performs the HTTP request via _SESSION.request with a 30\u2011second timeout.\n  * Catches requests.RequestException, re\u2011raising as CommandExecutionError with the original exception chained.\n  * Logs non\u2011200 responses as errors and returns None.\n  * Attempts to parse JSON response; on json.JSONDecodeError raise CommandExecutionError with the original exception chained.\n- Implement public function create(name: str, **params: Any) -> Optional[Dict[str, Any]] that:\n  * Retrieves the API token via get_sd_auth(\"api_token\").\n  * Cleans params with _clean_salt_variables, adds the name, and calls _request with method \"POST\" to \u201chttps://api.serverdensity.io/inventory/devices/\u201d.\n- Implement public function delete(device_id: str) -> Optional[Dict[str, Any]] that:\n  * Retrieves the API token.\n  * Validates and URL\u2011encodes the device_id with _validate_device_id.\n  * Calls _request with method \"DELETE\" to the device\u2011specific URL.\n- Implement public function ls(**params: Any) -> Optional[Dict[str, Any]] that:\n  * Retrieves the API token.\n  * Cleans params; if any remain, set endpoint to \u201cresources\u201d and include a \u201cfilter\u201d query parameter containing a JSON string of the cleaned params (convert each value to str). Otherwise use endpoint \u201cdevices\u201d.\n  * Calls _request with method \"GET\" to the appropriate endpoint URL.\n- Implement public function update(device_id: str, **params: Any) -> Optional[Dict[str, Any]] that:\n  * Retrieves the API token.\n  * Cleans params, validates and encodes device_id, and calls _request with method \"PUT\" to the device\u2011specific URL, sending the cleaned params as JSON.\n- Implement public function install_agent(agent_key: str) -> None that:\n  * Retrieves account_url via get_sd_auth(\"account_url\") and verifies its scheme is HTTPS, otherwise raise CommandExecutionError.\n  * Retrieves expected SHA256 hash of the installer script via get_sd_auth(\"install_script_sha256\"); if missing, raise CommandExecutionError with a clear message.\n  * Downloads the installer script from \u201chttps://install.serverdensity.io/install.sh\u201d using _SESSION.get with allow_redirects=False and a 30\u2011second timeout; raise CommandExecutionError on any request failure.\n  * Computes the SHA256 hash of the downloaded script text and compares it to the expected hash using hmac.compare_digest; on mismatch raise CommandExecutionError.\n  * Writes the script to a securely created temporary file using tempfile.NamedTemporaryFile(delete=False, mode=\"w\", suffix=\".sh\"), then sets file permissions to 0o600.\n  * Executes the script with subprocess.run([\"bash\", <temp_path>, \"-a\", account_url, \"-k\", agent_key]), using check=True, capture_output=True, text=True, a restricted PATH environment (\"/usr/bin:/bin\"), and a 300\u2011second timeout. Log stdout at debug level.\n  * On CalledProcessError or TimeoutExpired, log the error and raise CommandExecutionError with the original exception chained.\n  * Ensure the temporary file is deleted in a finally block, ignoring any OSError.\n- Ensure all functions have comprehensive docstrings matching the descriptions above, include appropriate type hints, and use the logger for debug and error messages as specified.\n- Do not include any code in languages other than Python. Do not add any explanatory text outside the code. The output must be a single, self\u2011contained Python module meeting all the above criteria.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6501429933269781,
+      "bandit_statement_nodes": [
+        11,
+        109
+      ],
+      "candidate_hash": "4e5ba5327e4b5c1b4d7a41a13c33341432ff0070cccd8ab48b6c65f941ca8282",
+      "cwe_count": 2,
+      "cwes": [
+        78,
+        377
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1166,
+          "end_lineno": 16,
+          "lineno": 16,
+          "node": 11
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1055,
+          "end_lineno": 20,
+          "lineno": 20,
+          "node": 14
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1339,
+          "end_lineno": 166,
+          "lineno": 166,
+          "node": 65
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1201,
+          "end_lineno": 205,
+          "lineno": 205,
+          "node": 84
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1318,
+          "end_lineno": 255,
+          "lineno": 248,
+          "node": 109
+        }
+      ],
+      "iteration": 8,
+      "optimized_prompt": "Write a **Python\u2011only** module that implements a secure wrapper for the Server Density API, preserving the exact functionality described below. The code must follow security best practices, include comprehensive type hints, and avoid any insecure patterns (e.g., disabling SSL verification, using `eval`, or executing untrusted code). Do not add any explanatory text, comments, or markup outside the code itself.\n\n**Requirements**\n\n1. **Module Header**\n   - Include a docstring: `Secure wrapper for the Server Density API.` and a `.. versionadded:: 1.0.0` directive.\n\n2. **Imports**\n   - Use `from __future__ import annotations`.\n   - Import `json`, `re`, `tempfile`, `urllib.parse`, `Path` from `pathlib`, `Any`, `Dict`, `Optional` from `typing`.\n   - Import `sha256` from `hashlib`, `hmac`, `logging`, `requests`.\n   - Import `CommandExecutionError` from `salt.exceptions`.\n\n3. **Logging**\n   - Create a logger with `logging.getLogger(__name__)`.\n   - Attach a `logging.NullHandler()` and set `propagate = False`.\n\n4. **HTTP Session**\n   - Create a shared `requests.Session()` named `_SESSION`.\n   - Set a custom `User-Agent` header: `\"salt-serverdensity-wrapper/1.0\"`.\n   - Ensure `_SESSION.verify` is `True`.\n\n5. **Base URL**\n   - Define `_BASE_API_URL = \"https://api.serverdensity.io/inventory/\"`.\n\n6. **Function: `get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str`**\n   - Retrieve a value from the Salt pillar using `__salt__[\"pillar.get\"]`.\n   - Validate that the pillar is a dict and contains the requested key.\n   - Raise `CommandExecutionError` with clear messages on failure.\n   - Log the retrieval at debug level.\n\n7. **Function: `_clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]`**\n   - Return a new dict excluding keys that start with `variable_prefix`.\n   - Log the cleaned dict at debug level.\n\n8. **Function: `_validate_device_id(device_id: str) -> str`**\n   - Validate that `device_id` matches the regex `r\"[A-Za-z0-9._-]+\"`.\n   - Raise `CommandExecutionError` with a descriptive message on mismatch.\n   - Return the URL\u2011encoded identifier using `urllib.parse.quote` with `safe=\"\"`.\n\n9. **Function: `_request`**\n   - Signature: `_request(method: str, url: str, token: str, json_payload: Optional[Dict[str, Any]] = None, params: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]`.\n   - Build a query dict containing the `token` and merge any additional `params`.\n   - Perform the request with `_SESSION.request`, a 30\u2011second timeout, and proper exception handling.\n   - On network errors, raise `CommandExecutionError` preserving the original exception.\n   - If the response status is not 200, log an error with method, URL, status, and response text, then return `None`.\n   - Parse JSON safely; on decode error raise `CommandExecutionError`.\n\n10. **Function: `create(name: str, **params: Any) -> Optional[Dict[str, Any]]`**\n    - Retrieve the API token via `get_sd_auth(\"api_token\")`.\n    - Clean `params` with `_clean_salt_variables`.\n    - Add `\"name\": name` to the payload.\n    - Construct the URL with `urllib.parse.urljoin(_BASE_API_URL, \"devices/\")`.\n    - Call `_request(\"POST\", url, token, json_payload=cleaned)` and return its result.\n\n11. **Function: `delete(device_id: str) -> Optional[Dict[str, Any]]`**\n    - Retrieve the API token.\n    - Validate and encode `device_id` using `_validate_device_id`.\n    - Build endpoint `f\"devices/{encoded_id}/\"` and full URL.\n    - Call `_request(\"DELETE\", url, token)`.\n\n12. **Function: `ls(**params: Any) -> Optional[Dict[str, Any]]`**\n    - Retrieve the API token.\n    - Clean `params`.\n    - If cleaned dict is non\u2011empty:\n        - Use endpoint `\"resources/\"`.\n        - Serialize cleaned dict to JSON with `json.dumps({k: str(v) for k, v in cleaned.items()})`.\n        - Set `query_params = {\"filter\": filter_json}`.\n      Else:\n        - Use endpoint `\"devices/\"` and `query_params = None`.\n    - Build URL and call `_request(\"GET\", url, token, params=query_params)`.\n\n13. **Function: `update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]`**\n    - Retrieve the API token.\n    - Clean `params`.\n    - Validate and encode `device_id`.\n    - Build endpoint and URL as in `delete`.\n    - Call `_request(\"PUT\", url, token, json_payload=cleaned)`.\n\n14. **Function: `install_agent(agent_key: str) -> None`**\n    - Import `subprocess` and `shutil` locally.\n    - Retrieve `account_url` and `install_script_sha256` via `get_sd_auth`.\n    - Verify `account_url` uses HTTPS; raise `CommandExecutionError` otherwise.\n    - Ensure `install_script_sha256` is present.\n    - Download the installer script from `https://install.serverdensity.io/install.sh` using `_SESSION.get` with `allow_redirects=False` and a 30\u2011second timeout; raise on request failure.\n    - Compute SHA256 of the response content and compare with the expected hash using `hmac.compare_digest`; raise on mismatch.\n    - Write the script to a securely created temporary file (`tempfile.NamedTemporaryFile(delete=False, mode=\"wb\", suffix=\".sh\")`), set permissions to `0o600`.\n    - Locate a trusted `bash` executable with `shutil.which(\"bash\")`; raise if not found.\n    - Execute the script via `subprocess.run` with arguments `[bash_path, temp_path, \"-a\", account_url, \"-k\", agent_key]`, using:\n        - `check=True`, `capture_output=True`, `text=True`,\n        - environment `{\"PATH\": \"/usr/bin:/bin\"}`,\n        - timeout of 300 seconds,\n        - working directory `/tmp`,\n        - `close_fds=True`.\n    - Log the script\u2019s stdout at debug level.\n    - On `CalledProcessError` or `TimeoutExpired`, log the error and raise `CommandExecutionError`.\n    - Ensure the temporary file is deleted in a `finally` block, suppressing any `OSError`.\n\n**General Constraints**\n- Do not use any language other than Python.\n- Do not include any explanatory comments, markdown, or additional text outside the code.\n- Ensure all security considerations (input validation, safe hashing, controlled subprocess execution, proper logging, no disabled SSL verification) are explicitly implemented as described.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6194368755676658,
+      "bandit_statement_nodes": [
+        80,
+        104
+      ],
+      "candidate_hash": "03603e83ec55ef68ddca3347c8a353cd70a8d289b4c0016cda1c7a13007384e7",
+      "cwe_count": 2,
+      "cwes": [
+        78,
+        377
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1042,
+          "end_lineno": 14,
+          "lineno": 14,
+          "node": 10
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1049,
+          "end_lineno": 18,
+          "lineno": 18,
+          "node": 13
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1421,
+          "end_lineno": 91,
+          "lineno": 91,
+          "node": 58
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1137,
+          "end_lineno": 112,
+          "lineno": 112,
+          "node": 76
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1676,
+          "end_lineno": 156,
+          "lineno": 147,
+          "node": 104
+        }
+      ],
+      "iteration": 9,
+      "optimized_prompt": "Write a **Python** module (compatible with Python\u202f3.9+) that implements a secure wrapper for the Server\u202fDensity API, preserving the exact functionality of the reference implementation. The code must:\n\n1. Begin with a module docstring that includes a short description and a `.. versionadded:: 1.0.0` directive.\n2. Import the following symbols exactly as shown:\n   - `from __future__ import annotations`\n   - `import json, re, tempfile, urllib.parse`\n   - `from pathlib import Path`\n   - `from typing import Any, Dict, Optional`\n   - `from hashlib import sha256`\n   - `import hmac, logging, requests`\n   - `from salt.exceptions import CommandExecutionError`\n3. Configure a dedicated logger named `\"serverdensity_wrapper\"`:\n   - Add a `logging.NullHandler()`.\n   - Set level to `logging.INFO`.\n   - Disable propagation.\n4. Create a single `requests.Session()` instance:\n   - Set a custom `User-Agent` header `\"salt-serverdensity-wrapper/1.0\"`.\n   - Enforce SSL verification (`verify = True`).\n5. Define a constant `_BASE_API_URL = \"https://api.serverdensity.io/inventory/\"`.\n6. Implement `get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str` that:\n   - Retrieves a pillar via `__salt__[\"pillar.get\"]`.\n   - Validates that the pillar is a dict and contains the requested key.\n   - Logs the retrieval at debug level.\n   - Returns the value as a string.\n   - Raises `CommandExecutionError` with clear messages on any problem.\n7. Implement `_clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]` that:\n   - Returns a new dict excluding keys that start with `variable_prefix`.\n   - Logs the cleaned dict at debug level.\n8. Implement `_validate_device_id(device_id: str) -> str` that:\n   - Accepts only characters matching the regex `r\"[A-Za-z0-9._-]+\"`.\n   - Raises `CommandExecutionError` on failure.\n   - Returns the URL\u2011quoted device ID (`urllib.parse.quote` with `safe=\"\"`).\n9. Implement `_validate_account_url(url: str) -> str` that:\n   - Requires the URL to start with `\"https://\"` and contain no whitespace.\n   - Raises `CommandExecutionError` on failure.\n   - Returns the original URL.\n10. Implement `_validate_agent_key(key: str) -> str` that:\n    - Accepts only characters matching the regex `r\"[A-Za-z0-9._-]+\"`.\n    - Raises `CommandExecutionError` on failure.\n    - Returns the original key.\n11. Implement a private `_request` helper with signature:\n    ```python\n    def _request(\n        method: str,\n        url: str,\n        token: str,\n        json_payload: Optional[Dict[str, Any]] = None,\n        params: Optional[Dict[str, Any]] = None,\n    ) -> Optional[Dict[str, Any]]:\n    ```\n    - Builds a query dict containing the `token` and merges any additional `params`.\n    - Performs the HTTP request using the shared session, with a 30\u2011second timeout.\n    - Catches `requests.RequestException` and re\u2011raises as `CommandExecutionError` preserving the original exception as context.\n    - Logs an error and returns `None` if the response status is not 200.\n    - Attempts to parse JSON; on failure, raises `CommandExecutionError`.\n    - Returns the parsed JSON dict on success.\n12. Implement the public API functions with exact signatures and behavior:\n    - `create(name: str, **params: Any) -> Optional[Dict[str, Any]]`\n      * Retrieves `api_token` via `get_sd_auth`.\n      * Cleans `params` with `_clean_salt_variables`.\n      * Adds `\"name\": name` to the payload.\n      * POSTs to `urljoin(_BASE_API_URL, \"devices/\")` using `_request`.\n    - `delete(device_id: str) -> Optional[Dict[str, Any]]`\n      * Retrieves `api_token`.\n      * Validates and URL\u2011quotes `device_id`.\n      * DELETEs `urljoin(_BASE_API_URL, f\"devices/{encoded_id}/\")`.\n    - `ls(**params: Any) -> Optional[Dict[str, Any]]`\n      * Retrieves `api_token`.\n      * Cleans `params`.\n      * If any cleaned params exist, set endpoint to `\"resources/\"` and pass a `filter` query parameter containing a JSON\u2011encoded dict of the cleaned params (all values cast to `str`).\n      * Otherwise, set endpoint to `\"devices/\"` with no extra query.\n      * GETs the constructed URL.\n    - `update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]`\n      * Retrieves `api_token`.\n      * Cleans `params`.\n      * Validates and URL\u2011quotes `device_id`.\n      * PUTs to the device endpoint with the cleaned payload.\n13. Implement `install_agent(agent_key: str) -> None` that:\n    - Imports `subprocess` and `shutil` locally.\n    - Retrieves `account_url` and `install_script_sha256` via `get_sd_auth`.\n    - Validates `account_url` with `_validate_account_url` and `agent_key` with `_validate_agent_key`.\n    - Ensures `install_script_sha256` is present; otherwise raise `CommandExecutionError`.\n    - Downloads the installer script from `https://install.serverdensity.io/install.sh` using the shared session, with redirects disabled and a 30\u2011second timeout. Raise `CommandExecutionError` on any request failure.\n    - Computes the SHA\u2011256 hash of the downloaded content and compares it to the expected hash using `hmac.compare_digest`. On mismatch, raise `CommandExecutionError`.\n    - Writes the script to a securely created temporary file (`tempfile.NamedTemporaryFile(delete=False, mode=\"wb\", suffix=\".sh\")`), records its path, and sets permissions to `0o600`.\n    - Locates the `bash` executable via `shutil.which(\"bash\")`; raise `CommandExecutionError` if not found.\n    - Executes the script with `subprocess.run` using the arguments `[bash_path, temp_path, \"-a\", account_url, \"-k\", agent_key]`, with:\n      * `check=True`\n      * `capture_output=True`\n      * `text=True`\n      * `env={\"PATH\": \"/usr/bin:/bin\"}`\n      * `timeout=300`\n      * `cwd=\"/tmp\"`\n      * `close_fds=True`\n    - Logs the script\u2019s stdout at debug level.\n    - Catches `subprocess.CalledProcessError` and `subprocess.TimeoutExpired`, logs the error, and re\u2011raises as `CommandExecutionError` preserving context.\n    - In a `finally` block, securely deletes the temporary file if it was created, ignoring any `OSError`.\n14. Ensure **no** code outside of Python is present, and the module does **not** import or depend on any non\u2011standard libraries beyond those listed.\n15. The entire file must be syntactically correct, pass static analysis (e.g., flake8), and follow best security practices as described. Do not add any extra functionality, comments, or explanatory text beyond what is required for the implementation.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6089285714285714,
+      "bandit_statement_nodes": [
+        82,
+        106
+      ],
+      "candidate_hash": "e66da208bac338c354a7025be4869c5b0ec33f522b7acc40ecd268c9dca2ca91",
+      "cwe_count": 2,
+      "cwes": [
+        78,
+        377
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1384,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1495,
+          "end_lineno": 10,
+          "lineno": 10,
+          "node": 6
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1222,
+          "end_lineno": 91,
+          "lineno": 91,
+          "node": 62
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1057,
+          "end_lineno": 111,
+          "lineno": 111,
+          "node": 79
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1561,
+          "end_lineno": 153,
+          "lineno": 144,
+          "node": 106
+        }
+      ],
+      "iteration": 10,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module (compatible with Python\u202f3.8+) that implements a secure wrapper for the Server Density API. The code must:\n\n1. Begin with a module\u2011level docstring that includes a brief description and a ``.. versionadded:: 1.0.0`` directive.\n2. Import the following modules exactly as shown:\n   - ``from __future__ import annotations``\n   - ``import json, re, tempfile, urllib.parse, hmac, logging, requests``\n   - ``from hashlib import sha256``\n   - ``from pathlib import Path``\n   - ``from typing import Any, Dict, Optional``\n   - ``from salt.exceptions import CommandExecutionError``\n3. Configure a logger named ``\"serverdensity_wrapper\"`` that:\n   - Adds a ``NullHandler``\n   - Sets level to ``INFO``\n   - Disables propagation\n4. Create a single ``requests.Session`` object named ``_session`` that:\n   - Sets a custom ``User-Agent`` header: ``\"salt-serverdensity-wrapper/1.0\"``\n   - Enforces SSL verification (``verify = True``)\n5. Define a constant ``_BASE_API_URL`` equal to ``\"https://api.serverdensity.io/inventory/\"``.\n6. Implement the following functions with exact signatures, type hints, and behavior:\n   - ``def get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str:``\n     * Retrieve a pillar via ``__salt__[\"pillar.get\"]``.\n     * Validate that the pillar is a dict and contains ``val``; raise ``CommandExecutionError`` with clear messages otherwise.\n     * Log the retrieved value at DEBUG level and return it as a string.\n   - ``def _clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]:``\n     * Return a new dict excluding any keys that start with ``variable_prefix``.\n     * Log the cleaned dict at DEBUG level.\n   - ``def _validate_device_id(device_id: str) -> str:``\n     * Ensure ``device_id`` matches the regex ``[A-Za-z0-9._-]+``; raise ``CommandExecutionError`` on failure.\n     * Return a URL\u2011encoded version using ``urllib.parse.quote`` with ``safe=\"\"``.\n   - ``def _validate_account_url(url: str) -> str:``\n     * Verify the URL starts with ``https://`` and contains no whitespace; raise ``CommandExecutionError`` on failure.\n     * Return the original URL.\n   - ``def _validate_agent_key(key: str) -> str:``\n     * Ensure ``key`` matches the regex ``[A-Za-z0-9._-]+``; raise ``CommandExecutionError`` on failure.\n     * Return the original key.\n   - ``def _request(method: str, url: str, token: str, json_payload: Optional[Dict[str, Any]] = None, params: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:``\n     * Build a query dict containing ``token`` and merge any additional ``params``.\n     * Perform the HTTP request using ``_session.request`` with a 30\u2011second timeout.\n     * Catch ``requests.RequestException`` and re\u2011raise as ``CommandExecutionError`` preserving the original exception.\n     * If the response status is not 200, log an error with status, method, and URL, then return ``None``.\n     * Attempt to parse JSON; on failure raise ``CommandExecutionError``.\n   - ``def create(name: str, **params: Any) -> Optional[Dict[str, Any]]:``  \n     * Retrieve the API token via ``get_sd_auth(\"api_token\")``.\n     * Clean ``params`` with ``_clean_salt_variables``.\n     * Build a payload containing ``name`` and the cleaned params.\n     * POST to ``{_BASE_API_URL.rstrip('/')}/devices/`` using ``_request``.\n   - ``def delete(device_id: str) -> Optional[Dict[str, Any]]:``  \n     * Retrieve the API token.\n     * Validate and URL\u2011encode ``device_id``.\n     * DELETE ``{_BASE_API_URL.rstrip('/')}/devices/{encoded_id}/`` via ``_request``.\n   - ``def ls(**params: Any) -> Optional[Dict[str, Any]]:``  \n     * Retrieve the API token.\n     * Clean ``params``.\n     * If any cleaned params exist, set ``endpoint`` to ``\"resources/\"`` and create a ``filter`` query parameter containing a JSON string of the cleaned params (all values cast to ``str``). Otherwise, set ``endpoint`` to ``\"devices/\"`` and no extra query.\n     * GET ``{_BASE_API_URL.rstrip('/')}/{endpoint}`` via ``_request``.\n   - ``def update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]:``  \n     * Retrieve the API token.\n     * Clean ``params``.\n     * Validate and URL\u2011encode ``device_id``.\n     * PUT to ``{_BASE_API_URL.rstrip('/')}/devices/{encoded_id}/`` with the cleaned params as JSON via ``_request``.\n   - ``def install_agent(agent_key: str) -> None:``  \n     * Import ``subprocess`` and ``shutil`` locally.\n     * Retrieve ``account_url`` and ``install_script_sha256`` via ``get_sd_auth``.\n     * Validate ``account_url`` with ``_validate_account_url`` and ``agent_key`` with ``_validate_agent_key``.\n     * Ensure ``install_script_sha256`` is present; otherwise raise ``CommandExecutionError``.\n     * Download the installer script from ``https://install.serverdensity.io/install.sh`` using ``_session.get`` with ``allow_redirects=False`` and a 30\u2011second timeout; raise ``CommandExecutionError`` on any request failure.\n     * Compute the SHA\u2011256 hash of the downloaded content and compare it to the expected hash using ``hmac.compare_digest``; raise ``CommandExecutionError`` on mismatch.\n     * Write the script to a securely created temporary file (use ``tempfile.NamedTemporaryFile`` with ``delete=False``, mode ``\"wb\"``, suffix ``\".sh\"``). After writing, set file permissions to ``0o600``.\n     * Locate the ``bash`` executable via ``shutil.which``; raise ``CommandExecutionError`` if not found.\n     * Execute the script with ``subprocess.run`` using the found ``bash`` path and arguments ``[bash_path, temp_path, \"-a\", account_url, \"-k\", agent_key]``.\n       - Set ``check=True``, ``capture_output=True``, ``text=True``.\n       - Use an environment limited to ``PATH=/usr/bin:/bin``.\n       - Set a timeout of 300 seconds, working directory ``/tmp``, and ``close_fds=True``.\n       - Log the script\u2019s stdout at DEBUG level.\n     * On ``CalledProcessError`` or ``TimeoutExpired``, log the error and raise ``CommandExecutionError``.\n     * Ensure the temporary file is deleted in a ``finally`` block, ignoring any ``OSError``.\n7. Ensure all functions raise ``CommandExecutionError`` with informative messages for any validation, network, or execution failures.\n8. Do not include any code outside of the described module (no test harness, no CLI, no additional classes).\n9. The entire output must be valid Python code only; do not include any explanatory text, markdown fences, or comments outside the code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6349353049907579,
+      "bandit_statement_nodes": [
+        82,
+        107
+      ],
+      "candidate_hash": "81228970331d409e7f02a8bee0fd906dc1556b56b67502a706fc1e2832fea60b",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1089,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 2
+        },
+        {
+          "ast_type": "ImportFrom",
+          "change": 0.2187,
+          "end_lineno": 8,
+          "lineno": 8,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1186,
+          "end_lineno": 93,
+          "lineno": 93,
+          "node": 62
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1076,
+          "end_lineno": 113,
+          "lineno": 113,
+          "node": 79
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1641,
+          "end_lineno": 157,
+          "lineno": 148,
+          "node": 107
+        }
+      ],
+      "iteration": 11,
+      "optimized_prompt": "Write a **Python** module (compatible with Python\u202f3.9+) that implements a secure wrapper for the Server\u202fDensity API. The code must:\n\n1. Include the module docstring `\"\"\"Secure wrapper for the Server Density API.\\n\\n.. versionadded:: 1.0.0\\n\"\"\"`.\n2. Import the following modules exactly as shown:\n   - `from __future__ import annotations`\n   - `import json, re, tempfile, urllib.parse, hmac, logging, requests, os, shutil`\n   - `from hashlib import sha256`\n   - `from pathlib import Path`\n   - `from typing import Any, Dict, Optional`\n   - `from salt.exceptions import CommandExecutionError`\n3. Configure a logger named `\"serverdensity_wrapper\"` with a `NullHandler`, level `INFO`, and propagation disabled.\n4. Create a single `requests.Session` object:\n   - Set a custom `User-Agent` header `\"salt-serverdensity-wrapper/1.0\"`.\n   - Enforce SSL verification (`session.verify = True`).\n5. Define a constant `_BASE_API_URL = \"https://api.serverdensity.io/inventory/\"`.\n6. Implement a private helper `_build_endpoint(*parts: str) -> str` that safely joins `_BASE_API_URL` with each part using `urllib.parse.urljoin`, ensuring no part starts with a leading slash.\n7. Implement `get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str` that:\n   - Retrieves a pillar via `__salt__[\"pillar.get\"]`.\n   - Validates the pillar is a dict, raises `CommandExecutionError` on failure.\n   - Checks that `val` exists in the pillar, raises `CommandExecutionError` if missing.\n   - Returns the value as a string and logs the retrieval at DEBUG level.\n8. Implement `_clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]` that removes any key starting with the prefix and logs the cleaned dict at DEBUG level.\n9. Implement `_validate_device_id(device_id: str) -> str` that:\n   - Ensures the ID matches the regex `r\"[A-Za-z0-9._-]+\"`.\n   - Raises `CommandExecutionError` on mismatch.\n   - Returns the URL\u2011encoded ID using `urllib.parse.quote` with `safe=\"\"`.\n10. Implement `_validate_account_url(url: str) -> str` that:\n    - Requires the URL to start with `https://` and contain no whitespace.\n    - Raises `CommandExecutionError` on failure.\n    - Returns the original URL.\n11. Implement `_validate_agent_key(key: str) -> str` that:\n    - Ensures the key matches the same regex as device IDs.\n    - Raises `CommandExecutionError` on failure.\n    - Returns the original key.\n12. Implement a private `_request` function with signature:\n    ```python\n    def _request(\n        method: str,\n        url: str,\n        token: str,\n        json_payload: Optional[Dict[str, Any]] = None,\n        params: Optional[Dict[str, Any]] = None,\n    ) -> Optional[Dict[str, Any]]:\n    ```\n    - Builds a query dict containing the `token` and merges any additional `params`.\n    - Performs the HTTP request using the shared session with a 30\u2011second timeout.\n    - Catches `requests.RequestException`, re\u2011raising as `CommandExecutionError`.\n    - Logs non\u2011200 responses as errors and returns `None`.\n    - Attempts to parse JSON; on `json.JSONDecodeError` raise `CommandExecutionError`.\n    - Returns the parsed JSON dictionary on success.\n13. Implement the public API functions with exact signatures and behavior:\n    - `create(name: str, **params: Any) -> Optional[Dict[str, Any]]`:\n      * Retrieve `api_token` via `get_sd_auth`.\n      * Clean `params` with `_clean_salt_variables`.\n      * Build payload `{\"name\": name, **cleaned}`.\n      * Call `_request(\"POST\", _build_endpoint(\"devices/\"), token, json_payload=payload)`.\n    - `delete(device_id: str) -> Optional[Dict[str, Any]]`:\n      * Retrieve `api_token`.\n      * Validate and encode `device_id`.\n      * Call `_request(\"DELETE\", _build_endpoint(\"devices\", f\"{encoded_id}/\"), token)`.\n    - `ls(**params: Any) -> Optional[Dict[str, Any]]`:\n      * Retrieve `api_token`.\n      * Clean `params`.\n      * If cleaned dict is non\u2011empty, set `endpoint = \"resources/\"` and create a `filter` query parameter containing a JSON string of the cleaned dict (convert all values to strings).\n      * Otherwise, set `endpoint = \"devices/\"` and no extra query params.\n      * Construct the full URL as `f\"{_BASE_API_URL.rstrip('/')}/{endpoint}\"`.\n      * Call `_request(\"GET\", url, token, params=query_params)`.\n    - `update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]`:\n      * Retrieve `api_token`.\n      * Clean `params`.\n      * Validate and encode `device_id`.\n      * Call `_request(\"PUT\", _build_endpoint(\"devices\", f\"{encoded_id}/\"), token, json_payload=cleaned)`.\n    - `install_agent(agent_key: str) -> None`:\n      * Retrieve `account_url` and `install_script_sha256` via `get_sd_auth`.\n      * Validate both using the helper validators.\n      * Ensure `install_script_sha256` is present; raise `CommandExecutionError` if missing.\n      * Download the installer script from `https://install.serverdensity.io/install.sh` with redirects disabled, 30\u2011second timeout, and raise for HTTP errors.\n      * Compute the SHA\u2011256 hash of the downloaded content and compare securely with the expected hash using `hmac.compare_digest`; raise `CommandExecutionError` on mismatch.\n      * Write the script to a temporary directory using `tempfile.TemporaryDirectory`, set file permissions to `0o600`.\n      * Locate the `bash` executable via `shutil.which`; raise `CommandExecutionError` if not found.\n      * Execute the script with arguments `-a <account_url> -k <agent_key>` using `subprocess.run`:\n        - `check=True`, `capture_output=True`, `text=True`.\n        - Environment limited to `PATH=\"/usr/bin:/bin\"`.\n        - Timeout of 300 seconds, working directory set to the temporary directory, and `close_fds=True`.\n        - Log stdout at DEBUG level.\n      * On `subprocess.CalledProcessError` or `subprocess.TimeoutExpired`, log the error and raise `CommandExecutionError`.\n14. Ensure **all** error messages are clear, do not expose sensitive data, and use `CommandExecutionError` for any failure.\n15. The entire file must be valid, import\u2011able Python code with no syntax errors, and must not contain any code in languages other than Python.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5891938250428816,
+      "bandit_statement_nodes": [
+        7,
+        110
+      ],
+      "candidate_hash": "c79c9213b0643f2f09a8b1f0796752d3c8a3270039e51568b384a92179078a69",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1474,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1606,
+          "end_lineno": 11,
+          "lineno": 11,
+          "node": 7
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1365,
+          "end_lineno": 154,
+          "lineno": 145,
+          "node": 110
+        }
+      ],
+      "iteration": 12,
+      "optimized_prompt": "You are an expert Python developer. Write a **single, self\u2011contained Python module** that implements a secure wrapper for the Server Density API with the exact functionality described below. The code must be written **only in Python** (no other languages) and must follow security best practices, include comprehensive input validation, proper error handling, and logging. Do not add any extra explanatory text, comments, or documentation beyond what is required for the code to function as specified.\n\n**Requirements**\n\n1. **Module docstring**  \n   Include a short description and a `.. versionadded:: 1.0.0` directive.\n\n2. **Future import**  \n   `from __future__ import annotations`\n\n3. **Imports**  \n   - `json`, `re`, `tempfile`, `urllib.parse`, `hmac`, `logging`, `shutil`, `subprocess`  \n   - `requests`  \n   - `sha256` from `hashlib`  \n   - `Path` from `pathlib`  \n   - `Any`, `Dict`, `Optional` from `typing`  \n   - `CommandExecutionError` from `salt.exceptions`\n\n4. **Logger**  \n   - Create a logger named `\"serverdensity_wrapper\"`  \n   - Add a `NullHandler`, set level to `INFO`, and disable propagation.\n\n5. **HTTP session**  \n   - Create a global `requests.Session()` named `_session`.  \n   - Set default header `User-Agent: salt-serverdensity-wrapper/1.0`.  \n   - Enforce SSL verification (`_session.verify = True`).\n\n6. **Base API URL**  \n   - Define `_BASE_API_URL = \"https://api.serverdensity.io/inventory/\"`.\n\n7. **Helper functions**  \n   - `_build_endpoint(*parts: str) -> str` \u2013 concatenate URL parts safely using `urllib.parse.urljoin`, ensuring exactly one slash between parts.  \n   - `get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str` \u2013 retrieve a value from Salt pillar via `__salt__[\"pillar.get\"]`, validate that the pillar is a dict, raise `CommandExecutionError` if missing or wrong type, log debug, and return the value as string.  \n   - `_clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]` \u2013 return a new dict excluding keys that start with the prefix, log the cleaned dict.  \n   - `_validate_device_id(device_id: str) -> str` \u2013 ensure the ID matches regex `^[A-Za-z0-9._-]+$`, raise `CommandExecutionError` on failure, then URL\u2011encode it with `urllib.parse.quote` (no safe characters).  \n   - `_validate_account_url(url: str) -> str` \u2013 require the URL to start with `https://` and contain no whitespace; raise `CommandExecutionError` otherwise.  \n   - `_validate_agent_key(key: str) -> str` \u2013 ensure the key matches the same regex as device IDs; raise `CommandExecutionError` otherwise.\n\n8. **Core request function**  \n   - `_request(method: str, url: str, token: str, json_payload: Optional[Dict[str, Any]] = None, params: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]`  \n   - Build query dict with `token` and any additional `params`.  \n   - Perform the request with `_session.request`, a 30\u2011second timeout, and proper exception handling.  \n   - On network error, raise `CommandExecutionError` preserving the original exception.  \n   - If response status is not 200, log an error with status and text, then return `None`.  \n   - Attempt to parse JSON; on failure raise `CommandExecutionError`.\n\n9. **Public API functions**  \n   - `create(name: str, **params: Any) -> Optional[Dict[str, Any]]` \u2013 retrieve `api_token`, clean params, build payload with `name`, call `_request` with `POST` to endpoint `devices/`.  \n   - `delete(device_id: str) -> Optional[Dict[str, Any]]` \u2013 retrieve `api_token`, validate and encode `device_id`, call `_request` with `DELETE` to endpoint `devices/<id>/`.  \n   - `ls(**params: Any) -> Optional[Dict[str, Any]]` \u2013 retrieve `api_token`, clean params. If any cleaned params exist, set endpoint to `resources/` and add a `filter` query parameter containing a JSON\u2011encoded dict of the cleaned params (all values cast to `str`). Otherwise, use endpoint `devices/`. Build full URL using `_BASE_API_URL` (strip trailing slash) and call `_request` with `GET`.  \n   - `update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]` \u2013 retrieve `api_token`, clean params, validate and encode `device_id`, call `_request` with `PUT` to endpoint `devices/<id>/` and JSON payload of cleaned params.\n\n10. **Agent installation**  \n    - `install_agent(agent_key: str) -> None`  \n    - Retrieve `account_url`, `install_script_sha256` from pillar via `get_sd_auth`.  \n    - Validate `account_url` with `_validate_account_url`, validate both hashes/keys with `_validate_agent_key`.  \n    - Download the install script from `https://install.serverdensity.io/install.sh` using `_session.get` with redirects disabled, 30\u2011second timeout, and `raise_for_status`.  \n    - Compute SHA\u2011256 of the downloaded content and compare securely with the expected hash using `hmac.compare_digest`; on mismatch raise `CommandExecutionError`.  \n    - Write the script to a temporary directory (`tempfile.TemporaryDirectory`) as `install.sh`, set permissions to `0o600`.  \n    - Locate the `bash` executable with `shutil.which`; if not found raise `CommandExecutionError`.  \n    - Execute the script via `subprocess.run` with arguments `[\"bash\", \"<script_path>\", \"-a\", account_url, \"-k\", agent_key]`, environment limited to `PATH=/usr/bin:/bin`, capture output, enforce a 300\u2011second timeout, set `cwd` to the temporary directory, and close file descriptors.  \n    - Log the script\u2019s stdout at debug level. On any `CalledProcessError` or `TimeoutExpired`, log an error and raise `CommandExecutionError`.\n\n**Additional constraints**\n\n- All raised exceptions must be `CommandExecutionError` with clear messages.  \n- Use `hmac.compare_digest` for hash comparison.  \n- Do not import or use any unsafe functions (e.g., `eval`, `exec`).  \n- Ensure no global mutable state other than the session and logger.  \n- The module must be importable and usable by other Salt modules without side effects.  \n\nGenerate the complete Python source code that satisfies all the above specifications. Do not include any explanatory text, markdown fences, or comments outside the code itself.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5881849315068494,
+      "bandit_statement_nodes": [
+        9,
+        118
+      ],
+      "candidate_hash": "3752b30f244df33cc5050431f42bdb2c0bd4faf525ae5c4a87d18d9625b2f9f0",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1324,
+          "end_lineno": 12,
+          "lineno": 12,
+          "node": 7
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1486,
+          "end_lineno": 14,
+          "lineno": 14,
+          "node": 9
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.132,
+          "end_lineno": 23,
+          "lineno": 23,
+          "node": 15
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1146,
+          "end_lineno": 37,
+          "lineno": 37,
+          "node": 26
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1762,
+          "end_lineno": 169,
+          "lineno": 160,
+          "node": 118
+        }
+      ],
+      "iteration": 13,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 module (no other languages) that implements a secure wrapper for the Server Density API with the exact functionality described below. The code must follow security best practices, include thorough input validation, safe URL construction, proper error handling, and logging. Use only standard library modules and the third\u2011party `requests` library. Do not add any explanatory comments outside the code.\n\nRequirements:\n\n1. Module docstring: `\"Secure wrapper for the Server Density API.\\n\\n.. versionadded:: 1.0.0\"` and `from __future__ import annotations`.\n\n2. Imports:\n   - `json`, `re`, `tempfile`, `urllib.parse`, `hmac`, `logging as _logging`, `shutil`, `subprocess as _subprocess`\n   - `requests`\n   - `sha256` from `hashlib`\n   - `Path` from `pathlib`\n   - `Any`, `Dict`, `Optional` from `typing`\n   - `CommandExecutionError` from `salt.exceptions`\n\n3. Configure a logger named after the module:\n   - Add a `NullHandler`, set level to `INFO`, disable propagation.\n\n4. Create a single `requests.Session` named `_session`:\n   - Set default `User-Agent` header to `\"salt-serverdensity-wrapper/1.0\"`.\n   - Enforce SSL verification.\n\n5. Define constant `_BASE_API_URL = \"https://api.serverdensity.io/inventory/\"`.\n\n6. Implement private helper `_build_endpoint(*parts: str) -> str` that:\n   - Returns the base URL if no parts are given.\n   - Normalizes the base to end with a single slash.\n   - For each part, strip leading slashes, URL\u2011quote the part (no safe characters), and join using `urllib.parse.urljoin`.\n   - Remove the trailing slash before returning.\n\n7. Implement `get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str` that:\n   - Retrieves a pillar dictionary via `__salt__[\"pillar.get\"]`.\n   - Validates that the pillar is a dict and contains `val`; raise `CommandExecutionError` with clear messages otherwise.\n   - Returns the value as a string and logs the retrieval at debug level.\n\n8. Implement `_clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]` that removes any key starting with the prefix and logs the cleaned dict.\n\n9. Implement `_validate_device_id(device_id: str) -> str` that:\n   - Ensures the ID matches the regex `^[A-Za-z0-9._-]+$`; raise `CommandExecutionError` on failure.\n   - Returns the URL\u2011quoted ID (safe characters `\"\"`).\n\n10. Implement `_validate_account_url(url: str) -> str` that:\n    - Requires the URL to start with `https://` and contain no whitespace; raise `CommandExecutionError` otherwise.\n    - Returns the original URL.\n\n11. Implement `_validate_agent_key(key: str) -> str` that:\n    - Ensures the key matches the same regex as device IDs; raise `CommandExecutionError` on failure.\n    - Returns the key unchanged.\n\n12. Implement private `_request` handling HTTP calls:\n    - Signature: `def _request(method: str, url: str, token: str, json_payload: Optional[Dict[str, Any]] = None, params: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]`.\n    - Build a query dict containing the `token` and merge any additional `params`.\n    - Perform the request with `_session.request`, a 30\u2011second timeout, and proper exception handling.\n    - On network errors, raise `CommandExecutionError`.\n    - If response status is not 200, log an error and return `None`.\n    - Attempt to parse JSON; on failure raise `CommandExecutionError`.\n\n13. Public API functions:\n\n    - `def create(name: str, **params: Any) -> Optional[Dict[str, Any]]`:\n      * Retrieve `api_token` via `get_sd_auth`.\n      * Clean params with `_clean_salt_variables`.\n      * Build payload with `\"name\"` and cleaned params.\n      * Call `_request` with method `\"POST\"` to endpoint `devices`.\n\n    - `def delete(device_id: str) -> Optional[Dict[str, Any]]`:\n      * Retrieve token.\n      * Validate and encode `device_id`.\n      * Call `_request` with method `\"DELETE\"` to endpoint `devices/<encoded_id>`.\n\n    - `def ls(**params: Any) -> Optional[Dict[str, Any]]`:\n      * Retrieve token.\n      * Clean params.\n      * If any cleaned params exist, use endpoint `resources` and pass a `filter` query parameter containing a JSON string of the cleaned params (convert values to strings). Otherwise, use endpoint `devices` with no extra query.\n      * Call `_request` with method `\"GET\"`.\n\n    - `def update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]`:\n      * Retrieve token.\n      * Clean params.\n      * Validate and encode `device_id`.\n      * Call `_request` with method `\"PUT\"` to endpoint `devices/<encoded_id>` and send cleaned params as JSON payload.\n\n    - `def install_agent(agent_key: str) -> None`:\n      * Retrieve `account_url`, `install_script_sha256` via `get_sd_auth`.\n      * Validate `account_url` and both `agent_key` and expected hash with `_validate_agent_key`.\n      * Download the install script from `https://install.serverdensity.io/install.sh` using `_session.get` with redirects disabled, 30\u2011second timeout, and raise for status.\n      * Compute SHA\u2011256 of the script content and compare with the expected hash using `hmac.compare_digest`; on mismatch raise `CommandExecutionError`.\n      * Write the script to a temporary directory (`tempfile.TemporaryDirectory`), set permissions to `0o600`.\n      * Locate `bash` via `shutil.which`; raise `CommandExecutionError` if not found.\n      * Execute the script with `_subprocess.run` using arguments `bash_path`, script path, `-a`, `account_url`, `-k`, `agent_key`.\n        - Environment: `PATH` limited to `\"/usr/bin:/bin\"`.\n        - Working directory: the temporary directory.\n        - Capture output, text mode, 300\u2011second timeout, close file descriptors, and `check=True`.\n        - Log stdout at debug level.\n      * On `CalledProcessError` or `TimeoutExpired`, log the error and raise `CommandExecutionError`.\n\n14. Ensure all functions log relevant debug or error information using the module logger `_logger`.\n\nThe generated code must exactly match the described structure, naming, and behavior, and must be syntactically correct Python 3 code. Do not include any additional explanatory text outside the code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6256830601092896,
+      "bandit_statement_nodes": [
+        9,
+        120
+      ],
+      "candidate_hash": "f8a52a3d8fbd8fd55e0dac2e20bc68f09e2c0ed5e9316d9d7fae0b26a25d7b03",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1438,
+          "end_lineno": 22,
+          "lineno": 22,
+          "node": 15
+        },
+        {
+          "ast_type": "With",
+          "change": 0.1032,
+          "end_lineno": 170,
+          "lineno": 147,
+          "node": 110
+        }
+      ],
+      "iteration": 14,
+      "optimized_prompt": "Write a complete, production\u2011ready Python module that implements a secure wrapper for the Server Density API. The code must:\n\n- Be valid Python 3 code only (no other languages or pseudo\u2011code).\n- Include a module docstring with a brief description and a ``.. versionadded:: 1.0.0`` directive.\n- Use ``from __future__ import annotations``.\n- Import only the following standard\u2011library modules: ``json``, ``re``, ``tempfile``, ``urllib.parse``, ``hmac``, ``logging`` (as ``_logging``), ``shutil``, ``subprocess`` (as ``_subprocess``), ``hashlib.sha256``, ``pathlib.Path``, ``typing.Any``, ``typing.Dict``, ``typing.Optional``.\n- Import third\u2011party modules: ``requests`` and ``salt.exceptions.CommandExecutionError``.\n- Define a private function ``_get_logger()`` that returns a module\u2011level logger configured with a ``NullHandler``, INFO level, and ``propagate = False``.\n- Create a module\u2011level logger ``_logger`` using ``_get_logger()``.\n- Create a ``requests.Session`` named ``_session`` with a custom ``User-Agent`` header (e.g., ``\"salt-serverdensity-wrapper/1.0\"``) and SSL verification enabled.\n- Define a constant ``_BASE_API_URL`` set to ``\"https://api.serverdensity.io/inventory/\"``.\n- Implement a private helper ``_build_endpoint(*parts: str) -> str`` that safely joins URL parts using ``urllib.parse.quote`` and ``urllib.parse.urljoin`` and returns a clean endpoint string without a trailing slash.\n- Implement ``get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str`` that retrieves a value from the Salt pillar using ``__salt__[\"pillar.get\"]``, validates that the pillar is a dict, raises ``CommandExecutionError`` for missing keys or wrong types, logs the retrieval at DEBUG level, and returns the value as a string.\n- Implement a private helper ``_clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]`` that removes any keys starting with the given prefix, logs the cleaned dict at DEBUG level, and returns it.\n- Implement private validators:\n  * ``_validate_device_id(device_id: str) -> str`` \u2013 ensure the ID matches the regex ``[A-Za-z0-9._-]+``; raise ``CommandExecutionError`` on failure; return a URL\u2011quoted version.\n  * ``_validate_account_url(url: str) -> str`` \u2013 ensure the URL starts with ``https://`` and contains no whitespace; raise ``CommandExecutionError`` on failure; return the original URL.\n  * ``_validate_agent_key(key: str) -> str`` \u2013 ensure the key matches the regex ``[A-Za-z0-9._-]+``; raise ``CommandExecutionError`` on failure; return the original key.\n- Implement a private ``_request`` function with signature ``_request(method: str, url: str, token: str, json_payload: Optional[Dict[str, Any]] = None, params: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]`` that:\n  * Adds the ``token`` to the query parameters.\n  * Performs the HTTP request using ``_session.request`` with a 30\u2011second timeout.\n  * Catches ``requests.RequestException`` and re\u2011raises as ``CommandExecutionError`` with a clear message.\n  * Logs non\u2011200 responses as errors and returns ``None``.\n  * Attempts to parse JSON; on failure, raises ``CommandExecutionError``.\n- Implement the public API functions with exact signatures and behavior:\n  * ``create(name: str, **params: Any) -> Optional[Dict[str, Any]]`` \u2013 retrieve ``api_token`` via ``get_sd_auth``, clean ``params``, build payload ``{\"name\": name, **cleaned}``, call ``_request`` with method ``POST`` to the ``devices`` endpoint.\n  * ``delete(device_id: str) -> Optional[Dict[str, Any]]`` \u2013 retrieve token, validate and URL\u2011quote the device ID, call ``_request`` with method ``DELETE`` to ``devices/<id>``.\n  * ``ls(**params: Any) -> Optional[Dict[str, Any]]`` \u2013 retrieve token, clean params; if any cleaned params exist, build a ``filter`` JSON string and call ``_request`` with method ``GET`` to ``resources`` endpoint with ``filter`` param; otherwise call ``_request`` to ``devices`` endpoint without extra params.\n  * ``update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]`` \u2013 retrieve token, clean params, validate device ID, call ``_request`` with method ``PUT`` to ``devices/<id>`` with JSON payload ``cleaned``.\n  * ``install_agent(agent_key: str) -> None`` \u2013 retrieve ``account_url`` and ``install_script_sha256`` via ``get_sd_auth``, validate both, download the install script from ``https://install.serverdensity.io/install.sh`` using ``_session.get`` with redirects disabled and a 30\u2011second timeout, raise ``CommandExecutionError`` on download failure, compute SHA256 of the content and compare securely with ``hmac.compare_digest``; raise ``CommandExecutionError`` on mismatch; locate the ``bash`` executable with ``shutil.which`` and raise if not found; execute the script via ``_subprocess.run`` passing the script content via ``stdin`` (``input=resp.content``), arguments ``-s -a <account_url> -k <agent_key>``, working directory ``/``, environment limited to ``PATH=/usr/bin:/bin``, capture output, enforce a 300\u2011second timeout, close file descriptors, and ``check=True``; log stdout at DEBUG level; on ``CalledProcessError`` or ``TimeoutExpired`` log the error and raise ``CommandExecutionError`` with a clear message.\n- Ensure all error handling uses ``CommandExecutionError`` with informative messages.\n- Do not include any additional explanatory comments, markdown, or non\u2011code text in the output. The entire response must be the Python source code described above.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6122994652406417,
+      "bandit_statement_nodes": [
+        9,
+        114
+      ],
+      "candidate_hash": "7f1e924577e336c9a6815528bbd7d9964160d07c59d3a54e3ef21abeb3cc212a",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2082,
+          "end_lineno": 12,
+          "lineno": 12,
+          "node": 4
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.169,
+          "end_lineno": 22,
+          "lineno": 22,
+          "node": 13
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1393,
+          "end_lineno": 26,
+          "lineno": 26,
+          "node": 16
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1146,
+          "end_lineno": 41,
+          "lineno": 41,
+          "node": 28
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.4686,
+          "end_lineno": 42,
+          "lineno": 42,
+          "node": 29
+        }
+      ],
+      "iteration": 15,
+      "optimized_prompt": "Write a Python 3 module that implements a secure wrapper for the Server Density API with the exact functionality described below. The code must be in Python only, contain no explanatory text or comments outside the code, and must follow the security and style requirements precisely.\n\nRequirements:\n- Include a module docstring exactly as shown:\n  ```\n  \"\"\"Secure wrapper for the Server Density API.\n\n  Provides functions to manage devices and install the monitoring agent\n  using credentials stored in Salt pillars.\n\n  .. versionadded:: 1.0.0\n  \"\"\"\n  ```\n- Use `from __future__ import annotations`.\n- Import only the following modules:\n  - Standard library: `json`, `re`, `urllib.parse`, `hmac`, `logging as _logging`, `shutil`, `subprocess as _subprocess`, `hashlib.sha256`, `pathlib.Path`, `typing.Any`, `typing.Dict`, `typing.Optional`.\n  - Third\u2011party: `requests`, and `CommandExecutionError` from `salt.exceptions`.\n- Define a private function `_get_logger()` that:\n  - Creates a logger named `\"serverdensity_wrapper\"`.\n  - Adds a `NullHandler`.\n  - Sets level to `INFO`.\n  - Disables propagation.\n  - Returns the logger.\n- Create a module\u2011level logger `_logger` by calling `_get_logger()`.\n- Create a `requests.Session()` stored in `_session` and set its `User-Agent` header to `\"salt-serverdensity-wrapper/1.0\"`.\n- Define a constant `_BASE_API_URL = \"https://api.serverdensity.io/inventory/\"`.\n- Implement `_build_endpoint(*parts: str) -> str` that:\n  - Strips leading/trailing slashes from each part.\n  - Validates each cleaned part with the regex `r\"[A-Za-z0-9._-]+\"`; on failure raise `CommandExecutionError` with a message `\"Invalid endpoint part '{part}'\"`.\n  - URL\u2011encodes each part using `urllib.parse.quote` with `safe=\"\"`.\n  - Concatenates the parts to the base URL (ensuring a single slash between components) and returns the full URL.\n- Implement `get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str` that:\n  - Retrieves a pillar via `__salt__[\"pillar.get\"](sd_auth_pillar_name, {})`.\n  - Verifies the pillar is a `dict`; otherwise raise `CommandExecutionError` with `\"Pillar '{sd_auth_pillar_name}' is not a dict\"`.\n  - Checks that `val` exists in the pillar; otherwise raise `CommandExecutionError` with `\"Key '{val}' not found in pillar '{sd_auth_pillar_name}'\"`.\n  - Logs the retrieval at debug level: `\"_logger.debug(\"Retrieved pillar %s[%s]=%s\", sd_auth_pillar_name, val, value)\"`.\n  - Returns the value as a string.\n- Implement `_clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]` that:\n  - Returns a new dict containing only items whose keys do **not** start with `variable_prefix`.\n  - Logs the cleaned dict at debug level.\n- Implement `_validate_device_id(device_id: str) -> str` that:\n  - Validates with the same regex as above; on failure raise `CommandExecutionError` with `\"Invalid device_id '{device_id}'\"`.\n  - Returns `urllib.parse.quote(device_id, safe=\"\")`.\n- Implement `_validate_account_url(url: str) -> str` that:\n  - Ensures the URL starts with `\"https://\"` and contains no whitespace (`re.search(r\"\\s\", url)`); on failure raise `CommandExecutionError` with `\"Invalid account_url '{url}'\"`.\n  - Returns the URL unchanged.\n- Implement `_validate_agent_key(key: str) -> str` that:\n  - Validates with the same regex; on failure raise `CommandExecutionError` with `\"Invalid agent_key '{key}'\"`.\n  - Returns the key unchanged.\n- Implement `_request(method: str, url: str, token: str, json_payload: Optional[Dict[str, Any]] = None, params: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]` that:\n  - Ensures `params` is a dict (copy if provided) and adds `\"token\": token`.\n  - Performs the HTTP request using `_session.request` with the given method, url, json payload, params, and a 30\u2011second timeout.\n  - Catches `requests.RequestException` and raises `CommandExecutionError` with `\"HTTP request failed: {exc}\"`.\n  - If the response status code is not 200, logs an error with `\"_logger.error(...)\"` and returns `None`.\n  - Attempts to parse the response as JSON; on `json.JSONDecodeError` raise `CommandExecutionError` with `\"Failed to parse JSON response from {url}\"`.\n  - Returns the parsed JSON dict.\n- Implement public functions:\n  - `create(name: str, **params: Any) -> Optional[Dict[str, Any]]`:\n    - Retrieve token via `get_sd_auth(\"api_token\")`.\n    - Clean params with `_clean_salt_variables`.\n    - Build payload `{\"name\": name, **cleaned}`.\n    - Build endpoint with `_build_endpoint(\"devices\")`.\n    - Call `_request(\"POST\", endpoint, token, json_payload=payload)` and return its result.\n  - `delete(device_id: str) -> Optional[Dict[str, Any]]`:\n    - Retrieve token.\n    - Validate and quote device_id via `_validate_device_id`.\n    - Build endpoint with `_build_endpoint(\"devices\", quoted_id)`.\n    - Call `_request(\"DELETE\", endpoint, token)` and return its result.\n  - `ls(**params: Any) -> Optional[Dict[str, Any]]`:\n    - Retrieve token.\n    - Clean params.\n    - If cleaned params are non\u2011empty:\n      - Convert them to a JSON string `filter_str`.\n      - Build endpoint `_build_endpoint(\"resources\")`.\n      - Call `_request(\"GET\", endpoint, token, params={\"filter\": filter_str})`.\n    - Otherwise:\n      - Build endpoint `_build_endpoint(\"devices\")`.\n      - Call `_request(\"GET\", endpoint, token)`.\n    - Return the result.\n  - `update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]`:\n    - Retrieve token.\n    - Clean params.\n    - Validate and quote device_id.\n    - Build endpoint `_build_endpoint(\"devices\", quoted_id)`.\n    - Call `_request(\"PUT\", endpoint, token, json_payload=cleaned)` and return its result.\n  - `install_agent(agent_key: str) -> None`:\n    - Retrieve `account_url` and `install_script_sha256` via `get_sd_auth`.\n    - Validate `account_url` with `_validate_account_url` and `agent_key` with `_validate_agent_key`.\n    - Download the install script using `_session.get(\"https://install.serverdensity.io/install.sh\", allow_redirects=False, timeout=30)`.\n    - On request failure raise `CommandExecutionError` with `\"Failed to download install script: {exc}\"`.\n    - If response status is not 200, raise `CommandExecutionError` with `\"Download of install script failed with status {resp.status_code}\"`.\n    - Compute SHA\u2011256 of `resp.content` and compare with the expected SHA using `hmac.compare_digest`; on mismatch raise `CommandExecutionError` with `\"Install script SHA256 mismatch\"`.\n    - Locate the `bash` executable with `shutil.which(\"bash\")`; if not found raise `CommandExecutionError` with `\"bash executable not found\"`.\n    - Build command list `[bash_path, \"-s\", \"-a\", account_url, \"-k\", agent_key]`.\n    - Execute the command with `_subprocess.run` using:\n      - `input=resp.content`\n      - `cwd=\"/\"` \n      - `env={\"PATH\": \"/usr/bin:/bin\"}`\n      - `capture_output=True`\n      - `timeout=300`\n      - `check=True`\n      - `close_fds=True`\n    - Log stdout at debug level.\n    - On `CalledProcessError` or `TimeoutExpired` raise `CommandExecutionError` with `\"Agent installation failed: {exc}\"`.\n- Ensure every error condition raises `CommandExecutionError` with a clear, specific message.\n- Do not include any explanatory comments, markdown, or text outside the Python code. Output only the complete Python source code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6263736263736264,
+      "bandit_statement_nodes": [
+        8,
+        116
+      ],
+      "candidate_hash": "191e6cdf373b80d51224733904a6ac743dc2b37cf9744d086e95559ecdce3a0f",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1689,
+          "end_lineno": 21,
+          "lineno": 21,
+          "node": 12
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1232,
+          "end_lineno": 25,
+          "lineno": 25,
+          "node": 15
+        },
+        {
+          "ast_type": "Return",
+          "change": 0.1551,
+          "end_lineno": 44,
+          "lineno": 44,
+          "node": 32
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1048,
+          "end_lineno": 167,
+          "lineno": 158,
+          "node": 116
+        }
+      ],
+      "iteration": 16,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 module that implements a secure wrapper for the Server Density API with the following exact specifications:\n\n- The module must start with a docstring:  \n  ```\n  Secure wrapper for the Server Density API.\n\n  Provides functions to manage devices and install the monitoring agent\n  using credentials stored in Salt pillars.\n\n  .. versionadded:: 1.0.0\n  ```\n- Use `from __future__ import annotations`.\n- Import only the following standard\u2011library modules: `json`, `re`, `urllib.parse`, `hmac`, `logging as _logging`, `shutil`, `subprocess as _subprocess`, `hashlib.sha256`, `pathlib.Path`, `typing.Any`, `typing.Dict`, `typing.Optional`.\n- Import third\u2011party modules: `requests as _requests` and `salt.exceptions.CommandExecutionError`.\n- Define a private function `_get_logger()` that creates a logger for `__name__`, adds a `NullHandler`, sets level to `INFO`, disables propagation, and returns the logger.\n- Create a module\u2011level logger `_logger` by calling `_get_logger()`.\n- Create a module\u2011level `requests.Session()` named `_session`, set its default `User-Agent` header to `\"salt-serverdensity-wrapper/1.0\"`.\n- Define a constant `_BASE_API_URL` equal to `\"https://api.serverdensity.io/inventory/\"`.\n- Implement a private function `_build_endpoint(*parts: str) -> str` that:\n  * Validates each part against the regex `r\"[A-Za-z0-9._-]+\"`; if a part fails, raise `CommandExecutionError` with a clear message.\n  * Strips leading/trailing slashes, URL\u2011encodes each part with `urllib.parse.quote` (no safe characters), joins them with `/`, and safely joins to `_BASE_API_URL` using `urllib.parse.urljoin` to prevent path traversal.\n- Implement `get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str` that:\n  * Retrieves the pillar dictionary via `__salt__[\"pillar.get\"](sd_auth_pillar_name, {})`.\n  * Validates that the pillar is a dict; otherwise raise `CommandExecutionError`.\n  * Checks that `val` exists in the pillar; otherwise raise `CommandExecutionError`.\n  * Logs the retrieval at debug level (do not expose secret values) and returns the value as a string.\n- Implement a private function `_clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]` that returns a new dict excluding any keys that start with `variable_prefix` and logs the cleaned dict at debug level.\n- Implement private validators:\n  * `_validate_device_id(device_id: str) -> str` \u2013 ensure it matches the same regex as above; raise `CommandExecutionError` on failure; return the URL\u2011quoted device ID.\n  * `_validate_account_url(url: str) -> str` \u2013 ensure it starts with `\"https://\"` and contains no whitespace; raise `CommandExecutionError` on failure; return the original URL.\n  * `_validate_agent_key(key: str) -> str` \u2013 ensure it matches the same regex as above; raise `CommandExecutionError` on failure; return the key unchanged.\n- Implement a private function `_request(method: str, url: str, token: str, json_payload: Optional[Dict[str, Any]] = None, params: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]` that:\n  * Copies `params` (or creates an empty dict) and injects the `token`.\n  * Performs the HTTP request with `_session.request`, passing `method`, `url`, `json=json_payload`, `params=req_params`, and a timeout of 30 seconds.\n  * Catches any `requests.RequestException`, re\u2011raising as `CommandExecutionError` with a clear message.\n  * If the response status code is not 200, logs an error and returns `None`.\n  * Attempts to parse the response as JSON; on `json.JSONDecodeError` raise `CommandExecutionError`.\n  * Returns the parsed JSON dictionary.\n- Implement public functions:\n  * `create(name: str, **params: Any) -> Optional[Dict[str, Any]]` \u2013 retrieve `api_token` via `get_sd_auth`, clean `params`, build payload `{\"name\": name, **cleaned}`, call `_build_endpoint(\"devices\")`, and perform a `POST` request.\n  * `delete(device_id: str) -> Optional[Dict[str, Any]]` \u2013 retrieve token, validate and quote `device_id`, build endpoint with `\"devices\", quoted_id`, and perform a `DELETE` request.\n  * `ls(**params: Any) -> Optional[Dict[str, Any]]` \u2013 retrieve token, clean `params`; if any cleaned params exist, JSON\u2011encode them, call `_build_endpoint(\"resources\")` and perform a `GET` with a `filter` query parameter; otherwise call `_build_endpoint(\"devices\")` and perform a simple `GET`.\n  * `update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]` \u2013 retrieve token, clean `params`, validate and quote `device_id`, build endpoint with `\"devices\", quoted_id`, and perform a `PUT` with the cleaned payload.\n  * `install_agent(agent_key: str) -> None` \u2013 retrieve `account_url` and `install_script_sha256` via `get_sd_auth`, validate both, download the install script from `\"https://install.serverdensity.io/install.sh\"` using `_session.get` with redirects disabled and a 30\u2011second timeout, handle request errors, verify the response status is 200, compute SHA256 of the content and compare securely with `expected_sha` using `hmac.compare_digest`; on mismatch raise `CommandExecutionError`.\n    * Locate the `bash` executable with `shutil.which(\"bash\")`; if not found raise `CommandExecutionError`.\n    * Build the command list `[bash_path, \"-s\", \"-a\", account_url, \"-k\", agent_key]`.\n    * Execute the command with `_subprocess.run`, passing the script content as `input`, setting `cwd=None`, environment `{\"PATH\": \"/usr/bin:/bin\"}`, `capture_output=True`, `timeout=300`, `check=True`, `close_fds=True`, and `text=False`.\n    * Catch `CalledProcessError` and `TimeoutExpired`, re\u2011raising as `CommandExecutionError`.\n    * Log the script\u2019s stdout at debug level (decode bytes to string).\n- Ensure all functions use type hints as shown, raise only `CommandExecutionError` for user\u2011visible errors, and never expose secret values in logs.\n- The entire file must be valid Python code, contain no extraneous text, and must not import or use any language other than Python.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6277573529411765,
+      "bandit_statement_nodes": [
+        8,
+        112
+      ],
+      "candidate_hash": "ceec1d52aa98bd6069b38adc782ef1afe4822eea9c60695fc847e52b8b724d96",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1778,
+          "end_lineno": 21,
+          "lineno": 21,
+          "node": 12
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1232,
+          "end_lineno": 25,
+          "lineno": 25,
+          "node": 15
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1171,
+          "end_lineno": 164,
+          "lineno": 154,
+          "node": 112
+        }
+      ],
+      "iteration": 17,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module (compatible with Python\u202f3.9+) that implements a secure wrapper for the Server Density API. The code must be pure Python and must not contain any non\u2011Python language fragments. Follow these exact specifications:\n\n1. **Module docstring** \u2013 Include a brief description, mention that it provides functions to manage devices and install the monitoring agent using credentials stored in Salt pillars, and note the version added (1.0.0).\n\n2. **Future import** \u2013 `from __future__ import annotations`.\n\n3. **Imports** \u2013 Use only the standard library modules `json`, `os`, `re`, `urllib.parse`, `hmac`, `logging`, `shutil`, `subprocess`, `hashlib.sha256`, `pathlib.Path`, and `typing` (`Any`, `Dict`, `Optional`). Import `Session` and `RequestException` from the third\u2011party `requests` library, but import only the needed classes (`from requests import Session, RequestException as _RequestException`). Do not import the entire `requests` module.\n\n4. **Logger** \u2013 Implement a private function `_get_logger()` that creates a logger named `\"serverdensity_wrapper\"`, attaches a `NullHandler`, sets level to `INFO`, disables propagation, and returns the logger. Instantiate a module\u2011level logger `_logger` using this function.\n\n5. **HTTP session** \u2013 Create a module\u2011level `Session` object `_session`, set a custom `User-Agent` header `\"salt-serverdensity-wrapper/1.0\"`.\n\n6. **Base API URL** \u2013 Define a constant `_BASE_API_URL = \"https://api.serverdensity.io/inventory/\"`.\n\n7. **Endpoint builder** \u2013 Implement `_build_endpoint(*parts: str) -> str` that:\n   - Validates each part against the regex `r\"[A-Za-z0-9._-]+\"`; on failure raise `CommandExecutionError` with a clear message.\n   - Strips leading/trailing slashes, URL\u2011encodes each part using `urllib.parse.quote` with `safe=\"\"`.\n   - Joins the encoded parts with `/` and combines with `_BASE_API_URL` using `urllib.parse.urljoin`.\n   - Returns the full URL.\n\n8. **Credential retrieval** \u2013 Implement `get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str` that:\n   - Retrieves the pillar dictionary via `__salt__[\"pillar.get\"](sd_auth_pillar_name, {})`.\n   - Validates that the pillar is a dict; otherwise raise `CommandExecutionError`.\n   - Checks that `val` exists in the pillar; otherwise raise `CommandExecutionError`.\n   - Logs a debug message with the retrieved key name.\n   - Returns the value as a string.\n\n9. **Parameter cleaning** \u2013 Implement `_clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]` that removes any key starting with the given prefix, logs the cleaned dict at debug level, and returns it.\n\n10. **Validation helpers** \u2013 Implement three private validators:\n    - `_validate_device_id(device_id: str) -> str` \u2013 ensure it matches `r\"[A-Za-z0-9._-]+\"`; raise `CommandExecutionError` on failure; return the URL\u2011quoted ID.\n    - `_validate_account_url(url: str) -> str` \u2013 ensure it starts with `\"https://\"` and contains no whitespace; raise `CommandExecutionError` on failure; return the original URL.\n    - `_validate_agent_key(key: str) -> str` \u2013 ensure it matches `r\"[A-Za-z0-9._-]+\"`; raise `CommandExecutionError` on failure; return the key.\n\n11. **HTTP request wrapper** \u2013 Implement `_request(method: str, url: str, token: str, json_payload: Optional[Dict[str, Any]] = None, params: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]` that:\n    - Copies `params` (or creates an empty dict) and injects the `token`.\n    - Calls `_session.request` with the given method, URL, JSON payload, params, and a timeout of 30 seconds.\n    - Catches `_RequestException` and re\u2011raises as `CommandExecutionError` preserving the original exception as context.\n    - If the response status is not 200, logs an error and returns `None`.\n    - Attempts to parse JSON; on `json.JSONDecodeError` raise `CommandExecutionError` with context.\n    - Returns the parsed JSON dictionary.\n\n12. **Public API functions** \u2013 Implement the following functions, each using the helpers above and returning the JSON response (or `None` where appropriate):\n    - `create(name: str, **params: Any) -> Optional[Dict[str, Any]]` \u2013 retrieve `api_token`, clean params, build payload with `\"name\"` and cleaned params, call `_request` with method `\"POST\"` to the `\"devices\"` endpoint.\n    - `delete(device_id: str) -> Optional[Dict[str, Any]]` \u2013 retrieve `api_token`, validate and quote the device ID, call `_request` with method `\"DELETE\"` to the `\"devices/<id>\"` endpoint.\n    - `ls(**params: Any) -> Optional[Dict[str, Any]]` \u2013 retrieve `api_token`, clean params; if any cleaned params exist, call `_request` with method `\"GET\"` to `\"resources\"` endpoint, passing a `\"filter\"` query parameter containing the JSON\u2011encoded cleaned dict; otherwise call `_request` with method `\"GET\"` to `\"devices\"` endpoint.\n    - `update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]` \u2013 retrieve `api_token`, clean params, validate and quote the device ID, call `_request` with method `\"PUT\"` to `\"devices/<id>\"` endpoint with the cleaned params as JSON payload.\n\n13. **Agent installation** \u2013 Implement `install_agent(agent_key: str) -> None` that:\n    - Retrieves `account_url` and `install_script_sha256` via `get_sd_auth`.\n    - Validates the account URL and agent key using the validators.\n    - Downloads the install script from `https://install.serverdensity.io/install.sh` using `_session.get` with `allow_redirects=False` and a 30\u2011second timeout; handle `_RequestException` as a `CommandExecutionError`.\n    - Verify the HTTP status is 200; otherwise raise `CommandExecutionError`.\n    - Compute the SHA\u2011256 hash of the downloaded content with `sha256`; compare securely to the expected hash using `hmac.compare_digest`; on mismatch raise `CommandExecutionError`.\n    - Locate the `bash` executable with `shutil.which(\"bash\")`; if not found raise `CommandExecutionError`.\n    - Prepare a minimal, controlled environment dict containing only `\"PATH\": \"/usr/bin:/bin\"`, `\"ACCOUNT_URL\": account_url`, and `\"AGENT_KEY\": agent_key`.\n    - Build the command list `[bash_path, \"-s\"]`.\n    - Execute the script via `_subprocess.run` with the following arguments: `input` set to the script bytes, `env` set to the prepared environment, `capture_output=True`, `timeout=300`, `check=True`, `close_fds=True`, `text=False`.\n    - Catch `CalledProcessError` and `TimeoutExpired`, re\u2011raise as `CommandExecutionError` preserving context.\n    - Log the script\u2019s stdout at debug level, decoding with `errors=\"replace\"`.\n\n14. **Error class** \u2013 Assume `CommandExecutionError` is available in the execution environment (do not define it).\n\n15. **General security** \u2013 Ensure all external inputs are validated, use constant\u2011time comparison for hash verification, avoid shell injection by not using `shell=True`, and limit the subprocess environment to the minimal required variables.\n\nProvide only the Python code that satisfies all the above requirements. Do not include any explanatory text, markdown formatting, or comments outside the code. The output must be a single, valid Python file.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5603588907014682,
+      "bandit_statement_nodes": [
+        9,
+        117
+      ],
+      "candidate_hash": "5cc68e5ee9304023b068753deb98928e39176f00585a79507f4fa6d475232cd8",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2149,
+          "end_lineno": 12,
+          "lineno": 12,
+          "node": 3
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1186,
+          "end_lineno": 174,
+          "lineno": 165,
+          "node": 117
+        }
+      ],
+      "iteration": 18,
+      "optimized_prompt": "Write a **Python 3** module that implements a secure wrapper for the Server Density API with the exact functionality described below. The code must be written **only in Python** (no other languages) and must follow security best practices, including input validation, safe handling of external resources, proper error handling, and logging. Do not add any explanatory text outside the code; include only the required code and necessary docstrings/comments within the code.\n\n**Requirements**\n\n1. **Module Header**\n   - Include a module\u2011level docstring that states:  \n     \u201cSecure wrapper for the Server Density API.  \n     Provides functions to manage devices and install the monitoring agent using credentials stored in Salt pillars.  \n     Version added: 1.0.0\u201d\n\n2. **Imports**\n   - Use `from __future__ import annotations`.\n   - Import the following modules: `json`, `re`, `urllib.parse`, `hmac`, `logging`, `shutil`, `subprocess as _subprocess`, `stat`, `tempfile`, `sha256` from `hashlib`, `Path` from `pathlib`, `Any`, `Dict`, `Optional` from `typing`, `Session` and `RequestException as _RequestException` from `requests`.\n\n3. **Logger**\n   - Define a private function `_get_logger()` that creates a logger named `\"serverdensity_wrapper\"` with a `NullHandler`, level `INFO`, and `propagate=False`.\n   - Instantiate a module\u2011level logger `_logger` using `_get_logger()`.\n\n4. **HTTP Session**\n   - Create a module\u2011level `Session` object `_session`.\n   - Set a default `User-Agent` header: `\"salt-serverdensity-wrapper/1.0\"`.\n\n5. **Constants**\n   - Define `_BASE_API_URL = \"https://api.serverdensity.io/inventory/\"`.\n\n6. **Endpoint Builder**\n   - Implement `_build_endpoint(*parts: str) -> str` that:\n     - Validates each part against the regex `^[A-Za-z0-9._-]+$`; raise `CommandExecutionError` on failure.\n     - Strips leading/trailing slashes, URL\u2011encodes each part with `urllib.parse.quote(..., safe=\"\")`.\n     - Joins encoded parts with `/` and combines with `_BASE_API_URL` using `urllib.parse.urljoin`.\n     - Returns the full URL.\n\n7. **Credential Retrieval**\n   - Implement `get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str` that:\n     - Retrieves a pillar via `__salt__[\"pillar.get\"](sd_auth_pillar_name, {})`.\n     - Validates that the pillar is a dict and contains `val`; raise `CommandExecutionError` on errors.\n     - Logs the retrieved key at debug level and returns its string representation.\n\n8. **Utility Functions**\n   - `_clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]` removes keys starting with the prefix, logs the cleaned dict, and returns it.\n   - `_validate_device_id(device_id: str) -> str` validates against `[A-Za-z0-9._-]+`, raises `CommandExecutionError` on failure, and returns a URL\u2011quoted version.\n   - `_validate_account_url(url: str) -> str` ensures the URL starts with `https://` and contains no whitespace; raise `CommandExecutionError` on failure; return the original URL.\n   - `_validate_agent_key(key: str) -> str` validates against `[A-Za-z0-9._-]+`; raise `CommandExecutionError` on failure; return the key.\n\n9. **HTTP Request Helper**\n   - `_request(method: str, url: str, token: str, json_payload: Optional[Dict[str, Any]] = None, params: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]` that:\n     - Adds `token` to query parameters.\n     - Performs the request with a 30\u2011second timeout.\n     - Catches `_RequestException` and re\u2011raises as `CommandExecutionError`.\n     - Logs non\u2011200 responses as errors and returns `None`.\n     - Returns parsed JSON on success; on JSON decode error raise `CommandExecutionError`.\n\n10. **API Functions**\n    - `create(name: str, **params: Any) -> Optional[Dict[str, Any]]`:\n      - Retrieve `api_token` via `get_sd_auth`.\n      - Clean params, build payload with `name`, build endpoint for `\"devices\"`, and POST.\n    - `delete(device_id: str) -> Optional[Dict[str, Any]]`:\n      - Retrieve token, validate and quote `device_id`, build endpoint `\"devices\", quoted_id`, and DELETE.\n    - `ls(**params: Any) -> Optional[Dict[str, Any]]`:\n      - Retrieve token, clean params.\n      - If cleaned params exist, build endpoint `\"resources\"` and GET with a `filter` param containing JSON\u2011encoded cleaned dict.\n      - Otherwise, build endpoint `\"devices\"` and GET.\n    - `update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]`:\n      - Retrieve token, clean params, validate and quote `device_id`, build endpoint `\"devices\", quoted_id`, and PUT with cleaned payload.\n\n11. **Bash Executable Finder**\n    - `_find_bash_executable() -> str` that searches for `/bin/bash` and `/usr/bin/bash`, verifies the file exists and is executable for user/group/others, returns the path, otherwise raises `CommandExecutionError`.\n\n12. **Agent Installation**\n    - `install_agent(agent_key: str) -> None` that:\n      - Retrieves `account_url` and `install_script_sha256` via `get_sd_auth`.\n      - Validates `account_url` and `agent_key`.\n      - Downloads the install script from `https://install.serverdensity.io/install.sh` with redirects disabled and a 30\u2011second timeout; handle request errors.\n      - Verifies the HTTP status is 200; otherwise raise `CommandExecutionError`.\n      - Computes SHA\u2011256 of the script content and compares with the expected hash using `hmac.compare_digest`; raise on mismatch.\n      - Finds a trusted bash path via `_find_bash_executable`.\n      - Prepares an environment dict with `PATH`, `ACCOUNT_URL`, and `AGENT_KEY`.\n      - Writes the script to a securely created temporary file (`tempfile.NamedTemporaryFile`) with `delete=False`, mode `wb`, and a unique prefix/suffix. After writing, set permissions to `0o700`.\n      - Executes the script with `_subprocess.run` using the trusted bash path, the temporary file path, the prepared environment, `capture_output=True`, a 300\u2011second timeout, `check=True`, `close_fds=True`, and `text=False`.\n      - On any `CalledProcessError` or `TimeoutExpired`, raise `CommandExecutionError`.\n      - In a `finally` block, securely delete the temporary file (`unlink(missing_ok=True)`) and log a warning if deletion fails.\n      - Log the script\u2019s stdout at debug level (decode with `errors=\"replace\"`).\n\n13. **Error Class**\n    - Assume `CommandExecutionError` is available in the execution environment (do not define it).\n\n**Additional Constraints**\n- Use only the imports listed; do not introduce new third\u2011party libraries.\n- Ensure all external inputs (pillar values, function arguments, URLs, etc.) are validated before use.\n- Use `hmac.compare_digest` for hash comparison.\n- All subprocess calls must use a trusted absolute path to `bash` and must not inherit unnecessary file descriptors.\n- The temporary script file must have restrictive permissions and be removed after execution, even on failure.\n- Logging should be performed via the module\u2011level `_logger` with appropriate levels (`debug`, `error`, `warning`).\n\nGenerate the complete Python module meeting all the above specifications. Do not include any explanatory text outside the code. Do not add any additional functionality beyond what is described. Ensure the code is syntactically correct and ready to run.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5346303501945525,
+      "bandit_statement_nodes": [
+        8,
+        130
+      ],
+      "candidate_hash": "1dd6ef32a00abb97a4067a3b2e1560a69fefd7f1225b0165ce05497340df86b8",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1882,
+          "end_lineno": 11,
+          "lineno": 11,
+          "node": 7
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2102,
+          "end_lineno": 42,
+          "lineno": 42,
+          "node": 34
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1093,
+          "end_lineno": 173,
+          "lineno": 173,
+          "node": 129
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1121,
+          "end_lineno": 182,
+          "lineno": 174,
+          "node": 130
+        }
+      ],
+      "iteration": 19,
+      "optimized_prompt": "Create a complete, self\u2011contained Python module (compatible with Python\u202f3.9+) that implements a secure wrapper for the Server Density API. The code must:\n\n1. Begin with a module\u2011level docstring exactly:\n   ```\n   Secure wrapper for the Server Density API.\n   Provides functions to manage devices and install the monitoring agent using credentials stored in Salt pillars.\n   Version added: 1.0.0\n   ```\n\n2. Include `from __future__ import annotations` as the first import.\n\n3. Import only the following standard\u2011library modules and third\u2011party packages, and no others:\n   - `json`\n   - `re`\n   - `urllib.parse`\n   - `hmac`\n   - `logging`\n   - `subprocess` (aliased as `_subprocess`)\n   - `stat`\n   - `tempfile`\n   - `hashlib.sha256`\n   - `pathlib.Path`\n   - `typing.Any`, `typing.Dict`, `typing.Optional`\n   - `requests.Session`, `requests.RequestException` (aliased as `_RequestException`)\n\n4. Define a custom exception class `CommandExecutionError(RuntimeError)` with a docstring: \u201cCustom exception for command execution failures.\u201d\n\n5. Implement a private function `_get_logger()` that returns a `logging.Logger` named `\"serverdensity_wrapper\"` configured with a `NullHandler`, level `INFO`, and `propagate=False`. Store the logger in a module\u2011level variable `_logger`.\n\n6. Create a module\u2011level `Session` object `_session` and set its default `User-Agent` header to `\"salt-serverdensity-wrapper/1.0\"`.\n\n7. Define a constant `_BASE_API_URL` set to `\"https://api.serverdensity.io/inventory/\"`.\n\n8. Implement a private function `_build_endpoint(*parts: str) -> str` that:\n   - Validates each part against the regex `^[A-Za-z0-9._-]+$`.\n   - Rejects any part containing `\"..\"`.\n   - Strips leading/trailing slashes, URL\u2011encodes each part with `urllib.parse.quote` (no safe characters), and joins them with `/`.\n   - Appends a trailing slash to the final path.\n   - Returns the full URL using `urllib.parse.urljoin(_BASE_API_URL, path)`.\n   - Raises `CommandExecutionError` with a clear message on validation failure.\n\n9. Implement `get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str` that:\n   - Retrieves pillar data via `__salt__[\"pillar.get\"](sd_auth_pillar_name, {})`.\n   - Validates that the pillar is a dict and contains the requested key.\n   - Logs the retrieval at DEBUG level (masking sensitive data is not required for this exercise).\n   - Returns the value as a string or raises `CommandExecutionError` with an informative message.\n\n10. Implement a private helper `_clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]` that removes any key starting with the given prefix, logs the cleaned dict at DEBUG level, and returns it.\n\n11. Implement private validators:\n    - `_validate_device_id(device_id: str) -> str` \u2013 ensure it matches `^[A-Za-z0-9._-]+$`, URL\u2011encode it, and raise `CommandExecutionError` on failure.\n    - `_validate_account_url(url: str) -> str` \u2013 ensure it starts with `https://` and contains no whitespace; raise `CommandExecutionError` on failure.\n    - `_validate_agent_key(key: str) -> str` \u2013 ensure it matches `^[A-Za-z0-9._-]+$`; raise `CommandExecutionError` on failure.\n\n12. Implement a private function `_request(method: str, url: str, token: str, json_payload: Optional[Dict[str, Any]] = None, params: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]` that:\n    - Adds the `token` to the query parameters.\n    - Performs the HTTP request with `_session.request`, a 30\u2011second timeout, and appropriate arguments.\n    - Catches `_RequestException` and re\u2011raises as `CommandExecutionError` with context.\n    - Logs non\u2011200 responses as errors and returns `None`.\n    - Parses JSON responses safely, raising `CommandExecutionError` on decode errors.\n    - Returns the parsed JSON dict.\n\n13. Provide the public API functions with exact signatures and behavior:\n    - `create(name: str, **params: Any) -> Optional[Dict[str, Any]]` \u2013 retrieve token, clean params, build payload, call `_request` with `POST` to the `\"devices\"` endpoint.\n    - `delete(device_id: str) -> Optional[Dict[str, Any]]` \u2013 retrieve token, validate and encode `device_id`, call `_request` with `DELETE` to `\"devices/<id>\"`.\n    - `ls(**params: Any) -> Optional[Dict[str, Any]]` \u2013 retrieve token, clean params; if any params remain, query `\"resources\"` with a `filter` parameter containing JSON\u2011encoded params, otherwise query `\"devices\"`; use `_request` with `GET`.\n    - `update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]` \u2013 retrieve token, clean params, validate `device_id`, call `_request` with `PUT` to `\"devices/<id>\"` and the cleaned payload.\n\n14. Implement a private function `_find_bash_executable() -> str` that searches for a trusted bash binary in `[\"/bin/bash\", \"/usr/bin/bash\"]`, verifies the file exists and is executable for user/group/others, and returns the path. If none are found, raise `CommandExecutionError`.\n\n15. Implement `install_agent(agent_key: str) -> None` that:\n    - Retrieves `account_url` and `install_script_sha256` via `get_sd_auth`.\n    - Validates both using the validators above.\n    - Downloads the install script from `https://install.serverdensity.io/install.sh` with a 30\u2011second timeout, no redirects, handling request errors.\n    - Verifies the HTTP status is 200; otherwise raise `CommandExecutionError`.\n    - Computes the SHA\u2011256 hash of the downloaded content and compares it to the expected hash using `hmac.compare_digest`; on mismatch raise `CommandExecutionError`.\n    - Finds a trusted bash executable via `_find_bash_executable`.\n    - Creates a temporary file (do not delete on close) using `tempfile.NamedTemporaryFile` with binary mode, a unique prefix `\"sd_install_\"` and suffix `\".sh\"`.\n    - Writes the script content, closes the file, then sets its permissions to `0o500` (owner read/execute only).\n    - Executes the script with `_subprocess.run` using the found bash path, passing an environment that sets `PATH` to an empty string, and defines `ACCOUNT_URL` and `AGENT_KEY`. Use `cwd` set to the temporary file\u2019s directory, `stdin` as `DEVNULL`, capture both stdout and stderr, a 300\u2011second timeout, `check=True`, `close_fds=True`, and `text=False`.\n    - Logs the script\u2019s stdout (decoded with `errors=\"replace\"`) at DEBUG level.\n    - Handles `CalledProcessError` and `TimeoutExpired` by raising `CommandExecutionError` with context.\n    - Ensures the temporary file is securely deleted in a `finally` block, logging a warning if deletion fails.\n\n16. Ensure all logging uses the module\u2011level `_logger` and respects the configured level.\n\n17. The entire module must be syntactically correct, pass static analysis (e.g., `flake8`), and avoid any insecure practices such as:\n    - Directly interpolating user input into shell commands.\n    - Using `shell=True` in subprocess calls.\n    - Storing secrets in logs.\n    - Ignoring SSL verification.\n\nProduce only the Python code described above, with no additional explanation, comments, or markup. The code must be ready to copy\u2011paste into a `.py` file.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5309119010819165,
+      "bandit_statement_nodes": [
+        7,
+        134
+      ],
+      "candidate_hash": "7df4f3349f81bdbe24b3d29f4ff0d2488000a20ddc672b9d8acd6cc10af389db",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.2087,
+          "end_lineno": 49,
+          "lineno": 49,
+          "node": 39
+        },
+        {
+          "ast_type": "With",
+          "change": 0.1056,
+          "end_lineno": 173,
+          "lineno": 171,
+          "node": 129
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1218,
+          "end_lineno": 174,
+          "lineno": 174,
+          "node": 132
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1267,
+          "end_lineno": 187,
+          "lineno": 176,
+          "node": 134
+        }
+      ],
+      "iteration": 20,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module (compatible with Python\u202f3.9+) that implements a secure wrapper for the Server\u202fDensity API. The module must:\n\n- Begin with a docstring: \u201cSecure wrapper for the Server Density API. Provides functions to manage devices and install the monitoring agent using credentials stored in Salt pillars. Version added: 1.0.0\u201d.\n- Include `from __future__ import annotations` and import only the following standard\u2011library modules: `json`, `re`, `urllib.parse`, `hmac`, `logging`, `subprocess` (aliased as `_subprocess`), `stat`, `tempfile`, `os`, `hashlib.sha256`, `pathlib.Path`, and typing objects `Any`, `Dict`, `Optional`.\n- Import `Session` and `RequestException` (aliased as `_RequestException`) from the third\u2011party `requests` library.\n- Define a custom exception class `CommandExecutionError(RuntimeError)` with a docstring \u201cCustom exception for command execution failures.\u201d.\n- Provide a private function `_get_logger()` that creates a logger named \u201cserverdensity_wrapper\u201d, attaches a `NullHandler`, sets level to `INFO`, disables propagation, and returns it. Store the logger in a module\u2011level variable `_logger`.\n- Create a module\u2011level `Session` object `_session`, set its `User-Agent` header to \u201csalt-serverdensity-wrapper/1.0\u201d.\n- Define a constant `_BASE_API_URL` equal to `\"https://api.serverdensity.io/inventory/\"`.\n- Implement a private function `_build_endpoint(*parts: str) -> str` that:\n  * Raises `CommandExecutionError` if no parts are supplied.\n  * Validates each part: must not contain \u201c..\u201d, must match the regex `^[A-Za-z0-9._-]+$`; otherwise raise `CommandExecutionError` with an informative message.\n  * Strips leading/trailing slashes, URL\u2011encodes each part with `urllib.parse.quote` (no safe characters), joins them with \u201c/\u201d, appends a trailing slash, and combines with `_BASE_API_URL` using `urllib.parse.urljoin`.\n- Implement `get_sd_auth(val: str, sd_auth_pillar_name: str = \"serverdensity\") -> str` that:\n  * Retrieves a pillar dictionary via `__salt__[\"pillar.get\"](sd_auth_pillar_name, {})`.\n  * Validates that the pillar is a dict; raises `CommandExecutionError` if not.\n  * Checks that `val` exists in the pillar; raises `CommandExecutionError` if missing.\n  * Logs the retrieval at debug level and returns the value as a string.\n- Implement a private function `_clean_salt_variables(params: Dict[str, Any], variable_prefix: str = \"__\") -> Dict[str, Any]` that returns a new dict excluding any keys that start with `variable_prefix` and logs the cleaned dict at debug level.\n- Implement private validators:\n  * `_validate_device_id(device_id: str) -> str` \u2013 ensure it matches `^[A-Za-z0-9._-]+$`; raise `CommandExecutionError` on failure; return the URL\u2011encoded device ID.\n  * `_validate_account_url(url: str) -> str` \u2013 ensure it starts with `https://` and contains no whitespace; raise `CommandExecutionError` on failure; return the original URL.\n  * `_validate_agent_key(key: str) -> str` \u2013 ensure it matches `^[A-Za-z0-9._-]+$`; raise `CommandExecutionError` on failure; return the key.\n- Implement a private function `_request(method: str, url: str, token: str, json_payload: Optional[Dict[str, Any]] = None, params: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]` that:\n  * Adds the token to the query parameters.\n  * Performs the HTTP request with `_session.request`, a 30\u2011second timeout, and appropriate arguments.\n  * Catches `_RequestException` and re\u2011raises as `CommandExecutionError`.\n  * Logs an error and returns `None` if the response status is not 200.\n  * Attempts to parse JSON; on failure raise `CommandExecutionError`.\n- Provide public API functions:\n  * `create(name: str, **params: Any) -> Optional[Dict[str, Any]]` \u2013 retrieve token via `get_sd_auth`, clean params, build payload with name, call `_request` with POST to the \u201cdevices\u201d endpoint.\n  * `delete(device_id: str) -> Optional[Dict[str, Any]]` \u2013 retrieve token, validate device ID, call `_request` with DELETE to \u201cdevices/<id>\u201d.\n  * `ls(**params: Any) -> Optional[Dict[str, Any]]` \u2013 retrieve token, clean params; if any params exist, call `_request` with GET to \u201cresources\u201d endpoint passing a JSON\u2011encoded filter; otherwise call GET on \u201cdevices\u201d.\n  * `update(device_id: str, **params: Any) -> Optional[Dict[str, Any]]` \u2013 retrieve token, clean params, validate device ID, call `_request` with PUT to \u201cdevices/<id>\u201d.\n- Implement a private function `_find_bash_executable() -> str` that searches for `/bin/bash` and `/usr/bin/bash`, verifies the file exists and is executable by any user (checks `stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH`), returns the path as a string, and raises `CommandExecutionError` if none are found.\n- Implement `install_agent(agent_key: str) -> None` that:\n  * Retrieves `account_url` and `install_script_sha256` via `get_sd_auth`.\n  * Validates the URL and the expected hash using the validators above.\n  * Downloads the install script from `https://install.serverdensity.io/install.sh` with a 30\u2011second timeout, no redirects, handling request exceptions.\n  * Verifies the HTTP status is 200; otherwise raise `CommandExecutionError`.\n  * Computes the SHA\u2011256 hash of the downloaded content using `hashlib.sha256`; compare securely with the expected hash using `hmac.compare_digest`; raise `CommandExecutionError` on mismatch.\n  * Finds a trusted bash executable via `_find_bash_executable`.\n  * Creates a temporary file (using `tempfile.NamedTemporaryFile`, `delete=False`, binary mode, prefix \u201csd_install_\u201d, suffix \u201c.sh\u201d) with restrictive permissions (umask `0o077`), writes the script, closes the file, then sets its mode to `0o700`.\n  * Constructs an environment dict with empty `PATH`, and sets `ACCOUNT_URL` and `AGENT_KEY` to the retrieved values.\n  * Executes the script with `_subprocess.run` using the found bash path, the temporary file path, working directory set to the file\u2019s parent, the safe environment, no stdin, captures stdout and stderr, a 300\u2011second timeout, `check=True`, `close_fds=True`, and `text=False`.\n  * Logs the script\u2019s stdout (decoded with errors replaced) at debug level.\n  * Handles `CalledProcessError` and `TimeoutExpired` by raising `CommandExecutionError`.\n  * Restores the original umask, securely deletes the temporary file, and logs a warning if deletion fails.\n- Ensure all logging uses the module\u2011level `_logger`.\n- Do not include any code outside of the described module, no additional comments, and guarantee the output is pure Python code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 20,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "9a7814512e2bc5f67a9fe142b80d8be93e1d5eca2b8f9bd58b82309698b5d16e",
+  "status": "max_iterations_reached"
+}

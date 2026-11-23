@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "c7960b61abd08dcff8ed0a340367a91ab22e041e46a326c126df3d39fbc1061a",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payload to /inventory/add results in a 400 error.",
+      "Missing required fields (e.g., item_id, item_name, password) cause 400 or 401 responses.",
+      "Providing an empty or wrong password to admin routes yields authentication failure.",
+      "Calling /process/start or /data/backup with empty parameters still triggers the system command.",
+      "Updating the password to an empty string is prevented by a 400 error.",
+      "Requests with unexpected HTTP methods on defined routes return 405 (method not allowed)."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple HTTP API for inventory management, user information, and process control with admin authentication and configurable settings.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" key.",
+      "Admin\u2011protected endpoints reject requests without the correct MASTER_PASSWORD (401).",
+      "Endpoints validate required parameters and return 400 on missing or malformed input.",
+      "The Flask app runs with debug mode disabled, exposing only defined routes."
+    ],
+    "io_behavior": [
+      "POST /inventory/add \u2013 accepts raw YAML in the request body, returns JSON with item_id and item_name or error on bad format/missing fields.",
+      "GET /process/start \u2013 reads query parameters process and parameter, invokes a shell script, returns JSON status.",
+      "POST /admin/login \u2013 reads form field password, returns JSON indicating success or 401 failure.",
+      "POST /admin/update_password \u2013 requires current master password, updates it, returns JSON confirmation.",
+      "GET /inventory/details \u2013 requires item_id query, returns JSON with static sample item data.",
+      "POST /inventory/delete \u2013 requires item_id form field, returns JSON confirming deletion."
+    ],
+    "public_api": {
+      "route:GET /data/backup": "",
+      "route:GET /inventory/details": "",
+      "route:GET /process/logs": "",
+      "route:GET /process/start": "",
+      "route:GET /process/status": "",
+      "route:GET /user/info": "",
+      "route:POST /admin/configure": "",
+      "route:POST /admin/login": "",
+      "route:POST /admin/update_password": "",
+      "route:POST /inventory/add": "",
+      "route:POST /inventory/delete": ""
+    },
+    "side_effects": [
+      "Executes external commands via os.system for start_process.sh, backup_inventory_data.py, and other scripts.",
+      "Mutates the in\u2011memory MASTER_PASSWORD variable when updated.",
+      "Potentially creates subprocesses that may affect the host environment.",
+      "No persistent storage; all responses are generated at request time."
+    ],
+    "source_hash": "ae8d3d87484dcc4668d5093204765ae0ad7d2c7b7bf7aec8510f1c6dab934157"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.5,
+    "invariants": 0.3,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file12.py",
+  "gated_score": 0.54,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.54,
+  "original_hash": "ae8d3d87484dcc4668d5093204765ae0ad7d2c7b7bf7aec8510f1c6dab934157",
+  "rationale": "Implements most required routes and validations, but violates key invariants (responses often lack a \"status\" field), does not trigger commands with empty parameters as specified, and may accept an empty password when MASTER_PASSWORD defaults to empty. Other edge cases and side\u2011effects are correctly handled.",
+  "schema": 1,
+  "stability_abs_difference": 0.17413,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.67,
+    "invariants": 0.5,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.71413,
+  "weighted_mean": 0.62,
+  "worst_dimension": 0.3
+}

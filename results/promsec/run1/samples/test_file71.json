@@ -1,0 +1,185 @@
+{
+  "ast_similarity": 0.5636363636363636,
+  "candidate_hash": "a9f7e7e5f804bfdc33e787da8689b5529ba4f378dfbf502be35e330be4e582d3",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    89,
+    259,
+    327
+  ],
+  "error": "",
+  "file": "test_file71.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5719557195571956,
+      "bandit_statement_nodes": [
+        14,
+        15,
+        17
+      ],
+      "candidate_hash": "94fd6732d44ac7204221d572ca2e4e0b3186d0a82866771091f5fc6a3ec50933",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1627,
+          "end_lineno": 25,
+          "lineno": 25,
+          "node": 14
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1058,
+          "end_lineno": 30,
+          "lineno": 27,
+          "node": 15
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1032,
+          "end_lineno": 33,
+          "lineno": 33,
+          "node": 17
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other languages) that implements a Flask web application with the following exact functionality and security requirements:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect` from `flask`; `os`; `hashlib`; `MySQLdb`; and `re` if needed.\n- Create a Flask app instance named `app`.\n- Define a route `/register` that accepts only POST requests.\n- Inside the route handler:\n  1. Retrieve `username` and `password` from `request.form`.\n  2. Generate a 16\u2011byte cryptographic salt using `os.urandom(16)` and store its hexadecimal representation in a variable `salt_hex`.\n  3. Compute a password hash using PBKDF2\u2011HMAC\u2011SHA256 with 100,000 iterations, the UTF\u20118 encoded password, and the raw salt. Convert the resulting hash to a hexadecimal string named `encrypted_password`.\n  4. Establish a MySQL database connection using `MySQLdb.connect` with the following parameters taken **exclusively** from environment variables (provide sensible defaults only for local testing):\n     - `host` from `DB_HOST` (default `'localhost'`)\n     - `user` from `DB_USER` (default `'Raju'`)\n     - `passwd` from `DB_PASSWORD` (default `'raju'`)\n     - `db` from `DB_NAME` (default `'CWE'`)\n  5. Create a cursor and execute a **parameterized** INSERT statement to store `username`, `encrypted_password`, `salt_hex`, and timestamps (`NOW()`) into the table `users` with columns `(username, password, salt, created_at, updated_at)`.\n  6. Commit the transaction and close the cursor/connection properly.\n  7. Return a redirect response to `'/'`.\n\n- After the Flask route, include a second function named `register` (outside any class) that duplicates the logic of the route handler exactly as described above (including retrieving form data, generating salt, hashing the password, etc.) but does **not** contain Flask decorators. This duplicate definition must be present for compatibility with the original source.\n\n- Ensure the code follows secure coding best practices:\n  * Do not hard\u2011code any secrets; rely on environment variables.\n  * Use cryptographically strong random salt.\n  * Use a high iteration count for PBKDF2.\n  * Use parameterized queries to prevent SQL injection.\n  * Handle potential exceptions for database connection and query execution without exposing stack traces (you may use generic try/except blocks that log errors or pass).\n\n- The script must be runnable as a Flask application (include the typical `if __name__ == \"__main__\": app.run()` block) and must not contain any additional explanatory comments, markdown, or non\u2011code text. Output only the Python code that satisfies all the above requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5938697318007663,
+      "bandit_statement_nodes": [
+        19,
+        26,
+        30
+      ],
+      "candidate_hash": "24e072c5acc46a5abcac120e041c48d31653a1f58d74f3a497f2887b8e9a5ad9",
+      "cwe_count": 2,
+      "cwes": [
+        605,
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1458,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.104,
+          "end_lineno": 15,
+          "lineno": 15,
+          "node": 12
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1108,
+          "end_lineno": 51,
+          "lineno": 51,
+          "node": 40
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web server with a `/register` endpoint handling POST requests. The script must:\n\n- Import only `Flask`, `request`, `redirect` from `flask`, `os`, `MySQLdb`, and `generate_password_hash` from `werkzeug.security`.\n- Define a Flask app instance.\n- Implement a private function `_process_registration()` that:\n  * Retrieves `username` and `password` from `request.form`.\n  * If either value is missing, returns a redirect to `'/'`.\n  * Generates a 16\u2011byte random salt using `os.urandom` and stores its hexadecimal representation.\n  * Hashes the password with `generate_password_hash` using the method `'pbkdf2:sha256'`.\n  * Reads database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`, providing defaults `'localhost'`, `'Raju'`, `'raju'`, and `'CWE'` respectively.\n  * Connects to a MySQL database using `MySQLdb.connect` with the retrieved parameters.\n  * Executes a parameterized `INSERT` statement into a table `users` with columns `(username, password, salt, created_at, updated_at)`, using `NOW()` for the timestamp columns.\n  * Commits the transaction.\n  * Catches any exception silently (no traceback) and ensures that both the cursor and the connection are closed in a `finally` block, with each close operation wrapped in its own `try/except`.\n  * Returns a redirect to `'/'` after processing.\n- Create a Flask route `'/register'` that accepts only `POST` requests and calls `_process_registration()`.\n- Define a function `register()` that also calls `_process_registration()` (for potential external use).\n- Include the standard `if __name__ == \"__main__\":` guard that runs `app.run` with `host='0.0.0.0'`, `port=5000`, and `debug=False`.\n- Ensure the code follows security best practices: use parameterized queries, never expose raw passwords, store credentials in environment variables, do not enable Flask debug mode, and close all resources properly.\n- Output only the Python code, with no additional explanation, comments, or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5535714285714286,
+      "bandit_statement_nodes": [
+        18,
+        25,
+        29,
+        39
+      ],
+      "candidate_hash": "34d4e8b2496c65b39be4c5a7ae103af1679f7a98d37134c923783981329d916e",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1956,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2391,
+          "end_lineno": 50,
+          "lineno": 50,
+          "node": 39
+        }
+      ],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other language) that implements a Flask web application with a single POST endpoint at \u201c/register\u201d. The script must:\n\n- Import exactly the following modules: `Flask`, `request`, `redirect` from `flask`; `MySQLdb`; `generate_password_hash` from `werkzeug.security`; `secrets`; and `environ` from `os`.\n- Create a Flask app instance named `app`.\n- Define a private helper function `_process_registration()` that:\n  1. Retrieves `username` and `password` from `request.form` using `get`.\n  2. If either value is missing, immediately returns `redirect('/')`.\n  3. Generates a 32\u2011character hexadecimal salt using `secrets.token_hex(16)`.\n  4. Hashes the password with `generate_password_hash` using the method `pbkdf2:sha256`.\n  5. Reads database connection parameters `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` from environment variables via `environ`. If any are missing, return `redirect('/')`.\n  6. Establishes a MySQL connection with `MySQLdb.connect` using the retrieved parameters.\n  7. Creates a cursor and executes a parameterized INSERT statement:\n     ```\n     INSERT INTO users (username, password, salt, created_at, updated_at)\n     VALUES (%s, %s, %s, NOW(), NOW())\n     ```\n     passing `(username, pwd_hash, salt)` as parameters.\n  8. Commits the transaction.\n  9. Silently handles any exception during connection, query execution, or commit (do not expose error details).\n 10. Ensures the cursor and connection are closed in a `finally` block, each close wrapped in its own `try/except` that suppresses any exception.\n 11. After all cleanup, returns `redirect('/')`.\n\n- Define a route `@app.route('/register', methods=['POST'])` with a view function `register_route()` that simply returns the result of `_process_registration()`.\n- Define a public function `register()` that also returns the result of `_process_registration()`.\n- Include the standard `if __name__ == \"__main__\":` guard that runs the Flask app on host `127.0.0.1`, port `5000`, with `debug=False`.\n- Ensure the code follows security best practices: use parameterized queries, never expose stack traces or raw exceptions, do not enable Flask debug mode, and obtain all secrets and credentials from environment variables.\n- The final output must be valid Python code only, with no explanatory text, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5535714285714286,
+      "bandit_statement_nodes": [
+        21,
+        27,
+        31
+      ],
+      "candidate_hash": "2b8fb839cdf8327dc33668d43bc0fe7245be4f3de092b2bdcc967db9cccd2377",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other languages) that implements a Flask web application with the following exact behavior and security requirements:\n\n- Import only the modules: `Flask`, `request`, `redirect` from `flask`; `MySQLdb`; `generate_password_hash` from `werkzeug.security`; `secrets`; and `environ` from `os`.\n- Create a Flask app instance named `app`.\n- Define a private helper function `_process_registration()` that:\n  1. Retrieves `username` and `password` from `request.form` using `get`.\n  2. If either value is missing or empty, immediately returns `redirect('/')`.\n  3. Generates a 32\u2011character hexadecimal salt using `secrets.token_hex(16)`.\n  4. Hashes the password with `generate_password_hash` using the method `pbkdf2:sha256`.\n  5. Reads database connection parameters `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` from environment variables via `environ.get`. If any are missing, return `redirect('/')`.\n  6. Establishes a MySQL connection with `MySQLdb.connect` using the retrieved parameters, handling the connection and cursor objects safely.\n  7. Executes a parameterized INSERT statement to add a new row to the `users` table with columns `username`, `password`, `salt`, `created_at`, and `updated_at`. Use `NOW()` for the timestamp columns and pass the values `(username, pwd_hash, salt)` as parameters to prevent SQL injection.\n  8. Commits the transaction.\n  9. Catches any exception during database operations, suppresses the error (do not expose details), and proceeds to cleanup.\n 10. In a `finally` block, closes the cursor and connection if they were created, each within its own `try/except` to ignore any closing errors.\n 11. Returns `redirect('/')` after all processing.\n\n- Define a route `@app.route('/register', methods=['POST'])` with a view function `register_route()` that simply returns the result of `_process_registration()`.\n- Define a plain function `register()` (outside of Flask routing) that also returns the result of `_process_registration()`.\n- Include the standard `if __name__ == \"__main__\":` guard that runs the Flask app with `host='127.0.0.1'`, `port=5000`, and `debug=False`.\n- Ensure the code follows best security practices: use environment variables for secrets, use parameterized queries, do not log or expose sensitive information, and use a strong password hashing algorithm.\n- The entire output must be valid Python code only, with no explanatory text, comments, or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5535714285714286,
+      "bandit_statement_nodes": [
+        21,
+        27,
+        31
+      ],
+      "candidate_hash": "c49ec6ed8251fcb4f8d3a763993b1aff44bdd3a035300a1437d87f43f292050e",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 5,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.8+) that implements the following functionality exactly as described, ensuring security best practices and preserving the original behavior:\n\n- Import only the required modules: `Flask`, `request`, `redirect` from `flask`; `MySQLdb`; `generate_password_hash` from `werkzeug.security`; `secrets`; and `environ` from `os`.\n- Create a Flask app instance named `app`.\n- Define a private helper function `_process_registration()` that:\n  1. Retrieves `username` and `password` from `request.form` using `get`.\n  2. If either value is missing, immediately returns `redirect('/')`.\n  3. Generates a 16\u2011byte hexadecimal salt using `secrets.token_hex(16)`.\n  4. Hashes the password with `generate_password_hash` using the `pbkdf2:sha256` method.\n  5. Reads the database connection parameters `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` from environment variables via `environ.get`. If any are missing, return `redirect('/')`.\n  6. Establishes a MySQL connection with `MySQLdb.connect` using the retrieved parameters, handling potential connection errors without exposing details.\n  7. Uses a cursor to execute a parameterized INSERT statement:\n     ```\n     INSERT INTO users (username, password, salt, created_at, updated_at)\n     VALUES (%s, %s, %s, NOW(), NOW())\n     ```\n     passing `(username, pwd_hash, salt)` as parameters to prevent SQL injection.\n  8. Commits the transaction.\n  9. Implements robust cleanup in a `finally` block: closes the cursor and connection if they were created, swallowing any exceptions during cleanup.\n 10. Returns `redirect('/')` after processing, regardless of success or failure, without leaking error information.\n\n- Register a Flask route at `/register` that accepts only POST requests and returns the result of `_process_registration()`.\n- Provide a public function `register()` that also returns the result of `_process_registration()` (for potential external use).\n- Include the standard `if __name__ == \"__main__\":` guard to run the Flask development server on host `127.0.0.1`, port `5000`, with `debug=False`.\n- Ensure the entire script contains **only** Python code\u2014no comments, no explanatory text, no markdown formatting, and no additional output. The code must be ready to run as\u2011is.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5636363636363636,
+      "bandit_statement_nodes": [
+        21,
+        27,
+        31
+      ],
+      "candidate_hash": "a9f7e7e5f804bfdc33e787da8689b5529ba4f378dfbf502be35e330be4e582d3",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 6,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/register` endpoint handling POST requests. The script must:\n\n- Import only the required modules: `Flask`, `request`, `redirect` from `flask`; `MySQLdb`; `generate_password_hash` from `werkzeug.security`; `secrets`; `environ` from `os`.\n- Define a Flask app instance.\n- Implement a private function `_process_registration()` that:\n  * Retrieves `username` and `password` from `request.form`, validates they are present, otherwise redirects to `/`.\n  * Generates a cryptographically secure 16\u2011byte hex salt using `secrets.token_hex`.\n  * Hashes the password with `generate_password_hash` using method `pbkdf2:sha256`.\n  * Reads database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) from environment variables; if any are missing, redirects to `/`.\n  * Connects to a MySQL database using `MySQLdb.connect` with the retrieved parameters, using a `try/except/finally` block.\n  * Executes a parameterized `INSERT` statement into a `users` table with columns `(username, password, salt, created_at, updated_at)` using placeholders (`%s`) and passes `(username, pwd_hash, salt)` as parameters.\n  * Commits the transaction, closes cursor and connection safely, handling any exceptions without leaking details.\n  * Returns a redirect to `/` after successful or failed registration.\n- Create a Flask route `/register` that accepts only POST and calls `_process_registration()`.\n- Provide a public function `register()` that also calls `_process_registration()`.\n- Include the standard `if __name__ == \"__main__\":` block to run the app on `127.0.0.1:5000` with debug disabled.\n- Ensure the code follows security best practices: never log or print passwords or salts, use environment variables for secrets, use parameterized queries to prevent SQL injection, handle exceptions without exposing stack traces, and avoid using debug mode in production.\n\nThe output must be valid Python code only, with no additional explanation, comments, or markup.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 6,
+  "schema": 1,
+  "selected_iteration": 6,
+  "source_hash": "359bf4558a37b043a9986e5d5ee7d208b47b107dbde69c7955862c1fa79105c7",
+  "status": "secured"
+}

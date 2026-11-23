@@ -1,0 +1,84 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "af58e7266f73c4090082d8e74743e8a8599153402bf29b3ceff9225349a873cc",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing required fields (e.g., no config_name) results in a 400 error with an explanatory message.",
+      "Invalid YAML syntax or missing keys leads to a 400 error on /config/upload.",
+      "Incorrect admin password yields a 401 response for login, password update, and settings endpoints.",
+      "Empty new_password during password update returns a 400 error.",
+      "Providing an empty job_id or user_id returns a 400 error for status, logs, and user info endpoints.",
+      "Running the service execution or backup endpoints with malicious parameters could trigger unintended shell commands due to lack of sanitization."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for uploading/retrieving/deleting configurations, executing services, managing admin authentication and settings, fetching user info, and triggering backups.",
+    "invariants": [
+      "ADMIN_PASSWORD must match the stored value for any admin\u2011only endpoint to succeed.",
+      "All required request parameters (e.g., config_name, job_id, password) must be present; otherwise a 400/401 error is returned.",
+      "YAML payload must contain both config_name and config_value keys to be accepted.",
+      "Responses are always JSON objects with a \"status\" field.",
+      "Subprocess commands are invoked with shell=True, preserving the exact argument order supplied by the request."
+    ],
+    "io_behavior": [
+      "POST /config/upload \u2013 accepts raw YAML, returns JSON with config_name and config_value or 400 on invalid data.",
+      "GET /service/execute \u2013 takes query parameters service and param, starts a shell script, returns JSON status.",
+      "POST /admin/login \u2013 expects form field password, returns success JSON or 401 failure.",
+      "POST /admin/update_password \u2013 requires current_password and new_password, updates in\u2011memory password, returns JSON status.",
+      "GET /config/retrieve \u2013 requires config_name query, returns JSON with a sample config value.",
+      "GET /service/status \u2013 requires job_id query, returns JSON indicating the job is running."
+    ],
+    "public_api": {
+      "func:validate_yaml": "(data)",
+      "route:GET /backup/data": "",
+      "route:GET /config/retrieve": "",
+      "route:GET /service/execute": "",
+      "route:GET /service/logs": "",
+      "route:GET /service/status": "",
+      "route:GET /user/info": "",
+      "route:POST /admin/login": "",
+      "route:POST /admin/settings": "",
+      "route:POST /admin/update_password": "",
+      "route:POST /config/delete": "",
+      "route:POST /config/upload": ""
+    },
+    "side_effects": [
+      "Executes external commands via subprocess.run for run_service.sh, backup_data.py, and other scripts.",
+      "Mutates the global ADMIN_PASSWORD variable when the password is updated.",
+      "Potentially writes logs or creates backup files as performed by the invoked scripts (observable outside the process).",
+      "Flask server starts listening on a network port when the module is imported (if not __main__).",
+      "No persistent storage; all state is kept in memory for the duration of the process."
+    ],
+    "source_hash": "ca794296deaf0f617845cbc23b46b9470f11520f319806dfc3be9fa9095a96a8"
+  },
+  "dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.9,
+    "invariants": 0.8,
+    "io_semantics": 0.9,
+    "side_effects": 0.4
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file15.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.655,
+  "original_hash": "ca794296deaf0f617845cbc23b46b9470f11520f319806dfc3be9fa9095a96a8",
+  "rationale": "All required routes exist and return JSON with a status field, handling missing/invalid inputs as specified. However, the program never invokes subprocesses (service execution, backup) and does not start the Flask server on import, breaking side\u2011effect and entrypoint invariants. Input\u2011output handling and edge\u2011case checks are largely correct, yielding higher scores for those dimensions.",
+  "schema": 1,
+  "stability_abs_difference": 0.04375,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.9,
+    "invariants": 0.8,
+    "io_semantics": 0.95,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.69875,
+  "weighted_mean": 0.74,
+  "worst_dimension": 0.4
+}

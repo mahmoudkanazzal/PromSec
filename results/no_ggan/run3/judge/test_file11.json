@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "9cd9792dcf7bb44dd8707fa6aec768db0c3ebf7cdd8f383a2ef221c88a4a3baa",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML in /service/create results in a 400 error.",
+      "Empty or missing password on admin routes leads to 401 or 400 responses.",
+      "Omitting required parameters (e.g., service_id, operation_id) returns 400 errors.",
+      "Providing an empty new_password during password update returns 400.",
+      "Unsupported or missing backup format defaults to \"json\" but still triggers the backup script.",
+      "Running /operations/start with empty operation or parameter still invokes the script with empty arguments."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a REST\u2011like API for creating, retrieving, and deleting services, managing operations, handling admin authentication and configuration, providing user info, and triggering data backups.",
+    "invariants": [
+      "All endpoints return JSON with a \"status\" field.",
+      "Admin\u2011protected routes require the current MASTER_PASSWORD; otherwise they return 401.",
+      "Required query or form parameters must be present; missing ones yield 400 with an error message.",
+      "service_id and service_name must be non\u2011empty strings for service creation.",
+      "Password update succeeds only if the supplied current password matches the stored MASTER_PASSWORD."
+    ],
+    "io_behavior": [
+      "POST /service/create with YAML body \u2192 JSON with service_id and service_name or 400 on bad YAML/missing fields.",
+      "GET /operations/start?operation=&parameter= \u2192 JSON status and runs run_operation.sh with given args.",
+      "POST /admin/login with form password \u2192 JSON success or 401 failure.",
+      "POST /admin/update_password with current password and new_password \u2192 JSON confirmation or error codes.",
+      "GET /service/details?service_id= \u2192 JSON with static service details or 400 if missing.",
+      "GET /data/backup?format= \u2192 JSON status and runs backup_data.py with chosen format."
+    ],
+    "public_api": {
+      "route:GET /data/backup": "",
+      "route:GET /operations/logs": "",
+      "route:GET /operations/start": "",
+      "route:GET /operations/status": "",
+      "route:GET /service/details": "",
+      "route:GET /user/info": "",
+      "route:POST /admin/configure": "",
+      "route:POST /admin/login": "",
+      "route:POST /admin/update_password": "",
+      "route:POST /service/create": "",
+      "route:POST /service/delete": ""
+    },
+    "side_effects": [
+      "Executes external shell script run_operation.sh via os.system.",
+      "Executes backup_data.py via os.system.",
+      "Updates in\u2011memory MASTER_PASSWORD variable on password change."
+    ],
+    "source_hash": "8b59bd3ae154e82072eb04f1a36d3460a25aeba4d36cf11d86af2f20fa25870c"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.7,
+    "invariants": 0.5,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file11.py",
+  "gated_score": 0.62,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.62,
+  "original_hash": "8b59bd3ae154e82072eb04f1a36d3460a25aeba4d36cf11d86af2f20fa25870c",
+  "rationale": "The program implements most routes and side\u2011effects, but deviates on several edge\u2011cases and invariants: it rejects unsupported backup formats instead of defaulting to json, refuses to run run_operation.sh when arguments are empty, and error responses often omit the required \"status\" field.",
+  "schema": 1,
+  "stability_abs_difference": 0.20125,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.7,
+    "invariants": 0.6,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.82125,
+  "weighted_mean": 0.66,
+  "worst_dimension": 0.5
+}

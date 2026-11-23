@@ -1,0 +1,73 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "10a99a054212b2fddf3aad7f3b53472ce13c58ca316902a425377e82ca5e0e04",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields raise a KeyError and abort the request.",
+      "The unsanitized username allows SQL injection attacks.",
+      "If multiple rows share the same username, the last fetched row determines authentication.",
+      "An empty password string is still compared to the stored value, possibly granting access if the stored value is empty.",
+      "Failure to connect to MySQL triggers process exit, stopping the server.",
+      "If the stored password is a hash, direct string comparison will always fail."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via POST /login and redirect to a user\u2011specific page on success or to a generic page on failure.",
+    "invariants": [
+      "The endpoint only responds to POST requests.",
+      "Form data must contain both 'username' and 'password' keys.",
+      "Database connection parameters (host, user, password, db) are hard\u2011coded and unchanged.",
+      "Redirect URLs always begin with '/cwe200/'.",
+      "The database cursor is always closed via db.close() after the request.",
+      "Password comparison is performed using plain string equality."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request with form fields 'username' and 'password'.",
+      "Executes a SELECT query against the local MySQL 'cwe200' database for the supplied username.",
+      "If a row is found and the supplied password string equals the stored password value, returns an HTTP 302 redirect to '/cwe200/<username>'.",
+      "If the password does not match, returns an HTTP 302 redirect to '/cwe200/'.",
+      "On any MySQL error, prints an error message to standard output and terminates the process.",
+      "Closes the database connection after handling the request."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to the MySQL server on localhost.",
+      "Runs a SELECT statement that reads data from the 'users' table.",
+      "May terminate the Flask application process on database errors.",
+      "Writes error details to the console (stdout/stderr).",
+      "Performs an HTTP redirect response to the client.",
+      "Closes the MySQL connection in a finally block."
+    ],
+    "source_hash": "5ff655af97023add1622ea6ebc2d3e83554414ad4d9064096674986a62f222ce"
+  },
+  "dimensions": {
+    "behavior": 0.1,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.1,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file58.py",
+  "gated_score": 0.19,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.19,
+  "original_hash": "5ff655af97023add1622ea6ebc2d3e83554414ad4d9064096674986a62f222ce",
+  "rationale": "The program deviates from the contract on key behaviors: it aborts with 400 instead of raising KeyError, sanitizes inputs, hashes passwords, and does not exit on DB errors, violating multiple edge cases and invariants, though it still performs the expected side\u2011effects like DB connection, query, and redirects.",
+  "schema": 1,
+  "stability_abs_difference": 0.16512,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.0,
+    "invariants": 0.5,
+    "io_semantics": 0.67,
+    "side_effects": 0.83
+  },
+  "stability_score": 0.35512,
+  "weighted_mean": 0.22,
+  "worst_dimension": 0.1
+}

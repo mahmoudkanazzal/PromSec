@@ -1,0 +1,68 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "964c2e4b7d8a4b1f717a7346f0fbe2121d70a32099c138bbb9d7902d45caec1b",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'stock_name'/'stock_quantity' fields cause a KeyError or malformed SQL.",
+      "Database connection failure or SQL execution error triggers a rollback and error response.",
+      "If algorithm.py is missing or not executable, the subprocess may produce no output or an error.",
+      "Very large input values may overflow command length or cause resource exhaustion.",
+      "Shell=True with unsanitized inputs opens the possibility of command injection.",
+      "If the session does not contain 'username', the handler will raise an exception."
+    ],
+    "entrypoints": [],
+    "intent": "Process a buy order request: record the order in a MySQL database, invoke an external algorithm script with the order details, and return the script's output to the client.",
+    "invariants": [
+      "A valid session must contain a 'username' key; otherwise a KeyError will be raised.",
+      "The SQL INSERT statement is always constructed with the three values in the same order.",
+      "The subprocess command always starts with 'python3' followed by the path to algorithm.py and the four arguments.",
+      "The response body is always a string representation of the subprocess's stdout or a fixed error message."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST to /buy_order with form fields 'stock_name' and 'stock_quantity'.",
+      "Reads the current session's 'username'.",
+      "Returns the standard output of the invoked algorithm script as a plain\u2011text response.",
+      "If a database error occurs, returns the literal string 'Error: Something went wrong. Please try again later.'.",
+      "No other HTTP methods or routes are defined."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the MySQL table db_table.order_table.",
+      "Commits or rolls back the database transaction based on success.",
+      "Spawns a subprocess that runs ../algorithm.py with the order parameters.",
+      "Potentially modifies external state if algorithm.py performs actions (e.g., trading, logging)."
+    ],
+    "source_hash": "af64aaef30e33624fe62fe243029377344aebc3fb5040c046582ee15c2712898"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.6,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file79.py",
+  "gated_score": 0.36875,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.36875,
+  "original_hash": "af64aaef30e33624fe62fe243029377344aebc3fb5040c046582ee15c2712898",
+  "rationale": "Program deviates from contract in session handling, error messages, subprocess invocation, and edge\u2011case handling, though it performs the basic insert and returns algorithm output.",
+  "schema": 1,
+  "stability_abs_difference": 0.15188,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.6,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.52063,
+  "weighted_mean": 0.425,
+  "worst_dimension": 0.2
+}

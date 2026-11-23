@@ -1,0 +1,108 @@
+{
+  "ast_similarity": 0.39879759519038077,
+  "candidate_hash": "e888741401cca7b42f17c09ae4df1df34a78dcc9d1a9450881a8c6adad7aab61",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file16.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.39553752535496955,
+      "bandit_statement_nodes": [
+        5,
+        10,
+        22
+      ],
+      "candidate_hash": "9fd699f75a5f97ddd6c1f7881a1561e5895a4173f6fda3df3448a732d8398fea",
+      "cwe_count": 2,
+      "cwes": [
+        78,
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9782,
+          "end_lineno": 10,
+          "lineno": 10,
+          "node": 5
+        },
+        {
+          "ast_type": "Return",
+          "change": 0.8502,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 7
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9865,
+          "end_lineno": 40,
+          "lineno": 40,
+          "node": 22
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 script that implements a Flask web application with the exact same functionality as the following insecure code, but with all security issues fixed while preserving behavior:\n\n- The application must expose two routes:\n  1. **GET /api/temperature_for_location** \u2013 accepts a query parameter `payload` containing a YAML document. The YAML must be parsed safely, the fields `latitude`, `longitude`, and `date` extracted, and a temperature value retrieved from a MySQL database.\n  2. **GET /api/update_weather_data** \u2013 accepts a query parameter `location` and runs an external Python script `weather_update_script.py` with the `--location` argument.\n\n- Security requirements:\n  - **No hard\u2011coded passwords**: obtain the MySQL password exclusively from the environment variable `DB_PASSWORD`. If the variable is missing, raise a clear error.\n  - **Safe YAML parsing**: use `yaml.safe_load` (or an equivalent safe parser) and validate that the resulting object is a dictionary containing the required keys. Verify that `latitude` and `longitude` are numbers (float or int) and that `date` is a string matching the format `YYYY\u2011MM\u2011DD`. Return a 400 response for any validation failure.\n  - **SQL injection protection**: use parameterized queries (as in the original code) and ensure the database connection is properly closed even on errors (use `with` statements or try/finally).\n  - **OS command injection protection**: validate the `location` parameter against a whitelist of allowed characters (e.g., alphanumeric, hyphens, underscores) and reject any input containing unsafe characters with a 400 response. Then invoke the external script using `subprocess.run` with a list of arguments, `check=True`, and `capture_output=True` to avoid shell interpretation.\n  - **Error handling**: catch and log exceptions without exposing stack traces to the client. Return generic error messages with appropriate HTTP status codes.\n  - **Production settings**: run the Flask app with `debug=False` and bind to `0.0.0.0` on port `5000`. Include any necessary imports and ensure the script can be executed directly (`if __name__ == \"__main__\":` block).\n\n- Additional constraints:\n  - The code must be pure Python 3, using only standard library modules and the third\u2011party packages `Flask`, `PyYAML`, and `MySQLdb`.\n  - Do not include any explanatory text, comments, or markdown formatting in the output. Provide only the Python source code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.39879759519038077,
+      "bandit_statement_nodes": [
+        5,
+        61,
+        68
+      ],
+      "candidate_hash": "e888741401cca7b42f17c09ae4df1df34a78dcc9d1a9450881a8c6adad7aab61",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.999,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 5
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.5904,
+          "end_lineno": 53,
+          "lineno": 53,
+          "node": 44
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9999,
+          "end_lineno": 76,
+          "lineno": 75,
+          "node": 61
+        },
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 86,
+          "lineno": 86,
+          "node": 68
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages, no explanatory text, no comments) that implements a Flask web application with the following exact functionality and security requirements:\n\n- Use only the standard library modules `os`, `re`, `logging`, `mimetypes` and the third\u2011party packages `yaml`, `MySQLdb`, and `flask`.\n- Configure logging with `logging.basicConfig(level=logging.INFO)`.\n- Create a Flask app instance named `app`.\n- Define constants `DB_HOST = 'localhost'`, `DB_USER = 'weather_user'`, `DB_NAME = 'weather_db'`.\n- Implement a function `get_db_password()` that reads the environment variable `DB_PASSWORD`. If the variable is missing, raise a `RuntimeError` with the message `'Environment variable DB_PASSWORD is required'`. Return the password string.\n- Implement a function `validate_payload(data)` that returns `True` only if:\n  * `data` is a dictionary,\n  * it contains the keys `latitude`, `longitude`, and `date`,\n  * `latitude` and `longitude` are of type `int` or `float`,\n  * `date` is a string matching the ISO date format `YYYY\u2011MM\u2011DD` (use a full\u2011match regular expression).\n- Implement a function `validate_location(loc)` that returns `True` only if `loc` matches the regular expression `^[A-Za-z0-9_-]+$`.\n- Create a route `/api/temperature_for_location` that accepts only `GET` requests:\n  * Retrieve the query parameter `payload`. If missing, abort with HTTP 400.\n  * Parse `payload` using `yaml.safe_load`. If parsing fails, abort with HTTP 400.\n  * Validate the parsed data with `validate_payload`. If validation fails, abort with HTTP 400.\n  * Open a MySQL connection using `MySQLdb.connect` with the host, user, password from `get_db_password()`, database name, charset `'utf8mb4'`, and `use_unicode=True`.\n  * Use a cursor to execute a parameterized query:  \n    `SELECT temperature FROM weather WHERE latitude=%s AND longitude=%s AND date=%s`  \n    passing the latitude, longitude, and date from the validated payload.\n  * If a row is returned, respond with JSON `{'temperature': <value>}`. If no row, abort with HTTP 404.\n  * Ensure the database connection is closed in a `finally` block.\n  * On any unexpected exception, log the full stack trace with `logging.exception('Error retrieving temperature')` and abort with HTTP 500.\n- Create a route `/api/update_weather_data` that accepts only `GET` requests:\n  * Retrieve the query parameter `location`. If missing or `validate_location` returns `False`, abort with HTTP 400.\n  * Use `mimetypes.guess_type` to guess the MIME type of `location`.\n  * Return JSON `{'output': 'Guessed MIME type: <type>'}` if a MIME type is found, otherwise `{'output': 'No MIME type found'}`.\n  * On any unexpected exception, log the full stack trace with `logging.exception('Error processing update')` and abort with HTTP 500.\n- Include the standard Flask entry point:\n  ```python\n  if __name__ == '__main__':\n      app.run(host='127.0.0.1', port=5000, debug=False)\n  ```\n- Ensure all database interactions use parameterized queries to prevent SQL injection.\n- Ensure no use of `eval`, `exec`, or unsafe YAML loading.\n- Ensure the script runs under Python 3 without requiring any additional files.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "00ef446e4ffe7380744100a7e572276e4748c3bf5fdc961d646efa176ce770fa",
+  "status": "secured"
+}

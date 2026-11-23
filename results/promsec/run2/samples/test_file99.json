@@ -1,0 +1,53 @@
+{
+  "ast_similarity": 0.48592592592592593,
+  "candidate_hash": "469856b9f36be23ec12ec254ce43933e8382edb78ed260a7f67797ba6e9732e3",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file99.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.48592592592592593,
+      "bandit_statement_nodes": [
+        10,
+        14,
+        25,
+        34
+      ],
+      "candidate_hash": "469856b9f36be23ec12ec254ce43933e8382edb78ed260a7f67797ba6e9732e3",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.177,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1236,
+          "end_lineno": 22,
+          "lineno": 22,
+          "node": 14
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that implements a Flask web service with the following specifications:\n\n- The script must be written **only in Python** and use no other programming languages.\n- Import `sqlite3` as `_sqlite3` and `connect` from `sqlite3`, and import `Flask`, `request`, and `jsonify` from `flask`.\n- Create a Flask app instance named `app`.\n- Define a function `get_db_connection()` that returns a SQLite connection to a file named `recipe.db` using `detect_types=_sqlite3.PARSE_DECLTYPES`.\n- Implement three routes:\n\n  1. **POST `/add_recipe`**\n     - Expect a JSON body containing:\n       - `title`: a non\u2011empty string.\n       - `ingredients`: a list of non\u2011empty strings.\n     - Validate the presence and types of these fields; return a JSON error with status\u202f400 if validation fails.\n     - Use a parameterized `INSERT` statement to add the recipe title to the `recipes` table and retrieve the generated `recipe_id`.\n     - For each ingredient, use a parameterized `INSERT` statement to add a row to the `ingredients` table with `recipe_id` and the ingredient text.\n     - Commit the transaction, close the connection, and return a JSON response `{\"message\": \"Recipe added successfully\", \"recipe_id\": <id>}` with status\u202f201.\n     - Wrap all database operations in a `try/except` block to catch `sqlite3.Error`; on error, roll back, close the connection, and return a JSON error with status\u202f500.\n\n  2. **POST `/submit_review`**\n     - Expect a JSON body containing:\n       - `recipe_id`: an integer.\n       - `review`: a non\u2011empty string.\n       - `reviewer_id`: an integer.\n     - Validate the fields; return a JSON error with status\u202f400 on failure.\n     - Use a parameterized `INSERT` statement to add the review to the `reviews` table.\n     - Commit, close, and return `{\"message\": \"Review submitted successfully\"}` with status\u202f200.\n     - Handle database errors as above.\n\n  3. **GET `/get_recipe_reviews`**\n     - Expect a query parameter `recipe_id` (integer). Validate its presence and type; return a JSON error with status\u202f400 if invalid.\n     - Use a parameterized `SELECT` query to retrieve each review and the count of reviews per `id` from the `reviews` table for the given `recipe_id`. The query should be:\n       ```\n       SELECT r.review, COUNT(r.id) AS review_count\n       FROM reviews r\n       WHERE r.recipe_id = ?\n       GROUP BY r.id\n       ```\n     - Fetch all rows, close the connection, and return the list of rows as JSON with status\u202f200.\n     - Handle database errors as above.\n\n- Ensure all database connections and cursors are properly closed, preferably using context managers (`with` statements) or explicit `close()` calls in `finally` blocks.\n- Use only **parameterized SQL statements** (`?` placeholders) to prevent SQL injection.\n- Include comprehensive error handling for missing/invalid input and database exceptions, returning appropriate JSON error messages and HTTP status codes.\n- At the end of the script, add the standard entry point:\n  ```python\n  if __name__ == '__main__':\n      app.run(debug=False)\n  ```\n- The final code must be functional, secure, and maintain the exact behavior described above.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "05a8f2728379041b6e2e15e634979a3fa87f110fe73dca5cd6b12c3a325c1542",
+  "status": "secured"
+}

@@ -1,0 +1,84 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "347903eb26865ac8c5735838ecbc7646d95f2a8e5a47fbf561263d3a4d284495",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payloads cause a 400 error for add_book, submit_review, and submit_event.",
+      "Providing a non\u2011integer year_published leads to a 400 error.",
+      "Incorrect admin credentials return a 401 error without changing state.",
+      "Changing the password to an empty string is allowed and will lock out future admin logins unless corrected.",
+      "Calling /inventory/check with empty section/location still spawns the subprocess with empty arguments.",
+      "Submitting a review with rating outside 1\u20115 or missing any field results in a 400 error."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple library management web API that allows adding, removing, querying, and updating book records, handling admin authentication, and processing auxiliary actions like inventory checks, reviews, and events via HTTP requests.",
+    "invariants": [
+      "A book addition requires non\u2011empty title, author, and isbn fields.",
+      "year_published must be an integer; otherwise the request is rejected.",
+      "Review submissions require rating between 1 and 5 inclusive.",
+      "Admin login succeeds only when password matches the current LIBRARIAN_PASSWORD and secret_key equals the hard\u2011coded value.",
+      "All endpoints return JSON with a \"status\" field indicating success or error.",
+      "Missing required parameters result in a 400 response (or 401 for admin auth)."
+    ],
+    "io_behavior": [
+      "POST /library/add_book with YAML body returns JSON confirming addition or error for missing/invalid fields.",
+      "POST /library/remove_book with form field 'isbn' returns JSON confirming removal or error if absent.",
+      "GET /inventory/check with query parameters 'section' and 'location' triggers a subprocess and returns a JSON status.",
+      "POST /admin/login with form fields 'password' and 'secret_key' returns admin access JSON or 401 error.",
+      "POST /admin/change_password with form fields 'old_password' and 'new_password' updates the in\u2011memory password and returns success JSON or 401 error.",
+      "Various GET/POST endpoints under /library and /api return JSON responses reflecting the requested operation (book info, list, availability, request, return, review, event)."
+    ],
+    "public_api": {
+      "route:GET /api/check_availability": "",
+      "route:GET /inventory/check": "",
+      "route:GET /library/book_info": "",
+      "route:GET /library/list_books": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/login": "",
+      "route:POST /api/request_book": "",
+      "route:POST /api/return_book": "",
+      "route:POST /api/submit_event": "",
+      "route:POST /api/submit_review": "",
+      "route:POST /library/add_book": "",
+      "route:POST /library/remove_book": "",
+      "route:POST /library/update_book": ""
+    },
+    "side_effects": [
+      "Executes an external Python script via os.system in /inventory/check.",
+      "Modifies the global LIBRARIAN_PASSWORD variable when /admin/change_password succeeds.",
+      "Potentially logs request data through Flask's default logging (implicit side effect)."
+    ],
+    "source_hash": "79f06a718f9233fb94588d4ef4a2c9ddacb133ad2041110188b3de4c6ce1c069"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.4,
+    "invariants": 0.5,
+    "io_semantics": 0.5,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file4.py",
+  "gated_score": 0.44875,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.44875,
+  "original_hash": "79f06a718f9233fb94588d4ef4a2c9ddacb133ad2041110188b3de4c6ce1c069",
+  "rationale": "Core endpoints exist and reject invalid YAML, non\u2011int years, bad admin creds, and out\u2011of\u2011range ratings, but many contract details are missing or altered: empty password change is disallowed, inventory check rejects empty params instead of running, admin login/change_password expect JSON not form fields, no \"status\" field in responses, and password is stored as a hash rather than LIBRARIAN_PASSWORD variable.",
+  "schema": 1,
+  "stability_abs_difference": 0.24188,
+  "stability_dimensions": {
+    "behavior": 0.68,
+    "edge_cases": 0.67,
+    "invariants": 0.83,
+    "io_semantics": 0.67,
+    "side_effects": 0.67
+  },
+  "stability_score": 0.69063,
+  "weighted_mean": 0.465,
+  "worst_dimension": 0.4
+}

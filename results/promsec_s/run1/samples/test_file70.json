@@ -1,0 +1,78 @@
+{
+  "ast_similarity": 0.9882697947214076,
+  "candidate_hash": "7504defab5b2973c376624bb482b9686c866c4f31823c684d0e060ee72c11c31",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file70.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9882697947214076,
+      "bandit_statement_nodes": [
+        14,
+        19,
+        30,
+        45,
+        49,
+        62,
+        66,
+        77
+      ],
+      "candidate_hash": "7504defab5b2973c376624bb482b9686c866c4f31823c684d0e060ee72c11c31",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 1.0,
+          "end_lineno": 18,
+          "lineno": 18,
+          "node": 14
+        },
+        {
+          "ast_type": "Assign",
+          "change": 1.0,
+          "end_lineno": 37,
+          "lineno": 37,
+          "node": 30
+        },
+        {
+          "ast_type": "Assign",
+          "change": 1.0,
+          "end_lineno": 54,
+          "lineno": 54,
+          "node": 45
+        },
+        {
+          "ast_type": "Assign",
+          "change": 1.0,
+          "end_lineno": 73,
+          "lineno": 73,
+          "node": 62
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9999,
+          "end_lineno": 77,
+          "lineno": 77,
+          "node": 66
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the following exact functionality and security requirements:\n\n1. **General Requirements**\n   - The code must be pure Python and runnable with Python\u202f3.x.\n   - Use only the standard library and the external packages `Flask`, `MySQLdb`, `hashlib`, `os`, and `re` (if needed).\n   - Do not include any code in other programming languages.\n   - All database connections must be created with `MySQLdb.connect(\"localhost\", \"root\", \"\", \"projectdb\")`.\n   - Ensure every database cursor and connection is properly closed in all execution paths.\n   - Use parameterized SQL statements everywhere to prevent SQL injection.\n   - Use `os.urandom(16)` to generate a per\u2011user salt; store the salt as a hexadecimal string in the database.\n   - Hash passwords with SHA\u2011256: `hashlib.sha256(salt + password.encode('utf-8')).hexdigest()`.\n   - Return JSON responses where appropriate and plain text otherwise.\n   - Use `redirect(..., code=307)` for successful redirects.\n   - Set `debug=False` when running the Flask app.\n\n2. **Endpoints**\n   - `POST /register`\n     - Accept form fields `username` and `password`.\n     - Check if the username already exists (`SELECT username FROM users WHERE username = %s`).\n     - If it exists, close resources and `redirect(\"/login\", code=307)`.\n     - If not, insert the new user with fields `username`, `password` (hashed), `salt` (hex), and `account_created` set to `1` (`INSERT INTO users(username, password, salt, account_created) VALUES (%s, %s, %s, %s)`).\n     - Commit, close resources, and return the plain text `\"Registration successful\"`.\n\n   - `POST /login`\n     - Accept form fields `username` and `password`.\n     - Retrieve stored `password` and `salt` for the given username (`SELECT password, salt FROM users WHERE username = %s`).\n     - If a record is found, convert the stored salt from hex to bytes, recompute the hash, and compare.\n     - On a match, close resources and `redirect(\"/dashboard\", code=307)`.\n     - On failure, close resources and return the plain text `\"Invalid credentials\"`.\n\n   - `POST /project/create`\n     - Accept form fields `username` and `project_name`.\n     - Verify the user exists (`SELECT username FROM users WHERE username = %s`).\n     - If the user exists, insert a new project (`INSERT INTO projects(username, project_name) VALUES (%s, %s)`), commit, close resources, and return `\"Project created successfully\"`.\n     - If the user does not exist, close resources and return `\"User not found\"`.\n\n   - `POST /task/add`\n     - Accept form fields `project_name`, `task_name`, and `task_description`.\n     - Verify the project exists (`SELECT project_name FROM projects WHERE project_name = %s`).\n     - If it exists, insert a new task (`INSERT INTO tasks(project_name, task_name, task_description) VALUES (%s, %s, %s)`), commit, close resources, and return `\"Task added successfully\"`.\n     - If not, close resources and return `\"Project not found\"`.\n\n   - `GET /tasks/view`\n     - Accept a query parameter `project_name`.\n     - Retrieve all tasks for that project (`SELECT task_name, task_description FROM tasks WHERE project_name = %s`).\n     - Return the result as JSON using `flask.jsonify`.\n\n3. **Implementation Details**\n   - Import statements must be exactly: `from flask import Flask, request, redirect, jsonify`, `import re`, `import hashlib`, `import MySQLdb`, `import os`.\n   - Initialize the Flask app with `app = Flask(__name__)`.\n   - Define each route with the appropriate `@app.route` decorator and HTTP methods.\n   - Use `request.form[...]` for POST data and `request.args.get(...)` for GET query parameters.\n   - Ensure the script ends with the standard `if __name__ == '__main__': app.run(debug=False)` block.\n\nGenerate the full Python source code that satisfies all of the above specifications. Do not include any explanatory text, comments, or markup outside the code. Do not output anything else.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "6d4e51f8cfe78b6dadd8dc3e30ee24aee6e08732d4bad4f640760688e2a3b5cd",
+  "status": "secured"
+}

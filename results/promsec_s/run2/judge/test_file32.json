@@ -1,0 +1,78 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "d9b6e89d2f802a51df24970c521e2f7921f9a5ade3238b8fbd5ea903d0f4e4f3",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "method or path supplied as Unicode strings are encoded to ASCII bytes; non\u2011ASCII characters may raise UnicodeEncodeError.",
+      "Empty or missing content results in no 'Content-Type' header being added.",
+      "When access_token is None, no Authorization header is added; when provided, it is prefixed with 'Bearer '.",
+      "If federation_auth_origin is set, an additional Authorization header with a fake X\u2011Matrix signature is added.",
+      "Calling FakeChannel.json_body, code, or headers before any response is written raises an Exception.",
+      "Streaming producers trigger periodic resumeProducing calls; non\u2011streaming producers are resumed immediately."
+    ],
+    "entrypoints": [],
+    "intent": "Provide helper utilities for unit\u2011testing the Sydent identity server, including a factory for an in\u2011memory Sydent instance, a fake Twisted web channel/site, a request builder, and test\u2011oriented logging configuration.",
+    "invariants": [
+      "If no 'db' key is supplied to make_sydent, a ':memory:' SQLite DB is always used.",
+      "make_request always ensures the path begins with '/_matrix/identity/v2/' when shorthand=True and the path does not already start with '/_matrix'.",
+      "Content passed as a dict to make_request is always JSON\u2011encoded and UTF\u20118 bytes.",
+      "FakeChannel.result always contains 'code', 'reason', 'headers' after writeHeaders is called.",
+      "ToTwistedHandler formats log records using a fixed timestamp\u2011level\u2011name\u2011message pattern.",
+      "FakeChannel.getPeer always returns a fixed IPv4 address, guaranteeing a non\u2011null client IP."
+    ],
+    "io_behavior": [
+      "make_sydent(test_config) \u2192 returns a Sydent object configured with an in\u2011memory SQLite DB (unless overridden) and a MemoryReactorClock.",
+      "make_request(reactor, method, path, content, access_token, ...) \u2192 returns a tuple (Request, FakeChannel) where the Request is pre\u2011populated with the given HTTP method, URL, body and headers.",
+      "FakeChannel exposes properties json_body, code, headers that read the accumulated response after the request is processed.",
+      "ToTwistedHandler.emit(record) forwards formatted Python log records to the Twisted logging system.",
+      "setup_logging() reads SYDENT_TEST_LOG_LEVEL env var and sets the root logger level, adding the Twisted handler.",
+      "FakeChannel.getPeerCertificate() returns a hard\u2011coded X.509 certificate object."
+    ],
+    "public_api": {
+      "class:FakeChannel": "code(self);getHost(self);getPeer(self);getPeerCertificate(self);headers(self);json_body(self);registerProducer(self, producer, streaming);requestDone(self, _self);transport(self);unregisterProducer(self);write(self, content);writeHeaders(self, version, code, reason, headers)",
+      "class:FakeSite": "",
+      "class:ToTwistedHandler": "emit(self, record)",
+      "func:make_request": "(reactor, method, path, content=b'', access_token=None, request=Request, shorthand=True, federation_auth_origin=None)",
+      "func:make_sydent": "(test_config={})",
+      "func:setup_logging": "()"
+    },
+    "side_effects": [
+      "Adds a ToTwistedHandler to the global Python logging configuration.",
+      "Sets the root logger's level based on an environment variable.",
+      "Loads a PEM\u2011encoded certificate into an OpenSSL crypto object when getPeerCertificate is called.",
+      "Modifies the global logging module state (handlers, level).",
+      "Potentially mutates the provided test_config dict by inserting default DB settings.",
+      "Creates in\u2011memory objects that persist for the lifetime of the process (e.g., MemoryReactorClock)."
+    ],
+    "source_hash": "fd29062fb5da351e7ce1cb83718776fe9a07e90f399c3bc40f4bb17f4e310c47"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.5,
+    "invariants": 0.5,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file32.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.6125,
+  "original_hash": "fd29062fb5da351e7ce1cb83718776fe9a07e90f399c3bc40f4bb17f4e310c47",
+  "rationale": "Most core functions exist and mostly follow the contract, but Unicode handling uses UTF-8 instead of ASCII (edge case), missing 'reason' in writeHeaders, and no streaming producer logic; also database key name differs from spec, reducing invariants and overall behavior scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.0095,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.33,
+    "invariants": 0.5,
+    "io_semantics": 1.0,
+    "side_effects": 0.83
+  },
+  "stability_score": 0.603,
+  "weighted_mean": 0.65,
+  "worst_dimension": 0.5
+}

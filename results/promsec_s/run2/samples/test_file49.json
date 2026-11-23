@@ -1,0 +1,91 @@
+{
+  "ast_similarity": 0.3858520900321543,
+  "candidate_hash": "e004f9d73447f75627643077eb48324505bf027c988dda417a13dff57f8e8afa",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    89,
+    259
+  ],
+  "error": "",
+  "file": "test_file49.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.36253776435045315,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        12
+      ],
+      "candidate_hash": "4293d587fc69639915bc4e49ab87cdfc5e8fc8e61be054591e3c6721aed7ad4d",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9993,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.8035,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 3
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.999,
+          "end_lineno": 26,
+          "lineno": 26,
+          "node": 12
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with a `/login` endpoint handling only POST requests. The script must:\n\n1. Import only necessary modules (`flask`, `os`, `hashlib` or a secure password\u2011hashing library such as `bcrypt`/`passlib`, and a MySQL client library like `MySQLdb` or `pymysql`).\n2. Create a Flask app instance.\n3. Load database connection parameters (`host`, `user`, `password`, `database`) securely from environment variables; do **not** hard\u2011code any credentials.\n4. Connect to the MySQL database using a context manager or proper cleanup to ensure the connection is closed after each request.\n5. In the `/login` view:\n   - Retrieve `username` and `password` from `request.form`.\n   - Validate that both fields are present; if missing, return a 400 response.\n   - Use a **parameterized** SQL query to fetch the stored password hash for the given username (`SELECT password_hash FROM users WHERE username = %s`).\n   - If no user is found, redirect to `/` (the home page).\n   - If a user is found, compare the submitted password with the stored hash using a constant\u2011time, secure verification function (e.g., `bcrypt.checkpw` or `passlib.context.verify`).\n   - On successful verification, redirect to `/dashboard`; on failure, redirect to `/`.\n6. Ensure all redirects use Flask\u2019s `redirect` function and that the response codes are appropriate (e.g., 302 for redirects).\n7. Include proper error handling for database errors and unexpected exceptions, returning a generic 500 error page without leaking internal details.\n8. Add a `if __name__ == \"__main__\":` block to run the app with `debug=False` and host/port configurable via environment variables.\n9. Follow security best practices:\n   - Do not expose raw passwords or hashes in logs or responses.\n   - Use HTTPS in production (note in a comment that the app should be served behind a TLS\u2011terminating proxy).\n   - Set Flask\u2019s `SESSION_COOKIE_HTTPONLY` and `SESSION_COOKIE_SECURE` flags.\n   - Limit request size if appropriate.\n   - Use `werkzeug.security.safe_str_cmp` or equivalent for any string comparisons if needed.\n\nThe final code must be syntactically correct, ready to run, and must preserve the original functionality: successful login redirects to `/dashboard`, failed login redirects to `/`. Do not include any explanatory text, comments, or markdown formatting outside the code itself.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3858520900321543,
+      "bandit_statement_nodes": [
+        36
+      ],
+      "candidate_hash": "e004f9d73447f75627643077eb48324505bf027c988dda417a13dff57f8e8afa",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.6886,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9327,
+          "end_lineno": 52,
+          "lineno": 52,
+          "node": 36
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other languages) that implements a secure Flask web application with the following exact specifications:\n\n- Import only the modules `os`, `bcrypt`, and the necessary objects from `flask` (`Flask`, `request`, `redirect`, `abort`). Import `pymysql` **inside** a helper function as shown.\n- Create a Flask app instance named `app`.\n- Configure the app with:\n  * `SESSION_COOKIE_HTTPONLY` set to `True`\n  * `SESSION_COOKIE_SECURE` set to `True`\n  * `MAX_CONTENT_LENGTH` set to `1024 * 1024` (1\u202fMiB)\n- Retrieve database connection parameters from environment variables: `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`.\n- Define a function `get_db_connection()` that imports `pymysql` locally and returns a connection using:\n  * `host=DB_HOST`\n  * `user=DB_USER`\n  * `password=DB_PASSWORD`\n  * `database=DB_NAME`\n  * `cursorclass=pymysql.cursors.DictCursor`\n  * `autocommit=True`\n- Add a route `'/login'` that only accepts `POST` requests. Inside the view:\n  * Extract `username` and `password` from `request.form` using `get`.\n  * If either value is missing, abort with status code `400`.\n  * Use a `try`/`except` block to catch any exception and abort with status code `500`.\n  * Within the `try` block, obtain a DB connection via `get_db_connection()` using a context manager (`with`), then open a cursor also as a context manager.\n  * Execute a parameterized query: `SELECT password_hash FROM users WHERE username = %s` with the provided `username`.\n  * Fetch one row. If no row is returned, redirect to `'/'` with HTTP status `302`.\n  * Retrieve `password_hash` from the row. If it is a `str`, encode it to UTF\u20118 bytes.\n  * Use `bcrypt.checkpw` to compare the UTF\u20118\u2011encoded submitted password with the stored hash.\n  * If the check succeeds, redirect to `'/dashboard'` with status `302`; otherwise redirect to `'/'` with status `302`.\n- Define an error handler for status code `500` that returns the plain text `'Internal Server Error'` and the status code `500`.\n- Include a `if __name__ == '__main__':` block that:\n  * Reads `FLASK_HOST` from the environment, defaulting to `'127.0.0.1'`.\n  * Reads `FLASK_PORT` from the environment, defaulting to `'5000'`, and converts it to an integer.\n  * Calls `app.run` with the host, port, and `debug=False`.\n- Ensure the code contains **no comments, no explanatory text, and no extra output**. The program must be syntactically correct, follow security best practices (use parameterized queries, proper password handling, secure cookie settings), and preserve the exact functionality described.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "b30096ed0fe299fe2d327a65ed18c147d00dd4e7971f82a42eb6bdc3e9f8de1d",
+  "status": "secured"
+}

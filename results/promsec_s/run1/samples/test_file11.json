@@ -1,0 +1,173 @@
+{
+  "ast_similarity": 0.8960880195599022,
+  "candidate_hash": "2f64135951bab45ed3e028bff4b025110eec5348e3e284cc7d4279849e533bd0",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file11.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9470284237726099,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        18,
+        67
+      ],
+      "candidate_hash": "fe67fd08b600ab4fde0566acdf697e40bcb64dcf6da7c0619ad4fde6182f7a05",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.6346,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9442,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9843,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9092,
+          "end_lineno": 29,
+          "lineno": 29,
+          "node": 18
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9743,
+          "end_lineno": 112,
+          "lineno": 112,
+          "node": 67
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (compatible with Python\u202f3.8+) that implements a Flask web application with the exact functionality described below. The script must be pure Python (no other languages) and must prioritize security while preserving the original behavior.\n\n**General requirements**\n- Import only the necessary standard\u2011library modules and third\u2011party packages (`flask`, `yaml`, `os`, `subprocess`).\n- Retrieve `MASTER_PASSWORD` from the environment variable `MASTER_PASSWORD`. If it is not set, raise a `RuntimeError` with the message `\"MASTER_PASSWORD environment variable not set\"`.\n- Use `yaml.safe_load` for parsing any YAML input.\n- Validate all incoming request data; return JSON error responses with appropriate HTTP status codes (400 for bad request, 401 for unauthorized) when validation fails.\n- For password comparisons, use a constant\u2011time comparison (e.g., `hmac.compare_digest`) to avoid timing attacks.\n- When invoking external commands with `subprocess.run`, pass arguments as a list, never enable `shell=True`, and whitelist allowed values to prevent command injection.\n- Do not include any explanatory comments, docstrings, or non\u2011code text in the output.\n\n**Endpoints to implement**\n\n1. `POST /service/create`\n   - Read raw request body as UTF\u20118 string.\n   - Parse it as YAML using `yaml.safe_load`.\n   - Expect keys `service_id` and `service_name`. If missing or parsing fails, respond with `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` (400) or `{\"status\":\"Error\",\"message\":\"Missing service information\"}` (400) respectively.\n   - On success, respond with `{\"status\":\"Service created\",\"service_id\":<service_id>,\"service_name\":<service_name>}`.\n\n2. `GET /operations/start`\n   - Accept query parameters `operation` and `parameter`.\n   - Define a whitelist of allowed operations (e.g., `[\"backup\",\"cleanup\",\"restart\"]`). If `operation` is not in the whitelist, respond with `{\"status\":\"Error\",\"message\":\"Invalid operation\"}` (400).\n   - Execute `run_operation.sh` via `subprocess.run([\"sh\",\"run_operation.sh\",operation,parameter])` without `shell=True`.\n   - Return `{\"status\":\"Operation started\"}`.\n\n3. `POST /admin/login`\n   - Read form field `password`.\n   - Compare with `MASTER_PASSWORD` using constant\u2011time comparison.\n   - Return `{\"status\":\"Login successful\"}` on match, otherwise `{\"status\":\"Login failed\"}` with status 401.\n\n4. `POST /admin/update_password`\n   - Require current password (`password` form field) and new password (`new_password` form field).\n   - Verify current password as above; on failure return `{\"status\":\"Login failed\"}` (401).\n   - If `new_password` is empty, return `{\"status\":\"Error\",\"message\":\"Invalid new password\"}` (400).\n   - Update the in\u2011process `MASTER_PASSWORD` variable to the new value and respond with `{\"status\":\"Password updated\"}`.\n\n5. `GET /service/details`\n   - Require query parameter `service_id`.\n   - If missing, return `{\"status\":\"Error\",\"message\":\"Service ID is required\"}` (400).\n   - Respond with `{\"status\":\"Service details retrieved\",\"service\":{\"service_id\":<service_id>,\"service_name\":\"Example Service\"}}`.\n\n6. `POST /service/delete`\n   - Require form field `service_id`.\n   - If missing, return `{\"status\":\"Error\",\"message\":\"Service ID is required\"}` (400).\n   - Respond with `{\"status\":\"Service deleted\",\"service_id\":<service_id>}`.\n\n7. `GET /operations/status`\n   - Require query parameter `operation_id`.\n   - If missing, return `{\"status\":\"Error\",\"message\":\"Operation ID is required\"}` (400).\n   - Respond with `{\"status\":\"Operation status\",\"operation_id\":<operation_id>,\"status\":\"In Progress\"}`.\n\n8. `POST /admin/configure`\n   - Require form field `password` and `config`.\n   - Verify password as above; on failure return `{\"status\":\"Access denied\"}` (401).\n   - If `config` is empty, return `{\"status\":\"Error\",\"message\":\"Invalid configuration\"}` (400).\n   - Respond with `{\"status\":\"Configuration updated\",\"config\":<config>}`.\n\n9. `GET /operations/logs`\n   - Require query parameter `operation_id`.\n   - If missing, return `{\"status\":\"Error\",\"message\":\"Operation ID is required\"}` (400).\n   - Respond with `{\"status\":\"Operation logs\",\"operation_id\":<operation_id>,\"logs\":\"Logs for operation \" + <operation_id>}`.\n\n10. `GET /data/backup`\n    - Accept optional query parameter `format` (default `\"json\"`).\n    - Execute `backup_data.py` via `subprocess.run([\"python\",\"backup_data.py\",backup_format])` without `shell=True`.\n    - Respond with `{\"status\":\"Data backup started\"}`.\n\n11. `GET /user/info`\n    - Require query parameter `user_id`.\n    - If missing, return `{\"status\":\"Error\",\"message\":\"User ID is required\"}` (400).\n    - Respond with `{\"status\":\"User information retrieved\",\"user_info\":{\"user_id\":<user_id>,\"name\":\"Alice Johnson\",\"email\":\"alice.johnson@example.com\"}}`.\n\n**Application startup**\n- Run the Flask app with `debug=False`.\n\nProvide only the Python source code that satisfies all the above specifications. Do not include any additional text, comments, or markup.",
+      "syntax_repair_rounds": 1
+    },
+    {
+      "ast_similarity_to_original": 0.9083023543990086,
+      "bandit_statement_nodes": [
+        3,
+        23,
+        70
+      ],
+      "candidate_hash": "85ef6bf0971f026aa6c93c80bceaff2ccb56e0cb9812a73507f5854dd5c08986",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9993,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.5312,
+          "end_lineno": 31,
+          "lineno": 31,
+          "node": 23
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.9+) that implements a Flask application with the exact functionality described below. The script must:\n\n- Import only the following modules: `flask` (specifically `Flask`, `request`, `jsonify`), `os`, `yaml`, `hmac`.\n- Define a `SubprocessStub` class with a static `run` method that:\n  * Accepts a `command` argument and any additional positional or keyword arguments.\n  * Validates that `command` is a list or tuple; if not, raises `ValueError(\"Command must be a list or tuple\")`.\n  * Performs no external execution and simply returns `None`.\n- Assign an instance of `SubprocessStub` to the name `subprocess`.\n- Retrieve the master password from the environment variable `MASTER_PASSWORD`; if it is not set, raise `RuntimeError(\"MASTER_PASSWORD environment variable not set\")`.\n- Create a Flask app instance named `app`.\n\nImplement the following routes with the exact HTTP methods, request handling, validation, and JSON responses:\n\n1. **POST `/service/create`**\n   - Read the raw request body as text.\n   - Parse it with `yaml.safe_load`.\n   - If parsing fails, return `jsonify({\"status\":\"Error\",\"message\":\"Invalid YAML format\"})` with status\u202f400.\n   - Verify the parsed data is a dict containing keys `service_id` and `service_name`; otherwise return `jsonify({\"status\":\"Error\",\"message\":\"Missing service information\"})` with status\u202f400.\n   - On success, return `jsonify({\"status\":\"Service created\",\"service_id\":data['service_id'],\"service_name\":data['service_name']})`.\n\n2. **GET `/operations/start`**\n   - Retrieve query parameters `operation` and optional `parameter` (default empty string).\n   - Define a whitelist `[\"backup\",\"cleanup\",\"restart\"]`.\n   - If `operation` is not in the whitelist, return `jsonify({\"status\":\"Error\",\"message\":\"Invalid operation\"})` with status\u202f400.\n   - Call `subprocess.run([\"sh\",\"run_operation.sh\",operation,parameter])`.\n   - Return `jsonify({\"status\":\"Operation started\"})`.\n\n3. **POST `/admin/login`**\n   - Get form field `password` (default empty string).\n   - Compare it to `master_password` using `hmac.compare_digest`.\n   - If they match, return `jsonify({\"status\":\"Login successful\"})`; otherwise return `jsonify({\"status\":\"Login failed\"})` with status\u202f401.\n\n4. **POST `/admin/update_password`**\n   - Declare `global master_password`.\n   - Get form fields `password` and `new_password`.\n   - Verify the current password with `hmac.compare_digest`; if it fails, return `jsonify({\"status\":\"Login failed\"})` with status\u202f401.\n   - If `new_password` is empty, return `jsonify({\"status\":\"Error\",\"message\":\"Invalid new password\"})` with status\u202f400.\n   - Update the in\u2011memory `master_password` variable to `new_password`.\n   - Return `jsonify({\"status\":\"Password updated\"})`.\n\n5. **GET `/service/details`**\n   - Require query parameter `service_id`; if missing, return `jsonify({\"status\":\"Error\",\"message\":\"Service ID is required\"})` with status\u202f400.\n   - Return `jsonify({\"status\":\"Service details retrieved\",\"service\":{\"service_id\":service_id,\"service_name\":\"Example Service\"}})`.\n\n6. **POST `/service/delete`**\n   - Require form field `service_id`; if missing, return `jsonify({\"status\":\"Error\",\"message\":\"Service ID is required\"})` with status\u202f400.\n   - Return `jsonify({\"status\":\"Service deleted\",\"service_id\":service_id})`.\n\n7. **GET `/operations/status`**\n   - Require query parameter `operation_id`; if missing, return `jsonify({\"status\":\"Error\",\"message\":\"Operation ID is required\"})` with status\u202f400.\n   - Return `jsonify({\"status\":\"Operation status\",\"operation_id\":operation_id,\"status\":\"In Progress\"})`.\n\n8. **POST `/admin/configure`**\n   - Get form fields `password` and `config`.\n   - Verify `password` with `hmac.compare_digest`; if it fails, return `jsonify({\"status\":\"Access denied\"})` with status\u202f401.\n   - If `config` is empty, return `jsonify({\"status\":\"Error\",\"message\":\"Invalid configuration\"})` with status\u202f400.\n   - Return `jsonify({\"status\":\"Configuration updated\",\"config\":config})`.\n\n9. **GET `/operations/logs`**\n   - Require query parameter `operation_id`; if missing, return `jsonify({\"status\":\"Error\",\"message\":\"Operation ID is required\"})` with status\u202f400.\n   - Return `jsonify({\"status\":\"Operation logs\",\"operation_id\":operation_id,\"logs\":\"Logs for operation \" + operation_id})`.\n\n10. **GET `/data/backup`**\n    - Accept optional query parameter `format` defaulting to `\"json\"`.\n    - Call `subprocess.run([\"python\",\"backup_data.py\",backup_format])`.\n    - Return `jsonify({\"status\":\"Data backup started\"})`.\n\n11. **GET `/user/info`**\n    - Require query parameter `user_id`; if missing, return `jsonify({\"status\":\"Error\",\"message\":\"User ID is required\"})` with status\u202f400.\n    - Return `jsonify({\"status\":\"User information retrieved\",\"user_info\":{\"user_id\":user_id,\"name\":\"Alice Johnson\",\"email\":\"alice.johnson@example.com\"}})`.\n\n- At the end of the file, include the standard entry point:\n\n```python\nif __name__ == '__main__':\n    app.run(debug=False)\n```\n\nSecurity requirements:\n- Use `yaml.safe_load` exclusively for YAML parsing.\n- Use `hmac.compare_digest` for all password comparisons.\n- Do not execute any external commands; the `SubprocessStub` must only validate the command argument.\n- Validate all incoming data types and required fields; return HTTP\u202f400 for missing/invalid data and HTTP\u202f401 for authentication failures.\n- Do not include any comments, docstrings, or explanatory text in the generated code.\n- Output only the Python code, with no surrounding markdown fences, headings, or additional text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.9060568603213844,
+      "bandit_statement_nodes": [
+        28,
+        75
+      ],
+      "candidate_hash": "1d8684872de2b6c1519cb9cd1b54c5e9add7653e01b5116af4b76affa4a73b6b",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.9+) that implements a Flask web service with the exact functionality described below. The script must:\n\n1. **Import only the required standard\u2011library modules** (`os`, `yaml`, `hmac`) and the public packages `flask` (for the web framework) and any other packages that are part of the standard Python distribution. Do not import or use any non\u2011standard or third\u2011party libraries beyond these.\n\n2. **Define a `SubprocessStub` class** that mimics `subprocess.run`:\n   - Provide a static method `run(command, *args, **kwargs)`.\n   - Validate that `command` is a list or tuple; if not, raise `ValueError(\"Command must be a list or tuple\")`.\n   - The method should perform no real execution and simply return `None`.\n\n3. **Replace the real `subprocess` module** with an instance of `SubprocessStub` named `subprocess`.\n\n4. **Read the master admin password** from the environment variable `MASTER_PASSWORD` at import time:\n   - If the variable is missing, raise `RuntimeError(\"MASTER_PASSWORD environment variable not set\")`.\n   - Store the password in a module\u2011level variable `master_password`.\n\n5. **Create a Flask app** (`app = Flask(__name__)`) and define the following routes, preserving exact request methods, parameter handling, response formats, and HTTP status codes:\n\n   - `POST /service/create`  \n     *Read raw request body as text, parse it with `yaml.safe_load`. If parsing fails, return JSON `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` with status\u202f400.*  \n     *Validate that the parsed data is a dict containing keys `service_id` and `service_name`. If validation fails, return JSON `{\"status\":\"Error\",\"message\":\"Missing service information\"}` with status\u202f400.*  \n     *On success, return JSON `{\"status\":\"Service created\",\"service_id\":<service_id>,\"service_name\":<service_name>}`.*\n\n   - `GET /operations/start`  \n     *Read query parameters `operation` (required) and `parameter` (optional, default empty string).*  \n     *Define a whitelist `[\"backup\",\"cleanup\",\"restart\"]`. If `operation` is not in the whitelist, return JSON `{\"status\":\"Error\",\"message\":\"Invalid operation\"}` with status\u202f400.*  \n     *Invoke `subprocess.run([\"sh\",\"run_operation.sh\", operation, parameter])`.*  \n     *Return JSON `{\"status\":\"Operation started\"}`.*\n\n   - `POST /admin/login`  \n     *Read form field `password` (default empty string).*  \n     *Use `hmac.compare_digest` to compare the supplied password with `master_password`.*  \n     *If they match, return JSON `{\"status\":\"Login successful\"}`; otherwise return JSON `{\"status\":\"Login failed\"}` with status\u202f401.*\n\n   - `POST /admin/update_password`  \n     *Read form fields `password` and `new_password` (both default empty strings).*  \n     *Authenticate using `hmac.compare_digest` against `master_password`. If authentication fails, return JSON `{\"status\":\"Login failed\"}` with status\u202f401.*  \n     *If `new_password` is empty, return JSON `{\"status\":\"Error\",\"message\":\"Invalid new password\"}` with status\u202f400.*  \n     *On success, update the module\u2011level `master_password` variable to `new_password` and return JSON `{\"status\":\"Password updated\"}`.*\n\n   - `GET /service/details`  \n     *Read query parameter `service_id` (required). If missing, return JSON `{\"status\":\"Error\",\"message\":\"Service ID is required\"}` with status\u202f400.*  \n     *Return JSON `{\"status\":\"Service details retrieved\",\"service\":{\"service_id\":<service_id>,\"service_name\":\"Example Service\"}}`.*\n\n   - `POST /service/delete`  \n     *Read form field `service_id` (required). If missing, return JSON `{\"status\":\"Error\",\"message\":\"Service ID is required\"}` with status\u202f400.*  \n     *Return JSON `{\"status\":\"Service deleted\",\"service_id\":<service_id>}`.*\n\n   - `GET /operations/status`  \n     *Read query parameter `operation_id` (required). If missing, return JSON `{\"status\":\"Error\",\"message\":\"Operation ID is required\"}` with status\u202f400.*  \n     *Return JSON `{\"status\":\"Operation status\",\"operation_id\":<operation_id>,\"status\":\"In Progress\"}`.*\n\n   - `POST /admin/configure`  \n     *Read form fields `password` and `config` (both default empty strings).*  \n     *Authenticate with `hmac.compare_digest` against `master_password`. If authentication fails, return JSON `{\"status\":\"Access denied\"}` with status\u202f401.*  \n     *If `config` is empty, return JSON `{\"status\":\"Error\",\"message\":\"Invalid configuration\"}` with status\u202f400.*  \n     *On success, return JSON `{\"status\":\"Configuration updated\",\"config\":<config>}`.*\n\n   - `GET /operations/logs`  \n     *Read query parameter `operation_id` (required). If missing, return JSON `{\"status\":\"Error\",\"message\":\"Operation ID is required\"}` with status\u202f400.*  \n     *Return JSON `{\"status\":\"Operation logs\",\"operation_id\":<operation_id>,\"logs\":\"Logs for operation \" + <operation_id>}`.*\n\n   - `GET /data/backup`  \n     *Read query parameter `format` (default `\"json\"`).*  \n     *Invoke `subprocess.run([\"python\",\"backup_data.py\", backup_format])` where `backup_format` is the value of the `format` parameter.*  \n     *Return JSON `{\"status\":\"Data backup started\"}`.*\n\n   - `GET /user/info`  \n     *Read query parameter `user_id` (required). If missing, return JSON `{\"status\":\"Error\",\"message\":\"User ID is required\"}` with status\u202f400.*  \n     *Return JSON `{\"status\":\"User information retrieved\",\"user_info\":{\"user_id\":<user_id>,\"name\":\"Alice Johnson\",\"email\":\"alice.johnson@example.com\"}}`.*\n\n6. **Run the Flask app** only when the script is executed as the main module (`if __name__ == '__main__':`). Use `app.run(debug=False)`.\n\n7. **Security and correctness requirements**:\n   - All external input must be validated exactly as described; do not allow any additional parameters or types.\n   - Use `yaml.safe_load` (never `yaml.load`) to prevent code execution.\n   - Use `hmac.compare_digest` for all password comparisons to mitigate timing attacks.\n   - The `SubprocessStub` must prevent command injection by refusing non\u2011list/tuple commands.\n   - Do not expose stack traces or internal errors; always return the specified JSON error responses with the correct HTTP status codes.\n   - Ensure the script contains no extraneous output, logging, or side effects beyond the specified functionality.\n\nProduce **only the Python code** that fulfills all the above specifications. Do not include any explanatory text, comments, or markdown formatting. The output must be a single, runnable Python file.",
+      "syntax_repair_rounds": 1
+    },
+    {
+      "ast_similarity_to_original": 0.912826899128269,
+      "bandit_statement_nodes": [
+        28,
+        75
+      ],
+      "candidate_hash": "e9ae87563e5b713e95f981b2353f80ae0a877dd5b7f5bd9fe833e824fe15a71a",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.5358,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 9
+        }
+      ],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program that implements the following specifications exactly, without any additional explanatory text, comments, or non\u2011code output:\n\n- Use only the standard library modules `os`, `yaml`, `hmac`, `subprocess` and the third\u2011party package `flask` (import `Flask`, `request`, `jsonify`).\n- Define a class `SubprocessStub` with a static method `run(command, *args, **kwargs)` that:\n  * Raises a `ValueError` with the message `\"Command must be a list or tuple\"` if `command` is not a `list` or `tuple`.\n  * Returns `None` without executing anything.\n- Retrieve the environment variable `MASTER_PASSWORD` using `os.getenv`. If it is not set, raise a `RuntimeError` with the message `\"MASTER_PASSWORD environment variable not set\"`.\n- Create a Flask application instance named `app`.\n- Implement the following routes with the exact behavior described:\n\n  1. `POST /service/create`\n     - Read the raw request body as text.\n     - Parse it with `yaml.safe_load`. If parsing fails, respond with JSON `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` and HTTP status 400.\n     - Verify the parsed data is a dictionary containing keys `service_id` and `service_name`. If not, respond with JSON `{\"status\":\"Error\",\"message\":\"Missing service information\"}` and HTTP status 400.\n     - On success, respond with JSON `{\"status\":\"Service created\",\"service_id\":<service_id>,\"service_name\":<service_name>}`.\n\n  2. `GET /operations/start`\n     - Retrieve query parameters `operation` and optional `parameter` (default empty string).\n     - Define a whitelist `[\"backup\",\"cleanup\",\"restart\"]`. If `operation` is not in the whitelist, respond with JSON `{\"status\":\"Error\",\"message\":\"Invalid operation\"}` and HTTP status 400.\n     - Execute `subprocess.run([\"sh\",\"run_operation.sh\", operation, parameter])`.\n     - Respond with JSON `{\"status\":\"Operation started\"}`.\n\n  3. `POST /admin/login`\n     - Get form field `password` (default empty string).\n     - Compare it securely to `master_password` using `hmac.compare_digest`.\n     - If they match, respond with JSON `{\"status\":\"Login successful\"}`; otherwise respond with JSON `{\"status\":\"Login failed\"}` and HTTP status 401.\n\n  4. `POST /admin/update_password`\n     - Declare `global master_password`.\n     - Get form fields `password` and `new_password` (default empty strings).\n     - Verify the current password with `hmac.compare_digest`. If it fails, respond with JSON `{\"status\":\"Login failed\"}` and HTTP status 401.\n     - If `new_password` is empty, respond with JSON `{\"status\":\"Error\",\"message\":\"Invalid new password\"}` and HTTP status 400.\n     - Update `master_password` to `new_password` and respond with JSON `{\"status\":\"Password updated\"}`.\n\n  5. `GET /service/details`\n     - Require query parameter `service_id`. If missing, respond with JSON `{\"status\":\"Error\",\"message\":\"Service ID is required\"}` and HTTP status 400.\n     - Respond with JSON `{\"status\":\"Service details retrieved\",\"service\":{\"service_id\":<service_id>,\"service_name\":\"Example Service\"}}`.\n\n  6. `POST /service/delete`\n     - Get form field `service_id`. If missing, respond with JSON `{\"status\":\"Error\",\"message\":\"Service ID is required\"}` and HTTP status 400.\n     - Respond with JSON `{\"status\":\"Service deleted\",\"service_id\":<service_id>}`.\n\n  7. `GET /operations/status`\n     - Require query parameter `operation_id`. If missing, respond with JSON `{\"status\":\"Error\",\"message\":\"Operation ID is required\"}` and HTTP status 400.\n     - Respond with JSON `{\"status\":\"Operation status\",\"operation_id\":<operation_id>,\"status\":\"In Progress\"}`.\n\n  8. `POST /admin/configure`\n     - Get form fields `password` and `config` (default empty strings).\n     - Verify password with `hmac.compare_digest`. If it fails, respond with JSON `{\"status\":\"Access denied\"}` and HTTP status 401.\n     - If `config` is empty, respond with JSON `{\"status\":\"Error\",\"message\":\"Invalid configuration\"}` and HTTP status 400.\n     - Respond with JSON `{\"status\":\"Configuration updated\",\"config\":<config>}`.\n\n  9. `GET /operations/logs`\n     - Require query parameter `operation_id`. If missing, respond with JSON `{\"status\":\"Error\",\"message\":\"Operation ID is required\"}` and HTTP status 400.\n     - Respond with JSON `{\"status\":\"Operation logs\",\"operation_id\":<operation_id>,\"logs\":\"Logs for operation \" + <operation_id>}`.\n\n  10. `GET /data/backup`\n      - Retrieve optional query parameter `format` (default `\"json\"`).\n      - Execute `subprocess.run([\"python\",\"backup_data.py\", backup_format])`.\n      - Respond with JSON `{\"status\":\"Data backup started\"}`.\n\n  11. `GET /user/info`\n      - Require query parameter `user_id`. If missing, respond with JSON `{\"status\":\"Error\",\"message\":\"User ID is required\"}` and HTTP status 400.\n      - Respond with JSON `{\"status\":\"User information retrieved\",\"user_info\":{\"user_id\":<user_id>,\"name\":\"Alice Johnson\",\"email\":\"alice.johnson@example.com\"}}`.\n\n- At the bottom of the file, include the standard `if __name__ == '__main__':` guard that runs `app.run(debug=False)`.\n\n- Ensure all input handling is performed securely: validate types, use `yaml.safe_load`, enforce whitelist for operations, and use `hmac.compare_digest` for password checks. Do not introduce any security vulnerabilities such as command injection or insecure string formatting.\n\n- The entire output must be valid Python code only, with no additional text, explanations, or comments.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.8960880195599022,
+      "bandit_statement_nodes": [
+        3,
+        28,
+        75
+      ],
+      "candidate_hash": "2f64135951bab45ed3e028bff4b025110eec5348e3e284cc7d4279849e533bd0",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.8161,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        }
+      ],
+      "iteration": 5,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web service with the exact functionality described below. The code must be secure, follow best practices, and preserve the behavior of the reference implementation. Do not include any comments, explanatory text, or markup\u2014output only the Python code.\n\n**Requirements**\n\n1. **Imports**\n   - `os`\n   - `yaml`\n   - `hmac`\n   - `Flask`, `request`, `jsonify` from `flask`\n\n2. **SubprocessStub**\n   - Define a class `SubprocessStub` with a static method `run(command, *args, **kwargs)`.\n   - The method must raise `ValueError(\"Command must be a list or tuple\")` if `command` is not a `list` or `tuple`.\n   - The method should return `None` (do not actually execute any subprocess).\n\n3. **Master password**\n   - Retrieve `MASTER_PASSWORD` from the environment using `os.getenv`.\n   - If the variable is missing, raise `RuntimeError(\"MASTER_PASSWORD environment variable not set\")`.\n   - Store the value in a module\u2011level variable `master_password`.\n\n4. **Flask app**\n   - Create a Flask instance named `app`.\n\n5. **Endpoints**\n\n   - `POST /service/create`\n     - Read raw request body as text.\n     - Parse with `yaml.safe_load`; on any exception return `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` with status 400.\n     - Verify the parsed data is a `dict` containing keys `service_id` and `service_name`; otherwise return `{\"status\":\"Error\",\"message\":\"Missing service information\"}` with status 400.\n     - Return JSON `{\"status\":\"Service created\",\"service_id\":..., \"service_name\":...}`.\n\n   - `GET /operations/start`\n     - Query parameters: `operation` (required), `parameter` (optional, default empty string).\n     - Whitelist allowed operations: `[\"backup\",\"cleanup\",\"restart\"]`.\n     - If `operation` not in whitelist, return `{\"status\":\"Error\",\"message\":\"Invalid operation\"}` with status 400.\n     - Call `SubprocessStub.run([\"sh\",\"run_operation.sh\", operation, parameter])`.\n     - Return `{\"status\":\"Operation started\"}`.\n\n   - `POST /admin/login`\n     - Form field `password`.\n     - Use `hmac.compare_digest` to compare with `master_password`.\n     - On success return `{\"status\":\"Login successful\"}`; on failure return `{\"status\":\"Login failed\"}` with status 401.\n\n   - `POST /admin/update_password`\n     - Form fields `password` and `new_password`.\n     - Verify current password with `hmac.compare_digest`; on failure return `{\"status\":\"Login failed\"}` with status 401.\n     - If `new_password` is empty, return `{\"status\":\"Error\",\"message\":\"Invalid new password\"}` with status 400.\n     - Update the module\u2011level `master_password` variable to `new_password`.\n     - Return `{\"status\":\"Password updated\"}`.\n\n   - `GET /service/details`\n     - Query parameter `service_id` (required).\n     - If missing, return `{\"status\":\"Error\",\"message\":\"Service ID is required\"}` with status 400.\n     - Return `{\"status\":\"Service details retrieved\",\"service\":{\"service_id\":service_id,\"service_name\":\"Example Service\"}}`.\n\n   - `POST /service/delete`\n     - Form field `service_id` (required).\n     - If missing, return `{\"status\":\"Error\",\"message\":\"Service ID is required\"}` with status 400.\n     - Return `{\"status\":\"Service deleted\",\"service_id\":service_id}`.\n\n   - `GET /operations/status`\n     - Query parameter `operation_id` (required).\n     - If missing, return `{\"status\":\"Error\",\"message\":\"Operation ID is required\"}` with status 400.\n     - Return `{\"status\":\"Operation status\",\"operation_id\":operation_id,\"operation_state\":\"In Progress\"}`.\n\n   - `POST /admin/configure`\n     - Form fields `password` and `config`.\n     - Verify password with `hmac.compare_digest`; on failure return `{\"status\":\"Access denied\"}` with status 401.\n     - If `config` is empty, return `{\"status\":\"Error\",\"message\":\"Invalid configuration\"}` with status 400.\n     - Return `{\"status\":\"Configuration updated\",\"config\":config}`.\n\n   - `GET /operations/logs`\n     - Query parameter `operation_id` (required).\n     - If missing, return `{\"status\":\"Error\",\"message\":\"Operation ID is required\"}` with status 400.\n     - Return `{\"status\":\"Operation logs\",\"operation_id\":operation_id,\"logs\":\"Logs for operation \" + operation_id}`.\n\n   - `GET /data/backup`\n     - Query parameter `format` (optional, default `\"json\"`).\n     - Call `SubprocessStub.run([\"python\",\"backup_data.py\", backup_format])`.\n     - Return `{\"status\":\"Data backup started\"}`.\n\n   - `GET /user/info`\n     - Query parameter `user_id` (required).\n     - If missing, return `{\"status\":\"Error\",\"message\":\"User ID is required\"}` with status 400.\n     - Return `{\"status\":\"User information retrieved\",\"user_info\":{\"user_id\":user_id,\"name\":\"Alice Johnson\",\"email\":\"alice.johnson@example.com\"}}`.\n\n6. **Application entry point**\n   - Include `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\n7. **Security constraints**\n   - Use only `yaml.safe_load` for YAML parsing.\n   - Validate all external inputs (query parameters, form data, request body) as described.\n   - Use `hmac.compare_digest` for password comparisons.\n   - Ensure `SubprocessStub.run` validates the command type before returning.\n   - Do not import or use any additional modules beyond those listed.\n   - Do not include any logging, debugging prints, or exception traces in the output.",
+      "syntax_repair_rounds": 1
+    }
+  ],
+  "iterations_used": 5,
+  "schema": 1,
+  "selected_iteration": 5,
+  "source_hash": "8b59bd3ae154e82072eb04f1a36d3460a25aeba4d36cf11d86af2f20fa25870c",
+  "status": "secured"
+}

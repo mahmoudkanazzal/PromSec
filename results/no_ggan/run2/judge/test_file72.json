@@ -1,0 +1,66 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "a2bb6a79651cab2b771268bbf7f16a206c3117f9d0bfe6ef5a2d0b00e24d2183",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a request\u2011parsing error (400) before the try block.",
+      "Database connection failures or SQL errors are caught and result in a silent redirect to '/home'.",
+      "Duplicate usernames or constraint violations trigger the exception path, also redirecting to '/home'.",
+      "Very long input values may exceed column limits and cause DB errors.",
+      "The string\u2011concatenated SQL is vulnerable to injection if the username contains malicious characters."
+    ],
+    "entrypoints": [],
+    "intent": "Create a new user account by storing the supplied username and a salted SHA\u2011256 hash of the password, then redirect the client to the home page.",
+    "invariants": [
+      "The endpoint always returns a redirect to '/home' regardless of outcome.",
+      "Password hashing always uses SHA\u2011256 with a freshly generated 16\u2011byte random salt.",
+      "The SQL INSERT statement is built by concatenating the raw username and password values.",
+      "A database commit is issued after the INSERT.",
+      "If any exception occurs during the DB operation, the response is still a redirect to '/home'."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /register with form fields 'username' and 'password'.",
+      "Responds with an HTTP 302 redirect to '/home' (on both success and failure).",
+      "Writes the generated password hash and the constructed SQL statement to the server's standard output."
+    ],
+    "public_api": {
+      "func:register": "()",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the MySQL table `user` (username, password).",
+      "Commits the database transaction.",
+      "Prints diagnostic information (hash and SQL) to the console."
+    ],
+    "source_hash": "1d85cc97c3c3687ad4e1f27b1e2cf9944d891a79de7a2dc960b45beaf7549667"
+  },
+  "dimensions": {
+    "behavior": 0.1,
+    "edge_cases": 0.3,
+    "invariants": 0.2,
+    "io_semantics": 0.1,
+    "side_effects": 0.3
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file72.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.15625,
+  "original_hash": "1d85cc97c3c3687ad4e1f27b1e2cf9944d891a79de7a2dc960b45beaf7549667",
+  "rationale": "The program deviates from the contract on most fronts: it aborts with 500 on DB errors instead of silently redirecting, uses PBKDF2 instead of raw SHA\u2011256 with a salt, employs parameterized queries rather than string concatenation, does not print hash/SQL, and fails to always return a 302 redirect.",
+  "schema": 1,
+  "stability_abs_difference": 0.037,
+  "stability_dimensions": {
+    "behavior": 0.0,
+    "edge_cases": 0.2,
+    "invariants": 0.2,
+    "io_semantics": 0.0,
+    "side_effects": 0.66
+  },
+  "stability_score": 0.11925,
+  "weighted_mean": 0.175,
+  "worst_dimension": 0.1
+}

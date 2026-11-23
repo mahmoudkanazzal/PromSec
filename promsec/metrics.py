@@ -33,7 +33,9 @@ def compare_asts(tree1: ast.AST, tree2: ast.AST) -> float:
 def ast_similarity(code1: str, code2: str) -> float:
     """AST similarity of two programs; 0.0 if either does not parse."""
     try:
-        return compare_asts(ast.parse(code1), ast.parse(code2))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", SyntaxWarning)
+            return compare_asts(ast.parse(code1), ast.parse(code2))
     except SyntaxError:
         return 0.0
 

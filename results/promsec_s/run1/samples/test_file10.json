@@ -1,0 +1,108 @@
+{
+  "ast_similarity": 0.9225181598062954,
+  "candidate_hash": "baaecfb6c2b733261af66ccc964d038f6ca6d0ace047431bd8ac02178b1db00a",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file10.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.971830985915493,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        19,
+        68
+      ],
+      "candidate_hash": "269714de209cbf9169e6c04d398bb7c708eae851ac2554ca15774da07a446fb4",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9385,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9902,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9092,
+          "end_lineno": 30,
+          "lineno": 30,
+          "node": 19
+        },
+        {
+          "ast_type": "Global",
+          "change": 0.5142,
+          "end_lineno": 53,
+          "lineno": 53,
+          "node": 33
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9743,
+          "end_lineno": 114,
+          "lineno": 114,
+          "node": 68
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (compatible with Python\u202f3.8+) that implements a Flask web application with the exact functionality described below. The code must be written in Python only, contain no comments, and must not include any explanatory text outside the code. Ensure the implementation follows security best practices as specified.\n\n**Requirements**\n\n1. **Imports**\n   - `from flask import Flask, request, jsonify`\n   - `import os`\n   - `import yaml`\n   - `import subprocess`\n\n2. **Application Setup**\n   - Create a Flask app instance named `app`.\n   - Load an admin password from the environment variable `ADMIN_PASSWORD`; if not set, default to `\"event_admin_2024\"`. Store it in a mutable dictionary `ADMIN_PASSWORD = {\"value\": <value>}`.\n\n3. **Routes**\n   - `POST /event/add`\n     - Read raw request body, decode as UTF\u20118.\n     - Parse YAML safely using `yaml.safe_load`; on parsing error return `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` with HTTP\u202f400.\n     - Extract `event_id`, `event_name`, `event_date`. If any are missing or empty, return `{\"status\":\"Error\",\"message\":\"Missing event information\"}` with HTTP\u202f400.\n     - On success return `{\"status\":\"Event added\",\"event_id\":..., \"event_name\":..., \"event_date\":...}`.\n\n   - `GET /event/start`\n     - Retrieve query parameters `event_id` and `task` (default empty strings).\n     - Execute the script `start_event.sh` with arguments `[event_id, task]` using `subprocess.run(['sh','start_event.sh',event_id,task], check=False)`; do **not** use a shell.\n     - Return `{\"status\":\"Event started\"}`.\n\n   - `POST /auth/login`\n     - Get form field `password`.\n     - If it matches `ADMIN_PASSWORD[\"value\"]` return `{\"status\":\"Login successful\"}`; otherwise return `{\"status\":\"Login failed\"}` with HTTP\u202f401.\n\n   - `POST /auth/update_password`\n     - Get form field `password`. If it does not match the current admin password, return `{\"status\":\"Login failed\"}` with HTTP\u202f401.\n     - Get form field `new_password`. If missing or empty, return `{\"status\":\"Error\",\"message\":\"Invalid new password\"}` with HTTP\u202f400.\n     - Update `ADMIN_PASSWORD[\"value\"]` to the new password.\n     - Return `{\"status\":\"Password updated\"}`.\n\n   - `GET /event/get`\n     - Require query parameter `event_id`; if missing return `{\"status\":\"Error\",\"message\":\"Event ID is required\"}` with HTTP\u202f400.\n     - Return a placeholder event object:\n       `{\"status\":\"Event retrieved\",\"event\":{\"event_id\":event_id,\"event_name\":\"Sample Event\",\"event_date\":\"2024-01-01\"}}`.\n\n   - `POST /event/remove`\n     - Get form field `event_id`; if missing return `{\"status\":\"Error\",\"message\":\"Event ID is required\"}` with HTTP\u202f400.\n     - Return `{\"status\":\"Event removed\",\"event_id\":event_id}`.\n\n   - `GET /task/status`\n     - Require query parameter `task_id`; if missing return `{\"status\":\"Error\",\"message\":\"Task ID is required\"}` with HTTP\u202f400.\n     - Return `{\"status\":\"Task status\",\"task_id\":task_id,\"status\":\"In Progress\"}`.\n\n   - `POST /auth/settings`\n     - Get form field `password`; if it does not match the admin password, return `{\"status\":\"Access denied\"}` with HTTP\u202f401.\n     - Get form field `setting`; if missing or empty return `{\"status\":\"Error\",\"message\":\"Invalid setting\"}` with HTTP\u202f400.\n     - Return `{\"status\":\"Setting updated\",\"setting\":setting}`.\n\n   - `GET /task/logs`\n     - Require query parameter `task_id`; if missing return `{\"status\":\"Error\",\"message\":\"Task ID is required\"}` with HTTP\u202f400.\n     - Return `{\"status\":\"Task logs\",\"task_id\":task_id,\"logs\":\"Logs for task \" + task_id}`.\n\n   - `GET /data/export`\n     - Optional query parameter `format` defaulting to `\"json\"`.\n     - Run `export_event_data.py` with the format argument using `subprocess.run(['python','export_event_data.py',export_format], check=False)`; do **not** use a shell.\n     - Return `{\"status\":\"Data export started\"}`.\n\n   - `GET /user/info`\n     - Require query parameter `user_id`; if missing return `{\"status\":\"Error\",\"message\":\"User ID is required\"}` with HTTP\u202f400.\n     - Return placeholder user info:\n       `{\"status\":\"User information retrieved\",\"user_info\":{\"user_id\":user_id,\"name\":\"John Doe\",\"email\":\"john.doe@example.com\"}}`.\n\n4. **Application Execution**\n   - The server should start only when the script is executed directly (`if __name__ == \"__main__\":`), calling `app.run(debug=False)`.\n\n5. **Security Constraints**\n   - Use `yaml.safe_load` for YAML parsing.\n   - Invoke external scripts with `subprocess.run` using an argument list; never set `shell=True`.\n   - Validate all required inputs and return appropriate HTTP status codes (400 for bad request, 401 for unauthorized).\n   - Do not expose the admin password in responses.\n\nProduce only the Python code meeting all the above specifications, with no comments, no additional text, and no markdown formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.9225181598062954,
+      "bandit_statement_nodes": [
+        3,
+        22,
+        68
+      ],
+      "candidate_hash": "baaecfb6c2b733261af66ccc964d038f6ca6d0ace047431bd8ac02178b1db00a",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.8791,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.7581,
+          "end_lineno": 91,
+          "lineno": 91,
+          "node": 68
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.9+) that implements a Flask web application with the exact functionality described below. The code must be pure Python (no other languages) and must follow security best practices, preserving the behavior of the reference implementation.\n\n**General requirements**\n- Use only standard library modules and the following third\u2011party packages: `flask`, `pyyaml`, `re`, `os`.\n- All routes must return JSON responses with appropriate HTTP status codes.\n- Do not include any placeholder comments that suggest external scripts; implement all logic directly in the Flask app or clearly mark where real implementations would be inserted.\n- Use `yaml.safe_load` for parsing YAML input.\n- Validate all user\u2011supplied identifiers with a regular expression that allows only alphanumeric characters, hyphens, and underscores.\n- Restrict export formats to the whitelist `{\"json\", \"csv\", \"xml\"}`.\n- Store the admin password in a mutable dictionary `ADMIN_PASSWORD = {\"value\": os.getenv(\"ADMIN_PASSWORD\", \"event_admin_2024\")}` and never log or expose it.\n- Ensure that any failure paths return a JSON object with `\"status\":\"Error\"` (or the appropriate error status) and a descriptive `\"message\"` field, using HTTP 400 for client errors and HTTP 401 for authentication failures.\n- The application must be runnable with `if __name__ == \"__main__\": app.run(debug=False)`.\n\n**Endpoints and exact behavior**\n\n1. `POST /event/add`\n   - Read raw request body as text.\n   - Parse it with `yaml.safe_load`; on any exception or if the result is not a dict, respond with `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` and status 400.\n   - Extract `event_id`, `event_name`, `event_date`. If any are missing or falsy, respond with `{\"status\":\"Error\",\"message\":\"Missing event information\"}` and status 400.\n   - On success, respond with `{\"status\":\"Event added\",\"event_id\":event_id,\"event_name\":event_name,\"event_date\":event_date}`.\n\n2. `GET /event/start`\n   - Retrieve query parameters `event_id` and `task` (default empty string).\n   - Validate both with the safe identifier regex; if either fails, respond with `{\"status\":\"Error\",\"message\":\"Invalid parameters\"}` and status 400.\n   - Return `{\"status\":\"Event started\"}`.\n\n3. `POST /auth/login`\n   - Read form field `password`.\n   - If it matches `ADMIN_PASSWORD[\"value\"]`, respond with `{\"status\":\"Login successful\"}`.\n   - Otherwise respond with `{\"status\":\"Login failed\"}` and status 401.\n\n4. `POST /auth/update_password`\n   - Read form fields `password` and `new_password`.\n   - If `password` does not match the current admin password, respond with `{\"status\":\"Login failed\"}` and status 401.\n   - If `new_password` is empty, respond with `{\"status\":\"Error\",\"message\":\"Invalid new password\"}` and status 400.\n   - Update `ADMIN_PASSWORD[\"value\"]` to `new_password` and respond with `{\"status\":\"Password updated\"}`.\n\n5. `GET /event/get`\n   - Require query parameter `event_id`; if missing, respond with `{\"status\":\"Error\",\"message\":\"Event ID is required\"}` and status 400.\n   - Return a placeholder event JSON: `{\"status\":\"Event retrieved\",\"event\":{\"event_id\":event_id,\"event_name\":\"Sample Event\",\"event_date\":\"2024-01-01\"}}`.\n\n6. `POST /event/remove`\n   - Read form field `event_id`; if missing, respond with `{\"status\":\"Error\",\"message\":\"Event ID is required\"}` and status 400.\n   - Respond with `{\"status\":\"Event removed\",\"event_id\":event_id}`.\n\n7. `GET /task/status`\n   - Require query parameter `task_id`; if missing, respond with `{\"status\":\"Error\",\"message\":\"Task ID is required\"}` and status 400.\n   - Respond with `{\"status\":\"Task status\",\"task_id\":task_id,\"status\":\"In Progress\"}`.\n\n8. `POST /auth/settings`\n   - Read form fields `password` and `setting`.\n   - If `password` does not match the admin password, respond with `{\"status\":\"Access denied\"}` and status 401.\n   - If `setting` is empty, respond with `{\"status\":\"Error\",\"message\":\"Invalid setting\"}` and status 400.\n   - Respond with `{\"status\":\"Setting updated\",\"setting\":setting}`.\n\n9. `GET /task/logs`\n   - Require query parameter `task_id`; if missing, respond with `{\"status\":\"Error\",\"message\":\"Task ID is required\"}` and status 400.\n   - Respond with `{\"status\":\"Task logs\",\"task_id\":task_id,\"logs\":\"Logs for task \" + task_id}`.\n\n10. `GET /data/export`\n    - Read query parameter `format` (default `\"json\"`).\n    - If the format is not in the allowed set, respond with `{\"status\":\"Error\",\"message\":\"Unsupported export format\"}` and status 400.\n    - Respond with `{\"status\":\"Data export started\"}`.\n\n11. `GET /user/info`\n    - Require query parameter `user_id`; if missing, respond with `{\"status\":\"Error\",\"message\":\"User ID is required\"}` and status 400.\n    - Respond with `{\"status\":\"User information retrieved\",\"user_info\":{\"user_id\":user_id,\"name\":\"John Doe\",\"email\":\"john.doe@example.com\"}}`.\n\n**Helper functions**\n- Implement `_is_safe_identifier(value: str) -> bool` using `re.fullmatch(r\"[A-Za-z0-9_-]+\", value)`.\n- Implement `_is_allowed_format(fmt: str) -> bool` returning `fmt in {\"json\", \"csv\", \"xml\"}`.\n\n**Security considerations**\n- Do not execute any shell commands or external scripts.\n- Do not expose stack traces; catch all exceptions where appropriate and return generic error messages.\n- Ensure that the admin password is never printed, logged, or returned in any response.\n\nProvide the full Python source code meeting all the above specifications. Do not include any explanatory text outside the code. Do not use any language other than Python.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "1fe10c3a94b4f4ce46d789133eb8a4d34fc953a85d1d3497c79fad96d5cb565b",
+  "status": "secured"
+}

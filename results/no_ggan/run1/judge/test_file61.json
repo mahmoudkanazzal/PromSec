@@ -1,0 +1,71 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "57177153cc031cb5220140e81464d350a6510d5c44444d088b7164b3deaf9be3",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing payload parameter results in a specific error message.",
+      "Malformed YAML or missing keys cause a server error (exception from yaml.load).",
+      "Non\u2011numeric lat/lon/date values cause a ValueError when casting to int.",
+      "Database returns no matching row, leading to a TypeError when accessing row[0].",
+      "Database connection failure raises an exception and returns HTTP 500.",
+      "Large or malicious YAML content could trigger unsafe yaml.load behavior."
+    ],
+    "entrypoints": [],
+    "intent": "Provide the temperature for a given latitude, longitude, and date supplied via a YAML payload in a GET request.",
+    "invariants": [
+      "The endpoint always uses the GET method and reads only the 'payload' query parameter.",
+      "The database query uses parameterised placeholders, preventing SQL injection via the extracted values.",
+      "Returned temperature is always a string representation of the first column of the first row returned.",
+      "The service does not modify any database rows or files.",
+      "YAML parsing expects the top\u2011level keys 'lat', 'lon', and 'date' to exist.",
+      "All extracted values are cast to int before being used in the query."
+    ],
+    "io_behavior": [
+      "Accepts HTTP GET requests at /api/temperature_for_location with a query parameter named payload.",
+      "Parses the payload as YAML and extracts integer fields lat, lon, and date.",
+      "Queries a local MySQL database for a temperature matching those coordinates and date.",
+      "Returns the temperature value as a plain\u2011text string in the HTTP response body.",
+      "If the payload parameter is missing, returns the text \"YAML payload missing from request\".",
+      "If the query yields no result, the response will raise an exception (unhandled) or return None."
+    ],
+    "public_api": {
+      "route:GET /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to a MySQL server on localhost.",
+      "Executes a SELECT statement against the temperature table.",
+      "Potentially logs errors via the Flask framework's default logging.",
+      "May raise exceptions that propagate to the client as HTTP 500 errors."
+    ],
+    "source_hash": "b360cf04d2e65eae8542baff1da7038fcf535b689d5b42c3e5e53d93e0fc91e5"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.3,
+    "invariants": 0.2,
+    "io_semantics": 0.2,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file61.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.29,
+  "original_hash": "b360cf04d2e65eae8542baff1da7038fcf535b689d5b42c3e5e53d93e0fc91e5",
+  "rationale": "Core intent (return temperature for given lat/lon/date) is present, but the implementation diverges: parses JSON not YAML, accepts POST as well as GET, uses different error messages/status codes, returns 404 for missing rows, and adds extra range validation. Side\u2011effects (DB SELECT, possible 500 errors) match the contract.",
+  "schema": 1,
+  "stability_abs_difference": 0.07638,
+  "stability_dimensions": {
+    "behavior": 0.41,
+    "edge_cases": 0.12,
+    "invariants": 0.62,
+    "io_semantics": 0.28,
+    "side_effects": 0.92
+  },
+  "stability_score": 0.36638,
+  "weighted_mean": 0.32,
+  "worst_dimension": 0.2
+}

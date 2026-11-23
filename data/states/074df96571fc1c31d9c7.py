@@ -1,0 +1,135 @@
+from __future__ import annotations
+import os
+import hashlib
+import sqlite3
+import subprocess
+import yaml
+import shutil
+from werkzeug.utils import secure_filename
+from flask import Flask, request, jsonify, g
+
+APP = Flask(__name__)
+DATABASE = 'uploads.db'
+UPLOAD_FOLDER = 'uploaded_files'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# Determine full path to the external 'file' command
+FILE_CMD = shutil.which('file')
+if FILE_CMD is None:
+    # Fallback to a common location; will raise if not found at runtime
+    FILE_CMD = '/usr/bin/file'
+
+
+def get_db() -> sqlite3.Connection:
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+        db.row_factory = sqlite3.Row
+    return db
+
+
+def init_db() -> None:
+    conn = sqlite3.connect(DATABASE)
+    cur = conn.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS files (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            filename TEXT,
+            sha256 TEXT,
+            metadata TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+
+@APP.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
+
+
+def compute_sha256(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def save_file(file_storage) -> str:
+    # Use a secure filename to avoid path traversal
+    filename = secure_filename(file_storage.filename)
+    path = os.path.join(UPLOAD_FOLDER, filename)
+    file_storage.save(path)
+    return path
+
+
+def parse_yaml(yaml_str: str) -> dict:
+    # Use safe_load to avoid arbitrary object construction
+    return yaml.safe_load(yaml_str)
+
+
+def run_external_tool(file_path: str) -> str:
+    """
+    Run the external 'file' command on a validated file path.
+    """
+    # Resolve the absolute path and ensure it resides within the upload directory
+    abs_path = os.path.abspath(file_path)
+    upload_dir = os.path.abspath(UPLOAD_FOLDER)
+    if not abs_path.startswith(upload_dir + os.sep):
+        raise ValueError("Invalid file path")
+
+    try:
+        result = subprocess.run(
+            [FILE_CMD, abs_path],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        # Return the error output if the command fails
+        return e.stderr.strip() if e.stderr else ''
+
+
+@APP.route('/upload', methods=['POST'])
+def upload():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    yaml_text = request.form.get('metadata', '')
+    try:
+        metadata = parse_yaml(yaml_text) or {}
+    except Exception as e:
+        return jsonify({'error': f'YAML parse error: {str(e)}'}), 400
+
+    file_path = save_file(file)
+    with open(file_path, 'rb') as f:
+        data = f.read()
+    sha256 = compute_sha256(data)
+
+    file_info = run_external_tool(file_path)
+
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(
+        'INSERT INTO files (filename, sha256, metadata) VALUES (?, ?, ?)',
+        (file.filename, sha256, yaml_text)
+    )
+    db.commit()
+    file_id = cur.lastrowid
+
+    response = {
+        'id': file_id,
+        'filename': file.filename,
+        'sha256': sha256,
+        'file_info': file_info,
+        'metadata': metadata
+    }
+    return jsonify(response), 201
+
+
+if __name__ == '__main__':
+    init_db()
+    APP.run(host='127.0.0.1', port=5000)

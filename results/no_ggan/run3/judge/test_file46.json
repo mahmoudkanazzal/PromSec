@@ -1,0 +1,68 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "1a1ed36e5ab30669bfc7e6c5347d538fbeef2b4a4fc1456956aaed9a06eb9d4f",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and result in a 400/500 response.",
+      "Empty strings for username or password are treated as valid values and may return \"Bad Login\".",
+      "Extremely long input values may trigger database or request size limits.",
+      "SQL injection strings can alter the query semantics, potentially returning unexpected results.",
+      "Database connection errors (e.g., wrong credentials, server down) produce a 500 error."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by checking the supplied username and password against records in a MySQL database.",
+    "invariants": [
+      "The endpoint only handles POST requests; other methods are not routed.",
+      "The response body is always either \"Good Login\" or \"Bad Login\" (or an error page on failure).",
+      "Each request results in exactly one database query and one connection close.",
+      "No files are read or written on the server's filesystem.",
+      "The Flask application does not modify global state between requests."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to the /login path with form fields 'username' and 'password'.",
+      "Returns the plain\u2011text response \"Good Login\" when a matching record is found.",
+      "Returns the plain\u2011text response \"Bad Login\" when no matching record is found.",
+      "Responds with an HTTP 500 error if the database connection fails or an unexpected exception occurs.",
+      "Does not set cookies, sessions, or redirects; the response body is the only output."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a new MySQL connection for each request.",
+      "Executes a SELECT query against the 'user' table.",
+      "Closes the database cursor and connection after the query.",
+      "May log errors to the Flask default logger if an exception is raised."
+    ],
+    "source_hash": "c342ac763cd38f3e4cf27c5d04160741be7feb9eb24def7a7b7d8a73ecb749f8"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.3,
+    "invariants": 1.0,
+    "io_semantics": 0.4,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file46.py",
+  "gated_score": 0.4725,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.4725,
+  "original_hash": "c342ac763cd38f3e4cf27c5d04160741be7feb9eb24def7a7b7d8a73ecb749f8",
+  "rationale": "Core login logic and side\u2011effects match, but missing-field handling, SQL\u2011injection resistance, and some edge\u2011case behaviors diverge from the specified contract.",
+  "schema": 1,
+  "stability_abs_difference": 0.28375,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.4,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.75625,
+  "weighted_mean": 0.53,
+  "worst_dimension": 0.3
+}

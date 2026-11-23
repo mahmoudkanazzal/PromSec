@@ -1,0 +1,107 @@
+{
+  "ast_similarity": 0.8377425044091711,
+  "candidate_hash": "bf2bb5b2c63aebf397c7969f9832df55d3a920425fa713820d3cab3e872692be",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file28.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8739650413983441,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        28,
+        33
+      ],
+      "candidate_hash": "1c87656e86c27114de026649ea14752ac7a4e0f4c91d16f39b2ab79f6b34a3bd",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1349,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1428,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2753,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1675,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2077,
+          "end_lineno": 43,
+          "lineno": 43,
+          "node": 28
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (single file) that implements a Flask web application with the exact functionality described below. The code must be in Python only; do not include any other programming languages, pseudocode, or explanatory text outside the code. Follow security best practices as specified.\n\n**Requirements**\n\n1. **Imports**\n   - `from flask import Flask, request, jsonify`\n   - `import os`\n   - `import subprocess`\n   - `import yaml`\n   - `import re`\n\n2. **Application Setup**\n   - Create a Flask app instance named `app`.\n   - Load a librarian password from the environment variable `LIBRARIAN_PASSWORD`. If the variable is not set, default to the placeholder string `\"change_me\"` (note: in production this should be set and not defaulted).\n\n3. **Endpoints**\n\n   - **POST /api/add_book**\n     - Accept raw request body containing YAML.\n     - Decode request data as UTF\u20118.\n     - Parse YAML using `yaml.safe_load`; on parsing error return JSON `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` with HTTP 400.\n     - Extract fields: `title`, `author`, `isbn`, `publisher` (default `\"Unknown\"`), `year_published` (default `\"Unknown\"`).\n     - Validate that `title`, `author`, and `isbn` are non\u2011empty; otherwise return JSON error with HTTP 400.\n     - Validate that `year_published` is an integer; otherwise return JSON error with HTTP 400.\n     - Return JSON with status `\"Book added\"` and all extracted fields.\n\n   - **POST /api/remove_book**\n     - Retrieve `isbn` from form data (`request.form.get('isbn', '')`).\n     - If missing, return JSON error with HTTP 400.\n     - Return JSON `{\"status\":\"Book removed\",\"isbn\":<isbn>}`.\n\n   - **GET /api/start_inventory**\n     - Retrieve query parameters `section` and `location`.\n     - Validate each using a regular expression that allows only alphanumeric characters, hyphens, and underscores (`r'[\\w-]+'`). If either fails, return JSON error with HTTP 400.\n     - Execute an external script `inventory_checker.py` with arguments `section` and `location` using `subprocess.run` **without** a shell, suppressing stdout and stderr, and not raising on non\u2011zero exit codes.\n     - Return JSON `{\"status\":\"Inventory check started\"}`.\n\n   - **POST /admin/login**\n     - Retrieve `password` and `secret_key` from form data.\n     - Load expected secret key from environment variable `ADMIN_SECRET_KEY`, defaulting to `\"admin_key_2024\"` if not set.\n     - If both `password` matches `LIBRARIAN_PASSWORD` **and** `secret_key` matches the expected secret, return JSON `{\"status\":\"Admin access granted\",\"message\":\"Welcome, Admin!\"}`.\n     - Otherwise return JSON `{\"status\":\"Access denied\",\"message\":\"Invalid credentials\"}` with HTTP 401.\n\n   - **POST /admin/change_password**\n     - Declare `global LIBRARIAN_PASSWORD`.\n     - Retrieve `old_password` and `new_password` from form data.\n     - If `old_password` matches the current `LIBRARIAN_PASSWORD`, update `LIBRARIAN_PASSWORD` to `new_password` and return JSON `{\"status\":\"Password changed successfully\"}`.\n     - Otherwise return JSON `{\"status\":\"Access denied\",\"message\":\"Invalid old password\"}` with HTTP 401.\n\n   - **GET /api/book_info**\n     - Retrieve `isbn` from query parameters.\n     - If missing, return JSON error with HTTP 400.\n     - Return a placeholder book info dictionary containing `title`, `author`, `isbn`, `publisher`, and `year_published` (use static values except for the provided `isbn`) inside JSON `{\"status\":\"Book details\",\"book_info\":<dict>}`.\n\n   - **POST /api/update_book**\n     - Retrieve `isbn`, `new_title`, and `new_author` from form data.\n     - If `isbn` is missing, return JSON error with HTTP 400.\n     - Return JSON `{\"status\":\"Book updated\",\"isbn\":<isbn>,\"new_title\":<new_title>,\"new_author\":<new_author>}`.\n\n   - **GET /api/list_books**\n     - Retrieve optional `section` query parameter.\n     - Return a static list of two book dictionaries (each with `title`, `author`, `isbn`, `publisher`, `year_published`) inside JSON `{\"status\":\"Books listed\",\"section\":<section>,\"books\":<list>}`.\n\n   - **POST /admin/adjust_settings**\n     - Retrieve `password` and `new_setting` from form data.\n     - If `password` does not match `LIBRARIAN_PASSWORD`, return JSON `{\"status\":\"Access denied\"}` with HTTP 401.\n     - If `new_setting` is empty, return JSON error with HTTP 400.\n     - Return JSON `{\"status\":\"Setting applied\",\"new_setting\":<new_setting>}`.\n\n   - **GET /api/check_book_availability**\n     - Retrieve `isbn` from query parameters.\n     - If missing, return JSON error with HTTP 400.\n     - Use a placeholder boolean `availability = True`.\n     - Return JSON `{\"status\":\"Book availability\",\"isbn\":<isbn>,\"available\":availability}`.\n\n   - **POST /api/request_book**\n     - Retrieve `isbn` and `user_id` from form data.\n     - If either is missing, return JSON error with HTTP 400.\n     - Return JSON `{\"status\":\"Book requested\",\"isbn\":<isbn>,\"user_id\":<user_id>}`.\n\n   - **POST /api/return_book**\n     - Retrieve `isbn` and `user_id` from form data.\n     - If either is missing, return JSON error with HTTP 400.\n     - Return JSON `{\"status\":\"Book returned\",\"isbn\":<isbn>,\"user_id\":<user_id>}`.\n\n4. **Running the Application**\n   - Include the standard `if __name__ == \"__main__\":` block.\n   - Call `app.run(debug=False)`.\n\n5. **Security and Style**\n   - Use `yaml.safe_load` for YAML parsing.\n   - Use `subprocess.run` with a list argument and `shell=False`.\n   - Validate all external inputs (query parameters, form data, YAML fields) as described.\n   - Store secrets in environment variables; provide sensible defaults only for demonstration.\n   - Do not include any additional routes, functions, or imports beyond those specified.\n   - Do not add any comments, explanatory text, or markdown formatting; output only the raw Python code.",
+      "syntax_repair_rounds": 1
+    },
+    {
+      "ast_similarity_to_original": 0.8377425044091711,
+      "bandit_statement_nodes": [
+        2,
+        37
+      ],
+      "candidate_hash": "bf2bb5b2c63aebf397c7969f9832df55d3a920425fa713820d3cab3e872692be",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.312,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2811,
+          "end_lineno": 55,
+          "lineno": 54,
+          "node": 37
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, secure Python 3 program that implements a Flask web service with the exact functionality described below. The code must be pure Python (no other languages) and must follow best security practices (e.g., avoid subprocess, eval, exec; validate all inputs; use yaml.safe_load; use environment variables for secrets). Include all necessary imports, define the Flask app, and ensure the application runs with `app.run(debug=False)` when executed as `__main__`. Do not add any extra functionality, comments, or explanatory text beyond what is required for the code to work.\n\n**Requirements**\n\n1. **Imports**\n   - `from flask import Flask, request, jsonify`\n   - `import os`\n   - `import yaml`\n   - `import re`\n\n2. **Application Setup**\n   - Create a Flask instance named `app`.\n   - Define a global variable `LIBRARIAN_PASSWORD` that reads the environment variable `LIBRARIAN_PASSWORD` with a default value of `'change_me'`.\n\n3. **Helper Function**\n   - Define `_run_inventory_check(section: str, location: str) -> None` as a placeholder that contains only a `pass` statement and a docstring explaining it is a stub.\n\n4. **Endpoints**\n\n   - **POST /api/add_book**\n     - Read raw request data, decode as UTF\u20118, and parse with `yaml.safe_load`.\n     - Return `400` with JSON `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` if parsing fails or the result is not a dict.\n     - Extract and strip `title`, `author`, `isbn`; default `publisher` to `'Unknown'`; default `year` to `'Unknown'`.\n     - If any of `title`, `author`, or `isbn` are missing or empty, return `400` with `{\"status\":\"Error\",\"message\":\"Missing required fields\"}`.\n     - If `year` is not `'Unknown'`, attempt to convert to `int`; on failure return `400` with `{\"status\":\"Error\",\"message\":\"year_published must be integer\"}`.\n     - Return `200` with JSON containing the added book details:\n       ```json\n       {\n         \"status\":\"Book added\",\n         \"title\": title,\n         \"author\": author,\n         \"isbn\": isbn,\n         \"publisher\": publisher,\n         \"year_published\": year\n       }\n       ```\n\n   - **POST /api/remove_book**\n     - Retrieve `isbn` from `request.form`, strip whitespace.\n     - If missing, return `400` with `{\"status\":\"Error\",\"message\":\"ISBN required\"}`.\n     - Return `200` with `{\"status\":\"Book removed\",\"isbn\": isbn}`.\n\n   - **GET /api/start_inventory**\n     - Retrieve `section` and `location` from query parameters, strip whitespace.\n     - Validate both against the regex pattern `^[\\\\w-]+$` using `re.fullmatch`.\n     - If validation fails, return `400` with `{\"status\":\"Error\",\"message\":\"Invalid parameters\"}`.\n     - Call `_run_inventory_check(section, location)`.\n     - Return `200` with `{\"status\":\"Inventory check started\"}`.\n\n   - **POST /admin/login**\n     - Retrieve `password` and `secret_key` from `request.form`.\n     - Read expected secret from environment variable `ADMIN_SECRET_KEY` with default `'admin_key_2024'`.\n     - If `password` equals `LIBRARIAN_PASSWORD` **and** `secret_key` equals the expected secret, return `200` with `{\"status\":\"Admin access granted\",\"message\":\"Welcome, Admin!\"}`.\n     - Otherwise return `401` with `{\"status\":\"Access denied\",\"message\":\"Invalid credentials\"}`.\n\n   - **POST /admin/change_password**\n     - Declare `global LIBRARIAN_PASSWORD`.\n     - Retrieve `old_password` and `new_password` from `request.form`.\n     - If `old_password` matches the current `LIBRARIAN_PASSWORD`, update `LIBRARIAN_PASSWORD` to `new_password` and return `200` with `{\"status\":\"Password changed successfully\"}`.\n     - Otherwise return `401` with `{\"status\":\"Access denied\",\"message\":\"Invalid old password\"}`.\n\n   - **GET /api/book_info**\n     - Retrieve `isbn` from query parameters, strip whitespace.\n     - If missing, return `400` with `{\"status\":\"Error\",\"message\":\"ISBN required\"}`.\n     - Return `200` with JSON:\n       ```json\n       {\n         \"status\":\"Book details\",\n         \"book_info\": {\n           \"title\":\"Sample Title\",\n           \"author\":\"Sample Author\",\n           \"isbn\": isbn,\n           \"publisher\":\"Sample Publisher\",\n           \"year_published\":\"2020\"\n         }\n       }\n       ```\n\n   - **POST /api/update_book**\n     - Retrieve `isbn`, `new_title`, and `new_author` from `request.form`; strip `isbn`.\n     - If `isbn` missing, return `400` with `{\"status\":\"Error\",\"message\":\"ISBN required\"}`.\n     - Return `200` with JSON:\n       ```json\n       {\n         \"status\":\"Book updated\",\n         \"isbn\": isbn,\n         \"new_title\": new_title,\n         \"new_author\": new_author\n       }\n       ```\n\n   - **GET /api/list_books**\n     - Retrieve optional `section` from query parameters.\n     - Define a static list `books` containing two sample book dictionaries as shown in the original code.\n     - Return `200` with JSON:\n       ```json\n       {\n         \"status\":\"Books listed\",\n         \"section\": section,\n         \"books\": books\n       }\n       ```\n\n   - **POST /admin/adjust_settings**\n     - Retrieve `password` and `new_setting` from `request.form`.\n     - If `password` does not match `LIBRARIAN_PASSWORD`, return `401` with `{\"status\":\"Access denied\"}`.\n     - If `new_setting` is empty, return `400` with `{\"status\":\"Error\",\"message\":\"New setting required\"}`.\n     - Return `200` with `{\"status\":\"Setting applied\",\"new_setting\": new_setting}`.\n\n   - **GET /api/check_book_availability**\n     - Retrieve `isbn` from query parameters, strip whitespace.\n     - If missing, return `400` with `{\"status\":\"Error\",\"message\":\"ISBN required\"}`.\n     - Assume availability is `True` and return `200` with `{\"status\":\"Book availability\",\"isbn\": isbn,\"available\": true}`.\n\n   - **POST /api/request_book**\n     - Retrieve `isbn` and `user_id` from `request.form`, strip both.\n     - If either is missing, return `400` with `{\"status\":\"Error\",\"message\":\"ISBN and user_id required\"}`.\n     - Return `200` with `{\"status\":\"Book requested\",\"isbn\": isbn,\"user_id\": user_id}`.\n\n   - **POST /api/return_book**\n     - Retrieve `isbn` and `user_id` from `request.form`, strip both.\n     - If either is missing, return `400` with `{\"status\":\"Error\",\"message\":\"ISBN and user_id required\"}`.\n     - Return `200` with `{\"status\":\"Book returned\",\"isbn\": isbn,\"user_id\": user_id}`.\n\n5. **Execution Guard**\n   - Include the standard `if __name__ == \"__main__\":` block that calls `app.run(debug=False)`.\n\n6. **Security and Style**\n   - Use only the standard library and Flask; do not import or invoke any external processes.\n   - Validate all external input as described.\n   - Use `yaml.safe_load` for YAML parsing.\n   - Do not include any additional comments, docstrings beyond the required placeholder, or explanatory text. The code should be ready to run as provided.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "57da26119eb9becbf1830dfb9351497ddbfeeaa09d2462e58b4bfbcd69099e12",
+  "status": "secured"
+}

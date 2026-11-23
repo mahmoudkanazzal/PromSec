@@ -1,0 +1,74 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "dfc80208e387c7f7eca780a863edfc864547bcc4179be36374b3c01badc2afc4",
+  "compile_ok": true,
+  "confidence": 0.93,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed pillar data (e.g., absent `api_token` or `account_url`).",
+      "API returns a non\u2011200 status code (e.g., 401, 404, 500).",
+      "API returns a 200 status but with non\u2011JSON body.",
+      "Calling `delete`, `update`, or `install_agent` with an empty or invalid device/agent identifier.",
+      "Network failures or timeouts during HTTP requests.",
+      "Attempting to install the agent when the download or script execution fails."
+    ],
+    "entrypoints": [],
+    "intent": "Provide a Salt execution module that lets users create, delete, list, update Server Density devices and install the Server Density agent via the Server Density REST API.",
+    "invariants": [
+      "An `api_token` pillar entry must exist; otherwise a `CommandExecutionError` is raised.",
+      "Only HTTP 200 responses are considered successful; any other status results in a `null` return.",
+      "All successful API responses are expected to be valid JSON; parsing failures raise `CommandExecutionError`.",
+      "Parameters whose keys start with `__` are stripped before being sent to the API.",
+      "Numeric filter values are converted to strings before being included in the request."
+    ],
+    "io_behavior": [
+      "Accepts function arguments (e.g., device name, ID, filter parameters, agent key) from the Salt CLI or other Salt callers.",
+      "Returns the parsed JSON response from the Server Density API on success, or `null` when the HTTP status is not 200.",
+      "Raises a `CommandExecutionError` when required authentication data is missing or when the API response cannot be parsed as JSON.",
+      "Logs debug and error messages to the Salt logger.",
+      "Downloads an installation script to `/tmp/` and executes it when installing the agent."
+    ],
+    "public_api": {
+      "func:create": "(name, **params)",
+      "func:delete": "(device_id)",
+      "func:get_sd_auth": "(val, sd_auth_pillar_name='serverdensity')",
+      "func:install_agent": "(agent_key)",
+      "func:ls": "(**params)",
+      "func:update": "(device_id, **params)"
+    },
+    "side_effects": [
+      "Performs HTTPS requests to `api.serverdensity.io` (POST, GET, PUT, DELETE).",
+      "Reads authentication values from the Salt pillar store.",
+      "Writes temporary files (`install.sh`) to `/tmp/` and runs shell commands via Salt's `cmd.run`.",
+      "Emits log entries via the Python `logging` module."
+    ],
+    "source_hash": "9a7814512e2bc5f67a9fe142b80d8be93e1d5eca2b8f9bd58b82309698b5d16e"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.9,
+    "invariants": 1.0,
+    "io_semantics": 0.95,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file30.py",
+  "gated_score": 0.93,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.93,
+  "original_hash": "9a7814512e2bc5f67a9fe142b80d8be93e1d5eca2b8f9bd58b82309698b5d16e",
+  "rationale": "The module implements all required functions, respects authentication, strips __ variables, converts numeric filters, handles HTTP 200 success and non\u2011JSON errors, logs appropriately, and performs the install script download/execution. Minor gaps: no explicit validation of empty device/agent identifiers and uses a temporary directory instead of a fixed /tmp path, but overall the behavioral contract is largely preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.02688,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.85,
+    "invariants": 1.0,
+    "io_semantics": 0.95,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.90312,
+  "weighted_mean": 0.94,
+  "worst_dimension": 0.9
+}

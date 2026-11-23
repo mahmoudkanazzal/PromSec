@@ -1,0 +1,74 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "2e8bc244faa1f59506a3521c31e9a7066b2d34ffeb869ec466bf0452eff31d97",
+  "compile_ok": true,
+  "confidence": 0.8,
+  "contract": {
+    "edge_cases": [
+      "Payload is valid YAML but contains null or empty values for latitude, longitude, or datetime.",
+      "The datetime value does not match any record, triggering a 404 response.",
+      "Database connection parameters are missing or incorrect, causing a 500 error.",
+      "The SELECT query returns multiple rows; only the first row is used.",
+      "The retrieved temperature contains characters that could affect the echo command (e.g., shell metacharacters).",
+      "Large payloads or malformed YAML that cause yaml.safe_load to raise an exception, resulting in a 500 error."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide the temperature for a given location and datetime via a POST request to /api/temperature_for_location, returning the temperature value or an appropriate error message.",
+    "invariants": [
+      "A non\u2011empty request body is required; otherwise a 400 error is returned.",
+      "All three keys (latitude, longitude, datetime) must be present; missing any results in a 400 error.",
+      "Database errors always produce a 500 response containing the exception text.",
+      "If the SELECT query yields no rows, the service responds with 404 and a fixed message.",
+      "When a row is found, the third column (index 2) is returned as the temperature string.",
+      "The service never modifies database contents; it only reads."
+    ],
+    "io_behavior": [
+      "Accepts a POST request with a YAML payload containing keys latitude, longitude, and datetime.",
+      "Returns HTTP 400 if the request body is empty or any required key is missing.",
+      "Returns HTTP 500 with the exception message if the database connection fails or a query error occurs.",
+      "Returns HTTP 404 with a plain text message when no temperature record matches the supplied datetime.",
+      "On success, returns the temperature value (as a string) with HTTP 200.",
+      "Writes a line to the server's standard output using the OS echo command containing the retrieved temperature."
+    ],
+    "public_api": {
+      "route:POST /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Opens a MySQL database connection using environment variables DB_HOST, DB_USER, DB_PASS, and DB_NAME.",
+      "Executes a SELECT query against the temperature table.",
+      "Closes the database cursor and connection after the query.",
+      "Invokes the operating system's echo command via os.system, potentially affecting system logs or console output."
+    ],
+    "source_hash": "efb06c21b05fa16bbd1d20a22444fcda5569615d4c66f5bab7077d2cf01f063b"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.6,
+    "invariants": 0.5,
+    "io_semantics": 0.5,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file64.py",
+  "gated_score": 0.46,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.46,
+  "original_hash": "efb06c21b05fa16bbd1d20a22444fcda5569615d4c66f5bab7077d2cf01f063b",
+  "rationale": "The program mostly follows the contract (POST endpoint, YAML parsing, DB SELECT, status codes) but deviates on several key points: it returns 400 instead of 500 for malformed YAML, does not invoke the required os.system echo, may reject valid latitude/longitude values of 0, and does not explicitly catch query errors to return their exception text. These gaps reduce preservation scores across behavior, I/O semantics, side\u2011effects, invariants, and edge\u2011case handling.",
+  "schema": 1,
+  "stability_abs_difference": 0.32737,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.67,
+    "invariants": 1.0,
+    "io_semantics": 0.83,
+    "side_effects": 0.75
+  },
+  "stability_score": 0.78737,
+  "weighted_mean": 0.48,
+  "worst_dimension": 0.4
+}

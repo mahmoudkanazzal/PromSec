@@ -1,0 +1,106 @@
+{
+  "ast_similarity": 0.5641547861507128,
+  "candidate_hash": "8a73a500a7842cdb6778fe34dda6ca76ada44fbbab73f188f5a4a00cdd189675",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 2,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file82.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6456876456876457,
+      "bandit_statement_nodes": [
+        2,
+        5,
+        8,
+        32
+      ],
+      "candidate_hash": "c6b622cd48eed59ab57e25484103b55c6ab53fd0d649e992befdc15d8f9c5b55",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1148,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.4447,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 5
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.15,
+          "end_lineno": 10,
+          "lineno": 10,
+          "node": 6
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1279,
+          "end_lineno": 11,
+          "lineno": 11,
+          "node": 7
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1554,
+          "end_lineno": 12,
+          "lineno": 12,
+          "node": 8
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the following exact specifications and security requirements. The code must be in Python only, use no other programming language, and must contain no explanatory comments or additional text outside the code.\n\n**Functional requirements**\n1. Import the modules: `os`, `subprocess`, `shlex`, `flask.Flask`, `flask.request`, `flask.session`, and `mysql.connector`.\n2. Create a Flask app instance and set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if the variable is not set, generate a random 24\u2011byte key with `os.urandom`.\n3. Define database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) using environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME` with defaults `'localhost'`, `'root'`, `'root'`, `'db'` respectively.\n4. Implement a POST route at `/buy_order` that:\n   - Retrieves `stock_name` and `stock_quantity` from `request.form`.\n   - Retrieves the current username from the Flask session (`session.get('username')`). If no username is present, return the string `\"unauthenticated\"` with HTTP status 401.\n   - Connects to the MySQL database using the parameters above.\n   - Checks whether a row exists in the `user_portfolio` table for the given username.\n   - If a row exists, fetch the current `stock_quantity`, add the submitted quantity (both converted to integers), and update the row with the new total.\n   - If no row exists, insert a new row with the username and the submitted `stock_quantity`.\n   - Commit the transaction, close the database connection, and return `\"updated\"` when an existing row was modified or `\"initialized\"` when a new row was inserted.\n5. Implement a POST route at `/run_command` that:\n   - Retrieves a `command` string from `request.form`.\n   - Splits the command safely using `shlex.split`.\n   - Executes the command using `subprocess.check_output`, capturing both stdout and stderr.\n   - Returns the raw output of the command.\n6. Include the standard `if __name__ == '__main__':` block to run the Flask app with `debug=False`.\n\n**Security requirements**\n- Use environment variables for all secret or configurable values; never hard\u2011code credentials.\n- Use parameterized queries (`%s` placeholders with a tuple of values) for all MySQL interactions to prevent SQL injection.\n- Validate and sanitize all user\u2011provided form data:\n  - Ensure `stock_quantity` can be safely converted to an integer; reject or handle conversion errors gracefully.\n  - For the `/run_command` endpoint, restrict execution to a predefined whitelist of allowed commands (e.g., `['ls', 'whoami', 'date']`). If the parsed command is not in the whitelist, return an error response with status 403.\n- Do not pass raw user input directly to `subprocess`; always use the list returned by `shlex.split` and enforce the whitelist.\n- Properly handle exceptions for database connections, query execution, and subprocess calls; return generic error messages without exposing stack traces.\n- Ensure the database connection is closed in all execution paths, using `try/finally` or context managers.\n- Set the Flask session cookie to be HTTP\u2011only and secure when applicable (e.g., `app.config['SESSION_COOKIE_HTTPONLY'] = True` and `app.config['SESSION_COOKIE_SECURE'] = True` if running over HTTPS).\n\n**Output format**\n- Provide only the Python source code that fulfills all the above requirements.\n- Do not include any comments, markdown formatting, or explanatory text outside the code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5641547861507128,
+      "bandit_statement_nodes": [
+        1,
+        50
+      ],
+      "candidate_hash": "8a73a500a7842cdb6778fe34dda6ca76ada44fbbab73f188f5a4a00cdd189675",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2359,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2089,
+          "end_lineno": 61,
+          "lineno": 61,
+          "node": 50
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.8+) that implements a Flask web application with the exact functionality described below. The output must be only the Python code\u2014no explanations, no comments, no markdown formatting, and no code in any language other than Python.\n\n**General requirements**\n- Use only standard library modules and the following third\u2011party packages: `flask`, `mysql-connector-python`.\n- The script must be executable as a standalone program (`if __name__ == '__main__': app.run(debug=False)`).\n- All configuration values (Flask secret key, database host, user, password, and name) must be read from environment variables with sensible defaults as specified.\n- Enforce secure session handling: set `SESSION_COOKIE_HTTPONLY` and `SESSION_COOKIE_SECURE` to `True`.\n- Do not include any explanatory comments or docstrings.\n\n**Flask app setup**\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` or, if not set, to a newly generated 24\u2011byte random key (`os.urandom(24)`).\n- Configure the session cookie flags as described above.\n\n**Database configuration**\n- Define constants `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME` that read from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME` respectively, defaulting to `'localhost'`, `'root'`, `'root'`, and `'db'`.\n\n**Endpoint `/buy_order` (POST)**\n- Retrieve `stock_name` and `stock_quantity` from `request.form`.\n- Retrieve the current username from the Flask session (`session.get('username')`). If missing, return the string `'unauthenticated'` with HTTP status 401.\n- Validate that `stock_quantity` can be converted to an integer; on failure return `'invalid quantity'` with status 400.\n- Open a MySQL connection using the defined DB constants. Use a `try/except/finally` block to ensure the connection is closed.\n- Use a cursor to query `user_portfolio` for the current `stock_quantity` of the logged\u2011in user (`SELECT stock_quantity FROM user_portfolio WHERE username = %s` with a parameterized query).\n- If a row exists, add the requested quantity to the existing quantity, update the row (`UPDATE user_portfolio SET stock_quantity = %s WHERE username = %s`), commit, and return `'updated'`.\n- If no row exists, insert a new row (`INSERT INTO user_portfolio (username, stock_quantity) VALUES (%s, %s)`), commit, and return `'initialized'`.\n- On any exception during database operations, return `'error'` with status 500.\n\n**Endpoint `/run_command` (POST)**\n- Retrieve the form field `command`. If missing, return `'no command'` with status 400.\n- Parse the command string safely using `shlex.split`. If parsing yields an empty list, return `'empty command'` with status 400.\n- Define a whitelist set containing exactly `'ls'`, `'whoami'`, and `'date'`.\n- Extract the first token as the command name. If it is not in the whitelist, return `'forbidden'` with status 403.\n- Disallow any additional arguments: if the parsed list length is greater than 1, return `'arguments not allowed'` with status 400.\n- Implement each whitelisted command without invoking a shell:\n  - `'ls'`: list the entries of the current working directory using `os.listdir('.')`, join them with newline characters, and return the result. On `OSError`, return the exception string with status 500.\n  - `'whoami'`: return the current system user obtained via `getpass.getuser()`.\n  - `'date'`: return the current date\u2011time formatted as `'%Y-%m-%d %H:%M:%S'` using `datetime.datetime.now()`.\n- If the command somehow falls through, return `'unsupported command'` with status 400.\n- Wrap the entire handler in a generic `try/except` that returns `'error'` with status 500 on unexpected exceptions.\n\n**Security constraints**\n- All database interactions must use parameterized queries; never concatenate user input into SQL strings.\n- Do not use `subprocess`, `os.system`, or any function that executes shell commands.\n- Ensure the Flask session cookie is marked HttpOnly and Secure.\n- Do not expose stack traces or internal error details; only return the generic messages specified.\n\nProduce the full Python source code that satisfies all of the above.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "e576461dff16c5a9ae90c7112659bd9a52879a53ccc7eb60a35471d13d2187b9",
+  "status": "secured"
+}

@@ -1,0 +1,40 @@
+{
+  "ast_similarity": 0.9056291390728477,
+  "candidate_hash": "3888372010ec0a74dc8f0b4e42a7fcdd6a58daf277be73dd2457851a4e5d2e0f",
+  "complete": true,
+  "config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file91.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9056291390728477,
+      "bandit_statement_nodes": [
+        8,
+        13,
+        23,
+        35,
+        44,
+        53
+      ],
+      "candidate_hash": "3888372010ec0a74dc8f0b4e42a7fcdd6a58daf277be73dd2457851a4e5d2e0f",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with the exact functionality described below. The script must:\n\n1. Import only the required modules: `os`, `Flask`, `request`, `redirect`, `url_for` from `flask`, `MySQLdb`, and `check_password_hash` from `werkzeug.security`.\n2. Create a Flask app instance named `app`.\n3. Define a function `get_db_connection()` that returns a `MySQLdb.connect` object using the following environment variables with the given defaults:\n   - `DB_HOST` (default `'localhost'`)\n   - `DB_USER` (default `'testuser'`)\n   - `DB_PASS` (default `'test123'`)\n   - `DB_NAME` (default `'LIBRARYDB'`)\n4. Implement the following routes with the exact HTTP methods, request handling, and responses:\n\n   - **POST `/add_book`**\n     - Retrieve `title` and `author` from `request.form`.\n     - Open a DB connection, create a cursor, and:\n       - Execute a parameterized `SELECT 1 FROM Books WHERE Title = %s` to check for duplicate titles.\n       - If a row exists, redirect back to the `add_book` endpoint.\n       - Otherwise, execute a parameterized `INSERT INTO Books (Title, Author) VALUES (%s, %s)`.\n       - Commit the transaction.\n     - Ensure the cursor and connection are closed in a `finally` block.\n     - After successful insertion, redirect to the `view_books` endpoint.\n\n   - **POST `/login_member`**\n     - Retrieve `username` and `password` from `request.form`.\n     - Open a DB connection, create a cursor, and execute a parameterized `SELECT Password FROM Members WHERE Username = %s`.\n     - Fetch one row, close cursor and connection in a `finally` block.\n     - If a row is returned and `check_password_hash(row[0], password)` is true, return the plain string `\"Login successful\"`.\n     - Otherwise, return the plain string `\"Invalid credentials\"`.\n\n   - **POST `/update_book_author`**\n     - Retrieve `title` and `new_author` from `request.form`.\n     - Open a DB connection, create a cursor, and execute a parameterized `UPDATE Books SET Author = %s WHERE Title = %s`.\n     - Commit the transaction.\n     - Close cursor and connection in a `finally` block.\n     - Return the plain string `\"Author updated successfully\"`.\n\n   - **POST `/delete_book`**\n     - Retrieve `title` from `request.form`.\n     - Open a DB connection, create a cursor, and execute a parameterized `DELETE FROM Books WHERE Title = %s`.\n     - Commit the transaction.\n     - Close cursor and connection in a `finally` block.\n     - Return the plain string `\"Book deleted successfully\"`.\n\n   - **GET `/search_books`**\n     - Retrieve the query parameter `term` (default empty string) via `request.args.get('term', '')`.\n     - Construct a LIKE pattern `%{term}%` safely (do not concatenate directly into SQL).\n     - Open a DB connection, create a cursor, and execute a parameterized `SELECT * FROM Books WHERE Title LIKE %s OR Author LIKE %s` using the pattern for both placeholders.\n     - Fetch all matching rows, close cursor and connection in a `finally` block.\n     - Return the string representation of the fetched rows.\n\n   - **GET `/view_books`**\n     - Open a DB connection, create a cursor, and execute `SELECT * FROM Books`.\n     - Fetch all rows, close cursor and connection in a `finally` block.\n     - Return the string representation of the fetched rows.\n\n5. Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)` (debug mode must be disabled).\n6. Ensure all SQL statements use parameterized queries to prevent SQL injection.\n7. Do not include any additional explanatory text, comments, or markup in the output\u2014only the raw Python code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "cb06a60bd3c87cb816d5f35e1b33a8e48b64e66f77d2ece4ac8da06b6fb415c7",
+  "status": "secured"
+}

@@ -1,0 +1,66 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "9ddd537e5ca05b8bfc1029f34b3dd3e48e36de71d2003d371798b9bbd8f51a79",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'username'/'password' fields may cause a KeyError or empty insert.",
+      "Duplicate usernames result in a 'Username already exists' message.",
+      "Database errors (e.g., connection failure) cause a rollback and return 'Registration Failed'.",
+      "Very long input values may exceed column size limits in the database.",
+      "SQL injection is possible because inputs are concatenated directly into SQL statements."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Register a new user via HTTP POST and store the supplied credentials in a MySQL database.",
+    "invariants": [
+      "The endpoint only responds to POST requests; other HTTP methods are ignored.",
+      "A response is always a short string message.",
+      "Database connection is always closed before the response is sent."
+    ],
+    "io_behavior": [
+      "Accepts a POST request to /register with form fields 'username' and 'password'.",
+      "Returns a plain\u2011text message indicating success, duplicate username, or registration failure."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Queries the MySQL database for an existing record with the given username.",
+      "If the username is not found, inserts a new row containing the username and password.",
+      "Commits the transaction on successful insert or rolls back on error.",
+      "Opens and closes a database connection for each request."
+    ],
+    "source_hash": "8f6905633ce84b756abc2530f40804adaa3e2210d0d61d05fcd07c4e1cd907ed"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.8,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file41.py",
+  "gated_score": 0.90125,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.90125,
+  "original_hash": "8f6905633ce84b756abc2530f40804adaa3e2210d0d61d05fcd07c4e1cd907ed",
+  "rationale": "The program fulfills the registration flow, handles duplicates, errors, and connection cleanup, and matches entry points and invariants, but it mitigates the expected SQL\u2011injection edge case, deviating from the contract.",
+  "schema": 1,
+  "stability_abs_difference": 0.04625,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.6,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.855,
+  "weighted_mean": 0.935,
+  "worst_dimension": 0.8
+}

@@ -1,0 +1,76 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "a443d82cfc3a72f6c3673d870fb087529884adb79b44ac73ac94a31b87c1496f",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed authentication pillar causes CommandExecutionError.",
+      "API returns non\u2011200 status \u2192 function returns None without raising.",
+      "API response body is not valid JSON \u2192 CommandExecutionError is raised.",
+      "Network timeout or connection error propagates as an exception from the requests library.",
+      "Calling install_agent on a system without curl or without write permission to /tmp/ will fail.",
+      "Providing unknown keys to get_sd_auth results in CommandExecutionError."
+    ],
+    "entrypoints": [],
+    "intent": "Provide a Salt execution module that lets users manage Server Density devices and install its monitoring agent via the Server Density REST API.",
+    "invariants": [
+      "All API calls include a 'token' query parameter obtained from the pillar.",
+      "Parameters beginning with '__' are stripped before sending to the API.",
+      "Successful HTTP responses (status 200) are parsed as JSON; otherwise the function returns None.",
+      "Numeric filter values are converted to strings before being sent in the ls request.",
+      "install_agent always uses /tmp/ as the working directory."
+    ],
+    "io_behavior": [
+      "create(name, **params) \u2192 makes an HTTP POST, returns parsed JSON on success or None on failure.",
+      "delete(device_id) \u2192 makes an HTTP DELETE, returns parsed JSON on success or None on failure.",
+      "ls(**params) \u2192 makes an HTTP GET, returns parsed JSON list of devices on success or None on failure.",
+      "update(device_id, **params) \u2192 makes an HTTP PUT, returns parsed JSON on success or None on failure.",
+      "install_agent(agent_key) \u2192 downloads a script, makes it executable, runs it with provided keys, returns the command output.",
+      "get_sd_auth(val) \u2192 reads authentication data from Salt pillar and returns the requested value or raises an error."
+    ],
+    "public_api": {
+      "func:create": "(name, **params)",
+      "func:delete": "(device_id)",
+      "func:get_sd_auth": "(val, sd_auth_pillar_name='serverdensity')",
+      "func:install_agent": "(agent_key)",
+      "func:ls": "(**params)",
+      "func:update": "(device_id, **params)"
+    },
+    "side_effects": [
+      "Network traffic to https://api.serverdensity.io for CRUD operations.",
+      "Writes temporary files (install.sh) to /tmp/ and executes them.",
+      "Logs debug and error messages via the module logger.",
+      "Raises CommandExecutionError when required pillar data is missing or JSON parsing fails.",
+      "Invokes Salt's cmd.run to execute shell commands during agent installation."
+    ],
+    "source_hash": "9a7814512e2bc5f67a9fe142b80d8be93e1d5eca2b8f9bd58b82309698b5d16e"
+  },
+  "dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.5,
+    "invariants": 0.6,
+    "io_semantics": 0.4,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file30.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.5275,
+  "original_hash": "9a7814512e2bc5f67a9fe142b80d8be93e1d5eca2b8f9bd58b82309698b5d16e",
+  "rationale": "Core contract expectations are broken: non\u2011200 responses raise CommandExecutionError instead of returning None, and request errors are wrapped rather than propagating the original exception. Other aspects (token handling, stripping __ keys, logging, temp file usage) are correctly implemented.",
+  "schema": 1,
+  "stability_abs_difference": 0.08713,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.67,
+    "invariants": 0.6,
+    "io_semantics": 0.2,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.44037,
+  "weighted_mean": 0.57,
+  "worst_dimension": 0.4
+}

@@ -1,0 +1,84 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "2e944d23b98d4cc3caaec65bdc460444013af9f54014d45692338fd9ef60e793",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML in /task/create triggers a 400 error with \"Invalid YAML format\".",
+      "Missing required fields (task_id, task_description, password, etc.) cause 400 or 401 errors depending on endpoint.",
+      "Providing an empty new_config or new_setting results in a 400 error.",
+      "Calling /task/execute or /task/export with empty parameters still runs the underlying shell command with empty arguments.",
+      "Changing the admin password to an empty string effectively locks out future admin access."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a lightweight HTTP API for creating, retrieving, updating, deleting, assigning, executing, and exporting tasks, with admin\u2011only endpoints protected by a password and simple in\u2011memory state changes.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" key.",
+      "Admin\u2011only routes reject requests unless the supplied password matches the current ADMIN_PASSWORD.",
+      "Required request parameters (e.g., task_id, task_name) must be non\u2011empty; otherwise a 400 error is returned.",
+      "YAML payloads are parsed with yaml.FullLoader; parsing failures result in a 400 error.",
+      "Password change only succeeds when the old password matches the current ADMIN_PASSWORD."
+    ],
+    "io_behavior": [
+      "POST /task/create \u2013 accepts raw YAML in the request body, returns JSON with task_id and description or error on bad format/missing fields.",
+      "GET /task/execute \u2013 reads task_name and task_param query strings, triggers a shell script via os.system, returns JSON status.",
+      "POST /admin/login \u2013 reads form field password, returns JSON indicating access granted or denied.",
+      "POST /admin/configure \u2013 requires admin password and new_config form field, returns JSON confirmation or error.",
+      "GET /task/retrieve \u2013 requires task_id query, returns JSON with sample task info.",
+      "GET /task/logs \u2013 requires task_id query, returns JSON with fabricated log string."
+    ],
+    "public_api": {
+      "route:GET /task/execute": "",
+      "route:GET /task/export": "",
+      "route:GET /task/logs": "",
+      "route:GET /task/retrieve": "",
+      "route:GET /task/status": "",
+      "route:GET /user/profile": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/configure": "",
+      "route:POST /admin/login": "",
+      "route:POST /admin/settings": "",
+      "route:POST /task/assign": "",
+      "route:POST /task/create": "",
+      "route:POST /task/delete": "",
+      "route:POST /task/update": ""
+    },
+    "side_effects": [
+      "os.system call to execute_task.sh with provided parameters.",
+      "os.system call to export_tasks.py with chosen format.",
+      "Global variable ADMIN_PASSWORD can be changed via /admin/change_password, affecting future admin authentication.",
+      "No persistent storage; all responses are generated on\u2011the\u2011fly."
+    ],
+    "source_hash": "6f7f42fcdfeb992e9bbe8a2cc5e9fd37dda5914349e632e695f6397675f28c28"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.1,
+    "io_semantics": 0.3,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file6.py",
+  "gated_score": 0.20125,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.20125,
+  "original_hash": "6f7f42fcdfeb992e9bbe8a2cc5e9fd37dda5914349e632e695f6397675f28c28",
+  "rationale": "The program deviates from key contract points: uses yaml.safe_load instead of FullLoader, returns error objects without a \"status\" key, rejects empty parameters for /task/execute and /task/export, disallows empty new_config/new_setting and empty admin password, and uses subprocess.run rather than os.system. While it implements the listed routes and runs scripts, these mismatches significantly reduce preservation of the specified behavior.",
+  "schema": 1,
+  "stability_abs_difference": 0.32125,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.5225,
+  "weighted_mean": 0.235,
+  "worst_dimension": 0.1
+}

@@ -1,0 +1,73 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "1a84a72ab547ce1cbfc05fe582a01d218877f226fa580798590ede761dc5f1e6",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and result in a 500 error.",
+      "If the database returns multiple rows for the same username, only the first row is used.",
+      "An empty password string is still hashed and compared, potentially allowing login if the stored hash matches SHA\u20111('').",
+      "Extremely long input values may cause performance degradation or buffer issues.",
+      "SQL injection is possible because the username is concatenated directly into the query.",
+      "Database connection failures produce a 500 error instead of a graceful login failure message."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by verifying the supplied password against the stored SHA\u20111 hash for the given username.",
+    "invariants": [
+      "The response is always a plain\u2011text string ending with an exclamation mark.",
+      "Only a SELECT query is performed; no data is written or modified.",
+      "Password comparison uses SHA\u20111 hex digest of the raw password string.",
+      "The username lookup is case\u2011sensitive and exact (no wildcards).",
+      "The endpoint only responds to POST requests; other methods return a 405 error.",
+      "The Flask app does not perform any redirects or set cookies."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to the path /login with form fields 'username' and 'password'.",
+      "Queries the local MySQL database for a row where the username column matches the supplied value.",
+      "If no matching row is found, returns the plain\u2011text response \"Login failed!\".",
+      "If a matching row is found, computes SHA\u20111 of the supplied password and compares it to the stored hash.",
+      "When the hashes match, returns \"Welcome <username>!\" where <username> is the supplied value.",
+      "When the hashes do not match, returns \"Login failed!\"."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to the MySQL server on localhost.",
+      "Executes a SELECT statement against the 'user' table.",
+      "Creates a cursor object for the query.",
+      "Closes the database connection when the request finishes (implicit on process exit).",
+      "May raise an exception that propagates as a 500 HTTP error if the database is unreachable.",
+      "Consumes CPU cycles for SHA\u20111 hashing of the password."
+    ],
+    "source_hash": "a1ecab2d254217bc6498996cd220a7dc8d9961ae33e3974a0681928247d3b1d9"
+  },
+  "dimensions": {
+    "behavior": 0.35,
+    "edge_cases": 0.2,
+    "invariants": 0.9,
+    "io_semantics": 0.6,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file47.py",
+  "gated_score": 0.44562,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.44562,
+  "original_hash": "a1ecab2d254217bc6498996cd220a7dc8d9961ae33e3974a0681928247d3b1d9",
+  "rationale": "Core login flow and responses match, but key contract edge cases (missing fields causing KeyError/500, SQL injection vulnerability, and DB failure handling) are altered, reducing overall behavior and edge\u2011case preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.30938,
+  "stability_dimensions": {
+    "behavior": 0.83,
+    "edge_cases": 0.5,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 0.83
+  },
+  "stability_score": 0.755,
+  "weighted_mean": 0.5275,
+  "worst_dimension": 0.2
+}

@@ -1,0 +1,67 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "ade3aab18755693775ecf6f1c53d1a60c3377b4d2f14b587d7e1bfe2712d046d",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields raise a KeyError and result in a server error.",
+      "SQL statements are built with string interpolation, so special characters can cause syntax errors or injection.",
+      "Database connection failures raise exceptions and abort the request.",
+      "Extremely long usernames may exceed database column limits or cause regex performance issues.",
+      "If the generated salt contains non\u2011printable bytes, insertion may fail depending on column type."
+    ],
+    "entrypoints": [],
+    "intent": "Create a new user account when a client sends a POST request to /register with a username and password.",
+    "invariants": [
+      "Usernames are unique; duplicate usernames never get inserted.",
+      "Passwords are stored as SHA\u2011256(salt + password) rather than plain text.",
+      "A random 16\u2011byte salt is generated for each registration and stored alongside the hash.",
+      "The 'account_created' column is always set to 1 for new rows."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST to /register with form fields 'username' and 'password'.",
+      "If the username already exists, responds with HTTP 307 redirect to /login.",
+      "If the username is new, responds with a default 200 OK (empty body).",
+      "Returns an error response if required form fields are missing or a database error occurs."
+    ],
+    "public_api": {
+      "func:register": "()",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Queries the MySQL 'users' table for the supplied username.",
+      "Inserts a new row into 'users' with the username, hashed password, salt, and account_created flag.",
+      "Commits the transaction and closes the database connection.",
+      "May cause a client redirect (HTTP 307) when the username is already taken."
+    ],
+    "source_hash": "91acf2a5aef5bcd370c6a3200ba7ebb3820f83aa24caea6ae6604f49f50bfecf"
+  },
+  "dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.5,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file1.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.425,
+  "original_hash": "91acf2a5aef5bcd370c6a3200ba7ebb3820f83aa24caea6ae6604f49f50bfecf",
+  "rationale": "Program deviates from contract in password hashing, account_created flag, response codes, and edge\u2011case handling, though it preserves main side\u2011effects and uniqueness.",
+  "schema": 1,
+  "stability_abs_difference": 0.06188,
+  "stability_dimensions": {
+    "behavior": 0.65,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.5,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.48688,
+  "weighted_mean": 0.5,
+  "worst_dimension": 0.2
+}

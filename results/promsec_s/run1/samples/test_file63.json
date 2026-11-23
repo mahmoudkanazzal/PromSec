@@ -1,0 +1,367 @@
+{
+  "ast_similarity": 0.8849557522123894,
+  "candidate_hash": "08bc58a7a5eb1ec4741db189140aec4be80d708e26bb9800d3821d6bc8b3ca34",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 1,
+  "cwe_count_before": 1,
+  "cwes_after": [
+    703
+  ],
+  "cwes_before": [
+    78
+  ],
+  "error": "",
+  "file": "test_file63.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8849557522123894,
+      "bandit_statement_nodes": [
+        2
+      ],
+      "candidate_hash": "08bc58a7a5eb1ec4741db189140aec4be80d708e26bb9800d3821d6bc8b3ca34",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9998,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.8145,
+          "end_lineno": 31,
+          "lineno": 30,
+          "node": 16
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program that uses Flask to expose an endpoint `/api/temperature_for_location`. The program must:\n\n- Begin with the shebang line `#!/bin/python3`.\n- Include a comment line stating the file was assembled by `gen.py`, written by `redactedAuthorFirstname redactedAuthorLastname`.\n- Import only the following modules: `Flask` and `request` from `flask`, `os`, `yaml`, and `MySQLdb`.\n- Create a Flask app instance named `app`.\n- Define a route with `@app.route('/api/temperature_for_location')` and a function named `temperature_for_location`.\n- Inside the function, retrieve a query\u2011string parameter called `payload`. If it is missing, return exactly `ERROR: No payload`.\n- Safely parse the `payload` string as YAML using `yaml.safe_load`. Extract the keys `latitude`, `longitude`, and `datetime` from the resulting dictionary. Do not use `latitude` or `longitude` in the database query, but keep them available for future use.\n- Obtain database connection parameters from environment variables: `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`. If any are missing, return exactly `Database configuration error`.\n- Connect to the MySQL database using `MySQLdb.connect` with the retrieved parameters and `charset='utf8mb4'`. Wrap the connection attempt in a try/except block; on exception, return the exception message as a string.\n- Create a cursor from the connection.\n- Execute a parameterized SQL query to select all columns from the `temperature` table where `datetime` equals the supplied datetime value. Use the `%s` placeholder and pass a tuple containing the datetime to prevent SQL injection.\n- If the query returns no rows, return exactly `No matching location found.`.\n- If a row is returned, convert the third column (`row[2]`) to a string and return it as the response.\n- Ensure the cursor and database connection are closed after the query, using a finally block or explicit close calls.\n- Do not include any additional functionality, external libraries, or code in any language other than Python.\n- Follow best security practices: use `yaml.safe_load`, parameterized queries, environment\u2011based credentials, and proper error handling.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.7611940298507462,
+      "bandit_statement_nodes": [
+        29
+      ],
+      "candidate_hash": "cb71bba4aee2d8a7ec08e8c036a67e53bc9e12a3dc72c4f987fdd42679af5a30",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a secure Python 3 script that starts with `#!/bin/python3` and includes a comment line indicating it was assembled by `gen.py`, written by a redacted author. The script must import only `Flask` and `request` from `flask`, `os`, `yaml`, and `MySQLdb`. Create a Flask app instance. Define a GET route at `/api/temperature_for_location` that:\n\n1. Retrieves the query parameter `payload`. If it is missing, return the exact string `ERROR: No payload`.\n2. Parses `payload` using `yaml.safe_load` (no unsafe loading). Extract the keys `latitude`, `longitude`, and `datetime` from the resulting dictionary.\n3. Reads the environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`. If any are missing, return the exact string `Database configuration error`.\n4. Attempts to connect to a MySQL database using `MySQLdb.connect` with the retrieved credentials and `charset='utf8mb4'`. If the connection fails, catch the exception and return its string representation.\n5. Creates a cursor and executes a **parameterized** SQL query: `SELECT * FROM temperature WHERE datetime = %s`, passing the extracted `datetime` value as a parameter to prevent SQL injection.\n6. Fetches one row. If no row is returned, respond with the exact string `No matching location found.` Otherwise, return the third column of the row (`row[2]`) converted to a string.\n7. Ensures proper cleanup: close the cursor inside a `try/except` block that ignores any errors, then close the database connection in a `finally` block.\n\nThe code must be valid Python 3, contain no additional functionality, avoid insecure practices, and follow best security practices (safe YAML loading, environment\u2011based credentials, parameterized queries, comprehensive error handling). Do not include any extra imports, comments, or explanatory text. Ensure the output is only the requested Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.7345454545454545,
+      "bandit_statement_nodes": [
+        34,
+        37
+      ],
+      "candidate_hash": "d6070f73f9aedc4c3d28d283763a216ed1f7e2a80195e0b9932faa7315744210",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program (no other languages) that implements the following specifications exactly:\n\n- Use Flask to create a web application.\n- Define a single route `GET /api/temperature_for_location`.\n- The route must read a query\u2011string parameter named `payload`. If the parameter is missing, return the plain text response `ERROR: No payload`.\n- Parse the `payload` string as YAML using `yaml.safe_load`. If parsing fails, return the plain text response `ERROR: Invalid payload`.\n- Extract the keys `latitude`, `longitude`, and `datetime` from the parsed data (use `.get()` to avoid KeyError). The `latitude` and `longitude` values are not used further, but must be retrieved.\n- Retrieve the following database configuration values from environment variables: `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`. If any are missing or empty, return the plain text response `Database configuration error`.\n- Connect to a MySQL database using `MySQLdb.connect` with the retrieved credentials, specifying `charset='utf8mb4'`. If the connection fails, return the exception message as a plain text response.\n- Use a parameterized SQL query to select all columns from the table `temperature` where the column `datetime` matches the supplied `datetime` value. The query must be written as:\n  ```sql\n  SELECT * FROM temperature WHERE datetime = %s\n  ```\n  and executed with a tuple containing the `datetime` value.\n- Fetch a single row with `cursor.fetchone()`. If no row is returned, respond with the plain text `No matching location found.`.\n- If a row is found, return the string representation of the third column (`row[2]`).\n- Ensure that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Include the standard Flask `if __name__ == '__main__':` guard to run the app with `app.run()`.\n\nAdditional security and quality requirements:\n- Use only `yaml.safe_load` (never `yaml.load`).\n- Use parameterized queries; never concatenate user input into SQL strings.\n- Do not expose stack traces or internal error details to the client, except for the raw exception message when the database connection fails (as specified).\n- Import only the necessary modules: `Flask` and `request` from `flask`, `os`, `yaml`, and `MySQLdb`.\n- The script must start with a shebang line `#!/bin/python3`.\n- Include a comment line after the shebang: `# assembled by gen.py, written by redacted author`.\n- Do not include any additional functionality, comments, or explanatory text beyond what is required for the code to run. Provide only the Python code as the output.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.7083333333333334,
+      "bandit_statement_nodes": [
+        32,
+        36
+      ],
+      "candidate_hash": "5c48910874c78bf2157a0a0a56e4e6cd1c332a54f2a8ad87b1f4157092bde863",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 4,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 program that uses Flask to expose a GET endpoint at `/api/temperature_for_location`. The endpoint must read a query parameter named `payload`. If the parameter is missing, return the exact string `ERROR: No payload`. The payload is a YAML document; load it safely using `yaml.safe_load`. If loading fails, return `ERROR: Invalid payload`. Extract the keys `latitude`, `longitude`, and `datetime` from the parsed data. Retrieve database connection parameters `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME` from environment variables; if any are missing, return `Database configuration error`. Connect to a MySQL database using `MySQLdb` with UTF\u20118mb4 charset, and execute a parameterized SELECT query: `SELECT * FROM temperature WHERE datetime = %s`, passing the `datetime` value. If no row is returned, respond with `No matching location found.` Otherwise return the third column of the row as a string. Catch `MySQLdb.Error` exceptions and return the exception message as a string. Ensure all cursors and connections are closed in a `finally` block, handling any errors silently. Include the standard `if __name__ == '__main__': app.run()` guard at the end. The code must be pure Python, contain no other language, and follow security best practices: use `yaml.safe_load`, parameterized queries, avoid exposing stack traces, and handle all resources safely.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6754966887417219,
+      "bandit_statement_nodes": [
+        35,
+        39
+      ],
+      "candidate_hash": "312d5445c955253d8b9a9c3c74075d79ac8cb5dc593ae0d4ca40ec9a9871deb2",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 5,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program that meets the following requirements:\n\n- The code must be written in Python 3 only; no other languages are allowed.\n- Import exactly these modules: `os`, `yaml`, `MySQLdb`, and `Flask` (specifically `Flask` and `request` from `flask`).\n- Create a Flask application instance named `app`.\n- Define a route for the HTTP GET method at the path `/api/temperature_for_location`.\n- Inside the route handler:\n  1. Retrieve the query parameter named `payload`. If it is missing, return the string `\"ERROR: No payload\"`.\n  2. Safely parse the `payload` string using `yaml.safe_load`. If parsing fails or the result is not a dictionary, return `\"ERROR: Invalid payload\"`.\n  3. Extract the keys `latitude`, `longitude`, and `datetime` from the parsed dictionary. If any key is missing, return `\"ERROR: Invalid payload\"`.\n  4. Read the environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`. If any are unset or empty, return `\"Database configuration error\"`.\n  5. Establish a MySQL connection using `MySQLdb.connect` with the retrieved credentials, setting `charset='utf8mb4'` and `use_unicode=True`.\n  6. Create a cursor and execute a parameterized query: `SELECT * FROM temperature WHERE datetime = %s`, passing the `datetime` value as a parameter to prevent SQL injection.\n  7. Fetch one row. If no row is returned, respond with `\"No matching location found.\"`.\n  8. If a row is found, return the string representation of the third column (`row[2]`).\n  9. Catch any `MySQLdb.Error` exceptions and return the exception\u2019s string representation.\n- Ensure that both the cursor and the connection are closed in a `finally` block, handling any exceptions during close silently.\n- At the end of the file, include the standard entry point:\n  ```python\n  if __name__ == '__main__':\n      app.run()\n  ```\n- The generated code must contain no comments, no explanatory text, and no markup; only the required Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6644951140065146,
+      "bandit_statement_nodes": [
+        35,
+        39
+      ],
+      "candidate_hash": "23a82236295933ce628eb87d6ae7bfdf1cf1fe4a7613324d7df4b7ed4b424003",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 6,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (no other languages) that implements a Flask web service with the following exact specifications and security considerations:\n\n- Use only the standard library and the third\u2011party packages: `flask`, `PyYAML` (imported as `yaml`), and `MySQLdb`.\n- Import the modules in this order: `import os`, `import yaml`, `import MySQLdb`, `from flask import Flask, request`.\n- Create a Flask app instance named `app`.\n- Define a route `'/api/temperature_for_location'` that accepts only GET requests.\n- Inside the view function `temperature_for_location`:\n  1. Retrieve the query parameter named `payload` using `request.args.get('payload')`.\n  2. If `payload` is missing, return the plain string `\"ERROR: No payload\"`.\n  3. Parse `payload` safely with `yaml.safe_load`. If parsing raises `yaml.YAMLError`, return `\"ERROR: Invalid payload\"`.\n  4. Verify that the parsed object is a dictionary; otherwise return `\"ERROR: Invalid payload\"`.\n  5. Extract the keys `latitude`, `longitude`, and `datetime` from the dictionary. If any are `None`, return `\"ERROR: Invalid payload\"`.\n  6. Load database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`. If any are missing, return `\"Database configuration error\"`.\n  7. Establish a MySQL connection using `MySQLdb.connect` with the loaded parameters, explicitly setting `charset='utf8mb4'` and `use_unicode=True`.\n  8. Use a cursor to execute a **parameterized** query: `SELECT * FROM temperature WHERE datetime = %s`, passing the `datetime` value as a tuple to prevent SQL injection.\n  9. Fetch one row with `cursor.fetchone()`. If no row is returned, respond with `\"No matching location found.\"`.\n  10. Return the third column of the fetched row (`row[2]`) converted to a string.\n  11. Catch any `MySQLdb.Error` exceptions and return the exception\u2019s string representation.\n  12. In a `finally` block, close the cursor and connection if they were created, suppressing any exceptions during close.\n- Include the standard Flask entry point:\n  ```python\n  if __name__ == '__main__':\n      app.run()\n  ```\n- Ensure the generated code contains **no comments**, no extraneous print statements, and no debugging or logging code.\n- The code must be syntactically correct, follow the order of operations described, and adhere to security best practices (use `yaml.safe_load`, parameterized SQL, environment variables for secrets, and proper resource cleanup).",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6455696202531646,
+      "bandit_statement_nodes": [
+        36,
+        40
+      ],
+      "candidate_hash": "a7e5fc5e531b8abc054f4b425ede576fb464a21221a347ecc6b3c1934a6dcbab",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 7,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages, no markdown, no explanatory text) that implements a Flask web service with the following exact specifications and security requirements:\n\n- **Imports**: only `os`, `yaml`, `MySQLdb`, and `Flask`\u2011related objects (`Flask`, `request`).\n- **Application**: create a Flask app instance named `app`.\n- **Endpoint**: define a route at `/api/temperature_for_location` that accepts only `GET` requests.\n- **Payload handling**:\n  - Retrieve the query\u2011string parameter named `payload`.\n  - If the parameter is missing, return the plain string `\"ERROR: No payload\"`.\n  - Parse the payload using `yaml.safe_load` only. If parsing fails, return `\"ERROR: Invalid payload\"`.\n  - Verify that the parsed object is a dictionary; otherwise return `\"ERROR: Invalid payload\"`.\n  - Extract the keys `latitude`, `longitude`, and `datetime` from the dictionary.\n  - If any of these keys are missing or have a value of `None`, return `\"ERROR: Invalid payload\"`.\n- **Database configuration**:\n  - Read the environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`.\n  - If any of these variables are not set, return the plain string `\"Database configuration error\"`.\n- **Database connection**:\n  - Use `MySQLdb.connect` with the retrieved credentials, specifying `charset='utf8mb4'` and `use_unicode=True`.\n  - Use a cursor obtained via `conn.cursor()`.\n  - Execute a **parameterized** SQL query to select all columns from the table `temperature` where `datetime = %s`, passing the `datetime` value as a parameter tuple.\n  - Fetch a single row with `cursor.fetchone()`.\n  - If no row is returned, respond with `\"No matching location found.\"`.\n  - If a row is returned, respond with the string representation of the third column (`row[2]`).\n- **Error handling**:\n  - Catch any `MySQLdb.Error` exceptions and return their string representation.\n  - Ensure that both the cursor and the connection are closed in a `finally` block, suppressing any exceptions that may occur during close operations.\n- **Application entry point**:\n  - Include the standard `if __name__ == '__main__':` guard that runs the Flask app with `app.run()`.\n\nAdditional security constraints:\n- Do **not** use `eval`, `exec`, or any dynamic code execution.\n- Do **not** use `yaml.load` or any unsafe YAML loader.\n- Use only parameterized queries; do not concatenate user input into SQL strings.\n- Validate that the payload is a dictionary before accessing its keys.\n- Ensure all error messages are returned as plain strings without additional formatting.\n\nOutput only the Python code that fulfills all the above requirements. Do not include any comments, explanations, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6688524590163935,
+      "bandit_statement_nodes": [
+        37,
+        41
+      ],
+      "candidate_hash": "11a9745a22222bd7ca6c5e1af0fc9a8721000f871c50c3fab736a3a1dca805d6",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 8,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that uses Flask to expose a GET endpoint at `/api/temperature_for_location`. The script must:\n\n- Import only `os`, `yaml`, `MySQLdb`, and Flask (`from flask import Flask, request`).\n- Create a Flask app instance.\n- Define the route with `methods=['GET']`.\n- Retrieve a query parameter named `payload`.\n- If missing, return the exact string `ERROR: No payload`.\n- Parse the payload using `yaml.safe_load` inside a try/except; on any exception return `ERROR: Invalid payload`.\n- Verify the parsed object is a dict; otherwise return `ERROR: Invalid payload`.\n- Extract `latitude`, `longitude`, and `datetime` keys; if any are missing return `ERROR: Invalid payload`.\n- Read database connection parameters `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME` from environment variables using `os.getenv`.\n- If any are missing, return `Database configuration error`.\n- Connect to MySQL using `MySQLdb.connect` with `host`, `user`, `passwd`, `db`, `charset='utf8mb4'`, `use_unicode=True`.\n- Use a cursor to execute a parameterized query: `SELECT * FROM temperature WHERE datetime = %s` with the datetime value.\n- Fetch one row; if none, return `No matching location found.`\n- Return the third column of the row as a string.\n- Catch `MySQLdb.Error` and return its string representation.\n- Ensure cursor and connection are closed in a finally block, handling any exceptions silently.\n- Include the usual `if __name__ == '__main__': app.run()` guard.\n- Do not include any comments, explanatory text, or code in any language other than Python.\n- Ensure the code follows security best practices: no use of `eval`/`exec`, safe YAML loading, parameterized SQL, proper resource cleanup, and no hard\u2011coded credentials.\n\nOutput only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6891891891891891,
+      "bandit_statement_nodes": [
+        35,
+        39
+      ],
+      "candidate_hash": "48bd78de9db382d7f79a0889e167a6d78357145024537fc70dedeabfa409f6e3",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 9,
+      "optimized_prompt": "Write a Python script that implements a Flask web service with a single GET endpoint at `/api/temperature_for_location`. The endpoint must:\n\n- Retrieve the query parameter named `payload`.\n- Return the exact string `ERROR: No payload` if the parameter is missing.\n- Safely parse the `payload` using `yaml.safe_load`; on any parsing error return `ERROR: Invalid payload`.\n- Verify that the parsed object is a dictionary; otherwise return `ERROR: Invalid payload`.\n- Extract the keys `latitude`, `longitude`, and `datetime` from the dictionary.\n- If any of those keys are missing or have a value of `None`, return `ERROR: Invalid payload`.\n- Load database connection settings from the environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`.\n- If any of those environment variables are missing, return the exact string `Database configuration error`.\n- Connect to a MySQL database using `MySQLdb.connect` with the loaded credentials, specifying `charset='utf8mb4'` and `use_unicode=True`.\n- Use a parameterized query (no string interpolation) to execute `SELECT * FROM temperature WHERE datetime = %s` with the provided `datetime` value.\n- Fetch one row; if no row is returned, respond with `No matching location found.`.\n- If a row is found, return the string representation of the third column (`row[2]`).\n- Catch any `MySQLdb.Error` exceptions and return the exception\u2019s string representation.\n- Ensure that both the cursor and the connection are closed in a `finally` block, handling any exceptions that may occur during closing.\n- The script must be runnable as a standalone program with the standard `if __name__ == '__main__': app.run()` guard.\n- Use only the following imports: `os`, `yaml`, `MySQLdb`, and `Flask`/`request` from `flask`.\n- Do not include any additional libraries, comments, or explanatory text.\n- The entire code must be valid Python and must not contain any insecure practices such as `eval`, string\u2011based SQL construction, or hard\u2011coded credentials.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6915254237288135,
+      "bandit_statement_nodes": [
+        34,
+        38
+      ],
+      "candidate_hash": "8318ae499995040ec6640c2366a8f8f770578648919458f1193a6a6e69ed6419",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 10,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program (compatible with Python\u202f3) that implements a Flask web service with a single GET endpoint `/api/temperature_for_location`. The program must:\n\n- Import only the modules: `os`, `yaml`, `MySQLdb`, and `from flask import Flask, request`.\n- Create a Flask app instance named `app`.\n- Define the route `/api/temperature_for_location` accepting only GET requests.\n- Retrieve a query parameter named `payload`. If `payload` is missing, return the exact string `ERROR: No payload`.\n- Parse `payload` using `yaml.safe_load`. If parsing raises `yaml.YAMLError` or the result is not a dictionary, return `ERROR: Invalid payload`.\n- Verify that the parsed dictionary contains the keys `latitude`, `longitude`, and `datetime` and that none of these values are `None`. If any check fails, return `ERROR: Invalid payload`.\n- Obtain database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`. If any are missing or empty, return `Database configuration error`.\n- Connect to a MySQL database using `MySQLdb.connect` with arguments `host=db_host, user=db_user, passwd=db_pass, db=db_name, charset='utf8mb4', use_unicode=True`.\n- Execute a parameterized query `SELECT * FROM temperature WHERE datetime = %s` using the provided `datetime` value to prevent SQL injection.\n- Fetch one row. If no row is returned, respond with `No matching location found.`.\n- If a row is returned, respond with the string representation of the third column (`row[2]`).\n- Catch any `MySQLdb.Error` exceptions and return the exception message as a string.\n- Ensure that both the cursor and the connection are closed in a `finally` block, suppressing any exceptions that occur during closing.\n- Include the standard guard `if __name__ == '__main__':` to run the Flask app with `app.run()`.\n\nThe code must be pure Python, contain no comments, no additional libraries, and must preserve the exact functionality and error messages described above. Ensure security best practices: use `yaml.safe_load`, validate all input, use parameterized SQL queries, and properly clean up database resources.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6915254237288135,
+      "bandit_statement_nodes": [
+        32,
+        36
+      ],
+      "candidate_hash": "33cca9a07e8095a3e71e92524a305546c91d4eed3b91ef1add2c7bc124563d20",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 11,
+      "optimized_prompt": "Generate Python code (no other language) that:\n\n- Imports `os`, `yaml`, `MySQLdb`, and `Flask` (`from flask import Flask, request`).\n- Creates a Flask app instance named `app`.\n- Defines a route `@app.route('/api/temperature_for_location', methods=['GET'])` with a function `temperature_for_location()` that:\n  - Retrieves the query parameter `payload` using `request.args.get('payload')`.\n  - Returns the string `'ERROR: No payload'` if `payload` is missing.\n  - Attempts to parse `payload` with `yaml.safe_load`; on `yaml.YAMLError` returns `'ERROR: Invalid payload'`.\n  - Verifies the parsed data is a `dict`; otherwise returns `'ERROR: Invalid payload'`.\n  - Checks that the keys `'latitude'`, `'longitude'`, and `'datetime'` exist in the dict and their values are not `None`; if any check fails, returns `'ERROR: Invalid payload'`.\n  - Reads database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`.\n  - If any of those variables are missing, returns `'Database configuration error'`.\n  - Establishes a MySQL connection using `MySQLdb.connect` with the retrieved parameters, setting `charset='utf8mb4'` and `use_unicode=True`.\n  - Creates a cursor and executes a parameterized query `SELECT * FROM temperature WHERE datetime = %s` with the `datetime` value from the payload.\n  - Fetches one row; if no row is found, returns `'No matching location found.'`.\n  - Returns the temperature value from the third column of the row as a string (`str(row[2])`).\n  - Catches any `MySQLdb.Error` and returns its string representation.\n  - In a `finally` block, safely closes the cursor and connection if they were created, suppressing any exceptions during close.\n- Includes the standard `if __name__ == '__main__':` block that runs the Flask app with `app.run()`.\n\nThe code must be secure: use `yaml.safe_load` for parsing, validate all input fields, use parameterized SQL queries to prevent injection, handle all exceptions, and ensure resources are properly released. Do not include any explanatory comments, markdown, or additional text. The output must be pure Python code only.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.7058823529411765,
+      "bandit_statement_nodes": [
+        34,
+        38
+      ],
+      "candidate_hash": "260eb837d2c2dcdd26393cb030c614fae55b8f8cb4c0499cda298eb11e411a99",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 12,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3) that implements a Flask web service with the following exact behavior and security requirements:\n\n- Import only the modules `os`, `yaml`, `MySQLdb`, and the necessary objects from `flask`.\n- Create a Flask app instance named `app`.\n- Define a route at `/api/temperature_for_location` that accepts only GET requests.\n- Inside the route handler:\n  1. Retrieve a query\u2011string parameter named `payload`. If it is missing, return the plain string `ERROR: No payload`.\n  2. Parse the `payload` using `yaml.safe_load`. If parsing fails or the result is not a dictionary, return `ERROR: Invalid payload`.\n  3. Verify that the dictionary contains the keys `latitude`, `longitude`, and `datetime`, and that none of these values are `None`. If any check fails, return `ERROR: Invalid payload`.\n  4. Load database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables using `os.getenv`. If any are missing, return the plain string `Database configuration error`.\n  5. Establish a MySQL connection with `MySQLdb.connect`, using the loaded credentials, `charset='utf8mb4'`, and `use_unicode=True`. Use a parameterized query to select all columns from the table `temperature` where `datetime` equals the provided `datetime` value. Do **not** concatenate strings to build the SQL query.\n  6. Fetch one row. If no row is found, return `No matching location found.`.\n  7. Return the third column of the fetched row (`row[2]`) as a string.\n  8. Catch any `MySQLdb.Error` exceptions and return the exception\u2019s string representation.\n  9. In a `finally` block, close the cursor and connection if they were created, suppressing any exceptions that may occur during closing.\n\n- Include the standard `if __name__ == '__main__':` guard to run the Flask app with `app.run()`.\n\nAdditional constraints:\n- Do not include any comments, docstrings, or explanatory text in the generated code.\n- Do not output any text other than the required Python code.\n- Ensure the code is secure: use `yaml.safe_load`, validate all inputs, use parameterized SQL queries, and never expose raw exception traces beyond the exception message.\n- The code must be valid Python and runnable without modification, assuming the required environment variables and database schema exist.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6915254237288135,
+      "bandit_statement_nodes": [
+        33,
+        37
+      ],
+      "candidate_hash": "5a2a30e8cf564d07211c2d883623fa7362b37eb62a50226e5e5f2eef8d551125",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 13,
+      "optimized_prompt": "Write a Python Flask application that defines an endpoint `/api/temperature_for_location` handling GET requests. The code must:\n\n- Import only `os`, `yaml`, `MySQLdb`, and Flask components.\n- Create a Flask app.\n- Retrieve a `payload` query parameter; if missing return `ERROR: No payload`.\n- Safely parse the payload using `yaml.safe_load`; on any exception return `ERROR: Invalid payload`.\n- Verify the parsed data is a dictionary and contains non\u2011null keys `latitude`, `longitude`, and `datetime`; otherwise return `ERROR: Invalid payload`.\n- Read database connection parameters `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME` from environment variables; if any are missing return `Database configuration error`.\n- Connect to a MySQL database using `MySQLdb` with UTF\u20118 support, using a parameterized query to select rows from the `temperature` table where `datetime` equals the provided value.\n- If no row is found return `No matching location found.`; otherwise return the temperature value (third column) as a string.\n- Catch `MySQLdb.Error` exceptions and return the exception message.\n- Ensure the cursor and connection are closed in a `finally` block, handling any errors during close silently.\n- Run the Flask app only when the script is executed as `__main__`.\n\nThe code must be secure: no use of `eval`, no string interpolation in SQL, proper error handling, no hard\u2011coded credentials, and must follow best practices for resource cleanup. Provide the complete Python source code without any additional explanation, comments, or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6986301369863014,
+      "bandit_statement_nodes": [
+        31,
+        35
+      ],
+      "candidate_hash": "a981ad500e1d462df5541768a675551b5460bf0b1051ab5b4f8363762af52092",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 14,
+      "optimized_prompt": "Write a Python script that implements a Flask web service with a single GET endpoint at `/api/temperature_for_location`. The endpoint must:\n\n- Retrieve a query parameter named `payload`.\n- If `payload` is missing, return the exact string `ERROR: No payload`.\n- Safely parse `payload` as YAML using `yaml.safe_load`.\n- If parsing fails or the result is not a dictionary containing the keys `latitude`, `longitude`, and `datetime`, return the exact string `ERROR: Invalid payload`.\n- Load database connection settings (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables using `os.getenv`.\n- If any of these environment variables are missing, return the exact string `Database configuration error`.\n- Connect to a MySQL database using `MySQLdb.connect` with UTF\u20118 support (`charset='utf8mb4', use_unicode=True`), using the loaded environment variables.\n- Execute a **parameterized** query: `SELECT * FROM temperature WHERE datetime = %s`, passing the `datetime` value from the parsed payload.\n- Fetch one row. If no row is returned, respond with the exact string `No matching location found.`.\n- If a row is found, return the third column (`row[2]`) as a string.\n- Catch any `MySQLdb.Error` exceptions and return the exception\u2019s string representation.\n- Ensure that both the cursor and the connection are closed in a `finally` block, suppressing any errors that occur during closing.\n- Include the standard `if __name__ == '__main__':` guard to run the Flask app.\n\nThe entire code must be written in Python only, use secure practices (safe YAML loading, parameterized SQL, no hard\u2011coded credentials, proper resource cleanup), and preserve the exact functionality described.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6845637583892618,
+      "bandit_statement_nodes": [
+        31,
+        35
+      ],
+      "candidate_hash": "7857667b640e5662f3b361af455f127e84c4902fb1d1810e4bb6243196d8939f",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 15,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that implements a Flask web service with a single GET endpoint `/api/temperature_for_location`. The program must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `yaml`, `MySQLdb`, and `Flask` components (`Flask`, `request`).\n- Create a Flask app instance.\n- Define the route as described, accepting a query parameter named `payload`.\n- If `payload` is missing, return the exact string `ERROR: No payload`.\n- Parse `payload` using `yaml.safe_load`. If parsing fails, return `ERROR: Invalid payload`.\n- Verify that the parsed object is a dict containing the keys `latitude`, `longitude`, and `datetime`. If not, return `ERROR: Invalid payload`.\n- Retrieve database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`. If any are missing, return `Database configuration error`.\n- Connect to a MySQL database using `MySQLdb.connect` with the retrieved parameters, setting `charset='utf8mb4'` and `use_unicode=True`.\n- Use a cursor to execute a parameterized SELECT query: `SELECT * FROM temperature WHERE datetime = %s`, passing the `datetime` value from the payload.\n- Fetch one row. If no row is found, return `No matching location found.`.\n- If a row is found, return the string representation of the third column (`row[2]`).\n- Catch any `MySQLdb.Error` and return its string representation.\n- Ensure that both the cursor and the connection are closed in a `finally` block, handling any exceptions during close silently.\n- Include the standard `if __name__ == '__main__':` guard to run the Flask app with `app.run()`.\n\nThe code must be valid Python 3, contain no comments, no additional output, and must not use any language other than Python. Emphasize security: use `yaml.safe_load`, parameterized queries, avoid exposing raw tracebacks, and clean up resources properly.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6580645161290323,
+      "bandit_statement_nodes": [
+        33,
+        37
+      ],
+      "candidate_hash": "03377681e0d86b7edb51f53652c62402bb9e079b61b851bbf65826a944fffa00",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 16,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other languages) that implements a Flask web service with the following specifications and security requirements:\n\n- Import only the necessary modules: `__future__` annotations, `os`, `yaml`, `MySQLdb`, and `flask` components.\n- Create a Flask app instance.\n- Define a route at `/api/temperature_for_location` that accepts only GET requests.\n- Retrieve a query\u2011string parameter named `payload`. If it is missing, return the exact string `ERROR: No payload`.\n- Parse the `payload` using `yaml.safe_load`. If parsing fails, return the exact string `ERROR: Invalid payload`.\n- Verify that the parsed data is a dictionary containing the keys `latitude`, `longitude`, and `datetime`. If not, return the exact string `ERROR: Invalid payload`.\n- Load database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables using `os.getenv`. If any are missing, return the exact string `Database configuration error`.\n- Establish a MySQL connection with `MySQLdb.connect` using the loaded parameters, setting `charset='utf8mb4'` and `use_unicode=True`. Use a parameterized query to select rows from the `temperature` table where `datetime` matches the provided value. Do **not** concatenate or format the query string with user input.\n- If no row is found, set the result to the exact string `No matching location found.`; otherwise, set the result to the string representation of the third column (`row[2]`).\n- Catch any `MySQLdb.Error` exceptions and set the result to the string representation of the exception.\n- Ensure that both the cursor and the connection are closed in a `finally` block, handling any exceptions that may occur during closing.\n- Return the result string as the HTTP response.\n- Include an `if __name__ == '__main__':` block that runs the Flask app.\n- Do not include any comments, explanatory text, or non\u2011code output. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6688524590163935,
+      "bandit_statement_nodes": [
+        34,
+        38
+      ],
+      "candidate_hash": "8bf0cc03267070658de6dfe55b5b2583c400880386eaff97d3fd37782dc455a5",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 17,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (Python\u202f3) that implements a Flask web service with the following specifications. The program must be written **only in Python** and must output **only the code** (no explanations, no comments, no markdown formatting).\n\n1. **Imports**  \n   - Use `from __future__ import annotations`.  \n   - Import `os`, `yaml`, `MySQLdb`, and the necessary objects from `flask`.\n\n2. **Flask Application**  \n   - Create a Flask app instance named `app`.\n\n3. **Endpoint**  \n   - Define a route at `/api/temperature_for_location` that accepts only `GET` requests.  \n   - The handler function must be named `temperature_for_location`.\n\n4. **Payload Handling**  \n   - Retrieve a query\u2011string parameter named `payload`.  \n   - If the parameter is missing, return the exact string `ERROR: No payload`.  \n   - Parse the payload using `yaml.safe_load`. If parsing fails, return `ERROR: Invalid payload`.  \n   - Verify that the parsed object is a dictionary containing the keys `latitude`, `longitude`, and `datetime`. If not, return `ERROR: Invalid payload`.\n\n5. **Database Configuration**  \n   - Read the following environment variables: `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`.  \n   - If any are missing or empty, return the exact string `Database configuration error`.\n\n6. **Database Interaction**  \n   - Connect to a MySQL database using `MySQLdb.connect` with the retrieved credentials, specifying `charset='utf8mb4'` and `use_unicode=True`.  \n   - Use a cursor to execute a **parameterized** query: `SELECT * FROM temperature WHERE datetime = %s`, passing the `datetime` value from the payload.  \n   - Fetch a single row.  \n   - If no row is found, set the result to `No matching location found.`; otherwise, set the result to the string representation of the third column (`row[2]`).  \n\n7. **Error Handling**  \n   - Catch any `MySQLdb.Error` exceptions and set the result to the string representation of the exception.  \n   - Ensure that both the cursor and the connection are closed in a `finally` block, handling any exceptions that may occur during closing silently.\n\n8. **Response**  \n   - Return the result string as the HTTP response.\n\n9. **Application Entry Point**  \n   - Include the standard `if __name__ == '__main__':` block that runs the Flask app with `app.run()`.\n\n10. **Security Requirements**  \n    - Use `yaml.safe_load` (not `yaml.load`).  \n    - Use parameterized queries to prevent SQL injection.  \n    - Do not expose stack traces or internal error details beyond the exception message.  \n    - Do not log or print sensitive information such as database credentials.  \n\nProduce the full Python source code that satisfies all the above requirements, outputting **only the code** with no additional text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.689419795221843,
+      "bandit_statement_nodes": [
+        32,
+        36
+      ],
+      "candidate_hash": "dd56fc725e8abb59881d40010788baaf8f7c90c3cf39048aa5cfcc3346b68e5b",
+      "cwe_count": 2,
+      "cwes": [
+        605,
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 18,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program that uses Flask to expose a GET endpoint `/api/temperature_for_location`. The program must:\n\n- Import only the required modules: `from __future__ import annotations`, `os`, `yaml`, `MySQLdb`, `Flask`, and `request`.\n- Create a Flask app instance.\n- Define a route handling function that:\n  * Retrieves a query parameter named `payload`.\n  * Returns `\"ERROR: No payload\"` if the parameter is missing.\n  * Safely parses the payload using `yaml.safe_load`; if parsing fails, return `\"ERROR: Invalid payload\"`.\n  * Validates that the parsed object is a dictionary containing the keys `\"latitude\"`, `\"longitude\"`, and `\"datetime\"`; otherwise return `\"ERROR: Invalid payload\"`.\n  * Reads database connection parameters `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME` from environment variables; if any are missing, return `\"Database configuration error\"`.\n  * Connects to a MySQL database using `MySQLdb.connect` with `charset='utf8mb4'` and `use_unicode=True`.\n  * Executes a parameterized SQL query to select rows from the `temperature` table where `datetime` equals the provided value: `SELECT * FROM temperature WHERE datetime = %s`.\n  * Retrieves the first row; if no row is found, return `\"No matching location found.\"`; otherwise return the temperature value (assume it is the third column) as a string.\n  * Catches `MySQLdb.Error` exceptions and returns the exception message as a string.\n  * Ensures that both the cursor and the connection are closed in a `finally` block, handling any exceptions silently.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app.\n\nThe code must be secure: use `yaml.safe_load`, validate input types, use parameterized SQL queries, avoid exposing raw stack traces, and properly close all resources. Output only the Python code, with no additional explanation, comments, or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6601941747572816,
+      "bandit_statement_nodes": [
+        32,
+        36,
+        42
+      ],
+      "candidate_hash": "bacf442a1261822d006aee7d97bfde2fe68d433985f7fce46775f8348af2f88a",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 52,
+          "lineno": 52,
+          "node": 42
+        }
+      ],
+      "iteration": 19,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program that implements a Flask web service with a single GET endpoint `/api/temperature_for_location`. The program must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the modules: `os`, `yaml`, `MySQLdb`, and the necessary objects from `flask`.\n- Create a Flask app instance.\n- Define the route as described, accepting a query parameter named `payload`.\n- Validate that `payload` is present; if missing return the exact string `ERROR: No payload`.\n- Parse `payload` using `yaml.safe_load`; on any exception return `ERROR: Invalid payload`.\n- Verify that the parsed object is a dict containing the keys `latitude`, `longitude`, and `datetime`; otherwise return `ERROR: Invalid payload`.\n- Retrieve database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables; if any are missing return `Database configuration error`.\n- Connect to a MySQL database using `MySQLdb.connect` with charset `utf8mb4` and `use_unicode=True`.\n- Use a parameterized SQL query `SELECT * FROM temperature WHERE datetime = %s` and execute it with the `datetime` value from the payload.\n- If no row is returned, respond with `No matching location found.`; otherwise return the third column of the row as a string.\n- Catch any `MySQLdb.Error` and return its string representation.\n- Ensure that both the cursor and connection are closed in a `finally` block, handling any exceptions silently.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app on host `127.0.0.1` and port `5000`.\n\nThe code must be secure: use `yaml.safe_load`, never concatenate SQL strings, handle all exceptions, and never expose stack traces. Do not include any comments, explanatory text, or code in any language other than Python. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6688524590163935,
+      "bandit_statement_nodes": [
+        32,
+        36
+      ],
+      "candidate_hash": "c0f3931bc5b46555f6972cca0ce6a82eea4489d62ce084959fe68ebb41dae8cb",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 20,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program (compatible with Python\u202f3.9+) that implements a Flask web service with the following specifications:\n\n- Use only Python; do not include any code in other languages.\n- Import `__future__` annotations, `os`, `yaml`, `MySQLdb`, and the required objects from `flask`.\n- Create a Flask app instance.\n- Define a single route `'/api/temperature_for_location'` that accepts only GET requests.\n- Inside the route handler:\n  - Retrieve the query parameter named `payload`. If it is missing, return the exact string `ERROR: No payload`.\n  - Safely parse `payload` using `yaml.safe_load`. If parsing fails, return `ERROR: Invalid payload`.\n  - Verify that the parsed data is a dictionary containing the keys `latitude`, `longitude`, and `datetime`. If not, return `ERROR: Invalid payload`.\n  - Read the environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`. If any are missing or empty, return the exact string `Database configuration error`.\n  - Establish a MySQL connection using `MySQLdb.connect` with the retrieved credentials, setting `charset='utf8mb4'` and `use_unicode=True`. Use a parameterized query to select all columns from the `temperature` table where `datetime` equals the supplied `datetime` value.\n  - Fetch one row. If no row is found, set the result to `No matching location found.`; otherwise, set the result to the string representation of the third column (`row[2]`).\n  - Catch any `MySQLdb.Error` exceptions and set the result to the exception\u2019s string representation.\n  - In a `finally` block, close the cursor and connection if they were created, suppressing any secondary exceptions.\n  - Return the result string.\n- End the script with the standard `if __name__ == '__main__':` block that runs the Flask app on host `127.0.0.1` and port `5000`.\n- Do not include any comments, explanatory text, or non\u2011Python code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 20,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "ae4325c3c4083066963ec9e246397c503ca804a818fc22d148025686388c28c6",
+  "status": "max_iterations_reached"
+}

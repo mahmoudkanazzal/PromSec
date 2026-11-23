@@ -1,0 +1,38 @@
+{
+  "ast_similarity": 0.5897435897435898,
+  "candidate_hash": "028493ec4b178170223f0b90edf44bdda9790b32c93c16fb6179c55764a40042",
+  "complete": true,
+  "config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file99.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5897435897435898,
+      "bandit_statement_nodes": [
+        10,
+        14,
+        25,
+        34
+      ],
+      "candidate_hash": "028493ec4b178170223f0b90edf44bdda9790b32c93c16fb6179c55764a40042",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that implements a Flask web service with three endpoints: `/add_recipe` (POST), `/submit_review` (POST), and `/get_recipe_reviews` (GET). Use the `sqlite3` module with a database file named `recipe.db`. Include a function `get_db_connection()` that returns a connection with `row_factory` set to `sqlite3.Row`. Include a helper `row_to_dict(row)` that converts a `sqlite3.Row` to a dictionary.\n\n**Endpoint `/add_recipe`**:  \n- Accept JSON payload containing a string `title` and a list `ingredients`.  \n- Validate that the payload exists and includes both fields; abort with HTTP 400 and a descriptive message if validation fails.  \n- Ensure `ingredients` is a list; abort with HTTP 400 if not.  \n- Insert the `title` into a `recipes` table using a parameterized SQL statement, retrieve the generated `recipe_id`, then insert each ingredient into an `ingredients` table with a parameterized statement that includes `recipe_id` and the ingredient value.  \n- Commit the transaction, close the database connection, and return a JSON response `{\"message\": \"Recipe added successfully\", \"recipe_id\": <id>}` with status code 201.\n\n**Endpoint `/submit_review`**:  \n- Accept JSON payload containing `recipe_id`, `review`, and `reviewer_id`.  \n- Validate that all required fields are present; abort with HTTP 400 if any are missing.  \n- Cast `recipe_id` to an integer, abort with HTTP 400 on failure.  \n- Insert the review into a `reviews` table using a parameterized SQL statement with `recipe_id`, `review`, and `reviewer_id`.  \n- Commit, close the connection, and return a JSON response `{\"message\": \"Review submitted successfully\"}` with status code 200.\n\n**Endpoint `/get_recipe_reviews`**:  \n- Read `recipe_id` from the query string.  \n- Validate its presence and that it can be converted to an integer; abort with HTTP 400 on failure.  \n- Query the `reviews` table for rows matching the given `recipe_id`, selecting `review` and `COUNT(r.id) AS review_count`, grouping appropriately.  \n- Fetch all rows, convert each row to a dictionary using `row_to_dict`, close the connection, and return the list of dictionaries as JSON with status code 200.\n\nEnsure the Flask application runs only when `__name__ == '__main__'` and invoke `app.run(debug=False)`. Use only standard library modules and Flask; do not import any third\u2011party packages beyond Flask. Follow security best practices: use parameterized queries exclusively, perform thorough input validation, handle errors with appropriate HTTP status codes, and guarantee that all database connections are closed in a `finally` block. The generated code must be valid Python, contain no explanatory comments, and must not include any output other than the requested script.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "05a8f2728379041b6e2e15e634979a3fa87f110fe73dca5cd6b12c3a325c1542",
+  "status": "secured"
+}

@@ -1,0 +1,77 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "a53a146190d538eb84ae9dd295632a51daea2a2e1164b80168fc8037d852c7bd",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields cause a Bad Request error before any processing.",
+      "Attempting to register with an existing username returns \"Username already exists\".",
+      "Login with a non\u2011existent username or wrong password returns \"Invalid credentials\".",
+      "Creating a project for a non\u2011existent user returns \"User not found\".",
+      "Adding a task to a non\u2011existent project returns \"Project not found\".",
+      "Viewing tasks for an unknown project returns an empty JSON list."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a web API for user registration, login, and basic project\u2011task management.",
+    "invariants": [
+      "Usernames are unique; duplicate registration attempts are rejected.",
+      "Passwords are stored only as bcrypt hashes, never in plain text.",
+      "A project can be created only if the supplied username exists in the users table.",
+      "A task can be added only if the referenced project exists in the projects table.",
+      "All database writes are performed within a transaction that is either committed or rolled back."
+    ],
+    "io_behavior": [
+      "POST /register with username, password, confirm_password returns a plain\u2011text success, duplicate, or failure message.",
+      "POST /login with username and password redirects to /dashboard on success or returns \"Invalid credentials\" on failure.",
+      "POST /create_project with project_name, description, username returns a plain\u2011text success or error message.",
+      "POST /add_task with project_name, task_name, task_description returns a plain\u2011text success or error message.",
+      "GET /view_tasks?project_name=... returns a JSON array of task rows for the given project."
+    ],
+    "public_api": {
+      "route:GET /view_tasks": "",
+      "route:POST /add_task": "",
+      "route:POST /create_project": "",
+      "route:POST /login": "",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Inserts a new user row into the MySQL users table on successful registration.",
+      "Inserts a new project row into the projects table when a valid user creates a project.",
+      "Inserts a new task row into the tasks table when a valid project is specified.",
+      "Commits or rolls back transactions based on success or failure of database operations.",
+      "Issues an HTTP redirect response on successful login."
+    ],
+    "source_hash": "e58b8e58a0fadc25c03d3f590849648226aa63c60cc17c1a6968d263d555fae4"
+  },
+  "dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.8,
+    "invariants": 1.0,
+    "io_semantics": 0.65,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file75.py",
+  "gated_score": 0.79812,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.79812,
+  "original_hash": "e58b8e58a0fadc25c03d3f590849648226aa63c60cc17c1a6968d263d555fae4",
+  "rationale": "Core functionality and invariants are implemented correctly, including hashing, transaction handling, and redirects. Responses are JSON rather than plain text and some error messages differ from the specification, causing partial loss of I/O semantics and edge\u2011case wording.",
+  "schema": 1,
+  "stability_abs_difference": 0.03063,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.9,
+    "invariants": 1.0,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.82875,
+  "weighted_mean": 0.8475,
+  "worst_dimension": 0.65
+}

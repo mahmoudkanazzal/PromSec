@@ -1,0 +1,82 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "edaffd71fad789406f9c3990248c4c142ba6dcd4c765bd6559b23c8f36a907a4",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Empty or malformed YAML payload leads to a 400 response.",
+      "Missing required fields (e.g., isbn) results in a 400 error with \"Missing book information\".",
+      "Providing an unknown 'action' to /librarian_panel yields a 400 error.",
+      "Omitting query parameters (e.g., section or type) still triggers the script with an empty argument.",
+      "Incorrect admin password returns a 401 status.",
+      "Large or malicious YAML could cause parsing delays or unexpected script arguments."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a Flask web API for managing library resources (books, members, inventory, reports, and admin actions) via HTTP requests, returning JSON responses and triggering external scripts.",
+    "invariants": [
+      "All YAML inputs must be parseable; otherwise a 400 error with \"Invalid YAML format\" is returned.",
+      "Book operations require at least 'title', 'author', and 'isbn' (or just 'isbn' for updates/deletions).",
+      "Member operations require 'name' and 'id' (or just 'id' for updates).",
+      "Admin access succeeds only when password exactly matches LIBRARIAN_PASSWORD.",
+      "Unsupported actions in /librarian_panel return a 400 error with \"Invalid action\"."
+    ],
+    "io_behavior": [
+      "POST /add_new_book with YAML body returns JSON with book details or error on missing fields/invalid YAML.",
+      "GET /execute_inventory?section=... starts inventory script and returns JSON status.",
+      "POST /admin_access with form field password returns admin grant JSON or 401 denial.",
+      "POST /update_book_details with YAML body returns JSON confirming update or error.",
+      "POST /delete_book with YAML body returns JSON confirming deletion or error.",
+      "GET /generate_reports?type=... starts report script and returns JSON status."
+    ],
+    "public_api": {
+      "route:GET /execute_inventory": "",
+      "route:GET /generate_reports": "",
+      "route:GET /view_books": "",
+      "route:POST /add_new_book": "",
+      "route:POST /add_new_member": "",
+      "route:POST /admin_access": "",
+      "route:POST /delete_book": "",
+      "route:POST /librarian_panel": "",
+      "route:POST /update_book_details": "",
+      "route:POST /update_member_details": ""
+    },
+    "side_effects": [
+      "Calls os.system to run external Python scripts for inventory, reports, backup/restore, and view books.",
+      "Potentially creates/updates files or databases via those external scripts (observable only through script side effects).",
+      "No persistent state is stored within the Flask app itself; all state changes are implied by external scripts.",
+      "Authentication check compares provided password to a hard\u2011coded secret."
+    ],
+    "source_hash": "76dd5602682d017e8d799027a76b3dc516f12e33666b851d5e47359bb6ab8bf7"
+  },
+  "dimensions": {
+    "behavior": 0.55,
+    "edge_cases": 0.3,
+    "invariants": 0.6,
+    "io_semantics": 0.7,
+    "side_effects": 0.2
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file27.py",
+  "gated_score": 0.42312,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.42312,
+  "original_hash": "76dd5602682d017e8d799027a76b3dc516f12e33666b851d5e47359bb6ab8bf7",
+  "rationale": "Routes and basic functionality exist, but error messages, handling of empty query parameters, and script execution (uses runpy instead of os.system) deviate from the contract, leading to partial preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.35688,
+  "stability_dimensions": {
+    "behavior": 0.95,
+    "edge_cases": 0.7,
+    "invariants": 0.95,
+    "io_semantics": 0.85,
+    "side_effects": 0.6
+  },
+  "stability_score": 0.78,
+  "weighted_mean": 0.4975,
+  "worst_dimension": 0.2
+}

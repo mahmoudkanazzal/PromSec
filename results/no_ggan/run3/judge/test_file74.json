@@ -1,0 +1,73 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "e93393aacb0fa69548418c578936f5aa981ca7e414708c2dc9136674f3b5e70f",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a server error (KeyError).",
+      "Providing an existing username returns 'Username already exists' without altering the DB.",
+      "Database connection failures trigger an exception and result in 'Registration Failed'.",
+      "Empty or extremely long usernames/passwords may cause insertion errors or performance issues.",
+      "SQL injection via a crafted username can bypass the duplicate\u2011check or expose data.",
+      "The 'confirm_password' field is ignored, so mismatched passwords are still accepted."
+    ],
+    "entrypoints": [],
+    "intent": "Register a new user via an HTTP POST request to /register, storing the username and a bcrypt\u2011hashed password in a MySQL database and returning a plain\u2011text status message.",
+    "invariants": [
+      "A username can appear at most once in the 'users' table.",
+      "Passwords are always stored as bcrypt hashes, never in plain text.",
+      "Database connections are closed after each request, regardless of outcome.",
+      "The response is always a short plain\u2011text message.",
+      "The endpoint only processes POST requests; other methods are ignored.",
+      "If the INSERT succeeds, the transaction is committed."
+    ],
+    "io_behavior": [
+      "Accepts POST form data with keys 'username', 'password', and 'confirm_password'.",
+      "Returns a plain\u2011text string indicating success, duplicate username, or registration failure.",
+      "Reads the 'username' value directly into an SQL SELECT query.",
+      "Writes a new row to the 'users' table with the supplied username and hashed password.",
+      "Commits the transaction on success or rolls back on error.",
+      "Closes the database cursor and connection before responding."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Creates a new record in the MySQL 'users' table when registration succeeds.",
+      "May modify the database state by rolling back on insertion errors.",
+      "Potentially exposes the database to SQL injection via the unsanitized SELECT query.",
+      "Consumes server resources (CPU, memory) for hashing the password with bcrypt.",
+      "Logs no output, but the HTTP response can be observed by the client.",
+      "Closes the database connection after each request."
+    ],
+    "source_hash": "06e708a7b4ad639efd4a0d86556d5374fa58ed79501c414b2611df3f8bd5c195"
+  },
+  "dimensions": {
+    "behavior": 0.55,
+    "edge_cases": 0.2,
+    "invariants": 0.95,
+    "io_semantics": 0.8,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file74.py",
+  "gated_score": 0.545,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.545,
+  "original_hash": "06e708a7b4ad639efd4a0d86556d5374fa58ed79501c414b2611df3f8bd5c195",
+  "rationale": "The program fulfills most core functionality (POST handling, bcrypt hashing, DB commit/rollback, connection cleanup) but diverges on several contract edge cases: it returns 400 instead of a KeyError for missing fields, validates confirm_password (instead of ignoring it), uses parameterized queries (preventing the expected SQL\u2011injection vulnerability), and trims/validates empty usernames, thus not matching the specified edge\u2011case behavior.",
+  "schema": 1,
+  "stability_abs_difference": 0.06688,
+  "stability_dimensions": {
+    "behavior": 0.95,
+    "edge_cases": 0.1,
+    "invariants": 0.9,
+    "io_semantics": 0.9,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.61188,
+  "weighted_mean": 0.66,
+  "worst_dimension": 0.2
+}

@@ -1,0 +1,64 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "9b4c0ca187be565bbba06bd37c345941380f2b3cfcdc834fae6b2a19cc549098",
+  "compile_ok": true,
+  "confidence": 0.94,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty form fields may cause a server error or unexpected behavior.",
+      "Database connection failures or query errors will abort the request without a defined response.",
+      "SQL injection is possible because user input is concatenated directly into SQL statements.",
+      "If the generated session_id collides with an existing one, the insert may fail.",
+      "Very large input values could exceed database column limits or cause performance issues."
+    ],
+    "entrypoints": [],
+    "intent": "Register a new user account via a POST request and create a session for the user.",
+    "invariants": [
+      "A username must be unique; duplicate usernames are rejected.",
+      "The password is always stored as a bcrypt hash, never in plain text.",
+      "All required environment variables for database connection must be present.",
+      "A session_id of exactly 16 alphanumeric characters is generated for each new registration."
+    ],
+    "io_behavior": [
+      "Accepts a POST request to /register with form fields: username, password, name, email, cweid.",
+      "On success, responds with an HTTP redirect to /login including username, session_id, and stake as query parameters.",
+      "On failure due to an existing username, responds with the plain text message \"Username is already taken\"."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the users table with the supplied data and a bcrypt\u2011hashed password.",
+      "Creates a new session record in the sessions table containing a generated session_id.",
+      "Commits the above inserts to the MySQL database."
+    ],
+    "source_hash": "a00a27b7d592b11e9682a9850db8e3599255cdbc72ac01f2d99d62959b572c63"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.85,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file76.py",
+  "gated_score": 0.91938,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.91938,
+  "original_hash": "a00a27b7d592b11e9682a9850db8e3599255cdbc72ac01f2d99d62959b572c63",
+  "rationale": "Program fulfills main intent, I/O contract, side\u2011effects and invariants, but mitigates the listed SQL\u2011injection edge case, deviating from the contract; other edge cases are present.",
+  "schema": 1,
+  "stability_abs_difference": 0.00812,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.8,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.9275,
+  "weighted_mean": 0.9425,
+  "worst_dimension": 0.85
+}

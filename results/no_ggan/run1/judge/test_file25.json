@@ -1,0 +1,80 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "6db85e908bddddcf995cef5363d69defe7d200b2fde2537bc9263974040d3346",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Malformed or non\u2011YAML request bodies raise an uncaught exception, resulting in a 500 internal server error.",
+      "Providing an empty 'section' or 'type' query parameter still triggers the external script with an empty argument.",
+      "Submitting a POST form without the expected fields (e.g., missing 'password' or 'action') leads to default empty strings and may cause denial or 400 responses.",
+      "Using an incorrect librarian password returns a 401 status without revealing the correct password.",
+      "If the external script invoked by os.system fails or is missing, the endpoint still returns a success JSON, hiding the failure."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a REST\u2011like HTTP API for basic library management operations such as adding, updating, deleting books and members, triggering inventory/report scripts, and performing admin backup/restore actions.",
+    "invariants": [
+      "All endpoints return a JSON object with a 'status' key.",
+      "Required identifiers (title/author/isbn for books, name/id for members) must be present; otherwise a 400 error is returned.",
+      "Librarian access is granted only when the exact hard\u2011coded password matches.",
+      "YAML payloads are parsed with yaml.FullLoader; missing keys default to empty strings unless explicitly accessed.",
+      "GET endpoints treat missing query parameters as empty strings and still invoke the corresponding script."
+    ],
+    "io_behavior": [
+      "POST /add_book \u2013 accepts a YAML payload, returns JSON with book details or 400 on missing title/author/isbn.",
+      "GET /run_inventory \u2013 reads 'section' query param, runs inventory_script.py, returns JSON status.",
+      "POST /librarian_access \u2013 reads form field 'password', returns JSON grant/deny and 401 on failure.",
+      "POST /update_book \u2013 accepts YAML with isbn and optional new fields, returns JSON with updated info or 400 if isbn missing.",
+      "GET /generate_reports \u2013 reads 'type' query param, runs report_generator.py, returns JSON status.",
+      "POST /admin_panel \u2013 reads form field 'action' (backup/restore), runs corresponding script, returns JSON status or 400 on invalid action."
+    ],
+    "public_api": {
+      "route:GET /generate_reports": "",
+      "route:GET /run_inventory": "",
+      "route:GET /view_books": "",
+      "route:POST /add_book": "",
+      "route:POST /add_member": "",
+      "route:POST /admin_panel": "",
+      "route:POST /delete_book": "",
+      "route:POST /librarian_access": "",
+      "route:POST /update_book": "",
+      "route:POST /update_member": ""
+    },
+    "side_effects": [
+      "Executes external Python scripts via os.system for inventory, report generation, backup, restore, and book view.",
+      "Potentially creates or modifies files/logs produced by those external scripts.",
+      "No persistent storage is modified by the Flask app itself; responses are generated from request data only."
+    ],
+    "source_hash": "289c03ce0525752ca513e1fac47268bf5c4aef9eeca6d6f2d1a2747263347a19"
+  },
+  "dimensions": {
+    "behavior": 0.45,
+    "edge_cases": 0.2,
+    "invariants": 0.8,
+    "io_semantics": 0.85,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file25.py",
+  "gated_score": 0.52063,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.52063,
+  "original_hash": "289c03ce0525752ca513e1fac47268bf5c4aef9eeca6d6f2d1a2747263347a19",
+  "rationale": "Endpoints exist but error handling, YAML loader choice, script\u2011failure response, and empty\u2011argument invocation differ from contract, lowering behavior and edge\u2011case scores while side\u2011effects and basic invariants remain largely intact.",
+  "schema": 1,
+  "stability_abs_difference": 0.12437,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.3,
+    "invariants": 0.7,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.645,
+  "weighted_mean": 0.6275,
+  "worst_dimension": 0.2
+}

@@ -1,0 +1,77 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "c8c1cf4d55326aadb52321d18fd911358a3d2d16366a6aa3a5ffe9d3695cf428",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing required fields in the POST/PUT JSON payload",
+      "Providing an event_id that does not exist for update or delete",
+      "Empty or absent keyword/date query parameters yielding no matches",
+      "Malformed JSON body causing a 400 error from Flask",
+      "Database connection failure leading to a 500 internal server error"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a RESTful HTTP API that lets clients create, retrieve, update, and delete event records stored in a SQLite database.",
+    "invariants": [
+      "The database contains an 'events' table with columns id, name, date, location",
+      "All responses are JSON-encoded and include an HTTP status code",
+      "Each successful write operation commits the transaction before closing the connection",
+      "Event IDs are integers supplied in the URL path",
+      "Empty result sets are returned as empty JSON arrays"
+    ],
+    "io_behavior": [
+      "POST /add_event with JSON {name, date, location} \u2192 201 and JSON {\"message\":\"Event added successfully\"}",
+      "GET /search_events?keyword=\u2026 \u2192 200 and JSON array of events whose name or location contains the keyword",
+      "PUT /update_event/<event_id> with JSON {name?, date?, location?} \u2192 200 and JSON {\"message\":\"Event updated successfully\"}",
+      "DELETE /delete_event/<event_id> \u2192 200 and JSON {\"message\":\"Event deleted successfully\"}",
+      "GET /get_events_by_date?date=\u2026 \u2192 200 and JSON array of events occurring on the given date"
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:DELETE /delete_event/<int:event_id>": "",
+      "route:GET /get_events_by_date": "",
+      "route:GET /search_events": "",
+      "route:POST /add_event": "",
+      "route:PUT /update_event/<int:event_id>": ""
+    },
+    "side_effects": [
+      "Writes new rows to the SQLite file (events.db) on add_event",
+      "Modifies existing rows on update_event",
+      "Removes rows on delete_event",
+      "Opens and closes a database connection for each request",
+      "Sends HTTP responses over the network"
+    ],
+    "source_hash": "4189069f0188b9e33c40ddff4df303aaabf6130acd7b039dbf0f45a279f5a4c5"
+  },
+  "dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.7,
+    "invariants": 0.9,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file96.py",
+  "gated_score": 0.7825,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.7825,
+  "original_hash": "4189069f0188b9e33c40ddff4df303aaabf6130acd7b039dbf0f45a279f5a4c5",
+  "rationale": "The program implements all required routes and CRUD operations, commits transactions, and returns JSON with proper status codes for successful cases. It handles missing fields, non\u2011existent IDs, malformed JSON, and DB errors as specified. However, it returns all events when the search keyword is absent (instead of an empty array) and aborts with a 400 error for missing date rather than returning an empty result set, and error responses are HTML by default, not JSON, violating the all\u2011responses\u2011J",
+  "schema": 1,
+  "stability_abs_difference": 0.145,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.8,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.9275,
+  "weighted_mean": 0.81,
+  "worst_dimension": 0.7
+}

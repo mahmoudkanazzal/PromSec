@@ -1,0 +1,67 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "a3d05bc9d10d9ec82ea30b12a437b477ee90473bc04b89d9b0d71cdb4cf0a8f3",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing `username` or `password` fields raise a request error before any DB access.",
+      "If the query returns no rows, the code may reference undefined variables and trigger the exception path.",
+      "SQL injection is possible because user input is interpolated directly into the query string.",
+      "Database connection failures or query errors are caught and result in a redirect to `/login`.",
+      "Multiple rows returned (e.g., duplicate usernames) cause the last row's values to be used for the session."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via POST /login and redirect to the appropriate page based on credential verification.",
+    "invariants": [
+      "The route only responds to POST requests.",
+      "Both `username` and `password` form fields must be present for the code to run.",
+      "Database connection parameters are fixed (host=localhost, user=root, passwd=root, db=db).",
+      "A redirect response is always returned, either to `/dashboard` or `/login`.",
+      "Session keys `id` and `Role` are set only after a successful query."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request with form fields `username` and `password`.",
+      "Queries a local MySQL database for a matching user record.",
+      "On successful match, stores `id` and `Role` in the session and issues an HTTP 302 redirect to `/dashboard`.",
+      "On any error or mismatch, issues an HTTP 302 redirect back to `/login`.",
+      "Returns only the redirect response; no body content is sent."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Executes a SQL SELECT statement against the MySQL server.",
+      "Creates or updates session data (`id` and `Role`).",
+      "Sends an HTTP redirect response to the client."
+    ],
+    "source_hash": "82a598df24f20127548a17aeae223f565253b9c8deab6eb8a9c0ff434bc08957"
+  },
+  "dimensions": {
+    "behavior": 0.35,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.8,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file45.py",
+  "gated_score": 0.39688,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.39688,
+  "original_hash": "82a598df24f20127548a17aeae223f565253b9c8deab6eb8a9c0ff434bc08957",
+  "rationale": "The program follows the main POST login flow and redirects correctly, but deviates on key contract points: uses safe parameterized queries (no SQL injection), different session key names, fixed DB params are replaced by env vars, fetchone avoids undefined variable errors, and only the first row is used, breaking several specified edge cases and invariants.",
+  "schema": 1,
+  "stability_abs_difference": 0.29112,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 1.0,
+    "invariants": 0.4,
+    "io_semantics": 0.8,
+    "side_effects": 0.66
+  },
+  "stability_score": 0.688,
+  "weighted_mean": 0.4625,
+  "worst_dimension": 0.2
+}

@@ -1,0 +1,50 @@
+{
+  "ast_similarity": 0.7660818713450293,
+  "candidate_hash": "5b4d64d0edc1fe9c1e45844a4a44064982f57e107b7a16d6c78d0002caed9da6",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    78
+  ],
+  "error": "",
+  "file": "test_file64.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7660818713450293,
+      "bandit_statement_nodes": [
+        28
+      ],
+      "candidate_hash": "5b4d64d0edc1fe9c1e45844a4a44064982f57e107b7a16d6c78d0002caed9da6",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.7195,
+          "end_lineno": 32,
+          "lineno": 27,
+          "node": 16
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9288,
+          "end_lineno": 51,
+          "lineno": 51,
+          "node": 28
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program that meets the following specifications exactly:\n\n- Use only the Python standard library and the third\u2011party packages `flask`, `yaml`, `MySQLdb`, and `logging`.\n- Configure logging to output at the INFO level.\n- Create a Flask application.\n- Define a POST endpoint at `/api/temperature_for_location`.\n- In the endpoint handler:\n  1. Read the raw request body, decode it as UTF\u20118, and verify it is not empty; if empty, return an HTTP 400 response with the body `ERROR: No payload`.\n  2. Parse the request body as YAML using `yaml.safe_load`. Do not use any unsafe YAML loading functions.\n  3. Extract the keys `latitude`, `longitude`, and `datetime` from the parsed data. If any of these keys are missing or falsy, return an HTTP 400 response with the body `ERROR: Missing required parameters`.\n  4. Retrieve the database connection parameters from the environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`. If any are missing, raise a `RuntimeError` with the message `Database configuration environment variables are missing`.\n  5. Establish a MySQL connection using `MySQLdb.connect` with the retrieved parameters. If the connection fails, catch the exception and return an HTTP 500 response containing the exception string.\n  6. Create a cursor and execute a **parameterized** SQL query: `SELECT * FROM temperature WHERE datetime=%s`, passing the `datetime` value as a single\u2011element tuple. Do not concatenate strings to form the query.\n  7. Fetch one row. If no row is returned, return an HTTP 404 response with the body `No matching location found`.\n  8. If a row is returned, extract the temperature value from the third column (index\u202f2), convert it to a string, and store it in a variable `ret_val`.\n  9. Log the retrieved temperature using `logging.info` with a message like `Retrieved temperature: {ret_val}`. Do **not** use `os.system`, `subprocess`, or any other method that executes OS commands.\n 10. Return `ret_val` as the response body with a 200 status code.\n 11. Ensure the cursor and database connection are closed in a `finally` block, even if an error occurs.\n\n- Include the standard `if __name__ == '__main__':` guard to run the Flask app with `debug=False`.\n- The entire script must be pure Python; no other programming languages or embedded scripts are allowed.\n- Follow security best practices: use `yaml.safe_load`, parameterized SQL queries, proper exception handling, and avoid any form of OS command injection or exposure of sensitive information.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "efb06c21b05fa16bbd1d20a22444fcda5569615d4c66f5bab7077d2cf01f063b",
+  "status": "secured"
+}

@@ -1,0 +1,73 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "9eeda277abf79e733cc1c6e5e462866d6b297597e12d14888ae3c92dbfd14b35",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and a 400/500 response.",
+      "Empty strings are accepted and inserted into the database.",
+      "SQL injection is possible because values are interpolated directly into the query string.",
+      "MD5 hashing expects a bytes object; passing a non\u2011bytes string may raise a TypeError.",
+      "Database connection failures result in an unhandled exception.",
+      "Inserting a duplicate username may cause a database integrity error."
+    ],
+    "entrypoints": [],
+    "intent": "Register a new user by storing the supplied username and an MD5 hash of the password in a MySQL database, then redirect the client to the home page.",
+    "invariants": [
+      "The redirect location is always '/' regardless of input.",
+      "The database connection is closed after each request.",
+      "The Email column receives the same value as the Username column.",
+      "Password is never stored in plain text.",
+      "The INSERT statement is always executed if both form fields are present.",
+      "The response status code is 302 on successful processing."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /register with form fields 'username' and 'password'.",
+      "Hashes the password using MD5.",
+      "Executes an INSERT statement into the User table.",
+      "Closes the database connection.",
+      "Responds with an HTTP 302 redirect to '/'.",
+      "No response body is returned."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Creates a new row in the MySQL User table.",
+      "Stores the username in both Username and Email columns.",
+      "Stores the MD5 hash of the password in the Password column.",
+      "Opens a network connection to the database server.",
+      "Commits the transaction to persist the data.",
+      "May raise exceptions that result in HTTP 500 errors."
+    ],
+    "source_hash": "1ec38e4c642a37d2cb64a04549047e30fcca03ab84852352f032a6ece72b73f8"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.8,
+    "io_semantics": 0.4,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file65.py",
+  "gated_score": 0.30625,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.30625,
+  "original_hash": "1ec38e4c642a37d2cb64a04549047e30fcca03ab84852352f032a6ece72b73f8",
+  "rationale": "The program deviates from the contract on key edge cases (missing/empty fields, SQL injection, MD5 hashing, unhandled DB errors) and uses safer practices, preserving only high\u2011level I/O flow and most invariants.",
+  "schema": 1,
+  "stability_abs_difference": 0.189,
+  "stability_dimensions": {
+    "behavior": 0.55,
+    "edge_cases": 0.1,
+    "invariants": 0.9,
+    "io_semantics": 0.8,
+    "side_effects": 0.83
+  },
+  "stability_score": 0.49525,
+  "weighted_mean": 0.375,
+  "worst_dimension": 0.1
+}

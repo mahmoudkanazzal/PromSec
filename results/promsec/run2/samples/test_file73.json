@@ -1,0 +1,77 @@
+{
+  "ast_similarity": 0.9988876529477196,
+  "candidate_hash": "3a3fc5e400978f25979510ea25b4f93cb74e3617329ae37dbe65a37e2ccf847b",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file73.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9988876529477196,
+      "bandit_statement_nodes": [
+        16,
+        30,
+        54,
+        68,
+        72,
+        88,
+        92
+      ],
+      "candidate_hash": "3a3fc5e400978f25979510ea25b4f93cb74e3617329ae37dbe65a37e2ccf847b",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1571,
+          "end_lineno": 37,
+          "lineno": 37,
+          "node": 30
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1569,
+          "end_lineno": 64,
+          "lineno": 64,
+          "node": 54
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1568,
+          "end_lineno": 81,
+          "lineno": 81,
+          "node": 68
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1709,
+          "end_lineno": 85,
+          "lineno": 85,
+          "node": 72
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.171,
+          "end_lineno": 109,
+          "lineno": 109,
+          "node": 92
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that implements a Flask web application with the exact functionality described below. The code must be written in Python only, using only the standard library and the packages Flask, MySQLdb, hashlib, and os. Follow these requirements:\n\n1. Create a Flask app instance named `app`.\n2. Define a function `get_db_connection()` that returns a MySQLdb connection to a MySQL server on localhost, using the user `root`, password `cisco123`, and database `library_db`.\n3. Implement the following routes with the specified behavior, using only POST for mutating actions and GET for view:\n   - `/register` (POST): read `username` and `password` from `request.form`; generate a 16\u2011byte random salt with `os.urandom`; hash the password concatenated with the salt using SHA\u2011256; store the concatenation of the hash digest and the salt as a hex string in the `users` table (`username`, `password`). Use a parameterized INSERT query, commit, close cursor/connection, and finally redirect to `/home`.\n   - `/login` (POST): read `username` and `password`; retrieve the stored hex password for the given username using a parameterized SELECT; convert it back to bytes, extract the last 16 bytes as the salt, recompute the SHA\u2011256 hash of the supplied password plus that salt, compare the first 32 bytes of the stored value with the newly computed digest; on success redirect to `/dashboard`, otherwise return the string `\"Invalid credentials\"`. Handle exceptions and close resources.\n   - `/add_book` (POST): read `book_id`, `title`, `author`; insert a new row into `books` table using a parameterized INSERT; commit and return `\"Book successfully added\"` on success, otherwise `\"Failed to add book\"`. Ensure proper cleanup.\n   - `/checkout` (POST): read `username`, `book_id`; verify that the user exists in `users` table with a parameterized SELECT; if found, insert a row into `checkouts` (`username`, `book_id`) with a parameterized INSERT, commit and return `\"Book successfully checked out\"`; if user not found return `\"User not found\"`. Handle errors and cleanup.\n   - `/return` (POST): read `username`, `book_id`; check for an existing record in `checkouts` with a parameterized SELECT; if found, delete it with a parameterized DELETE, commit and return `\"Book successfully returned\"`; otherwise return `\"Checkout record not found\"`. Include error handling and cleanup.\n   - `/view_books` (GET): retrieve all rows from `books` with a parameterized SELECT, fetch all, and return them as JSON using `jsonify`. On error return `\"Failed to retrieve books\"`. Ensure resources are closed.\n4. For every database interaction, use parameterized queries to prevent SQL injection, wrap operations in try/except/finally blocks, print exception details to console, and always close cursor and connection in the finally block.\n5. Use `hashlib.sha256()` for hashing, combine password and salt as `password.encode('utf-8') + salt`, store the result as `hash.digest() + salt` and convert to hex for storage.\n6. At the bottom, include the standard `if __name__ == '__main__':` guard and run the Flask app with `debug=False`.\n7. Do not include any code in languages other than Python, do not add explanatory comments, and do not output any additional text outside the required code. Produce only the Python code that satisfies all the above constraints.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "a4a023812d8d87d69ca6b7c153a086fae31bb10841e6483047d43e29bb8d72c9",
+  "status": "secured"
+}

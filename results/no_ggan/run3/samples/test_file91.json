@@ -1,0 +1,55 @@
+{
+  "ast_similarity": 0.7085492227979274,
+  "candidate_hash": "d0973e75f3dbf526adb76db90c42a83cd1b3d4e3d2312fd54e779a5994b37a4c",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file91.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9698581560283688,
+      "bandit_statement_nodes": [
+        8,
+        13,
+        23,
+        35,
+        44,
+        53
+      ],
+      "candidate_hash": "31f44fc7d13f54326527cb87d0c1167bb7a22c10268f3b25a6f684e2e98aec2a",
+      "cwe_count": 1,
+      "cwes": [
+        259
+      ],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that uses Flask to provide the following routes with the exact functionality described:\n\n- **/add_book** (POST): Retrieve `title` and `author` from `request.form`. Use a MySQLdb connection to query `SELECT * FROM Books WHERE Title = %s` with a parameterized query. If a row exists, close cursor and connection and `redirect(url_for('add_book'))`. Otherwise, insert the new book with `INSERT INTO Books (Title, Author) VALUES (%s, %s)`, commit, close resources, and `redirect(url_for('view_books'))`.\n\n- **/login_member** (POST): Retrieve `username` and `password` from `request.form`. Query `SELECT Password FROM Members WHERE Username = %s` using a parameterized query. Fetch one row, close resources, and verify the password using `werkzeug.security.check_password_hash`. Return `\"Login successful\"` if valid, otherwise `\"Invalid credentials\"`.\n\n- **/update_book_author** (POST): Retrieve `title` and `new_author` from `request.form`. Execute `UPDATE Books SET Author = %s WHERE Title = %s` with parameters, commit, close resources, and return `\"Author updated successfully\"`.\n\n- **/delete_book** (POST): Retrieve `title` from `request.form`. Execute `DELETE FROM Books WHERE Title = %s` with a parameter, commit, close resources, and return `\"Book deleted successfully\"`.\n\n- **/search_books** (GET): Retrieve `term` from `request.args`. Build a LIKE pattern `%{term}%`. Execute `SELECT * FROM Books WHERE Title LIKE %s OR Author LIKE %s` with the pattern as both parameters, fetch all rows, close resources, and return the string representation of the result.\n\n- **/view_books** (GET): Execute `SELECT * FROM Books`, fetch all rows, close resources, and return the string representation of the result.\n\nAdditional requirements:\n- Import only `Flask`, `request`, `redirect`, `url_for`, `jsonify` from `flask`, `MySQLdb`, and `check_password_hash` from `werkzeug.security`.\n- Define `app = Flask(__name__)`.\n- Implement a function `get_db_connection()` that returns `MySQLdb.connect(host=\"localhost\", user=\"testuser\", passwd=\"test123\", db=\"LIBRARYDB\")`.\n- Use parameterized queries (`%s` placeholders) everywhere to prevent SQL injection.\n- Ensure every database cursor and connection is closed in all execution paths, even on errors.\n- Do not use any global mutable state beyond the Flask app.\n- End the script with:\n```python\nif __name__ == '__main__':\n    app.run(debug=False)\n```\n- The code must be pure Python; no other languages or explanatory comments are allowed.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.7085492227979274,
+      "bandit_statement_nodes": [
+        5
+      ],
+      "candidate_hash": "d0973e75f3dbf526adb76db90c42a83cd1b3d4e3d2312fd54e779a5994b37a4c",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.9+) that implements a Flask web application with the exact functionality described below. The script must:\n\n1. **Import only the required libraries**: `os`, `flask` (specifically `Flask`, `request`, `redirect`, `url_for`, `jsonify`, `abort`), `MySQLdb`, `MySQLdb.cursors`, and `werkzeug.security.check_password_hash`.\n\n2. **Create a Flask app instance** named `app`.\n\n3. **Define a helper function `get_db_connection()`** that:\n   - Returns a new `MySQLdb.connect` object.\n   - Reads database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) from environment variables, providing sensible defaults (`\"localhost\"`, `\"testuser\"`, `\"test123\"`, `\"LIBRARYDB\"`).\n   - Uses `charset=\"utf8mb4\"`, `cursorclass=MySQLdb.cursors.DictCursor`, and `autocommit=False`.\n   - Does not expose credentials or connection details in logs.\n\n4. **Implement the following routes with exact behavior, using only parameterized SQL queries to prevent injection, proper error handling, and ensuring all cursors and connections are closed in `finally` blocks**:\n\n   - `POST /add_book`:\n     * Retrieve `title` and `author` from `request.form`.\n     * If either is missing, abort with status\u202f400 and description `\"Missing title or author\"`.\n     * Check if a book with the same title already exists; if so, redirect back to the same endpoint.\n     * Insert the new book into the `Books` table.\n     * Commit the transaction and redirect to the `view_books` endpoint.\n\n   - `POST /login_member`:\n     * Retrieve `username` and `password` from `request.form`.\n     * If either is missing, abort with status\u202f400 and description `\"Missing username or password\"`.\n     * Query the `Members` table for the stored password hash of the given username.\n     * Use `werkzeug.security.check_password_hash` to verify the password.\n     * Return `\"Login successful\"` on success; otherwise return `\"Invalid credentials\"` with status\u202f401.\n\n   - `POST /update_book_author`:\n     * Retrieve `title` and `new_author` from `request.form`.\n     * If either is missing, abort with status\u202f400 and description `\"Missing title or new_author\"`.\n     * Update the `Author` field of the matching book.\n     * Commit the transaction and return `\"Author updated successfully\"`.\n\n   - `POST /delete_book`:\n     * Retrieve `title` from `request.form`.\n     * If missing, abort with status\u202f400 and description `\"Missing title\"`.\n     * Delete the matching book record.\n     * Commit the transaction and return `\"Book deleted successfully\"`.\n\n   - `GET /search_books`:\n     * Retrieve query parameter `term` (default empty string).\n     * Construct a pattern `%{term}%`.\n     * Select all books where `Title` or `Author` matches the pattern using `LIKE`.\n     * Return the result as JSON.\n\n   - `GET /view_books`:\n     * Select all rows from `Books`.\n     * Return the result as JSON.\n\n5. **Run the Flask app** only when the script is executed as the main module, with `debug=False`.\n\n6. **Security and best\u2011practice requirements**:\n   - Use only parameterized queries (`%s` placeholders) \u2013 never concatenate user input into SQL strings.\n   - Do not enable Flask debug mode or expose stack traces.\n   - Ensure all database resources (cursors, connections) are closed in `finally` blocks.\n   - Do not log sensitive information (passwords, DB credentials).\n   - Use environment variables for configuration; do not hard\u2011code secrets.\n   - Follow PEP\u202f8 naming and formatting conventions.\n\nProduce **only** the Python code that satisfies all the above specifications. Do not include any explanatory text, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "cb06a60bd3c87cb816d5f35e1b33a8e48b64e66f77d2ece4ac8da06b6fb415c7",
+  "status": "secured"
+}

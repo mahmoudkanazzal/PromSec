@@ -1,0 +1,78 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "7e6836de98e454451bcf70b9903e6c4d1068b00ffe11d83a15a1b0c7ea983827",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required JSON fields in /add_book or /update_book may cause a server error",
+      "Providing a non\u2011existent book_id to update or delete returns success message but affects no rows",
+      "Empty keyword or genre parameters return all rows (or none) depending on the query",
+      "SQL injection is possible because user input is interpolated directly into queries",
+      "Database errors (e.g., table missing) result in a 500 internal server error",
+      "Large request bodies or result sets may exceed default Flask limits"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a RESTful HTTP API that lets clients add, search, update, delete, and list books in an SQLite\u2011backed library database.",
+    "invariants": [
+      "Each book row has columns id (primary key), title, author, genre",
+      "All responses are JSON\u2011encoded and include an HTTP status code",
+      "Database file name is fixed as library.db",
+      "Connection is closed after each request regardless of success",
+      "The API does not perform authentication or authorization"
+    ],
+    "io_behavior": [
+      "POST /add_book with JSON {title, author, genre} \u2192 201 and JSON {\"message\":\"Book added successfully\"}",
+      "GET /search_books?keyword=\u2026 \u2192 200 and JSON array of matching rows (title or author contains keyword)",
+      "PUT /update_book/<book_id> with JSON {title?, author?, genre?} \u2192 200 and JSON {\"message\":\"Book updated successfully\"}",
+      "DELETE /delete_book/<book_id> \u2192 200 and JSON {\"message\":\"Book deleted successfully\"}",
+      "GET /get_books_by_genre?genre=\u2026 \u2192 200 and JSON array of rows whose genre equals the parameter"
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:DELETE /delete_book/<int:book_id>": "",
+      "route:GET /get_books_by_genre": "",
+      "route:GET /search_books": "",
+      "route:POST /add_book": "",
+      "route:PUT /update_book/<int:book_id>": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the books table",
+      "Updates an existing row identified by its id",
+      "Deletes a row identified by its id",
+      "Commits the transaction to persist changes in library.db",
+      "Opens and closes a SQLite connection for each request"
+    ],
+    "source_hash": "e727b4fbbe3a2102e26d9a19664f53e0d8c919dc3e865b7edb34c9710b4466e1"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.5,
+    "invariants": 1.0,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file97.py",
+  "gated_score": 0.66875,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.66875,
+  "original_hash": "e727b4fbbe3a2102e26d9a19664f53e0d8c919dc3e865b7edb34c9710b4466e1",
+  "rationale": "The program implements the required routes and returns JSON with correct status codes, preserving most invariants and side\u2011effects. However, it deviates from the contract on update_book (requires all fields instead of optional) and get_books_by_genre (rejects missing genre instead of returning all/none). It also mitigates the expected SQL\u2011injection vulnerability, contrary to the contract's edge\u2011case description. These mismatches lower the behavior, I/O semantics, and edge\u2011case scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.18437,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.75,
+    "invariants": 1.0,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.85312,
+  "weighted_mean": 0.725,
+  "worst_dimension": 0.5
+}

@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "17a4fe7f6eb4df0a788c12c54637ae34531931129d6fb9d50134cbd6c796a586",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a server error (KeyError).",
+      "If the username does not exist, row[0] access raises an exception.",
+      "Database connection failures produce a 500 error response.",
+      "Empty password strings are still hashed and compared.",
+      "Non\u2011ASCII passwords are encoded as UTF\u20118 before hashing.",
+      "MD5 hash collisions are not mitigated, potentially allowing false positives."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via POST to /login and redirect to the home page on success or to an error page on failure.",
+    "invariants": [
+      "The endpoint only responds to POST requests.",
+      "Redirect destinations are fixed strings ('/' or '/error').",
+      "Password comparison is performed using MD5 hashes.",
+      "Database connection parameters (host, user, password, db) are constant.",
+      "SQL query uses a parameter placeholder to avoid literal injection.",
+      "A successful authentication always results in a redirect to '/'."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request with form fields 'username' and 'password'.",
+      "Queries the MySQL 'user_info' table for the stored password hash of the given username.",
+      "Computes the MD5 hash of the supplied password (UTF\u20118 encoded).",
+      "If the hashes match, returns an HTTP 302 redirect to '/'.",
+      "If the hashes do not match, returns an HTTP 302 redirect to '/error'.",
+      "Only the redirect response is sent back to the client."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a connection to a local MySQL server.",
+      "Executes a SELECT statement against the 'user_info' table.",
+      "Closes the database cursor/connection when the request ends (implicit)."
+    ],
+    "source_hash": "b2e18a09915013ea97ddd9cc2f500be31621fcde49a46a732060f7b6516dc55f"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.4,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file54.py",
+  "gated_score": 0.38,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.38,
+  "original_hash": "b2e18a09915013ea97ddd9cc2f500be31621fcde49a46a732060f7b6516dc55f",
+  "rationale": "The program handles POST login but uses SHA\u2011256 instead of MD5, defaults missing fields to empty strings rather than raising KeyError, and gracefully redirects on unknown users instead of raising an exception; however it still opens, queries, and closes the DB as required.",
+  "schema": 1,
+  "stability_abs_difference": 0.04875,
+  "stability_dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.3,
+    "io_semantics": 0.4,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.33125,
+  "weighted_mean": 0.44,
+  "worst_dimension": 0.2
+}

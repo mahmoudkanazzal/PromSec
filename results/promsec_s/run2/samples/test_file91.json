@@ -1,0 +1,106 @@
+{
+  "ast_similarity": 0.547112462006079,
+  "candidate_hash": "037a7daeac09294bff0f4074d113206ff79c7f6066db79574792af9d10310c33",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file91.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5601659751037344,
+      "bandit_statement_nodes": [
+        8,
+        13,
+        23,
+        35,
+        44,
+        53
+      ],
+      "candidate_hash": "21ca9fe8882844e983e5f42d22090427e059fa750f1ba39b8707ac9741b2afe0",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.9999,
+          "end_lineno": 14,
+          "lineno": 14,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 34,
+          "lineno": 34,
+          "node": 23
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.998,
+          "end_lineno": 53,
+          "lineno": 53,
+          "node": 35
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.999,
+          "end_lineno": 68,
+          "lineno": 68,
+          "node": 44
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9983,
+          "end_lineno": 83,
+          "lineno": 83,
+          "node": 53
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, production\u2011ready Python script (no other language) that implements a Flask web application with the following requirements:\n\n1. **General**\n   - The file must be a single, self\u2011contained Python module.\n   - Use only standard library modules and the third\u2011party packages `Flask` and `MySQLdb`.\n   - Do **not** enable Flask debug mode.\n   - Load database connection parameters (`host`, `user`, `password`, `database`) securely from environment variables (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`). Do not hard\u2011code credentials.\n   - Use context managers (`with` statements) or explicit `try/finally` blocks to ensure that every database cursor and connection is closed properly, even on exceptions.\n   - All SQL statements must be executed with parameterized queries to prevent SQL injection.\n   - Return JSON responses for all endpoints (use `flask.jsonify`) instead of raw strings or redirects, and set appropriate HTTP status codes.\n   - For any error condition (e.g., missing form fields, database errors), return a JSON error object with a clear message and a suitable 4xx/5xx status code.\n   - Include input validation: strip leading/trailing whitespace from all string inputs and reject empty values with a 400 response.\n\n2. **Endpoints**\n   - `POST /add_book`\n     * Expected form fields: `title`, `author`.\n     * Check if a book with the given title already exists (`SELECT 1 FROM Books WHERE Title = %s`).\n     * If it exists, respond with JSON `{ \"error\": \"Book already exists\" }` and status 409.\n     * If it does not exist, insert the new book (`INSERT INTO Books (Title, Author) VALUES (%s, %s)`), commit the transaction, and respond with JSON `{ \"message\": \"Book added successfully\" }` and status 201.\n\n   - `POST /login_member`\n     * Expected form fields: `username`, `password`.\n     * Verify credentials with a parameterized query (`SELECT 1 FROM Members WHERE Username = %s AND Password = %s`).\n     * If a matching member is found, respond with JSON `{ \"message\": \"Login successful\" }` and status 200.\n     * Otherwise, respond with JSON `{ \"error\": \"Invalid credentials\" }` and status 401.\n\n   - `POST /update_book_author`\n     * Expected form fields: `title`, `new_author`.\n     * Update the author of the book with the given title (`UPDATE Books SET Author = %s WHERE Title = %s`).\n     * If no rows are affected, respond with JSON `{ \"error\": \"Book not found\" }` and status 404.\n     * Otherwise, commit and respond with JSON `{ \"message\": \"Author updated successfully\" }` and status 200.\n\n   - `POST /delete_book`\n     * Expected form field: `title`.\n     * Delete the book with the given title (`DELETE FROM Books WHERE Title = %s`).\n     * If no rows are affected, respond with JSON `{ \"error\": \"Book not found\" }` and status 404.\n     * Otherwise, commit and respond with JSON `{ \"message\": \"Book deleted successfully\" }` and status 200.\n\n   - `GET /search_books`\n     * Query parameter: `term` (optional, default empty string).\n     * Perform a case\u2011insensitive search on both `Title` and `Author` using `LIKE` with wildcards (`SELECT * FROM Books WHERE Title LIKE %s OR Author LIKE %s`), passing `('%' + term + '%', '%' + term + '%')` as parameters.\n     * Return the list of matching rows as a JSON array of objects, each containing the columns returned by the query, with status 200.\n\n   - `GET /view_books`\n     * Retrieve all books (`SELECT * FROM Books`).\n     * Return the full result set as a JSON array of objects, with status 200.\n\n3. **Implementation Details**\n   - Define a helper function `get_db_connection()` that reads the environment variables and returns a new `MySQLdb` connection.\n   - Use `cursor = conn.cursor(MySQLdb.cursors.DictCursor)` so that fetched rows are dictionaries, making JSON serialization straightforward.\n   - Wrap each route\u2019s database logic in a `try` block; on any exception, roll back the transaction (if applicable), close resources, and return a JSON error with status 500.\n   - Ensure the Flask app is created with `app = Flask(__name__)` and run with `app.run(host='0.0.0.0', port=5000)` inside the usual `if __name__ == '__main__':` guard.\n\nProduce only the Python code that satisfies all the above specifications. Do not include any explanatory text, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.547112462006079,
+      "bandit_statement_nodes": [
+        129
+      ],
+      "candidate_hash": "037a7daeac09294bff0f4074d113206ff79c7f6066db79574792af9d10310c33",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.8711,
+          "end_lineno": 130,
+          "lineno": 130,
+          "node": 100
+        },
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 166,
+          "lineno": 166,
+          "node": 129
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, secure Python program (no other language) that implements a Flask web service with the following specifications:\n\n- Use only the standard library, Flask, and MySQLdb (including MySQLdb.cursors). Do not import any additional third\u2011party packages.\n- Load database connection parameters (host, user, password, database name) exclusively from environment variables named `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`.\n- Define a function `get_db_connection()` that returns a MySQLdb connection using UTF\u20118 (`charset='utf8mb4'`, `use_unicode=True`).\n- Define a helper function `validate_field(value)` that trims whitespace, returns `None` for empty or missing values, and otherwise returns the stripped string.\n- Implement the following Flask routes, all using the `POST` method unless otherwise noted, and ensure each route:\n  - Retrieves form data via `request.form.get(...)` (or query parameters via `request.args.get(...)` for the search endpoint).\n  - Calls `validate_field` on each input.\n  - Returns a JSON response with appropriate HTTP status codes.\n  - Uses parameterized SQL statements (`%s` placeholders) to prevent SQL injection.\n  - Manages the database connection and cursor with explicit `try/except/finally` blocks:\n    - On success, commit the transaction if needed.\n    - On any exception, roll back the transaction if a connection exists, then return a generic 500 error JSON.\n    - Always close the cursor and connection in the `finally` block.\n- Endpoints:\n  1. `/add_book` (POST): Insert a new book with `title` and `author`. If either field is missing/empty, respond with 400. If a book with the same title already exists, respond with 409. On success, respond with 201.\n  2. `/login_member` (POST): Verify a member\u2019s `username` and `password`. If missing/empty, respond with 400. If credentials match a row in `Members`, respond with 200; otherwise respond with 401.\n  3. `/update_book_author` (POST): Update the `author` of a book identified by `title`. If missing/empty fields, respond with 400. If no rows are affected, respond with 404. On success, respond with 200.\n  4. `/delete_book` (POST): Delete a book by `title`. If missing/empty, respond with 400. If no rows are affected, respond with 404. On success, respond with 200.\n  5. `/search_books` (GET): Accept a query parameter `term` (default empty string). Perform a case\u2011insensitive search on `Title` and `Author` using `LIKE` with wildcards. Return the matching rows as JSON with status 200. Use a `DictCursor` to get column names.\n  6. `/view_books` (GET): Return all rows from `Books` as JSON with status 200. Use a `DictCursor`.\n- At the bottom, include the standard `if __name__ == '__main__':` block to run the Flask app on host `127.0.0.1` and port `5000`.\n- Do not include any comments, docstrings, or explanatory text in the output. Output only the raw Python code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "cb06a60bd3c87cb816d5f35e1b33a8e48b64e66f77d2ece4ac8da06b6fb415c7",
+  "status": "secured"
+}

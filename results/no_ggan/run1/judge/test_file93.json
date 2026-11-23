@@ -1,0 +1,74 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "06b8d1f3d9ab9827225404effac10a0b3f4d0f5eb9a614cc9d53383d7f8d5186",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed JSON fields in POST requests",
+      "Non\u2011numeric or negative values for 'votes' or 'candidate_id'",
+      "Requesting a candidate id that does not exist",
+      "Database file missing or inaccessible",
+      "SQL injection payloads that alter query semantics",
+      "Extremely large vote increments causing integer overflow"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a RESTful service to manage election candidates and vote tallies via HTTP endpoints.",
+    "invariants": [
+      "Each candidate record has a unique integer id",
+      "Votes are stored as an integer value",
+      "All responses are JSON-encoded",
+      "HTTP status codes follow the documented contract (201 for creation, 200 for success)"
+    ],
+    "io_behavior": [
+      "POST /register_candidate with JSON {name, party} \u2192 201 and success message",
+      "GET /get_candidate?id=ID \u2192 200 and JSON object for the candidate",
+      "POST /update_votes with JSON {candidate_id, votes} \u2192 200 and success message",
+      "GET /get_results \u2192 200 and JSON array of candidates ordered by votes"
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:GET /get_candidate": "",
+      "route:GET /get_results": "",
+      "route:POST /register_candidate": "",
+      "route:POST /update_votes": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the SQLite 'candidates' table",
+      "Updates the 'votes' column of an existing candidate row",
+      "Reads rows from the 'candidates' table for retrieval and ranking",
+      "Commits changes to the 'election.db' file on each write operation"
+    ],
+    "source_hash": "47679752c6580ec721a4e649dd63089f102ea9f5858a6f578e464ff2959c276d"
+  },
+  "dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.5,
+    "invariants": 0.9,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file93.py",
+  "gated_score": 0.74,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.74,
+  "original_hash": "47679752c6580ec721a4e649dd63089f102ea9f5858a6f578e464ff2959c276d",
+  "rationale": "The program implements all required routes, JSON responses, and status codes, and performs the expected DB side\u2011effects. It handles missing/malformed JSON and unknown candidate IDs, but it accepts negative vote increments, does not guard against missing or inaccessible DB files, and lacks overflow protection, so edge\u2011case coverage is partial.",
+  "schema": 1,
+  "stability_abs_difference": 0.0675,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.5,
+    "invariants": 0.9,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.8075,
+  "weighted_mean": 0.82,
+  "worst_dimension": 0.5
+}

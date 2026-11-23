@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "3f36f193418f848f8e205c42e1c42fa6fdab1ed93a44281a56a784ade01aad5b",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML in /config/add results in a 400 response with an error message.",
+      "Missing required fields (e.g., config_id, password, new_password) cause a 400 error.",
+      "Incorrect admin password on login or protected actions returns a 401 Unauthorized response.",
+      "Providing an empty new_password during password update yields a 400 error.",
+      "Omitting query parameters like job_id or user_id leads to a 400 error.",
+      "Changing ADMIN_PASSWORD affects all subsequent authentication checks within the same process."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a small HTTP API for managing configurations, executing jobs, and retrieving user or job information with simple password\u2011based authentication.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" field.",
+      "Protected endpoints (/auth/*, /auth/settings) succeed only when the supplied password matches the current ADMIN_PASSWORD.",
+      "Required parameters (e.g., config_id, job_name, user_id) must be non\u2011empty; otherwise a 400 error is returned.",
+      "The server runs as a Flask application with debug mode disabled."
+    ],
+    "io_behavior": [
+      "POST /config/add \u2013 accepts raw YAML in the request body and returns a JSON object with the supplied config_id and config_value.",
+      "GET /job/execute \u2013 reads job_name and parameter query parameters and returns a JSON status message.",
+      "POST /auth/login \u2013 reads a form field \"password\" and returns a JSON success or failure message.",
+      "POST /auth/update_password \u2013 requires the current admin password and a new_password form field; returns JSON indicating the update result.",
+      "GET /config/get \u2013 requires a config_id query parameter and returns a JSON object containing a sample config_value.",
+      "GET /user/info \u2013 requires a user_id query parameter and returns a JSON object with static user details."
+    ],
+    "public_api": {
+      "route:GET /config/get": "",
+      "route:GET /data/export": "",
+      "route:GET /job/execute": "",
+      "route:GET /job/logs": "",
+      "route:GET /job/status": "",
+      "route:GET /user/info": "",
+      "route:POST /auth/login": "",
+      "route:POST /auth/settings": "",
+      "route:POST /auth/update_password": "",
+      "route:POST /config/add": "",
+      "route:POST /config/remove": ""
+    },
+    "side_effects": [
+      "Calls the external shell script execute_job.sh with supplied arguments via os.system.",
+      "Runs the Python script export_data.py with the requested format via os.system.",
+      "Updates the in\u2011memory ADMIN_PASSWORD variable when the password is changed.",
+      "Potentially starts background processes invoked by the shell scripts (observable only as command execution)."
+    ],
+    "source_hash": "0525122ed53928fa8d282c5f392bfd0ac67a247d4fac9a62a54c08b0630bd854"
+  },
+  "dimensions": {
+    "behavior": 0.82,
+    "edge_cases": 0.85,
+    "invariants": 0.84,
+    "io_semantics": 0.86,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file9.py",
+  "gated_score": 0.84062,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.84062,
+  "original_hash": "0525122ed53928fa8d282c5f392bfd0ac67a247d4fac9a62a54c08b0630bd854",
+  "rationale": "Program implements most contract endpoints and invariants, correctly handles YAML errors, authentication, and external script execution. However, it returns 401 instead of 400 for missing password fields and updates a hashed password variable rather than the plain ADMIN_PASSWORD, slightly violating edge\u2011case and invariant specifications.",
+  "schema": 1,
+  "stability_abs_difference": 0.08476,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.9,
+    "invariants": 0.92,
+    "io_semantics": 1.0,
+    "side_effects": 0.85
+  },
+  "stability_score": 0.92538,
+  "weighted_mean": 0.8475,
+  "worst_dimension": 0.82
+}

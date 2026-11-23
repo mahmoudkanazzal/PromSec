@@ -1,0 +1,91 @@
+{
+  "ast_similarity": 0.1913265306122449,
+  "candidate_hash": "ffa9ba262b52f2c5642b0d40657955b0b7427a998f5d4d85623779b47a919081",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    89,
+    259
+  ],
+  "error": "",
+  "file": "test_file45.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.46984126984126984,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        12
+      ],
+      "candidate_hash": "35da4ca296d495b9a866a86dea6b87650d8f53b1ecdd5dd23f8202fbc8243c1b",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other languages) that implements the exact functionality of the following description, preserving security best practices:\n\n- Use Flask to create a web application with a secret key taken from the environment variable `FLASK_SECRET_KEY`; if not set, default to a placeholder string that must be changed before production.\n- Define a function `get_db_connection()` that creates and returns a new MySQLdb connection using the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`, with sensible default values (`localhost`, `app_user`, empty password, `db`).\n- Define a function `verify_password(stored_hash, password)` that hashes the supplied password with SHA\u2011256 (UTF\u20118 encoding) using `hashlib` and returns a boolean indicating whether it matches `stored_hash`.\n- Implement a `/login` route that accepts only POST requests. It must:\n  1. Retrieve `username` and `password` from `request.form`, defaulting to empty strings.\n  2. If either field is missing or empty, redirect to `/login`.\n  3. Open a database connection via `get_db_connection()`, obtain a cursor, and execute a **parameterized** SQL query to select `id`, `role`, and `password_hash` from a `users` table where `username = %s`.\n  4. If no row is returned, redirect to `/login`.\n  5. Use `verify_password` to compare the stored hash with the supplied password; on mismatch, redirect to `/login`.\n  6. On successful authentication, store `id` in `session['id']` and `role` in `session['Role']`, then redirect to `/dashboard`.\n  7. Handle any `MySQLdb.Error` by aborting with HTTP 500.\n  8. Ensure the cursor and connection are closed in a `finally` block, swallowing any exceptions during cleanup.\n- Import only the required modules: `os`, `hashlib`, `MySQLdb`, and Flask components (`Flask`, `request`, `redirect`, `session`, `abort`).\n- The script must be ready to run as a Flask app (include `if __name__ == \"__main__\": app.run()` or equivalent) and must not contain any extraneous code, comments, or non\u2011Python content. Ensure all security considerations (environment\u2011based secrets, parameterized queries, proper password hashing, error handling) are explicitly implemented.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3915343915343915,
+      "bandit_statement_nodes": [
+        36,
+        38,
+        40,
+        42
+      ],
+      "candidate_hash": "25d24dfc2f7a9468e32ada0ba8f9e8e9e02ad86cdc8aa02728d2f2fe377b3cad",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a secure login endpoint. The script must:\n\n- Import only the standard library modules and the following third\u2011party packages: Flask, MySQLdb, and werkzeug.security.\n- Retrieve a secret key from the environment variable FLASK_SECRET_KEY; raise a RuntimeError if it is missing.\n- Configure Flask session cookies to be HttpOnly, Secure, and SameSite='Lax'.\n- Define a function get_db_connection() that reads DB_HOST, DB_USER, DB_PASSWORD, DB_NAME from environment variables (defaulting to localhost, app_user, empty password, db) and returns a MySQLdb connection with charset='utf8mb4' and use_unicode=True.\n- Define a function verify_password(stored_hash: str, password: str) -> bool that returns the result of werkzeug.security.check_password_hash.\n- Create a Flask route '/login' that accepts only POST requests. It must:\n  * Read 'username' and 'password' from request.form, stripping whitespace from username.\n  * If either field is missing, redirect to the view named 'login'.\n  * Open a database connection using get_db_connection(), execute a parameterised query to select id, role, password_hash from users where username = %s.\n  * If no row is returned or the password does not verify, redirect to the view named 'login'.\n  * On successful authentication, clear the session, store 'id' and 'role' in the session, and redirect to the view named 'dashboard'.\n  * Handle any MySQLdb.Error by aborting with HTTP 500.\n  * Ensure the cursor and connection are closed in a finally block, swallowing any exceptions during close.\n- Include the usual Flask application entry point guarded by if __name__ == '__main__': and call app.run().\n- Add a comment indicating that in production a proper WSGI server and HTTPS should be used.\n- Ensure the code is valid Python 3, follows best security practices, and does not contain any code in another language.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.20355191256830601,
+      "bandit_statement_nodes": [
+        41,
+        43,
+        45,
+        47
+      ],
+      "candidate_hash": "a30c16978ebda44a1dcfef898293f4d3a9e5ddac58a3b263cbd3cb7def8ea9ab",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, secure Python 3 script that implements a Flask web application with a login endpoint, matching the exact functionality described below. The script must:\n\n- Import only the following modules: `os`, `time`, `flask` (specifically `Flask`, `request`, `redirect`, `url_for`, `session`, `abort`), `MySQLdb`, `MySQLdb.cursors`, and `werkzeug.security.check_password_hash`.\n- Define security configuration constants:\n  - `MAX_LOGIN_ATTEMPTS = 5`\n  - `BLOCK_TIME_SECONDS = 15 * 60`\n- Use an in\u2011memory dictionary named `_login_attempts` to track failed login attempts per IP address.\n- Implement a function `_is_ip_blocked(ip: str) -> bool` that returns `True` if the given IP has exceeded the maximum failed attempts within the block window, otherwise `False`. It must also reset the record when the block window expires.\n- Implement a function `_record_login_attempt(ip: str, success: bool) -> None` that records a failed attempt or clears the record on successful login, handling the block window reset logic.\n- Implement a function `get_db_connection()` that:\n  - Reads the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`.\n  - Raises a `RuntimeError` with a clear message if any of these variables are missing.\n  - Returns a `MySQLdb` connection using these variables, with `charset='utf8mb4'`, `use_unicode=True`, and `cursorclass=MySQLdb.cursors.DictCursor`.\n- Implement a function `verify_password(stored_hash: str, password: str) -> bool` that returns the result of `check_password_hash(stored_hash, password)`.\n- Initialize a Flask app:\n  - Retrieve the secret key from the environment variable `FLASK_SECRET_KEY`; raise a `RuntimeError` if it is missing.\n  - Set `app.secret_key` to this value.\n  - Configure session cookies with `SESSION_COOKIE_HTTPONLY = True`, `SESSION_COOKIE_SECURE = True`, `SESSION_COOKIE_SAMESITE = 'Strict'`.\n  - Set `PREFERRED_URL_SCHEME = 'https'`.\n- Add an `@app.after_request` handler `set_security_headers(response)` that adds the following headers if not already present:\n  - `X-Content-Type-Options: nosniff`\n  - `X-Frame-Options: DENY`\n  - `Content-Security-Policy: default-src 'self'`\n  - `Referrer-Policy: no-referrer`\n- Define a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  - Retrieves the client IP from `request.remote_addr` (use `'unknown'` if not available).\n  - Calls `_is_ip_blocked(ip)` and aborts with status 429 if the IP is blocked.\n  - Extracts `username` and `password` from `request.form`, stripping whitespace from the username.\n  - If either field is missing, records a failed attempt and redirects back to the login page.\n  - Opens a database connection via `get_db_connection()`, creates a cursor, and executes a parameterized query:\n    `\"SELECT id, role, password_hash FROM users WHERE username = %s\"` with the provided username.\n  - Fetches one row; if no row is returned or the password verification fails, records a failed attempt and redirects back to the login page.\n  - On successful authentication, records a successful attempt, clears the session, stores `id` and `role` in the session, and redirects to the `dashboard` endpoint.\n  - Handles any `MySQLdb.Error` by aborting with status 500.\n  - Ensures the cursor and connection are closed in a `finally` block, suppressing any exceptions during close.\n- Include a guard `if __name__ == '__main__':` that runs the Flask app with `app.run()`.\n- Do not include any additional functionality, comments, or explanatory text. Output only the Python code that fulfills these requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.1913265306122449,
+      "bandit_statement_nodes": [
+        85,
+        88
+      ],
+      "candidate_hash": "ffa9ba262b52f2c5642b0d40657955b0b7427a998f5d4d85623779b47a919081",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, secure Python 3 script that implements a Flask web application with a login endpoint. The script must:\n\n- Import only the following modules: `os`, `time`, `logging`, `Flask`, `request`, `redirect`, `url_for`, `session`, `abort`, `make_response`, `MySQLdb`, `MySQLdb.cursors`, and `check_password_hash` from `werkzeug.security`.\n- Configure logging at INFO level and create a logger named `__name__`.\n- Define constants `MAX_LOGIN_ATTEMPTS = 5` and `BLOCK_TIME_SECONDS = 15 * 60`.\n- Maintain an in\u2011memory dictionary `_login_attempts` to track login attempts per IP.\n- Implement a function `_is_ip_blocked(ip: str) -> bool` that returns True if the IP has exceeded the maximum attempts within the block window, otherwise False. It must clean up expired records.\n- Implement a function `_record_login_attempt(ip: str, success: bool) -> None` that records a failed attempt or clears the record on success, respecting the block window.\n- Implement `get_client_ip() -> str` that returns the most reliable client IP: prefer the first IP in the `X-Forwarded-For` header if present, otherwise use `request.remote_addr`. Return `'unknown'` if no IP is available.\n- Implement `get_db_connection()` that reads environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`. If any are missing, raise a `RuntimeError` listing the missing variables. Return a `MySQLdb.connect` object with:\n  - host, user, passwd, db set from the environment,\n  - charset `'utf8mb4'`,\n  - use_unicode=True,\n  - cursorclass=`MySQLdb.cursors.DictCursor`,\n  - autocommit=True.\n- Implement `verify_password(stored_hash: str, password: str) -> bool` using `check_password_hash`.\n- Create a Flask app instance.\n- Load the secret key from the environment variable `FLASK_SECRET_KEY`. If missing, raise a `RuntimeError`. Set `app.secret_key` to this value.\n- Configure the Flask app with the following security settings:\n  - `SESSION_COOKIE_HTTPONLY = True`\n  - `SESSION_COOKIE_SECURE = True`\n  - `SESSION_COOKIE_SAMESITE = 'Strict'`\n  - `SESSION_PROTECTION = 'strong'`\n  - `PREFERRED_URL_SCHEME = 'https'`\n- Add an `@app.after_request` function `set_security_headers(response)` that adds these headers if not already present:\n  - `X-Content-Type-Options: nosniff`\n  - `X-Frame-Options: DENY`\n  - `X-XSS-Protection: 1; mode=block`\n  - `Content-Security-Policy: default-src 'self'`\n  - `Referrer-Policy: no-referrer`\n  - `Cache-Control: no-store`\n  Return the modified response.\n- Define a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  1. Retrieves the client IP via `get_client_ip()`.\n  2. Checks if the IP is blocked using `_is_ip_blocked`; if so, abort with status 429.\n  3. Reads `username` and `password` from `request.form`, stripping whitespace from the username.\n  4. If either field is empty, record a failed attempt and redirect to the login page (`url_for('login')`).\n  5. Opens a database connection using `get_db_connection()`, obtains a cursor, and executes a parameterized query:\n     `\"SELECT id, role, password_hash FROM users WHERE username = %s\"` with the username as a parameter.\n  6. Fetches one row. If no row is returned or `verify_password` fails, record a failed attempt and redirect to the login page.\n  7. On successful authentication, record a successful attempt, clear the session, set `session['user_id']` and `session['role']` from the row, and redirect to `url_for('dashboard')`.\n  8. Handle any `MySQLdb.Error` by logging the error with the logger and aborting with status 500.\n  9. Ensure the cursor and connection are closed in a `finally` block, logging any exceptions during close at DEBUG level.\n- Include a `if __name__ == '__main__':` block that runs the Flask development server with a comment indicating that a production WSGI server should be used instead.\n\nThe output must be only the Python code described above, with no additional explanations, comments beyond those required for functionality, or any non\u2011Python text. Ensure the code follows best security practices as specified.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 4,
+  "schema": 1,
+  "selected_iteration": 4,
+  "source_hash": "82a598df24f20127548a17aeae223f565253b9c8deab6eb8a9c0ff434bc08957",
+  "status": "secured"
+}

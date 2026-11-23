@@ -1,0 +1,45 @@
+{
+  "ast_similarity": 0.7112526539278131,
+  "candidate_hash": "0721a73ec58112b44f5a785a91dff464b9fc4e3da5d702f9608c8f4b442967f1",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file94.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7112526539278131,
+      "bandit_statement_nodes": [
+        10,
+        19,
+        29
+      ],
+      "candidate_hash": "0721a73ec58112b44f5a785a91dff464b9fc4e3da5d702f9608c8f4b442967f1",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.176,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (no other language) that implements a Flask web application with the following exact functionality and security requirements:\n\n- Use only the standard `flask` and `sqlite3` modules.\n- Import `Flask`, `request`, and `jsonify` from `flask`.\n- Create a Flask app instance named `app`.\n- Define a function `get_db_connection()` that:\n  - Connects to an SQLite database file named `library.db`.\n  - Sets `row_factory` to `sqlite3.Row`.\n  - Disables loading of SQLite extensions for security by calling `conn.enable_load_extension(False)` inside a try/except block that catches `AttributeError`.\n  - Returns the connection object.\n- Implement the route `/add_book` with method `POST` that:\n  - Retrieves JSON payload safely using `request.get_json(silent=True) or {}`.\n  - Extracts `title` and `author` from the payload.\n  - Returns a 400 JSON error if either field is missing.\n  - Inserts a new row into the `books` table using a parameterized query `INSERT INTO books (title, author) VALUES (?, ?)` with the extracted values.\n  - Commits the transaction and returns a 201 JSON success message.\n- Implement the route `/get_book` with method `GET` that:\n  - Reads the query parameter `id` from `request.args`.\n  - Validates that `id` exists and consists only of digits; otherwise return a 400 JSON error.\n  - Retrieves the book with the given integer id using a parameterized query `SELECT * FROM books WHERE id = ?`.\n  - If no row is found, return a 404 JSON error; otherwise convert the row to a dictionary and return it with a 200 status.\n- Implement the route `/update_copies` with method `POST` that:\n  - Retrieves JSON payload safely.\n  - Extracts `book_id` and `copies` from the payload.\n  - Validates that both are integers; otherwise return a 400 JSON error.\n  - Updates the `copies` column by adding the provided `copies` value using a parameterized query `UPDATE books SET copies = copies + ? WHERE id = ?`.\n  - If no rows are affected, return a 404 JSON error; otherwise commit and return a 200 JSON success message.\n- Implement the route `/get_catalog` with method `GET` that:\n  - Retrieves all books ordered by title using the query `SELECT title, author, copies FROM books ORDER BY title`.\n  - Converts each row to a dictionary and returns a list of these dictionaries as JSON with a 200 status.\n- Ensure that all database interactions use context managers (`with get_db_connection() as conn:`) and parameterized queries to prevent SQL injection.\n- Do not enable Flask debug mode; set `debug=False` when running the app.\n- Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\nThe generated code must be syntactically correct, follow the specifications exactly, and contain no additional functionality, comments, or explanatory text.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "e073dd9a61e0cb410dcefad0439b1bca1f2d3d6f7cbd533ee88fe43dc93f9972",
+  "status": "secured"
+}

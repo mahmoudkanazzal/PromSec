@@ -1,0 +1,67 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "9f92c83761102de710ef95c1451bb9b376b44dbc88367c27b7d10e219fc2cbca",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a server error (KeyError).",
+      "Empty strings for username or password are accepted and processed.",
+      "A username containing SQL metacharacters can lead to injection because queries are concatenated.",
+      "Database connection failures raise an exception and result in a 500 error.",
+      "Extremely long input values may exceed query length limits or cause performance issues.",
+      "Registering an already\u2011existing username returns \"user already exists\"."
+    ],
+    "entrypoints": [],
+    "intent": "Handle HTTP POST requests to /register by creating a new user account and storing the username with a SHA\u20111 hashed password in a MySQL database.",
+    "invariants": [
+      "Usernames are unique in the 'user' table.",
+      "Passwords are stored only as SHA\u20111 hashes of the supplied password.",
+      "The endpoint always returns one of the two exact response strings.",
+      "Database connection parameters (host, user, password, db) are fixed in the code."
+    ],
+    "io_behavior": [
+      "Accepts a POST request with form fields 'username' and 'password'.",
+      "Returns the plain\u2011text response \"register success\" when a new user is created.",
+      "Returns the plain\u2011text response \"user already exists\" when the username is already present.",
+      "Responds with HTTP 200 and the response body containing one of the above messages."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Opens a connection to a MySQL server.",
+      "Executes a SELECT query to check for existing usernames.",
+      "Executes an INSERT query and commits the transaction to add a new user record.",
+      "Sends network traffic to the database server."
+    ],
+    "source_hash": "b6e3cdbb96decf7cd13844e5210a27a2089060571717bc243e0a1303df33bc57"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.2,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file68.py",
+  "gated_score": 0.35,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.35,
+  "original_hash": "b6e3cdbb96decf7cd13844e5210a27a2089060571717bc243e0a1303df33bc57",
+  "rationale": "Key differences: missing fields do not raise a KeyError, uses parameterized queries (no SQL injection), hashes passwords with PBKDF2\u2011SHA256 and a random salt instead of SHA\u20111, and reads DB credentials from environment variables rather than fixed literals; however, it still returns the required response strings and performs the expected DB operations.",
+  "schema": 1,
+  "stability_abs_difference": 0.24588,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.33,
+    "invariants": 0.5,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.59588,
+  "weighted_mean": 0.4,
+  "worst_dimension": 0.2
+}

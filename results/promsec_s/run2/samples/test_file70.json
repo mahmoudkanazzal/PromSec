@@ -1,0 +1,101 @@
+{
+  "ast_similarity": 0.7650397275822929,
+  "candidate_hash": "b1e2475c29d448b12a069fd5559159fdf96fb7f2e9056b71ad8e4cfe50fb2960",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file70.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7966903073286052,
+      "bandit_statement_nodes": [
+        14,
+        19,
+        30,
+        45,
+        49,
+        62,
+        66,
+        77
+      ],
+      "candidate_hash": "2d3ef06a29580587844d8e3d0df65f4ee8c189ef724e9238388181dd2ea6081c",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 1.0,
+          "end_lineno": 18,
+          "lineno": 18,
+          "node": 14
+        },
+        {
+          "ast_type": "Assign",
+          "change": 1.0,
+          "end_lineno": 37,
+          "lineno": 37,
+          "node": 30
+        },
+        {
+          "ast_type": "Assign",
+          "change": 1.0,
+          "end_lineno": 54,
+          "lineno": 54,
+          "node": 45
+        },
+        {
+          "ast_type": "Assign",
+          "change": 1.0,
+          "end_lineno": 73,
+          "lineno": 73,
+          "node": 62
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9999,
+          "end_lineno": 77,
+          "lineno": 77,
+          "node": 66
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python Flask application that implements the following endpoints with the exact same functionality as described:\n\n- **POST /register**: Accept `username` and `password` from form data. Generate a cryptographically secure random 16\u2011byte salt, hash the password using SHA\u2011256 (or a stronger algorithm such as PBKDF2 via `werkzeug.security.generate_password_hash`) combined with the salt, and store `username`, the hashed password, the salt (as a hex string), and an `account_created` flag in a MySQL `users` table. If the username already exists, redirect to `/login` with HTTP status 307. Return a plain\u2011text success message on successful registration.\n\n- **POST /login**: Accept `username` and `password` from form data. Retrieve the stored password hash and salt for the given username from the `users` table, recompute the hash with the provided password and stored salt, and if they match, redirect to `/dashboard` with HTTP status 307. Return a plain\u2011text \u201cInvalid credentials\u201d message otherwise.\n\n- **POST /project/create**: Accept `username` and `project_name` from form data. Verify that the username exists in the `users` table, then insert a new row into a `projects` table linking the user to the project. Return a plain\u2011text success message or \u201cUser not found\u201d.\n\n- **POST /task/add**: Accept `project_name`, `task_name`, and `task_description` from form data. Verify that the project exists in the `projects` table, then insert a new row into a `tasks` table. Return a plain\u2011text success message or \u201cProject not found\u201d.\n\n- **GET /tasks/view**: Accept `project_name` as a query parameter. Retrieve all tasks (`task_name`, `task_description`) for that project from the `tasks` table and return them as JSON.\n\nSecurity and quality requirements:\n1. The code must be pure Python and use only publicly available packages (e.g., Flask, MySQLdb, werkzeug.security, os, hashlib, json).\n2. Use **parameterized queries** everywhere to prevent SQL injection.\n3. Store database credentials (`host`, `user`, `password`, `database`) in environment variables and read them with `os.getenv`.\n4. Use **context managers** (`with` statements) for database connections and cursors to ensure proper cleanup.\n5. Use a strong password\u2011hashing function (e.g., `werkzeug.security.generate_password_hash` with `pbkdf2:sha256`) instead of raw SHA\u2011256, and verify with `check_password_hash`.\n6. Convert the random salt to a hex string before storing; when verifying, convert it back to bytes.\n7. Validate and sanitize all incoming data (e.g., ensure required fields are present, non\u2011empty, and of reasonable length). Return appropriate HTTP status codes (e.g., 400 for bad request, 404 for not found, 200 for success).\n8. Disable Flask debug mode in production (`debug=False`).\n9. Include proper error handling: catch database errors, return generic error messages without leaking internal details, and ensure connections are closed even on exceptions.\n10. Use `jsonify` for JSON responses and set appropriate `Content\u2011Type` headers.\n11. Do not include any explanatory comments or extra output; output only the Python source code that fulfills the above specifications.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.7650397275822929,
+      "bandit_statement_nodes": [
+        90
+      ],
+      "candidate_hash": "b1e2475c29d448b12a069fd5559159fdf96fb7f2e9056b71ad8e4cfe50fb2960",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 118,
+          "lineno": 118,
+          "node": 90
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, secure Python Flask application that implements the following functionality exactly as described, using only Python code and no other language:\n\n- Import `os`, `Flask`, `request`, `redirect`, `jsonify`, `make_response` from `flask`, `MySQLdb`, and `generate_password_hash`, `check_password_hash` from `werkzeug.security`.\n- Create a Flask app instance.\n- Define a `get_db()` function that returns a MySQLdb connection using the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`. Set `charset='utf8mb4'` and `cursorclass=MySQLdb.cursors.DictCursor`.\n- Define a `validate_field(data, field, max_len=150)` helper that retrieves `field` from a dict, ensures it is a non\u2011empty string, strips whitespace, checks length \u2264 `max_len`, and returns the cleaned value or `None` on failure.\n- Implement the `/register` POST endpoint:\n  * Validate `username` and `password` from `request.form` using `validate_field`.\n  * Return a 400 response with body \u201cBad request\u201d if validation fails.\n  * Use a context manager (`with get_db() as conn`) and a cursor to:\n    - Check if the username already exists (`SELECT 1 FROM users WHERE username=%s`). If it does, redirect to `/login` with status code 307.\n    - Generate a 16\u2011byte random salt (`os.urandom(16).hex()`), concatenate password and salt, hash with `generate_password_hash(..., method='pbkdf2:sha256')`.\n    - Insert the new user (`INSERT INTO users (username, password_hash, salt, account_created) VALUES (%s, %s, %s, %s)`) with `account_created` set to `True`.\n    - Commit the transaction.\n  * Return a 200 response with plain\u2011text body \u201cRegistration successful\u201d.\n  * On any MySQLdb error, return a 500 response with body \u201cInternal server error\u201d.\n- Implement the `/login` POST endpoint:\n  * Validate `username` and `password` as above.\n  * Return 400 \u201cBad request\u201d on validation failure.\n  * Query the user\u2019s `password_hash` and `salt` (`SELECT password_hash, salt FROM users WHERE username=%s`).\n  * If no row is found, return 401 \u201cInvalid credentials\u201d with `Content-Type: text/plain`.\n  * Concatenate the supplied password with the stored salt and verify with `check_password_hash`.\n  * If verification succeeds, redirect to `/dashboard` with status code 307; otherwise return 401 \u201cInvalid credentials\u201d.\n  * On any MySQLdb error, return 500 \u201cInternal server error\u201d.\n- Implement the `/project/create` POST endpoint:\n  * Validate `username` and `project_name` from `request.form`.\n  * Return 400 \u201cBad request\u201d on validation failure.\n  * Verify the user exists (`SELECT 1 FROM users WHERE username=%s`). If not, return 404 \u201cUser not found\u201d.\n  * Insert the project (`INSERT INTO projects (username, project_name) VALUES (%s, %s)`) and commit.\n  * Return 200 \u201cProject created\u201d.\n  * On any MySQLdb error, return 500 \u201cInternal server error\u201d.\n- Implement the `/task/add` POST endpoint:\n  * Validate `project_name`, `task_name`, and `task_description` (max_len=500) from `request.form`.\n  * Return 400 \u201cBad request\u201d if any validation fails (note that `task_description` may be an empty string but must not be `None`).\n  * Verify the project exists (`SELECT 1 FROM projects WHERE project_name=%s`). If not, return 404 \u201cProject not found\u201d.\n  * Insert the task (`INSERT INTO tasks (project_name, task_name, task_description) VALUES (%s, %s, %s)`) and commit.\n  * Return 200 \u201cTask added\u201d.\n  * On any MySQLdb error, return 500 \u201cInternal server error\u201d.\n- Implement the `/tasks/view` GET endpoint:\n  * Retrieve `project_name` from query parameters, strip whitespace, and ensure it is non\u2011empty.\n  * Return 400 \u201cBad request\u201d if missing.\n  * Query tasks (`SELECT task_name, task_description FROM tasks WHERE project_name=%s`) and fetch all rows.\n  * Return the rows as JSON using `jsonify`.\n  * On any MySQLdb error, return 500 \u201cInternal server error\u201d.\n- At the bottom, include the standard `if __name__ == '__main__':` block to run the app on host `127.0.0.1`, port `5000`, with `debug=False`.\n\nAdditional security and quality requirements:\n- Use only parameterized queries (`%s` placeholders) to prevent SQL injection.\n- Do not expose stack traces or internal error details; return generic error messages as specified.\n- Ensure all responses have appropriate `Content-Type` headers where mentioned.\n- Do not include any debugging or development mode; `debug` must be set to `False`.\n- Do not add any extra routes, functions, or code beyond what is described.\n- The entire output must be valid Python code ready to run, with no explanatory text, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "6d4e51f8cfe78b6dadd8dc3e30ee24aee6e08732d4bad4f640760688e2a3b5cd",
+  "status": "secured"
+}

@@ -1,0 +1,371 @@
+{
+  "ast_similarity": 0.5119453924914675,
+  "candidate_hash": "77ad3fecd1c54bdb6ef2d61450f70a013377c0db8129c42923075a7e04c6ce4b",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 1,
+  "cwe_count_before": 4,
+  "cwes_after": [
+    703
+  ],
+  "cwes_before": [
+    78,
+    89,
+    259,
+    327
+  ],
+  "error": "",
+  "file": "test_file50.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5119453924914675,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        12,
+        18
+      ],
+      "candidate_hash": "77ad3fecd1c54bdb6ef2d61450f70a013377c0db8129c42923075a7e04c6ce4b",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9993,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.7872,
+          "end_lineno": 24,
+          "lineno": 24,
+          "node": 10
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9998,
+          "end_lineno": 26,
+          "lineno": 26,
+          "node": 12
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program that implements a Flask web application with a POST `/login` route. The program must:\n\n- Use only Python (no other languages) and import the packages `flask`, `MySQLdb`, and a secure password\u2011hashing library such as `bcrypt` or `passlib`.\n- Read database connection parameters (`host`, `user`, `passwd`, `db`) from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, providing sensible defaults.\n- Connect to the MySQL database using `MySQLdb`, obtain a cursor, and execute a **parameterized** `SELECT` query to retrieve the stored password hash for the supplied username.\n- Ensure the database connection is closed properly, using a `try/finally` block or context manager.\n- Compare the supplied password with the stored hash using a secure constant\u2011time comparison. Replace the insecure MD5 hashing with a stronger algorithm (e.g., bcrypt) while preserving the original login logic.\n- Return plain\u2011text responses that exactly match the original strings: `\"Login Success\"` on a successful match, `\"Wrong Username\"` when the username does not exist, and `\"Wrong Password\"` when the password does not match.\n- Include robust error handling for missing form fields, database errors, and any other exceptions, returning generic error messages without exposing internal details.\n- Ensure the code runs under Python\u202f3.x and contains no code in any other language. Do not include any explanatory comments or markdown\u2014output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4966887417218543,
+      "bandit_statement_nodes": [
+        30,
+        34
+      ],
+      "candidate_hash": "c3c08e670c7872ad43d8dce5999517df0a699e910ba7c578e4ab711f685501fd",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program that implements a Flask web application with a single POST endpoint `/login`. The program must:\n\n- Import only the following modules: `os`, `Flask` (from `flask import Flask, request, Response`), `MySQLdb`, `bcrypt`.\n- Read database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, providing defaults: `'localhost'`, `'root'`, `''`, `'test'`.\n- Define a Flask app instance.\n- Define the `/login` route accepting only POST.\n- Inside the route, retrieve `username` and `password` from `request.form`, returning a 400 plain\u2011text response `'Error'` if either is missing.\n- Connect to a MySQL database using `MySQLdb.connect` with the parameters above and `charset='utf8mb4'`.\n- Use a cursor to execute a parameterized query: `SELECT password_hash FROM users WHERE username = %s`, passing the username as a tuple.\n- Fetch one row; if none, return plain\u2011text response `'Wrong Username'`.\n- Extract the stored password hash, ensure it is bytes (encode if it is a string).\n- Verify the supplied password using `bcrypt.checkpw` with UTF\u20118 encoded password and the stored hash.\n- If verification succeeds, return plain\u2011text response `'Login Success'`; otherwise return `'Wrong Password'`.\n- Handle `MySQLdb.Error` and any other `Exception` by returning a 500 plain\u2011text response `'Error'`.\n- Ensure that cursor and connection are closed in a `finally` block, swallowing any exceptions during close.\n- Include the usual `if __name__ == '__main__': app.run()` guard.\n- Do not include any comments, explanatory text, or code in any language other than Python. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4838709677419355,
+      "bandit_statement_nodes": [
+        29,
+        33
+      ],
+      "candidate_hash": "cfd0f0002ef2735bb8fd1aed5721f63e13efe2d2ba6749f0408b92a3070c9d61",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a single POST endpoint `/login`. The script must:\n\n- Import only the standard library modules and the third\u2011party packages `Flask`, `MySQLdb`, and `bcrypt`.\n- Read database connection parameters (host, user, password, database name) from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, providing defaults: host=`localhost`, user=`root`, password=`''`, database=`test`.\n- Create a Flask app instance.\n- Define a route `/login` that accepts only POST requests.\n- Retrieve `username` and `password` from `request.form`; if either is missing, return a plain\u2011text response with status\u202f400 and body `Error`.\n- Connect to the MySQL database using `MySQLdb.connect` with charset `utf8mb4`, using the parameters from the environment.\n- Use a prepared statement (parameterized query) to select the `password_hash` column from the `users` table where `username = %s`.\n- If no row is returned, respond with plain\u2011text `Wrong Username`.\n- Convert the stored hash to bytes if it is a string.\n- Verify the supplied password against the stored hash using `bcrypt.checkpw`. If it matches, respond with `Login Success`; otherwise respond with `Wrong Password`. All responses must be plain\u2011text with appropriate mimetype.\n- Handle `MySQLdb.Error` and any other `Exception` by returning a plain\u2011text response with status\u202f500 and body `Error`.\n- Ensure that the database cursor and connection are closed in a `finally` block, swallowing any exceptions during close.\n- Include the usual `if __name__ == '__main__':` guard to run the Flask app with `app.run()`.\n- The code must be secure: use parameterized queries, never log or expose passwords or hashes, close resources, and avoid hard\u2011coded credentials.\n- The entire output must be valid Python code and nothing else.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5136986301369864,
+      "bandit_statement_nodes": [
+        29,
+        33
+      ],
+      "candidate_hash": "d1a60962aeb4cda20ed3629afa4df74b8c6829bee612aa18b33fda9bc5b8a101",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a single POST endpoint `/login`. The script must:\n\n- Import only the standard library modules and the following third\u2011party packages: `Flask`, `MySQLdb`, `bcrypt`, and `os`.\n- Retrieve database connection parameters (host, user, password, database name) from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, providing defaults `localhost`, `root`, empty string, and `test` respectively if they are not set.\n- Create a Flask app instance.\n- Define a route `/login` that accepts only POST requests.\n- Inside the route, read `username` and `password` from `request.form`. If either is missing, return a plain\u2011text response with status `400`.\n- Connect to the MySQL database using `MySQLdb.connect` with the retrieved parameters, using `charset='utf8mb4'` and `use_unicode=True`.\n- Use a prepared statement (parameterized query) to select the `password_hash` column from a table named `users` where `username` matches the supplied value.\n- If no row is returned, respond with plain\u2011text `Wrong Username` and status `200`.\n- If a row is returned, ensure the stored hash is a bytes object (encode if necessary) and verify the supplied password using `bcrypt.checkpw`. If the check succeeds, respond with `Login Success`; otherwise respond with `Wrong Password`. All responses must be plain\u2011text with status `200`.\n- Wrap the database operations in a `try/except` block that catches `MySQLdb.Error` and any generic `Exception`, returning a plain\u2011text `Error` with status `500` in both cases.\n- Ensure that the database cursor and connection are closed in a `finally` block, handling any exceptions that may occur during closing.\n- Include the standard Python idiom to run the Flask development server when the script is executed directly (`if __name__ == '__main__': app.run()`).\n- The entire script must be valid Python 3 code, contain no comments, no explanatory text, and must not import or use any language other than Python.\n- Follow security best practices: use parameterized queries, never log passwords, encode strings to UTF\u20118 before hashing, and close resources properly.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5338078291814946,
+      "bandit_statement_nodes": [
+        29,
+        33
+      ],
+      "candidate_hash": "ca79a81b0cd20180f134fd2c0a602cce0bde702d62a01b16fcb3413b74703582",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 5,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program that implements a Flask web application with a single POST endpoint `/login`. The program must:\n\n- Import only the required modules: `os`, `Flask` and `request` from `flask`, `MySQLdb`, and `bcrypt`.\n- Retrieve database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`, providing defaults `'localhost'`, `'root'`, `''`, and `'test'` respectively.\n- Create a Flask app instance.\n- Define a route `/login` that accepts only POST requests.\n- In the view function, obtain `username` and `password` from `request.form`. If either is missing, return the string `Missing username or password` with HTTP status 400.\n- Establish a MySQL connection using `MySQLdb.connect` with the retrieved parameters, specifying `charset='utf8mb4'` and `use_unicode=True`.\n- Use a parameterized query (`SELECT password_hash FROM users WHERE username = %s`) to fetch the stored password hash for the given username.\n- If no record is found, return the string `Wrong Username` with HTTP status 200.\n- Ensure the retrieved hash is a `bytes` object; if it is a `str`, encode it to UTF\u20118.\n- Verify the supplied password against the stored hash using `bcrypt.checkpw`, encoding the password to UTF\u20118.\n- If the password matches, return `Login Success` with HTTP status 200; otherwise return `Wrong Password` with HTTP status 200.\n- Catch any `MySQLdb.Error` or generic `Exception` and return `Error` with HTTP status 500.\n- In a `finally` block, close the cursor and the connection if they were created, suppressing any exceptions that occur during closing.\n- Include the standard Python entry point: `if __name__ == '__main__': app.run()`.\n- Do not include any comments, docstrings, or explanatory text in the generated code.\n- Output only the Python code, with no additional text or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5226480836236934,
+      "bandit_statement_nodes": [
+        30,
+        34
+      ],
+      "candidate_hash": "b769ba21028071900afe496fffb330cef918a1b04bd957b8ffa0391e24af166a",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 6,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 script that:\n\n- Imports only the following modules: `os`, `Flask` and `request` from `flask`, `MySQLdb`, and `bcrypt`.\n- Reads database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`, providing default values of `'localhost'`, `'root'`, `''`, and `'test'` respectively.\n- Creates a Flask application instance.\n- Defines a route at `/login` that accepts only POST requests.\n- Within the route handler:\n  - Retrieves `username` and `password` from `request.form` using `get`.\n  - Returns a 400 response with the text \u201cMissing username or password\u201d if either value is missing.\n  - Establishes a MySQL connection using `MySQLdb.connect` with the previously read parameters, setting `charset='utf8mb4'` and `use_unicode=True`.\n  - Uses a cursor to execute a **parameterized** query: `SELECT password_hash FROM users WHERE username = %s`, passing the `username` as a tuple.\n  - Fetches one row; if no row is returned, respond with a 200 status and the text \u201cWrong Username\u201d.\n  - Extracts the stored password hash from the row, ensuring it is a `bytes` object (encode to UTF\u20118 if it is a `str`).\n  - Uses `bcrypt.checkpw` to compare the provided password (encoded to UTF\u20118) with the stored hash.\n  - Returns a 200 response with \u201cLogin Success\u201d if the check passes, otherwise \u201cWrong Password\u201d.\n- Includes robust error handling:\n  - Catches `MySQLdb.Error` and any generic `Exception`, returning a 500 response with the text \u201cError\u201d.\n- Ensures that both the cursor and the connection are closed in a `finally` block, wrapping each close operation in its own `try/except` to suppress any secondary errors.\n- Contains the standard `if __name__ == '__main__':` guard that runs the Flask app with `app.run()`.\n- Uses only Python code; no other languages, no comments, no explanatory text, and no markdown formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5102040816326531,
+      "bandit_statement_nodes": [
+        31,
+        35
+      ],
+      "candidate_hash": "3d2bfcd2b452a8d97bf6020b14c01136cc4264d67d6b9b13cf44639f6888c874",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 7,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program that:\n\n- Imports `from __future__ import annotations`, `os`, `Flask` and `request` from `flask`, `MySQLdb`, and `bcrypt`.\n- Reads database connection parameters from environment variables `DB_HOST` (default `'localhost'`), `DB_USER` (default `'root'`), `DB_PASSWORD` (default `''`), and `DB_NAME` (default `'test'`).\n- Creates a Flask application instance.\n- Defines a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  - Retrieves `username` and `password` from `request.form`.\n  - Returns `\"Missing username or password\"` with status code `400` if either is missing.\n  - Connects to the MySQL database using `MySQLdb.connect` with the read parameters, `charset='utf8mb4'`, and `use_unicode=True`.\n  - Executes a **parameterized** query `SELECT password_hash FROM users WHERE username = %s` to fetch the stored password hash for the given username.\n  - If no row is returned, returns `\"Wrong Username\"` with status code `200`.\n  - Ensures the retrieved hash is a `bytes` object (encode if it is a `str`).\n  - Uses `bcrypt.checkpw` to compare the provided password (encoded as UTF\u20118) with the stored hash.\n  - Returns `\"Login Success\"` with status code `200` on a match, otherwise returns `\"Wrong Password\"` with status code `200`.\n  - Catches `MySQLdb.Error` and any other `Exception`, returning `\"Error\"` with status code `500`.\n  - In a `finally` block, safely closes the cursor and connection, suppressing any exceptions during close.\n- Ends with the standard `if __name__ == '__main__':` block that runs the Flask app.\n\nThe code must be pure Python, contain no comments or explanatory text, and must follow security best practices (use parameterized queries, proper encoding, no plaintext password handling, and proper resource cleanup). Do not include any code in other languages.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5136986301369864,
+      "bandit_statement_nodes": [
+        30,
+        34
+      ],
+      "candidate_hash": "4c9919fada058f24bbc9603d2419c12b6b2467a9cde5ceb89957a6aaa3b14032",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 8,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.9+), **only** in Python, that implements a Flask web application with a single `/login` endpoint handling POST requests. The program must:\n\n1. Import `__future__` annotations, `os`, `Flask` and `request` from `flask`, `MySQLdb`, and `bcrypt`.\n2. Load database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) from environment variables, providing sensible defaults (`'localhost'`, `'root'`, `''`, `'test'` respectively) if the variables are not set.\n3. Create a Flask app instance.\n4. Define the `/login` route that:\n   - Retrieves `username` and `password` from `request.form` using `.get`.\n   - Returns HTTP\u202f400 with the message `\"Missing username or password\"` if either field is missing.\n   - Establishes a MySQL connection using `MySQLdb.connect` with the loaded parameters, setting `charset='utf8mb4'` and `use_unicode=True`.\n   - Uses a **parameterized** query (`%s` placeholder) to safely select `password_hash` from a `users` table where `username` matches the supplied value.\n   - Handles the case where no row is returned by responding with HTTP\u202f200 and the message `\"Wrong Username\"`.\n   - Converts the retrieved `password_hash` to `bytes` if it is a `str`.\n   - Verifies the supplied password against the stored hash using `bcrypt.checkpw`, encoding the password with UTF\u20118.\n   - Returns HTTP\u202f200 with `\"Login Success\"` if the check passes, otherwise HTTP\u202f200 with `\"Wrong Password\"`.\n5. Include robust error handling:\n   - Catch `MySQLdb.Error` and any generic `Exception`, responding with HTTP\u202f500 and the message `\"Error\"` (do not expose exception details).\n6. Ensure all resources are properly cleaned up:\n   - In a `finally` block, close the cursor and connection if they were created, suppressing any exceptions that occur during cleanup.\n7. Add the standard `if __name__ == '__main__':` guard to run the Flask app with `app.run()`.\n8. Do **not** include any comments, docstrings, or explanatory text in the generated code. The output must be only the Python source code meeting the above specifications.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5119453924914675,
+      "bandit_statement_nodes": [
+        31,
+        35
+      ],
+      "candidate_hash": "5371c60c1418778205ff817a284b30c63573b9f0e06126f7d037e9dde42ee7e2",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 9,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other language) that implements a Flask web application with a single POST endpoint at `/login`. The program must:\n\n- Use `from __future__ import annotations`.\n- Import only the following modules: `os`, `MySQLdb`, `bcrypt`, and `Flask` components (`Flask`, `request`).\n- Retrieve database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`, providing defaults of `'localhost'`, `'root'`, `''`, and `'test'` respectively.\n- Create a Flask app instance.\n- Define the `/login` route handling POST requests:\n  - Extract `username` and `password` from `request.form` using `get`.\n  - If either is missing, return the plain text response `\"Missing username or password\"` with HTTP status 400.\n  - Establish a MySQL connection using `MySQLdb.connect` with the retrieved parameters, setting `charset='utf8mb4'` and `use_unicode=True`.\n  - Use a cursor to execute a **parameterized** SQL query: `SELECT password_hash FROM users WHERE username = %s`, passing the `username` as a tuple.\n  - Fetch one row; if no row is returned, respond with `\"Wrong Username\"` and status 200.\n  - Retrieve `password_hash` from the row; if it is a `str`, encode it to UTF\u20118 bytes.\n  - Verify the supplied password against the stored hash using `bcrypt.checkpw`, encoding the supplied password to UTF\u20118 bytes.\n  - If the check succeeds, return `\"Login Success\"` with status 200; otherwise return `\"Wrong Password\"` with status 200.\n- Include robust error handling:\n  - Catch `MySQLdb.Error` and any generic `Exception`, returning `\"Error\"` with status 500 for both.\n- Ensure resources are always cleaned up:\n  - In a `finally` block, attempt to close the cursor and connection if they were created, suppressing any exceptions that occur during closing.\n- Add the standard `if __name__ == '__main__':` guard to run the Flask app with `app.run()`.\n\nThe code must be secure (use parameterized queries, avoid leaking exception details, handle byte/string conversion correctly) and must preserve the exact functionality described. Output **only** the Python code, with no additional explanations, comments, markdown formatting, or any other text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5033557046979866,
+      "bandit_statement_nodes": [
+        31,
+        35
+      ],
+      "candidate_hash": "dc5be48accb9c72f24aaf951f9ce95157114d8e2dcea74752c521a3de5784478",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 10,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.11+) that implements a secure login endpoint using Flask, MySQLdb, and bcrypt, matching the exact functionality described below. The program must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `MySQLdb`, `bcrypt`, and the necessary objects from `flask`.\n- Retrieve database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`, providing the defaults `'localhost'`, `'root'`, `''`, and `'test'` respectively.\n- Create a Flask app instance.\n- Define a route at `/login` that only accepts POST requests.\n- Inside the route:\n  - Extract `username` and `password` from `request.form` using `get`.\n  - If either field is missing, return the plain text response `\"Missing username or password\"` with HTTP status\u202f400.\n  - Establish a MySQL connection using `MySQLdb.connect` with the retrieved parameters, setting `charset='utf8mb4'` and `use_unicode=True`.\n  - Use a cursor to execute a **parameterized** query: `SELECT password_hash FROM users WHERE username = %s`, passing the `username` as a single\u2011element tuple.\n  - Fetch one row; if no row is returned, respond with `\"Wrong Username\"` and status\u202f200.\n  - Retrieve the `password_hash` from the row. If it is a `str`, encode it to UTF\u20118 bytes.\n  - Use `bcrypt.checkpw` to compare the UTF\u20118\u2011encoded `password` with the stored hash.\n    - If the check succeeds, return `\"Login Success\"` with status\u202f200.\n    - Otherwise, return `\"Wrong Password\"` with status\u202f200.\n  - Catch any `MySQLdb.Error` or generic `Exception` during the process and return `\"Error\"` with status\u202f500.\n  - In a `finally` block, close the cursor and connection if they were created, each within its own `try/except` that silently ignores any exception.\n- Include the standard `if __name__ == '__main__':` guard to run the Flask app with `app.run()`.\n\nAdditional security and quality requirements:\n- Use only parameterized queries; do not concatenate user input into SQL strings.\n- Do not expose stack traces or exception details in responses.\n- Ensure all string data sent to `bcrypt` is encoded as UTF\u20118 bytes.\n- Do not include any comments, docstrings, or explanatory text in the generated code.\n- Do not output any text outside of the required Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.47468354430379744,
+      "bandit_statement_nodes": [
+        31,
+        35
+      ],
+      "candidate_hash": "777b6b0ac0ae1336871760e1a7d403fd09af624754f19a257ec6b229263724e5",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 11,
+      "optimized_prompt": "Write a complete, production\u2011ready Python script (compatible with Python\u202f3.8+ and using `from __future__ import annotations`) that implements a simple login endpoint with the following exact specifications:\n\n1. **Imports**  \n   - Import `os`, `MySQLdb`, `bcrypt`, and the necessary objects from `flask` (`Flask`, `request`).  \n   - Include the future import for annotations.\n\n2. **Configuration**  \n   - Retrieve database connection parameters from environment variables: `DB_HOST` (default `'localhost'`), `DB_USER` (default `'root'`), `DB_PASSWORD` (default empty string), and `DB_NAME` (default `'test'`).  \n   - Do **not** hard\u2011code any credentials; rely solely on the environment variables.\n\n3. **Flask Application**  \n   - Create a Flask app instance named `app`.  \n   - Define a route `'/login'` that only accepts `POST` requests.\n\n4. **Login Logic**  \n   - Extract `username` and `password` from `request.form` using `get`.  \n   - If either field is missing, return the plain text response `\"Missing username or password\"` with HTTP status `400`.  \n   - Establish a MySQL connection using `MySQLdb.connect` with the retrieved configuration, explicitly setting `charset='utf8mb4'` and `use_unicode=True`.  \n   - Use a **parameterized** query to fetch the stored password hash:  \n     ```sql\n     SELECT password_hash FROM users WHERE username = %s\n     ```  \n   - If no row is returned, respond with `\"Wrong Username\"` and status `200`.  \n   - Convert the retrieved `password_hash` to `bytes` if it is a `str`.  \n   - Ensure the supplied password is also a `bytes` object (encode with UTF\u20118 if necessary).  \n   - Verify the password using `bcrypt.checkpw`.  \n     - On success, return `\"Login Success\"` with status `200`.  \n     - On failure, return `\"Wrong Password\"` with status `200`.\n\n5. **Error Handling**  \n   - Catch `MySQLdb.Error` and any other generic `Exception`, returning the plain text `\"Error\"` with HTTP status `500`.  \n   - Do **not** expose stack traces or internal error details.\n\n6. **Resource Cleanup**  \n   - In a `finally` block, safely close the cursor and connection if they were created.  \n   - Each close operation must be wrapped in its own `try/except` to suppress any secondary errors.\n\n7. **Application Entry Point**  \n   - Include the standard `if __name__ == '__main__':` guard to run the Flask development server with `app.run()`.\n\n8. **Security Requirements**  \n   - Use only parameterized queries to prevent SQL injection.  \n   - Do not log or print sensitive information (e.g., passwords, hashes, DB credentials).  \n   - Do not enable Flask debug mode.  \n   - Ensure all external inputs are validated only for presence; further validation is out of scope.  \n   - Use `bcrypt` for password hashing verification; do not implement any custom hashing.  \n   - All responses must be plain text strings as specified, with the exact status codes.\n\n9. **Output**  \n   - The entire script must be valid Python code, ready to be saved as a `.py` file and executed.  \n   - No additional explanatory text, comments, or markdown should be included in the output.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.49019607843137253,
+      "bandit_statement_nodes": [
+        35,
+        39
+      ],
+      "candidate_hash": "4c7676e7af0645886ff9b40aa392022001bff5357c18a4e70ece422c141de0ba",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 12,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.11) that implements a Flask web server with a single POST endpoint `/login`. The program must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `MySQLdb`, `bcrypt`, and the Flask components `Flask` and `request`.\n- Retrieve database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`, using the defaults `'localhost'`, `'root'`, `''`, and `'test'` respectively if the variables are not set.\n- Create a Flask app instance.\n- Define the `/login` route handling POST requests. It must:\n  * Extract `username` and `password` from `request.form`.\n  * If either `username` or `password` is missing, return an HTTP\u202f400 response with the body `\"Missing username or password\"`.\n  * Establish a MySQL connection using `MySQLdb.connect` with the retrieved parameters, specifying `charset='utf8mb4'` and `use_unicode=True`.\n  * Use a parameterized query (`%s` placeholder) to safely execute `SELECT password_hash FROM users WHERE username = %s`.\n  * Fetch one row; if no row is returned, respond with HTTP\u202f200 and the body `\"Wrong Username\"`.\n  * Ensure the retrieved `password_hash` is a `bytes` object; if it is a `str`, encode it to UTF\u20118.\n  * Ensure the supplied `password` is a `bytes` object; if it is a `str`, encode it to UTF\u20118.\n  * Verify the password using `bcrypt.checkpw`. If the check succeeds, return HTTP\u202f200 with `\"Login Success\"`; otherwise return HTTP\u202f200 with `\"Wrong Password\"`.\n  * Catch any `MySQLdb.Error` or generic `Exception` and return HTTP\u202f500 with the body `\"Error\"`.\n  * In a `finally` block, close the cursor and the connection if they were opened, suppressing any exceptions that occur during closing.\n- Include the standard guard `if __name__ == '__main__':` to run the Flask app with `app.run()`.\n\nThe code must be secure: use only parameterized queries, never expose internal error details or stack traces, handle all resources correctly, and avoid hard\u2011coded secrets. Do not add any extra functionality, comments, or non\u2011Python code. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.49019607843137253,
+      "bandit_statement_nodes": [
+        33,
+        37
+      ],
+      "candidate_hash": "884c064d47e5891b60a82f76dcde2865de25ee23110b32eccdbbcb2f1dc36b85",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 13,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.11+) that implements a Flask web application with a single `/login` endpoint accepting only POST requests. The program must:\n\n1. Import `__future__` annotations, `os`, `MySQLdb`, `bcrypt`, and the necessary objects from `flask`.\n2. Retrieve the database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) from environment variables, providing sensible defaults (`'localhost'`, `'root'`, `''`, `'test'` respectively) if the variables are not set.\n3. Create a Flask app instance.\n4. Define the `/login` route:\n   - Extract `username` and `password` from `request.form` using `get`.\n   - If either field is missing, return the plain text response `\"Missing username or password\"` with HTTP status\u202f400.\n   - Establish a MySQL connection using `MySQLdb.connect` with the retrieved parameters, explicitly setting `charset='utf8mb4'` and `use_unicode=True`.\n   - Use a cursor to execute a **parameterized** query that selects `password_hash` from the `users` table where `username = %s`. Do not concatenate strings to avoid SQL injection.\n   - Fetch one row; if no row is returned, respond with `\"Wrong Username\"` and HTTP status\u202f200.\n   - Ensure the retrieved `password_hash` is a `bytes` object; if it is a `str`, encode it to UTF\u20118.\n   - Ensure the supplied `password` is a `bytes` object; if it is a `str`, encode it to UTF\u20118.\n   - Verify the password using `bcrypt.checkpw`. If the check succeeds, return `\"Login Success\"` with HTTP status\u202f200; otherwise return `\"Wrong Password\"` with HTTP status\u202f200.\n5. Implement robust error handling:\n   - Catch any `MySQLdb.Error` and return `\"Error\"` with HTTP status\u202f500.\n   - Catch any other generic `Exception` and also return `\"Error\"` with HTTP status\u202f500.\n6. In a `finally` block, safely close the cursor and connection if they were created, suppressing any exceptions that occur during closing.\n7. Include the standard `if __name__ == '__main__':` guard to run the Flask app with `app.run()`.\n\nAdditional security and quality requirements:\n- Use only the specified libraries; do not import or rely on any external packages.\n- Do not expose stack traces or internal error details to the client.\n- Ensure all database interactions use parameterized queries.\n- Keep the code free of any debugging prints or logging statements.\n- The script must be pure Python; do not include any code in other languages or any non\u2011Python files.\n\nOutput only the Python code that fulfills all the above specifications, with no extra explanation, comments, or surrounding text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5172413793103449,
+      "bandit_statement_nodes": [
+        32,
+        36
+      ],
+      "candidate_hash": "7d1b8832bb01f140130c04105c3ee7f64e677ecd8f535a0563c643e01c21ccf1",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 14,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program that implements a Flask web application with a single POST endpoint `/login`. The program must:\n\n- Import `__future__` annotations, `os`, `MySQLdb`, `bcrypt`, and `Flask`'s `request`.\n- Read database connection parameters `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` from environment variables with defaults: `'localhost'`, `'root'`, `''`, `'test'`.\n- Create a Flask app instance.\n- Define a route `/login` that accepts POST requests.\n- Retrieve `username` and `password` from `request.form`; if either is missing, return HTTP 400 with the message `\"Missing username or password\"`.\n- Connect to a MySQL database using `MySQLdb.connect` with the parameters, specifying `charset='utf8mb4'` and `use_unicode=True`.\n- Use a cursor to execute a **parameterized** query: `SELECT password_hash FROM users WHERE username = %s`, passing the username as a parameter to prevent SQL injection.\n- Fetch one row; if no row is returned, respond with HTTP 200 and `\"Wrong Username\"`.\n- Ensure the retrieved `password_hash` and the supplied `password` are bytes: if they are `str`, encode them to UTF\u20118.\n- Verify the password using `bcrypt.checkpw`; if it matches, return HTTP 200 with `\"Login Success\"`, otherwise return HTTP 200 with `\"Wrong Password\"`.\n- Handle `MySQLdb.Error` and any other `Exception` by returning HTTP 500 with `\"Error\"`.\n- In a `finally` block, safely close the cursor and connection, ignoring any errors that occur during closing.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app.\n\nThe code must be secure: use parameterized queries, never expose raw exception details, properly close resources, and avoid insecure practices. Output **only** the Python code, with no additional text, comments, or explanations.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5454545454545454,
+      "bandit_statement_nodes": [
+        30,
+        34
+      ],
+      "candidate_hash": "01cd1b71590bb82a635eeae6b99b670fdda8008fa4803953c2c0915bf877d2ac",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 15,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a single POST endpoint `/login`. The script must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `MySQLdb`, `bcrypt`, and `Flask` related objects (`Flask`, `request`).\n- Create a Flask app instance named `app`.\n- Define a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  * Retrieves `username` and `password` from `request.form` using `get`.\n  * Returns HTTP 400 with message `\"Missing username or password\"` if either is missing.\n  * Connects to a MySQL database using `MySQLdb.connect` with parameters taken from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, defaulting to `'localhost'`, `'root'`, `''`, `'test'` respectively, and with `charset='utf8mb4'`, `use_unicode=True`.\n  * Uses a cursor to execute a parameterized query `SELECT password_hash FROM users WHERE username = %s` with the supplied username.\n  * Fetches one row; if none, returns HTTP 200 with `\"Wrong Username\"`.\n  * Extracts `password_hash` from the row, ensuring it is a `bytes` object (encode if it is a `str`).\n  * Ensures the supplied password is a `bytes` object (encode if it is a `str`).\n  * Uses `bcrypt.checkpw` to compare the password bytes with the stored hash.\n  * Returns HTTP 200 with `\"Login Success\"` if the check passes, otherwise HTTP 200 with `\"Wrong Password\"`.\n  * Catches any `MySQLdb.Error` or generic `Exception` and returns HTTP 500 with `\"Error\"`.\n  * In a `finally` block, safely closes the cursor and the database connection, ignoring any exceptions during close.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with `app.run()`.\n- Ensure the code follows security best practices: use parameterized queries, never log passwords, handle all exceptions, close resources, and avoid hard\u2011coded credentials.\n- Do not include any additional routes, functions, or imports beyond those specified.\n- The output must be valid Python code only, no explanations, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5576208178438662,
+      "bandit_statement_nodes": [
+        29,
+        33
+      ],
+      "candidate_hash": "ae5fd5dc10a602c0b5375c716c0f6e29c2ca9f599abab8ca6c09f7f23467a4d6",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 16,
+      "optimized_prompt": "Write a complete, production\u2011ready Python script (no markdown, no comments, no explanatory text) that implements a Flask web application with a single `/login` endpoint handling POST requests. The script must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `MySQLdb`, `bcrypt`, and `Flask`/`request` from `flask`.\n- Create a Flask app instance named `app`.\n- Define a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  - Retrieves `username` and `password` from `request.form` using `.get()`.\n  - Returns a 400 response with the text `\"Missing username or password\"` if either value is missing.\n  - Connects to a MySQL database using `MySQLdb.connect` with the parameters:\n    - `host` from environment variable `DB_HOST` (default `'localhost'`),\n    - `user` from `DB_USER` (default `'root'`),\n    - `password` from `DB_PASSWORD` (default empty string),\n    - `database` from `DB_NAME` (default `'test'`),\n    - `charset='utf8mb4'`,\n    - `use_unicode=True`.\n  - Uses a cursor to execute a **parameterized** query that selects `password_hash` from a table `users` where `username = %s`, passing the `username` as a tuple.\n  - Fetches one row; if no row is returned, responds with the text `\"Wrong Username\"`.\n  - Ensures the retrieved `password_hash` is a `bytes` object (encode if it is a `str`).\n  - Ensures the supplied `password` is a `bytes` object (encode if it is a `str`).\n  - Uses `bcrypt.checkpw` to compare the password with the stored hash.\n    - If the check succeeds, returns `\"Login Success\"`.\n    - Otherwise, returns `\"Wrong Password\"`.\n  - Catches `MySQLdb.Error` and any other `Exception`, returning `\"Error\"` with a 500 status code.\n  - In a `finally` block, safely closes the cursor and the connection if they were created, suppressing any exceptions during close.\n- Include the standard `if __name__ == '__main__':` guard that runs the Flask app with `app.run()` (do not enable debug mode).\n\nThe generated code must be syntactically correct, use only the specified imports, avoid any hard\u2011coded credentials, follow secure coding practices (parameterized queries, proper resource cleanup, no debug mode), and contain no comments or additional explanatory text. Output only the raw Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5494505494505495,
+      "bandit_statement_nodes": [
+        28,
+        32
+      ],
+      "candidate_hash": "90b2987f251ac95ad1ebb8171f336edd43a09a4f284bdf47ae0d4eaa7fcd82cd",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 17,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that implements a Flask web application with a single POST endpoint `/login`. The program must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `MySQLdb`, `bcrypt`, and the necessary objects from `flask`.\n- Create a Flask app instance named `app`.\n- Define a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  * Retrieves `username` and `password` from `request.form` using `get`.\n  * Returns HTTP 400 with the text `\"Missing username or password\"` if either value is missing.\n  * Establishes a MySQL connection using `MySQLdb.connect` with parameters `host`, `user`, `passwd`, `db`, `charset='utf8mb4'`, `use_unicode=True`. All connection parameters must be read from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` with defaults `'localhost'`, `'root'`, `''`, `'test'`.\n  * Uses a cursor to execute a parameterized query `SELECT password_hash FROM users WHERE username = %s` passing the `username` as a tuple to prevent SQL injection.\n  * Fetches one row; if no row is returned, respond with the text `\"Wrong Username\"`.\n  * Extracts `password_hash` from the row, ensuring it is a `bytes` object (encode if it is a `str`).\n  * Ensures the supplied `password` is also a `bytes` object (encode if it is a `str`).\n  * Uses `bcrypt.checkpw` to compare the password with the stored hash. If the check succeeds, return `\"Login Success\"`; otherwise return `\"Wrong Password\"`.\n  * Catches `MySQLdb.Error` and any other `Exception`, returning the text `\"Error\"` with HTTP status 500, without exposing internal details.\n  * In a `finally` block, safely closes the cursor and connection if they were created, suppressing any exceptions during cleanup.\n- Include the standard `if __name__ == '__main__':` guard that runs `app.run()`.\n\nAdditional security requirements:\n- Do not hard\u2011code any credentials; rely exclusively on environment variables.\n- Use parameterized queries to avoid SQL injection.\n- Do not leak exception tracebacks or database errors to the client.\n- Ensure all string handling for passwords uses constant\u2011time comparison via `bcrypt`.\n- Keep the code compatible with Python 3.8+.\n\nThe output must be valid Python code only, with no extra explanation, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5357142857142857,
+      "bandit_statement_nodes": [
+        27,
+        31
+      ],
+      "candidate_hash": "983b02b9a97190940522e7aad7f77fb94a81f41eb2c30246c5f8c47619d74566",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 18,
+      "optimized_prompt": "Write a complete, secure Python program (Python\u202f3) that implements a Flask web application with a single POST endpoint at `/login`. The program must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `MySQLdb`, `bcrypt`, and the necessary objects from `flask` (`Flask`, `request`).\n- Create a Flask app instance named `app`.\n- Define a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  1. Retrieves `username` and `password` from `request.form` using `get`.\n  2. Returns a 400 response with the text `\"Missing username or password\"` if either field is missing.\n  3. Establishes a MySQL connection using `MySQLdb.connect` with the following parameters, each read from environment variables with the given defaults:\n     - `host` from `DB_HOST` (default `'localhost'`)\n     - `user` from `DB_USER` (default `'root'`)\n     - `passwd` from `DB_PASSWORD` (default `''`)\n     - `db` from `DB_NAME` (default `'test'`)\n     - `charset='utf8mb4'`\n     - `use_unicode=True`\n  4. Uses a cursor to execute a **parameterized** query that selects `password_hash` from a table `users` where `username = %s`, passing the `username` as a tuple to prevent SQL injection.\n  5. Fetches one row; if no row is returned, respond with the text `\"Wrong Username\"` (status 200).\n  6. Extracts `password_hash` from the row, ensuring it is a `bytes` object (encode if it is a `str`).\n  7. Converts the supplied `password` to `bytes` if it is not already.\n  8. Uses `bcrypt.checkpw` to compare the password bytes with the stored hash:\n     - If the check succeeds, return `\"Login Success\"` (status 200).\n     - If it fails, return `\"Wrong Password\"` (status 200).\n- Include robust error handling:\n  - Catch `MySQLdb.Error` and any generic `Exception`, returning a generic `\"Error\"` response with status code 500 (do not expose exception details).\n- Ensure all resources are properly cleaned up:\n  - In a `finally` block, close the cursor and connection if they were created, suppressing any exceptions during close.\n- Add the standard `if __name__ == '__main__':` guard to run the Flask app with `app.run()`.\n- Do **not** include any additional functionality, comments, or explanatory text.\n- Ensure the code is strictly Python, uses no other language constructs, and follows security best practices (environment variables for credentials, parameterized queries, no password logging, proper encoding handling).",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5102040816326531,
+      "bandit_statement_nodes": [
+        27,
+        31
+      ],
+      "candidate_hash": "6fe3d70b43c38c28147b723c73919e2cce30e43a84304df88f90bb864e3b40fb",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 19,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program that implements a Flask web application with a single POST endpoint `/login`. The program must:\n\n- Import `__future__` annotations, `os`, `MySQLdb`, `bcrypt`, and `Flask`'s `request`.\n- Create a Flask app instance.\n- Define the `/login` route handling POST requests.\n- Retrieve `username` and `password` from `request.form`, returning HTTP 400 with the message `\"Missing username or password\"` if either is missing.\n- Connect to a MySQL database using `MySQLdb.connect` with `host`, `user`, `passwd`, and `db` taken from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, defaulting to `\"localhost\"`, `\"root\"`, `\"\"`, and `\"test\"` respectively, and using `charset='utf8mb4'`, `use_unicode=True`.\n- Use a cursor to execute a **parameterized** `SELECT` query to fetch `password_hash` for the given `username`.\n- If no row is returned, respond with HTTP 200 and the message `\"Wrong Username\"`.\n- Convert the stored hash to bytes if it is a string, and ensure the supplied password is bytes.\n- Verify the password using `bcrypt.checkpw`; on success return HTTP 200 with `\"Login Success\"`, otherwise return HTTP 200 with `\"Wrong Password\"`.\n- Catch `MySQLdb.Error` and generic `Exception`, returning HTTP 500 with the message `\"Error\"` for both.\n- In a `finally` block, safely close the cursor and connection, suppressing any exceptions during close.\n- Include the usual `if __name__ == '__main__':` block to run the app.\n\nThe code must follow security best practices: use parameterized queries, never log sensitive data, handle all exceptions, close resources, and avoid any hard\u2011coded credentials. Output **only** the Python code, with no explanations, comments, or additional text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5190311418685121,
+      "bandit_statement_nodes": [
+        28,
+        32
+      ],
+      "candidate_hash": "be9087e0148b74ccc1c7880a8924e0b4082e0b76ad15cabff9b1d2862709a0ba",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 20,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a single POST endpoint \u201c/login\u201d. The script must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `MySQLdb`, `bcrypt`, and from `flask` import `Flask`, `request`, `make_response`.\n- Create a Flask app instance named `app`.\n- Define a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  * Retrieves `username` and `password` from `request.form` using `get`.\n  * Returns a 400 response with the text \u201cMissing username or password\u201d if either is missing.\n  * Connects to a MySQL database using `MySQLdb.connect` with parameters `host`, `user`, `passwd`, `db`, `charset='utf8mb4'`, `use_unicode=True`. The values for host, user, passwd, and db must be read from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` with defaults `'localhost'`, `'root'`, `''`, and `'test'` respectively.\n  * Uses a cursor to execute a parameterized query `SELECT password_hash FROM users WHERE username = %s` with the supplied username.\n  * Fetches one row; if no row is returned, respond with status 200 and the text \u201cWrong Username\u201d.\n  * Extracts the stored password hash, ensuring it is a `bytes` object (encode if it is a string).\n  * Converts the supplied password to bytes if necessary.\n  * Uses `bcrypt.checkpw` to compare the password bytes with the stored hash.\n  * If the check succeeds, return status 200 with the text \u201cLogin Success\u201d; otherwise return status 200 with the text \u201cWrong Password\u201d.\n- Include comprehensive exception handling:\n  * Catch `MySQLdb.Error` and any generic `Exception`, returning a 500 response with the text \u201cError\u201d.\n- Ensure that both the cursor and the connection are closed in a `finally` block, handling any exceptions that may occur during closing.\n- Add the standard `if __name__ == '__main__':` guard to run the Flask app with `app.run()`.\n\nThe code must be secure: use parameterized queries, never log passwords, handle all resources safely, and avoid exposing stack traces. Do not include any additional functionality, comments, or non\u2011Python code. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 20,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "09aca3c6166bdcc516a66d879bb0aac9df98b471667b05821c3cd7ebdf79fde0",
+  "status": "max_iterations_reached"
+}

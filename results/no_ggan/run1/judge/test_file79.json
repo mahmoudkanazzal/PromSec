@@ -1,0 +1,67 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "3ca63eeab018f2b48e8e2f374b6a8086be927e42070d87859cbcada351ccace4",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields or missing session username will raise a KeyError and abort the request.",
+      "Database connection or execution errors trigger the generic error response.",
+      "SQL injection is possible because inputs are not escaped before being placed in the query.",
+      "Command injection is possible because the subprocess command is built via string concatenation and executed with shell=True.",
+      "Non\u2011numeric or excessively large 'stock_quantity' values are not validated and may cause downstream failures.",
+      "Very large script output may be truncated or cause memory pressure when read into a string."
+    ],
+    "entrypoints": [],
+    "intent": "Handle a POST request to record a buy order, store it in a MySQL table, run an external algorithm script with the order details, and return the script's output.",
+    "invariants": [
+      "The request must contain 'stock_name' and 'stock_quantity' fields and a valid session 'username'.",
+      "Database connection parameters (host, user, password, db) are hard\u2011coded and unchanged.",
+      "The SQL INSERT statement is built by concatenating the three input strings directly.",
+      "The subprocess command always starts with 'python3 <path>/../algorithm.py buy'.",
+      "The route always returns a string (either the script output or an error message)."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST to /buy_order with form fields 'stock_name' and 'stock_quantity' and a session variable 'username'.",
+      "Returns the standard output of the invoked algorithm.py script as the HTTP response body.",
+      "If the database insertion fails, returns the literal string 'Error: Something went wrong. Please try again later.'."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the MySQL table db_table.order_table.",
+      "Commits the transaction on success or rolls back on failure.",
+      "Spawns a subprocess that runs algorithm.py via the system shell.",
+      "Closes the database connection after the operation."
+    ],
+    "source_hash": "af64aaef30e33624fe62fe243029377344aebc3fb5040c046582ee15c2712898"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.1,
+    "invariants": 0.1,
+    "io_semantics": 0.2,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file79.py",
+  "gated_score": 0.28375,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.28375,
+  "original_hash": "af64aaef30e33624fe62fe243029377344aebc3fb5040c046582ee15c2712898",
+  "rationale": "Core functionality (POST handling, DB insert, subprocess execution, returning script output) is present, but the program adds input validation, uses parameterized queries, avoids shell execution, reads DB config from env, and aborts with HTTP errors instead of the contract's insecure behavior and specific error strings, breaking most invariants and edge\u2011case expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.11375,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.0,
+    "invariants": 0.4,
+    "io_semantics": 0.2,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.3975,
+  "weighted_mean": 0.345,
+  "worst_dimension": 0.1
+}

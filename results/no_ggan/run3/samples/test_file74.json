@@ -1,0 +1,35 @@
+{
+  "ast_similarity": 0.7098976109215017,
+  "candidate_hash": "e93393aacb0fa69548418c578936f5aa981ca7e414708c2dc9136674f3b5e70f",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file74.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7098976109215017,
+      "bandit_statement_nodes": [
+        14
+      ],
+      "candidate_hash": "e93393aacb0fa69548418c578936f5aa981ca7e414708c2dc9136674f3b5e70f",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3) that implements a Flask web application with a single POST endpoint at `/register`. The script must:\n\n1. Import only the following modules: `flask.Flask`, `flask.request`, `os`, `bcrypt`, `MySQLdb`, and `MySQLdb.cursors`.\n2. Create a Flask app instance named `app`.\n3. Define a helper function `_get_db_connection()` that:\n   - Reads the database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`, providing sensible defaults (`'127.0.0.1'`, `'root'`, `'password'`, `'cwe_900'` respectively) if the variables are not set.\n   - Returns a new `MySQLdb.connect` object configured with:\n     * `host`, `user`, `passwd`, `db` from the environment variables,\n     * `charset='utf8mb4'`,\n     * `cursorclass=MySQLdb.cursors.DictCursor`,\n     * `autocommit=False`.\n4. Implement the `/register` route that:\n   - Accepts only POST requests.\n   - Retrieves `username`, `password`, and `confirm_password` from `request.form`, stripping whitespace from `username`.\n   - Returns HTTP\u202f400 with the message `\"Username and password are required\"` if `username` or `password` is empty.\n   - Returns HTTP\u202f400 with the message `\"Passwords do not match\"` if `password` and `confirm_password` differ.\n   - Hashes the password securely using `bcrypt.hashpw` with a generated salt (`bcrypt.gensalt()`), encoding the password as UTF\u20118.\n   - Opens a database connection via `_get_db_connection()`. Using a context manager (`with cnx.cursor() as cur:`), perform the following using **parameterized queries** to prevent SQL injection:\n     * Execute `SELECT 1 FROM users WHERE username = %s` with the supplied `username`. If a row is returned, respond with HTTP\u202f409 and the message `\"Username already exists\"`.\n     * Execute `INSERT INTO users (username, pw_hash) VALUES (%s, %s)` with the `username` and the binary password hash.\n   - Commit the transaction if the insert succeeds, then return HTTP\u202f201 with the message `\"You have successfully registered\"`.\n   - On any `MySQLdb.Error`, roll back the transaction (if a connection exists), and return HTTP\u202f500 with the generic message `\"Registration Failed\"`. Do not expose internal error details.\n   - Ensure the database connection is closed in a `finally` block (if it was created).\n5. Include a comment at the top of the file stating: `# This file was assembled by gen.py, written by redactedAuthorFirstname redactedAuthorLastname.` (the comment must be exactly as shown).\n6. Do **not** include any code in languages other than Python, and do not add any explanatory text, markdown formatting, or additional comments beyond the required top\u2011line comment. The script must be ready to run as\u2011is.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "06e708a7b4ad639efd4a0d86556d5374fa58ed79501c414b2611df3f8bd5c195",
+  "status": "secured"
+}

@@ -1,0 +1,38 @@
+{
+  "ast_similarity": 0.6018348623853211,
+  "candidate_hash": "a17ff172fd6fb3b51a18fa31010f13ba8f25a83a4b511d7d963901c77786500d",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file99.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6018348623853211,
+      "bandit_statement_nodes": [
+        10,
+        14,
+        25,
+        34
+      ],
+      "candidate_hash": "a17ff172fd6fb3b51a18fa31010f13ba8f25a83a4b511d7d963901c77786500d",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Flask application in Python that implements the following functionality:\n\n- Use SQLite with a database file named `recipe.db`. Create a helper function `get_db_connection()` that returns a connection with `row_factory` set to `sqlite3.Row`.\n\n- Define three routes:\n\n  1. **POST `/add_recipe`**\n     - Accept JSON payload (use `request.get_json(silent=True) or {}`) containing:\n       - `title`: a non\u2011empty string.\n       - `ingredients`: a list of strings (default to empty list if missing).\n     - Validate that `title` is present and `ingredients` is a list; return `400` with JSON error if validation fails.\n     - Insert the `title` into the `recipes` table using a parameterized query, retrieve the generated `recipe_id`.\n     - For each ingredient, insert a row into the `ingredients` table with the `recipe_id` and ingredient value, using parameterized queries.\n     - Commit the transaction, close the connection, and return a JSON response `{\"message\": \"Recipe added successfully\", \"recipe_id\": <id>}` with status `201`.\n\n  2. **POST `/submit_review`**\n     - Accept JSON payload containing:\n       - `recipe_id`: must be convertible to an integer.\n       - `review`: a non\u2011empty string.\n       - `reviewer_id`: a non\u2011empty string.\n     - Validate all fields; on any validation error return `400` with a JSON error message.\n     - Insert the review into the `reviews` table using a parameterized query (`recipe_id`, `review`, `reviewer_id`).\n     - Commit, close the connection, and return `{\"message\": \"Review submitted successfully\"}` with status `200`.\n\n  3. **GET `/get_recipe_reviews`**\n     - Expect a query parameter `recipe_id` that must be convertible to an integer.\n     - Validate the parameter; on failure return `400` with a JSON error.\n     - Query the `reviews` table for rows matching the given `recipe_id`, selecting `review` and `COUNT(r.id) AS review_count`, grouping appropriately.\n     - Fetch all rows, close the connection, convert each row to a dictionary, and return the list as JSON with status `200`.\n\n- Ensure all SQL statements use `?` placeholders to prevent SQL injection.\n- Do not enable Flask debug mode; run the app with `debug=False`.\n- Include the standard `if __name__ == '__main__':` block to start the Flask server.\n- The entire code must be pure Python, using only the standard library and Flask, with no other languages or external scripts.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "05a8f2728379041b6e2e15e634979a3fa87f110fe73dca5cd6b12c3a325c1542",
+  "status": "secured"
+}

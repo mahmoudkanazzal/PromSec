@@ -1,0 +1,63 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "ab06a8b3c5380d47c86df86a6123cacbf40c6191d5bab1c49d08d30931b06fcc",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' in the session raises a server error (KeyError).",
+      "Missing 'message' form field raises a server error (KeyError).",
+      "Database connection failures or query errors result in a 500 response.",
+      "Extremely long or malformed message strings may cause DB errors or truncation."
+    ],
+    "entrypoints": [],
+    "intent": "Accept a posted message from an authenticated user and store it in a MySQL database, then redirect the client to the home page.",
+    "invariants": [
+      "A valid session must contain a 'username' key; otherwise the request fails.",
+      "The request must be a POST; other methods are not handled.",
+      "The database insert is performed exactly once per successful request."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST requests at the path /post with a form field named 'message'.",
+      "Reads the current session to obtain the 'username' value.",
+      "Returns an HTTP 302 redirect response pointing to '/'."
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "func:insert_user_message_in_db": "(username, message)",
+      "route:POST /post": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the MySQL table 'messages' containing the username and message text.",
+      "Commits the transaction, persisting the new row in the database."
+    ],
+    "source_hash": "fa8139466766f50de1cf3e82becfde48623437f0868aca195be8f4ddfd3ea9c2"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.0,
+    "invariants": 0.5,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file86.py",
+  "gated_score": 0.3375,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.3375,
+  "original_hash": "fa8139466766f50de1cf3e82becfde48623437f0868aca195be8f4ddfd3ea9c2",
+  "rationale": "Core request handling matches contract, but missing username and missing message are handled with redirects/defaults instead of raising KeyError, violating edge\u2011case and invariant requirements; other aspects (POST method, DB insert, redirect) are preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.27988,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.2,
+    "invariants": 0.66,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.61738,
+  "weighted_mean": 0.45,
+  "worst_dimension": 0.0
+}

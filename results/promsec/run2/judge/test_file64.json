@@ -1,0 +1,73 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "958785008efb9dcea7c636bd8a0eb140f75630fa728249fd0d712c87c87ac100",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Payload is not valid YAML \u2013 yaml.safe_load raises an exception, resulting in a 500 response.",
+      "Environment variables for DB connection are missing or incorrect, causing a 500 response.",
+      "The datetime value exists in the table but the row's temperature column is NULL, leading to a string 'None' being returned.",
+      "Very large or malicious payloads may cause performance or security issues, though they still result in standard HTTP responses.",
+      "If the OS echo command fails (e.g., due to restricted permissions), the failure is not propagated to the client.",
+      "Multiple rows match the datetime; only the first row is used."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Return the temperature value associated with a given datetime (and implicitly a location) when a client POSTs a YAML payload to the /api/temperature_for_location endpoint.",
+    "invariants": [
+      "The endpoint only handles POST requests; other methods are not routed.",
+      "All responses are plain text strings, not JSON.",
+      "HTTP status codes reflect the outcome: 200 for success, 400 for client errors, 404 for not\u2011found, 500 for server errors.",
+      "The temperature value is taken from the third column of the first row returned by the query.",
+      "The database query filters solely on the datetime value; latitude and longitude are not used in the query.",
+      "The server runs with debug mode disabled."
+    ],
+    "io_behavior": [
+      "Accepts a POST request to /api/temperature_for_location with a YAML body containing keys latitude, longitude, and datetime.",
+      "If the request body is empty, responds with HTTP 400 and the text 'ERROR: No payload'.",
+      "If any of the required keys are missing, responds with HTTP 400 and the text 'ERROR: Missing required parameters'.",
+      "On successful processing, returns the temperature value (as a plain string) with HTTP 200.",
+      "If the database query finds no matching row, responds with HTTP 404 and the text 'No matching location found'.",
+      "On database connection or query failures, responds with HTTP 500 and the exception message."
+    ],
+    "public_api": {
+      "route:POST /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Executes an OS command that echoes the retrieved temperature to the server's standard output.",
+      "Opens a MySQL connection using environment variables and performs a SELECT query.",
+      "Closes the database cursor and connection after each request."
+    ],
+    "source_hash": "efb06c21b05fa16bbd1d20a22444fcda5569615d4c66f5bab7077d2cf01f063b"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.5,
+    "invariants": 1.0,
+    "io_semantics": 0.6,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file64.py",
+  "gated_score": 0.41625,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.41625,
+  "original_hash": "efb06c21b05fa16bbd1d20a22444fcda5569615d4c66f5bab7077d2cf01f063b",
+  "rationale": "The program matches most invariants and core I/O behavior, but deviates on error handling for invalid YAML (returns 400 instead of 500) and omits the required OS echo side\u2011effect, reducing behavior, I/O semantics, side\u2011effects, and edge\u2011case scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.38763,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.67,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 0.67
+  },
+  "stability_score": 0.80388,
+  "weighted_mean": 0.555,
+  "worst_dimension": 0.0
+}

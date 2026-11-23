@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "6772587ef5322e4f9aa4ffb205d8e97f46d0c47a0b06422f4912b0b408217951",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payload causes a 400 error on /library/add_book.",
+      "Non\u2011integer year_published causes a 400 error on /library/add_book.",
+      "Omitting isbn in /library/remove_book, /library/book_info, or /library/update_book yields a 400 error.",
+      "Providing wrong admin credentials returns 401 Access denied.",
+      "Changing password with incorrect old_password returns 401.",
+      "Calling /inventory/check with empty or malicious section/location still starts the script (possible command injection)."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple library management web API with endpoints to add, remove, query, and update book records, perform an inventory check, and handle admin authentication and password changes.",
+    "invariants": [
+      "A book must include non\u2011empty title, author, and isbn to be added.",
+      "year_published must be an integer when adding a book.",
+      "Admin login succeeds only if password matches current LIBRARIAN_PASSWORD and secret_key equals the hard\u2011coded value.",
+      "Password change succeeds only when old_password matches the current LIBRARIAN_PASSWORD.",
+      "All successful responses are JSON objects with a \"status\" field.",
+      "Missing required parameters result in a 400 (or 401 for auth) response."
+    ],
+    "io_behavior": [
+      "POST /library/add_book with raw YAML body returns JSON status and book details or 400 on format/validation errors.",
+      "POST /library/remove_book with form field 'isbn' returns JSON confirmation or 400 if missing.",
+      "GET /inventory/check with query parameters 'section' and 'location' triggers a script and returns JSON status.",
+      "POST /admin/login with form fields 'password' and 'secret_key' returns JSON access result (200 or 401).",
+      "POST /admin/change_password with form fields 'old_password' and 'new_password' updates the in\u2011memory password and returns JSON status (200 or 401).",
+      "GET /library/book_info with query parameter 'isbn' returns static JSON book info or 400 if missing."
+    ],
+    "public_api": {
+      "route:GET /inventory/check": "",
+      "route:GET /library/book_info": "",
+      "route:GET /library/list_books": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/login": "",
+      "route:POST /library/add_book": "",
+      "route:POST /library/remove_book": "",
+      "route:POST /library/update_book": ""
+    },
+    "side_effects": [
+      "Executes an external Python script via os.system in /inventory/check.",
+      "Mutates the global LIBRARIAN_PASSWORD variable when admin changes password.",
+      "Potentially logs request data via Flask's default logging.",
+      "None of the endpoints persist data to a database or file system."
+    ],
+    "source_hash": "150f610fd1bdaaeee8cf652e99d3fd9f1b9c911112f987adf9e70c06a38f0410"
+  },
+  "dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.8,
+    "invariants": 0.75,
+    "io_semantics": 0.9,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file3.py",
+  "gated_score": 0.75812,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.75812,
+  "original_hash": "150f610fd1bdaaeee8cf652e99d3fd9f1b9c911112f987adf9e70c06a38f0410",
+  "rationale": "Implements required endpoints and most validations, but adds extra safety checks (blocking unsafe inventory parameters) and uses password hashing instead of mutating the plain LIBRARIAN_PASSWORD variable, breaking several specified edge cases and invariants.",
+  "schema": 1,
+  "stability_abs_difference": 0.13213,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.83,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 0.75
+  },
+  "stability_score": 0.89025,
+  "weighted_mean": 0.7775,
+  "worst_dimension": 0.7
+}

@@ -73,17 +73,16 @@ def run(root: str | Path) -> dict:
             call_log=Path(tmp) / "calls.jsonl",
             transport=enforcement_transport,
         )
-        original_which = runner.shutil.which
-        original_scan = runner.scan_cwes
-        runner.shutil.which = lambda name: "/usr/bin/bandit"
+        original_which, original_scan, original_nodes = runner.shutil.which, runner.scan_cwes, runner.bandit_nodes
+        runner.shutil.which = lambda name: "/usr/bin/bandit"  # type: ignore[assignment]
         runner.scan_cwes = lambda code, require_compile=True: (0, []) if "PROMSEC_SELFTEST_SAFE" in code else (1, [999])
+        runner.bandit_nodes = lambda code: []
         try:
             first_run = runner.run_enforcement(cfg, llm=llm)
             second_run = runner.run_enforcement(cfg, llm=llm)
         finally:
-            runner.shutil.which = original_which
-            runner.scan_cwes = original_scan
-        if first_run["completed_now"] != 2 or second_run["resumed"] != 2:
+            runner.shutil.which, runner.scan_cwes, runner.bandit_nodes = original_which, original_scan, original_nodes
+        if first_run["completed_now"] != 2 or second_run["resumed_completed"] != 2:
             raise AssertionError("Run resume regression")
         if llm_calls["n"] != 6:
             raise AssertionError(
@@ -120,10 +119,10 @@ def run(root: str | Path) -> dict:
                 return 1, [998]
             return 2, [998, 999]
 
-        original_which = runner.shutil.which
-        original_scan = runner.scan_cwes
-        runner.shutil.which = lambda name: "/usr/bin/bandit"
+        original_which, original_scan, original_nodes = runner.shutil.which, runner.scan_cwes, runner.bandit_nodes
+        runner.shutil.which = lambda name: "/usr/bin/bandit"  # type: ignore[assignment]
         runner.scan_cwes = partial_scan
+        runner.bandit_nodes = lambda code: []
         try:
             try:
                 runner.run_enforcement(
@@ -143,11 +142,10 @@ def run(root: str | Path) -> dict:
                 ),
             )
         finally:
-            runner.shutil.which = original_which
-            runner.scan_cwes = original_scan
+            runner.shutil.which, runner.scan_cwes, runner.bandit_nodes = original_which, original_scan, original_nodes
         if resumed_run["resumed_partial"] != 1:
             raise AssertionError("Iteration-level resume regression")
-        partial_record = json.loads((Path(tmp) / "runs" / "partial-resume" / "samples" / (Path(sorted((root / "data" / "test").glob("*.py"))[0]).stem + ".json")).read_text(encoding="utf-8"))
+        partial_record = json.loads((Path(tmp) / "runs" / "partial-resume" / "samples" / (Path(min((root / "data" / "test").glob("*.py"))).stem + ".json")).read_text(encoding="utf-8"))
         if partial_record.get("status") != "secured" or [row.get("iteration") for row in partial_record.get("iterations", [])] != [1, 2]:
             raise AssertionError("Iteration-level resume did not continue at the next durable iteration")
 
@@ -179,7 +177,7 @@ def run(root: str | Path) -> dict:
         if judged["judged_now"] != 2:
             raise AssertionError("Judge-run regression")
         report = build_report(cfg)
-        if report["samples"] != 2 or report["secured_vulnerable_inputs"] != 2:
+        if report["programs"] != 2 or report["secured_programs"] != 2:
             raise AssertionError("Report regression")
         calibration = calibrate_judge(cfg, llm=judge_client, limit=1)
         if calibration["controls"] != 4:

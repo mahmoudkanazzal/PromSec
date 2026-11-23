@@ -1,0 +1,74 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "df4d60a81327cd2daafd3c6961d3110cc6df1c5f385381042c9b546a9b2e046e",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed JSON fields in POST requests",
+      "Non\u2011numeric or negative values for 'votes' or 'candidate_id'",
+      "Requesting a candidate id that does not exist",
+      "Database file missing or inaccessible",
+      "SQL injection payloads that alter query semantics",
+      "Extremely large vote increments causing integer overflow"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a RESTful service to manage election candidates and vote tallies via HTTP endpoints.",
+    "invariants": [
+      "Each candidate record has a unique integer id",
+      "Votes are stored as an integer value",
+      "All responses are JSON-encoded",
+      "HTTP status codes follow the documented contract (201 for creation, 200 for success)"
+    ],
+    "io_behavior": [
+      "POST /register_candidate with JSON {name, party} \u2192 201 and success message",
+      "GET /get_candidate?id=ID \u2192 200 and JSON object for the candidate",
+      "POST /update_votes with JSON {candidate_id, votes} \u2192 200 and success message",
+      "GET /get_results \u2192 200 and JSON array of candidates ordered by votes"
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:GET /get_candidate": "",
+      "route:GET /get_results": "",
+      "route:POST /register_candidate": "",
+      "route:POST /update_votes": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the SQLite 'candidates' table",
+      "Updates the 'votes' column of an existing candidate row",
+      "Reads rows from the 'candidates' table for retrieval and ranking",
+      "Commits changes to the 'election.db' file on each write operation"
+    ],
+    "source_hash": "47679752c6580ec721a4e649dd63089f102ea9f5858a6f578e464ff2959c276d"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.3,
+    "invariants": 0.4,
+    "io_semantics": 0.5,
+    "side_effects": 0.3
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file93.py",
+  "gated_score": 0.29,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.29,
+  "original_hash": "47679752c6580ec721a4e649dd63089f102ea9f5858a6f578e464ff2959c276d",
+  "rationale": "Routes and entrypoints exist, but use of sqlite3.Cursor as a context manager crashes at runtime, breaking core functionality. Success responses are JSON with correct codes, yet error responses default to HTML, violating JSON-only output. Negative or overly large vote values are not rejected, and missing DB file handling is absent. Intended side\u2011effects are coded but never execute due to the cursor bug, and invariants like unique IDs and integer votes rely on the DB without explicit enforcement.",
+  "schema": 1,
+  "stability_abs_difference": 0.56787,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.67,
+    "invariants": 0.8,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.85787,
+  "weighted_mean": 0.32,
+  "worst_dimension": 0.2
+}

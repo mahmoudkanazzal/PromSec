@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "bd4f1b539cf62bf6ada749791e6d48606a567befb0dfc6b96dbe30c355463789",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed YAML in /submit_feedback or /update_catalog results in a server error (500).",
+      "Absent 'user_id' or 'feedback' keys cause a KeyError and a 500 response.",
+      "Empty or missing 'id' query parameter in /generate_report still runs the command with an empty argument.",
+      "Omitted 'password' field in /admin_login leads to login failure (401).",
+      "Non\u2011POST methods on the defined routes return 405 Method Not Allowed."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a web API for submitting user feedback, generating reports, authenticating admin access, and updating a catalog via HTTP requests.",
+    "invariants": [
+      "All responses are JSON objects with a 'status' key.",
+      "Successful admin login returns HTTP 200; failed login returns HTTP 401.",
+      "YAML payloads are parsed with yaml.FullLoader and must contain the expected keys.",
+      "The master password is a fixed constant in the code."
+    ],
+    "io_behavior": [
+      "POST /submit_feedback with a YAML body containing 'user_id' and 'feedback' returns JSON echoing those fields.",
+      "GET /generate_report?id=<report_id> triggers a system command and returns JSON indicating initiation.",
+      "POST /admin_login with form field 'password' returns success JSON if it matches the master password, otherwise a 401 error JSON.",
+      "POST /update_catalog with a YAML body returns JSON confirming update and echoing the parsed catalog data."
+    ],
+    "public_api": {
+      "route:GET /generate_report": "",
+      "route:POST /admin_login": "",
+      "route:POST /submit_feedback": "",
+      "route:POST /update_catalog": ""
+    },
+    "side_effects": [
+      "Execution of an external './report_generator' command with the supplied report ID.",
+      "Potential logging or console output from the Flask server (not part of the API contract)."
+    ],
+    "source_hash": "f9b0e146383078e704acfde5a6976aceb335b0d502126348c4a493855f23bb1d"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.4,
+    "invariants": 0.5,
+    "io_semantics": 0.5,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file19.py",
+  "gated_score": 0.28125,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.28125,
+  "original_hash": "f9b0e146383078e704acfde5a6976aceb335b0d502126348c4a493855f23bb1d",
+  "rationale": "KeyError on missing fields, lack of command execution, use of safe_load instead of FullLoader, and master password from env violate contract; other routes and status codes match.",
+  "schema": 1,
+  "stability_abs_difference": 0.01125,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.5,
+    "invariants": 0.5,
+    "io_semantics": 0.5,
+    "side_effects": 0.0
+  },
+  "stability_score": 0.2925,
+  "weighted_mean": 0.375,
+  "worst_dimension": 0.0
+}

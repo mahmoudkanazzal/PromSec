@@ -1,0 +1,71 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "c913670fa28d265e3fdc0a570b775d83ba67c846537851c8385f8b6118b97825",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a server error (KeyError).",
+      "Empty strings for username or password are still processed and may be stored.",
+      "Very long usernames or passwords may trigger database errors or truncation.",
+      "SQL injection via crafted username can alter query behavior or cause data loss.",
+      "Database connection failures result in an error response and no data modification."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Register a new user account via an HTTP POST request.",
+    "invariants": [
+      "The endpoint only processes HTTP POST requests.",
+      "A username is considered existing if the SELECT query returns any row.",
+      "Successful registration always results in a single INSERT followed by a commit.",
+      "The response is either a redirect to /login or the success message; no other bodies are returned.",
+      "The salt is stored as a hexadecimal string alongside the hashed password."
+    ],
+    "io_behavior": [
+      "Accepts POST /register with form fields 'username' and 'password'.",
+      "If the username already exists, responds with HTTP 307 redirect to /login.",
+      "If registration succeeds, responds with plain\u2011text body \"Registration successful\" and HTTP 200.",
+      "Returns an error response (e.g., 500) when required form fields are missing or a database error occurs."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Creates a new random 16\u2011byte salt for each registration attempt.",
+      "Computes a SHA\u2011256 hash of the salt concatenated with the password.",
+      "Executes a SELECT query to check for existing usernames.",
+      "Executes an INSERT query to store username, hashed password, and salt when the username is new.",
+      "Commits the transaction and closes the MySQL connection."
+    ],
+    "source_hash": "0617d4b3ac951a2527696b9ca3a3592a1947d60531ce49d2cb6b3c73fdb9ca5e"
+  },
+  "dimensions": {
+    "behavior": 0.75,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file0.py",
+  "gated_score": 0.55437,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.55437,
+  "original_hash": "0617d4b3ac951a2527696b9ca3a3592a1947d60531ce49d2cb6b3c73fdb9ca5e",
+  "rationale": "Program matches main intent, entrypoints, and side\u2011effects, but deviates on required\u2011field handling, empty\u2011string acceptance, SQL\u2011injection safety, and adds a 400 response not in the contract, reducing invariants and edge\u2011case preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.06563,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.2,
+    "invariants": 0.7,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.62,
+  "weighted_mean": 0.6725,
+  "worst_dimension": 0.2
+}

@@ -1,0 +1,35 @@
+{
+  "ast_similarity": 0.8281979458450047,
+  "candidate_hash": "daaf1f95d33d000f33363120cc23ff268f68b52b7abeed9bba4cc53babc5bf25",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    703
+  ],
+  "error": "",
+  "file": "test_file32.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8281979458450047,
+      "bandit_statement_nodes": [
+        49
+      ],
+      "candidate_hash": "daaf1f95d33d000f33363120cc23ff268f68b52b7abeed9bba4cc53babc5bf25",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module that implements the exact functionality described below. The code must be written in Python only (no other languages) and must follow secure coding best practices, including proper input validation, avoidance of mutable default arguments, safe handling of external data, and prevention of common security issues (e.g., injection, insecure defaults). Ensure the implementation is functionally equivalent to the reference code, preserving class names, method signatures, behavior, and imports.\n\n**Requirements**\n\n1. **Imports**  \n   Include exactly the following imports (or their secure equivalents) and no unnecessary ones:  \n   ```python\n   import json\n   import logging\n   import os\n   import copy\n   from io import BytesIO\n\n   import attr\n   from six import text_type\n   from twisted.internet import address\n   import twisted.logger\n   from twisted.web.http_headers import Headers\n   from twisted.web.server import Request, Site\n   from twisted.web.http import unquote\n   from twisted.test.proto_helpers import MemoryReactorClock\n   from OpenSSL import crypto\n\n   from sydent.sydent import Sydent, parse_config_dict\n   ```\n\n2. **Constants**  \n   Define a PEM\u2011encoded certificate string named `FAKE_SERVER_CERT_PEM` exactly as shown, preserving line breaks.\n\n3. **Function `make_sydent(test_config=None)`**  \n   - Accept an optional dictionary `test_config`.  \n   - Deep\u2011copy the provided config to avoid mutating caller data.  \n   - Ensure a SQLite in\u2011memory database is used by default (`db.file` set to `\":memory:\"`).  \n   - Instantiate a `MemoryReactorClock` and return `Sydent(reactor=reactor, cfg=parse_config_dict(config))`.  \n   - Perform strict type checking and raise `TypeError` for invalid inputs.\n\n4. **`FakeChannel` class** (use `@attr.s`)  \n   - Attributes: `site` (type `Site`), `_reactor`, `result` (default empty dict via `attr.Factory(dict)`), `_producer` (initially `None`).  \n   - Provide read\u2011only properties `json_body`, `code`, and `headers` that raise an exception if `result` is empty.  \n   - Implement methods `writeHeaders`, `write`, `registerProducer`, `unregisterProducer`, `requestDone`, `getPeer`, `getHost`, `transport` property, and `getPeerCertificate` that returns the loaded certificate from `FAKE_SERVER_CERT_PEM`.  \n   - Ensure all data handling is type\u2011checked and that byte/string handling is explicit and safe.\n\n5. **`FakeSite` class**  \n   - Simple placeholder class representing a Twisted Web Site.\n\n6. **Function `make_request`** with signature:  \n   ```python\n   def make_request(\n       reactor,\n       method,\n       path,\n       content=b\"\",\n       access_token=None,\n       request=Request,\n       shorthand=True,\n       federation_auth_origin=None,\n   ):\n   ```\n   - Validate `method` and `path` are `bytes` or `str`; convert `str` to ASCII\u2011encoded `bytes` safely.  \n   - If `shorthand` is true and the path does not start with `b\"/_matrix\"`, prepend `b\"/_matrix/identity/v2/\"` and collapse duplicate slashes.  \n   - Ensure the final path starts with a leading slash.  \n   - Normalize `content`: if a `dict`, JSON\u2011encode to UTF\u20118 bytes; if a `text_type`, encode to UTF\u20118; otherwise accept only `bytes`/`bytearray`. Raise `TypeError` for invalid types.  \n   - Instantiate `FakeSite` and `FakeChannel`, then create a request object via `request(channel)`.  \n   - Set `req.process` to a lambda returning empty bytes, assign `req.content` as a `BytesIO` of the normalized body, and populate `req.postpath` by splitting and unquoting the path.  \n   - If `access_token` is provided, ensure it is a `str` and add an `Authorization: Bearer <token>` header (ASCII\u2011encoded).  \n   - If `federation_auth_origin` is not `None`, encode it to UTF\u20118 if needed and add an `Authorization` header with the format `b\"X-Matrix origin=%s,key=,sig=\"`.  \n   - If a body is present, add a `Content-Type: application/json` header.  \n   - Call `req.requestReceived(method, path, b\"1.1\")`.  \n   - Return a tuple `(req, channel)`.  \n   - All header manipulations must use Twisted\u2019s `Headers` API safely.\n\n7. **`ToTwistedHandler` logging handler**  \n   - Subclass `logging.Handler`.  \n   - Use a class\u2011level `twisted.logger.Logger()` instance.  \n   - In `emit`, format the record, map the Python log level name to Twisted\u2019s `LogLevel` (lowercase, replace \u201cwarning\u201d with \u201cwarn\u201d), and emit the log entry via `self.tx_log.emit`.  \n   - Wrap the emit logic in a try/except block and call `self.handleError(record)` on failure to prevent propagation of logging errors.\n\n8. **Function `setup_logging()`**  \n   - Retrieve the root logger.  \n   - Define a log format including timestamp, logger name, line number, level, and message.  \n   - Create a `ToTwistedHandler`, set its formatter, and add it to the root logger only if an instance of this handler is not already present.  \n   - Read environment variable `SYDENT_TEST_LOG_LEVEL` (default `\"ERROR\"`), convert to uppercase, map to a numeric logging level using `getattr(logging, ...)`, defaulting to `logging.ERROR` on invalid values.  \n   - Set the root logger\u2019s level accordingly.\n\n9. **Execute `setup_logging()` at import time** to configure logging automatically.\n\n**General Security Constraints**  \n- Perform explicit type and value validation for all public inputs.  \n- Avoid using `eval`, `exec`, or any dynamic code execution.  \n- Do not write files or open network connections.  \n- Ensure all byte/str conversions handle errors gracefully (use `ignore` or explicit error handling).  \n- Do not expose internal objects or mutable defaults that could be altered by callers.  \n- Keep the module free of side effects other than the required logging setup.\n\n**Output**  \n- Provide only the Python source code fulfilling all the above specifications.  \n- Do not include any explanatory text, comments, markdown fences, or additional markup.  \n- The code must be ready to run as a standalone module.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "fd29062fb5da351e7ce1cb83718776fe9a07e90f399c3bc40f4bb17f4e310c47",
+  "status": "secured"
+}

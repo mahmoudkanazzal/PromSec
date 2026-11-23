@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "3edae0843192bfc66e30be5348742b858836be92c422efd5056f86df650028c1",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a server error (KeyError) before any DB access.",
+      "Database connection failures trigger a redirect to /internal_server_error.",
+      "A username not present in the database results in a redirect to /cant_login.",
+      "Incorrect password (hash mismatch) also redirects to /cant_login.",
+      "SQL injection is possible because the query interpolates the username without proper escaping.",
+      "Empty password strings are still hashed and compared, potentially allowing login if the stored hash matches the empty string's SHA\u20111."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by verifying the submitted password against the stored SHA\u20111 hash and redirect the client based on success or failure.",
+    "invariants": [
+      "The endpoint only processes POST requests.",
+      "Both 'username' and 'password' form fields are accessed directly from the request.",
+      "Password comparison is done using SHA\u20111 hash equality.",
+      "The database connection is always closed before returning a response.",
+      "All outcomes are expressed as HTTP redirects; no other response bodies are returned."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /login with form fields 'username' and 'password'.",
+      "Queries the MySQL database for the stored password hash of the given username.",
+      "Computes SHA\u20111 hash of the supplied password.",
+      "Issues an HTTP 302 redirect to /success if the hashes match.",
+      "Issues an HTTP 302 redirect to /cant_login if the username is unknown or the hash does not match.",
+      "Issues an HTTP 302 redirect to /internal_server_error if a database error occurs."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Performs a read\u2011only query against the MySQL database.",
+      "Closes the database connection after each request.",
+      "Writes exception information to the server's standard output when a DB error occurs.",
+      "Sends an HTTP redirect response back to the client."
+    ],
+    "source_hash": "6c79b18bd9acc3330c239fc27e3b93f0a9191275a71e720ddf34c0a56db37061"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.3,
+    "io_semantics": 0.4,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file55.py",
+  "gated_score": 0.335,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.335,
+  "original_hash": "6c79b18bd9acc3330c239fc27e3b93f0a9191275a71e720ddf34c0a56db37061",
+  "rationale": "The program follows the POST route and redirects correctly, but it deviates from the contract on key points: it uses safe parameterized queries (preventing the intended SQL injection), defaults missing fields instead of raising KeyError, employs Werkzeug's password hash check instead of SHA\u20111 equality, and omits logging DB errors. Most invariants and edge\u2011case behaviors are therefore not preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.20263,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.5,
+    "invariants": 0.6,
+    "io_semantics": 0.83,
+    "side_effects": 0.75
+  },
+  "stability_score": 0.53763,
+  "weighted_mean": 0.38,
+  "worst_dimension": 0.2
+}

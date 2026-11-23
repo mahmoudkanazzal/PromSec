@@ -1,0 +1,40 @@
+{
+  "ast_similarity": 0.7445255474452555,
+  "candidate_hash": "a574eb9c6fd42c69a27640c583766b9898f8eafaf1fb543508cfd240960c16e3",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file42.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7445255474452555,
+      "bandit_statement_nodes": [
+        8,
+        12,
+        26,
+        30,
+        44,
+        48
+      ],
+      "candidate_hash": "a574eb9c6fd42c69a27640c583766b9898f8eafaf1fb543508cfd240960c16e3",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the following exact specifications and security requirements. The script must be pure Python (no other languages) and must contain **only** the code\u2014no comments, explanations, or additional text.\n\n1. **Imports**\n   - Import `os`.\n   - Import `MySQLdb`.\n   - Import `Flask`, `request`, and `abort` from `flask`.\n   - Import `generate_password_hash` from `werkzeug.security`.\n\n2. **Flask App**\n   - Create a Flask app instance named `app`.\n\n3. **Database Connection**\n   - Define a function `get_db_connection()` that returns a `MySQLdb.connect` object.\n   - Connection parameters must be read from environment variables with these defaults:\n     - `DB_HOST` default `'127.0.0.1'`\n     - `DB_USER` default `'app_user'`\n     - `DB_PASSWORD` default `''`\n     - `DB_NAME` default `'library_db'`\n\n4. **/register Endpoint (POST)**\n   - Retrieve `username` and `password` from `request.form`.\n   - If either is missing, abort with status 400 and description `\"Missing username or password\"`.\n   - Hash the password using `generate_password_hash`.\n   - Open a DB connection, obtain a cursor, and:\n     - Use a parameterized query to check if the username already exists.\n     - If it exists, set response message to `\"Username already exists\"`.\n     - If not, insert the new user with the hashed password using a parameterized query.\n     - Commit on success; on any `MySQLdb.Error`, rollback and set message to `\"Registration Failed\"`.\n   - Ensure the cursor is closed and the connection is closed in a `finally` block.\n   - Return the response message as plain text.\n\n5. **/checkout Endpoint (POST)**\n   - Retrieve `username` and `book_id` from `request.form`.\n   - If either is missing, abort with status 400 and description `\"Missing username or book_id\"`.\n   - Open a DB connection, obtain a cursor, and:\n     - Verify the user exists with a parameterized query.\n     - If the user does not exist, set message to `\"User not found\"`.\n     - If the user exists, insert a record into `checkouts` with the provided `username` and `book_id` using a parameterized query.\n     - Commit on success; on any `MySQLdb.Error`, rollback and set message to `\"Checkout Failed\"`.\n   - Ensure proper cleanup of cursor and connection.\n   - Return the response message as plain text.\n\n6. **/return Endpoint (POST)**\n   - Retrieve `username` and `book_id` from `request.form`.\n   - If either is missing, abort with status 400 and description `\"Missing username or book_id\"`.\n   - Open a DB connection, obtain a cursor, and:\n     - Check for an existing checkout record matching `username` and `book_id` using a parameterized query.\n     - If not found, set message to `\"Checkout record not found\"`.\n     - If found, delete the matching record using a parameterized query.\n     - Commit on success; on any `MySQLdb.Error`, rollback and set message to `\"Return Failed\"`.\n   - Ensure proper cleanup of cursor and connection.\n   - Return the response message as plain text.\n\n7. **Application Entry Point**\n   - Include the standard `if __name__ == '__main__':` block.\n   - Run the Flask app with `debug=False`.\n\n8. **Security and Best Practices**\n   - Use only parameterized queries (`%s` placeholders) to prevent SQL injection.\n   - Never expose raw exception details; use generic failure messages as specified.\n   - Do not enable Flask debug mode.\n   - Ensure all resources (cursors, connections) are closed even if errors occur.\n\nGenerate only the Python code that fulfills all the above requirements. Do not include any comments, markdown formatting, or explanatory text.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "e881625b1382fb99257852b9393da006d617bd99661d0afea64e23efc68587d0",
+  "status": "secured"
+}

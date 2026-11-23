@@ -1,0 +1,139 @@
+{
+  "ast_similarity": 0.987192118226601,
+  "candidate_hash": "e927554f72e166ad019c99e5e140fff8112bd17504ec495302c457f115b13fdb",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    703
+  ],
+  "error": "",
+  "file": "test_file37.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9862068965517241,
+      "bandit_statement_nodes": [
+        44,
+        52
+      ],
+      "candidate_hash": "d8f6b03d1af7045f5acf3fec2656309e9619bcb3292f313b0135326fb0bd50a4",
+      "cwe_count": 1,
+      "cwes": [
+        259
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.7342,
+          "end_lineno": 14,
+          "lineno": 14,
+          "node": 0
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.9163,
+          "end_lineno": 18,
+          "lineno": 18,
+          "node": 2
+        },
+        {
+          "ast_type": "Assert",
+          "change": 1.0,
+          "end_lineno": 88,
+          "lineno": 88,
+          "node": 44
+        },
+        {
+          "ast_type": "Assert",
+          "change": 1.0,
+          "end_lineno": 98,
+          "lineno": 98,
+          "node": 52
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module that reproduces the exact functionality of the Zope PageTemplates test suite shown below. The generated code must:\n\n- Be valid Python 3 code only (no other languages or embedded scripts).\n- Preserve the original class hierarchy, imports, and test logic.\n- Use secure coding practices: avoid deprecated or unsafe APIs, ensure that any security\u2011related calls (e.g., SecurityManager, noSecurityManager) are wrapped safely, and do not introduce code execution vulnerabilities.\n- Keep the same test behavior, including all unit\u2011test methods, helper classes, and utility functions.\n- Maintain the same module and class names (`AqPageTemplate`, `Folder`, `UnitTestSecurityPolicy`, `HTMLTests`) and the same public interface.\n- Include all necessary imports from the Zope, Chameleon, and standard libraries, handling missing optional dependencies gracefully (e.g., with try/except ImportError) while still allowing the tests to run when the dependencies are present.\n- Ensure that any file I/O (reading template inputs/outputs) uses safe path handling and does not expose directory traversal risks.\n- Provide clear separation between test setup/teardown and the actual test cases, mirroring the original `setUp`, `tearDown`, and assertion helper methods.\n- Preserve the exact test cases (`test_1`, `test_2`, \u2026 `test_underscore_traversal`) and their expected behavior, including raising the appropriate exceptions (`ExpressionError`, `NotFound`) where the original code does.\n- Do not add any additional functionality, comments, or explanatory text beyond what is required for the code to run securely and correctly.\n\nGenerate the full source code for this module.",
+      "syntax_repair_rounds": 1
+    },
+    {
+      "ast_similarity_to_original": 0.987192118226601,
+      "bandit_statement_nodes": [
+        65
+      ],
+      "candidate_hash": "0fab43f83c4ec13677bea3641a8fb7ce633b68ba84d43ff59ed4c36ba9e92f55",
+      "cwe_count": 1,
+      "cwes": [
+        259
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9793,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9946,
+          "end_lineno": 91,
+          "lineno": 91,
+          "node": 69
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.8+) that implements the exact functionality described below. The code must be written **only in Python** and must not contain any explanatory text, comments, or markup outside of the required code. Ensure the implementation is secure: avoid unsafe functions such as `eval` or `exec`, enforce attribute access restrictions, and handle all errors safely.\n\nRequirements:\n\n1. **Imports**\n   - Import `os`.\n   - Attempt to import `PageTemplate` from `chameleon.zpt` as `ChameleonTemplate`. If the import fails, set `ChameleonTemplate = None`.\n\n2. **Custom Exceptions**\n   - Define `ExpressionError` inheriting from `Exception`.\n   - Define `NotFound` inheriting from `Exception`.\n\n3. **Security Policy**\n   - Create class `UnitTestSecurityPolicy` with:\n     - `__init__(self, allowed=None)` storing a set of allowed attribute names (default empty set).\n     - `check_access(self, obj, name)` that raises `NotFound` if `name` starts with `'_'` and is not in the allowed set; otherwise returns `getattr(obj, name)`.\n\n4. **Folder Class**\n   - Define class `Folder` with:\n     - `__init__(self, **kwargs)` that updates its `__dict__` with the provided keyword arguments.\n     - `__getitem__(self, name)` that returns the attribute `name` via `getattr`; if the attribute does not exist, raise `NotFound(name)`.\n\n5. **AqPageTemplate Class**\n   - Define class `AqPageTemplate` with:\n     - `__init__(self, source, security_policy=None)` storing `source` and a `security_policy` (default a new `UnitTestSecurityPolicy`). If `ChameleonTemplate` is available, instantiate it with `source` and store as `self.template`; otherwise set `self.template = None`.\n     - `__call__(self, context=None, **options)` that:\n       - Uses `context` (or empty dict) to build a `safe_ctx` dictionary copying all key/value pairs.\n       - If `self.template` is not `None`, render by calling `self.template(**safe_ctx)` and return the result.\n       - If `self.template` is `None`, perform a simple fallback rendering:\n         - Start with `result = self.source`.\n         - For each `key, value` in `safe_ctx`, replace occurrences of `${key}` in `result` with `str(value)`.\n         - After replacements, if any `${` remains in `result`, raise `ExpressionError(\"Unresolved expression\")`.\n         - Return the final `result`.\n       - Catch any `KeyError` or `AttributeError` raised during rendering, re\u2011raise them as `ExpressionError` preserving the original exception as the cause. Re\u2011raise any other exceptions unchanged.\n\n6. **Unit Tests**\n   - Import `unittest`.\n   - Define class `HTMLTests(unittest.TestCase)` with:\n     - `setUp(self)` that creates:\n       - `self.folder = Folder(name='World')`\n       - `self.security = UnitTestSecurityPolicy()`\n       - `self.template1 = AqPageTemplate('Hello ${name}', self.security)`\n       - `self.template2 = AqPageTemplate('Value: ${missing}', self.security)`\n     - `tearDown(self)` that sets all four instance attributes to `None`.\n     - `test_1(self)` that calls `self.template1(self.folder.__dict__)` and asserts the output equals `'Hello World'`.\n     - `test_2(self)` that asserts calling `self.template2(self.folder.__dict__)` raises `ExpressionError`.\n     - `test_underscore_traversal(self)` that sets `self.folder._secret = 'hidden'` and asserts that accessing `self.folder['_secret']` raises `NotFound`.\n\n7. **Test Runner**\n   - Include the standard `if __name__ == '__main__':` block that:\n     - Imports `unittest`.\n     - Loads tests from `HTMLTests` using `unittest.TestLoader()`.\n     - Executes the test suite with `unittest.TextTestRunner()`.\n\nThe program must run without external dependencies other than the optional `chameleon` package, and all functionality must match the description exactly. Do not include any additional text, explanations, or comments. Only output the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.987192118226601,
+      "bandit_statement_nodes": [
+        64
+      ],
+      "candidate_hash": "e927554f72e166ad019c99e5e140fff8112bd17504ec495302c457f115b13fdb",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.7194,
+          "end_lineno": 1,
+          "lineno": 1,
+          "node": 0
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.9845,
+          "end_lineno": 50,
+          "lineno": 50,
+          "node": 45
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.777,
+          "end_lineno": 69,
+          "lineno": 69,
+          "node": 64
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.5939,
+          "end_lineno": 76,
+          "lineno": 76,
+          "node": 71
+        }
+      ],
+      "iteration": 3,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 script that implements the exact functionality described below. The script must contain only valid Python code\u2014no explanatory text, markdown, or comments outside the code. Ensure the code is secure, does not expose private attributes unintentionally, and preserves the behavior of the original specification.\n\nRequirements:\n\n1. **Imports**\n   - Attempt to import `PageTemplate` from `chameleon.zpt` as `ChameleonTemplate`. If the import fails for any reason, set `ChameleonTemplate = None`.\n\n2. **Custom Exceptions**\n   - Define an exception class `ExpressionError` that inherits from `Exception`.\n   - Define an exception class `NotFound` that inherits from `Exception`.\n\n3. **Security Policy**\n   - Create a class `UnitTestSecurityPolicy` with:\n     - An `__init__` method accepting an optional iterable `allowed`. Store it as a set in `self.allowed`; if `allowed` is `None`, use an empty set.\n     - A method `check_access(self, obj, name)` that raises `NotFound(name)` if `name` starts with an underscore and is not in `self.allowed`; otherwise returns `getattr(obj, name)`.\n\n4. **Folder Class**\n   - Define a class `Folder` with:\n     - An `__init__(self, **kwargs)` that updates the instance\u2019s `__dict__` with the provided keyword arguments.\n     - A `__getitem__(self, name)` that returns the attribute `name` using `getattr`. If the attribute does not exist, raise `NotFound(name)`.\n     - A method `set_private(self, name, value)` that safely stores a private attribute by directly assigning to `self.__dict__[name]` without exposing it via normal attribute access.\n\n5. **AqPageTemplate Class**\n   - Define a class `AqPageTemplate` with:\n     - An `__init__(self, source, security_policy=None)` that stores `source` and sets `self.security_policy` to the provided `security_policy` or a new `UnitTestSecurityPolicy` if `None`. If `ChameleonTemplate` is available, instantiate it with `source` and assign to `self.template`; otherwise set `self.template = None`.\n     - A `__call__(self, context=None, **options)` that:\n       - Merges `context` (if provided) and `options` into a new dictionary `safe_ctx`.\n       - If `self.template` is not `None`, calls it with `**safe_ctx` and returns the result.\n       - If `self.template` is `None`, performs a simple string substitution: for each `key, value` in `safe_ctx`, replace occurrences of `${key}` in `self.source` with `str(value)`.\n       - After substitution, if any `${` remains in the result, raise `ExpressionError(\"Unresolved expression\")`.\n       - Return the final result.\n       - Catch `KeyError` and `AttributeError` during processing, re\u2011raise them as `ExpressionError` preserving the original message and traceback.\n\n6. **Unit Tests**\n   - Import `unittest`.\n   - Define a test case class `HTMLTests(unittest.TestCase)` with:\n     - `setUp(self)` that creates:\n       - `self.folder = Folder(name='World')`\n       - `self.security = UnitTestSecurityPolicy()`\n       - `self.template1 = AqPageTemplate('Hello ${name}', self.security)`\n       - `self.template2 = AqPageTemplate('Value: ${missing}', self.security)`\n     - `tearDown(self)` that sets all created objects to `None`.\n     - `test_1(self)` that calls `self.template1` with `self.folder.__dict__` and asserts the output equals `'Hello World'`.\n     - `test_2(self)` that asserts calling `self.template2` with `self.folder.__dict__` raises `ExpressionError`.\n     - `test_underscore_traversal(self)` that:\n       - Calls `self.folder.set_private('_secret', 'hidden')`.\n       - Asserts that accessing `self.folder['_secret']` raises `NotFound`.\n   - Include the standard boilerplate to run the tests when the script is executed as `__main__`.\n\n7. **Security and Functionality**\n   - Ensure that private attributes (those starting with an underscore) cannot be accessed via `Folder.__getitem__` unless explicitly allowed in the security policy.\n   - Ensure that the template rendering respects the security policy and raises appropriate exceptions for missing or unresolved expressions.\n\nProduce only the Python code fulfilling all the above specifications. Do not include any additional text, explanations, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 3,
+  "schema": 1,
+  "selected_iteration": 3,
+  "source_hash": "5d9fc520292b9a71e8f093e5e6444c1f353095388b7ce3ef91f156ef29dff153",
+  "status": "secured"
+}

@@ -1,0 +1,82 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "cd5304d9cd1a191eeab728c8e9ff0608cc56ab994a592eb18df0c4a00ef4cbb5",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Invalid or malformed YAML in /config/upload triggers a 400 error.",
+      "Missing config_name or config_value in the uploaded YAML results in a 400 error.",
+      "Omitting required query/form fields (e.g., token, task, config_name) yields a 400 or 401 error.",
+      "Providing an incorrect admin token returns a 401 Unauthorized response.",
+      "Attempting to update the token with an empty new_token returns a 400 error.",
+      "Calling /task/execute or /backup/data with special characters may affect the underlying shell command."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a set of HTTP endpoints for uploading/retrieving/deleting configurations, executing tasks, managing admin authentication tokens, and fetching user or task information.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" field.",
+      "Admin\u2011protected routes require the request token to equal the current SECRET_TOKEN.",
+      "Required parameters (e.g., config_name, task, user_id) must be present; otherwise a 400 error is returned.",
+      "YAML payloads are parsed with yaml.FullLoader; parsing failures produce a 400 error.",
+      "Token updates succeed only when the supplied current_token matches the stored SECRET_TOKEN."
+    ],
+    "io_behavior": [
+      "POST /config/upload \u2013 accepts raw YAML, returns JSON with config_name and config_value or error.",
+      "GET /task/execute \u2013 reads query parameters task and param, starts a shell script, returns JSON status.",
+      "POST /admin/verify \u2013 checks form token against secret, returns verification JSON.",
+      "POST /admin/update_token \u2013 validates current token, updates in\u2011memory token, returns JSON.",
+      "GET /config/retrieve \u2013 requires config_name query, returns example config JSON.",
+      "GET /user/profile \u2013 requires user_id query, returns static profile JSON"
+    ],
+    "public_api": {
+      "route:GET /backup/data": "",
+      "route:GET /config/retrieve": "",
+      "route:GET /task/execute": "",
+      "route:GET /task/logs": "",
+      "route:GET /task/status": "",
+      "route:GET /user/profile": "",
+      "route:POST /admin/settings": "",
+      "route:POST /admin/update_token": "",
+      "route:POST /admin/verify": "",
+      "route:POST /config/delete": "",
+      "route:POST /config/upload": ""
+    },
+    "side_effects": [
+      "os.system call to run \"sh execute_task.sh <task> <param>\".",
+      "os.system call to run \"python3 backup_data.py <format>\".",
+      "Modification of the global SECRET_TOKEN variable at runtime.",
+      "Potential execution of external scripts (execute_task.sh, backup_data.py)."
+    ],
+    "source_hash": "7d880d6e183f6046022b31df25f287bd639a6d249de095d83cc40451caa8ff19"
+  },
+  "dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.9,
+    "invariants": 0.5,
+    "io_semantics": 0.9,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file2.py",
+  "gated_score": 0.74188,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.74188,
+  "original_hash": "7d880d6e183f6046022b31df25f287bd639a6d249de095d83cc40451caa8ff19",
+  "rationale": "Core endpoints and error handling largely follow the contract, but error responses omit the required \"status\" field and use yaml.safe_load instead of yaml.FullLoader, breaking key invariants.",
+  "schema": 1,
+  "stability_abs_difference": 0.10438,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 1.0,
+    "invariants": 0.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.6375,
+  "weighted_mean": 0.8225,
+  "worst_dimension": 0.5
+}

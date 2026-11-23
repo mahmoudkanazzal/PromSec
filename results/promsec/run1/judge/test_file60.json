@@ -1,0 +1,65 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "04697d452c5c1a333e25e7bb780e32cff20ecf667285ca0771e3d90ec19ffc1e",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'payload' query parameter.",
+      "Payload that is not valid YAML or lacks required keys.",
+      "Database connection failure or query error.",
+      "No matching temperature record for the given coordinates and date.",
+      "Unexpected data types for latitude/longitude/date causing query mismatches."
+    ],
+    "entrypoints": [],
+    "intent": "Return the temperature for a specified latitude, longitude, and date supplied in a YAML payload via an HTTP GET request.",
+    "invariants": [
+      "The endpoint always returns a string representation of the query result, even if empty.",
+      "Database connections are closed before the HTTP response is sent.",
+      "The request does not modify any data in the database.",
+      "The service expects the payload to contain 'latitude', 'longitude', and 'date' keys."
+    ],
+    "io_behavior": [
+      "Accepts a GET request to /api/temperature_for_location with a query parameter named 'payload'.",
+      "Responds with an HTTP body containing the temperature value (as a string) retrieved from the database.",
+      "Writes the raw payload and the intermediate YAML string to the server's standard output (log)."
+    ],
+    "public_api": {
+      "route:GET /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection to the local 'cwe_db' database.",
+      "Executes a SELECT query against the temperature_data table.",
+      "Closes the database cursor and connection after the query.",
+      "Emits log output via print statements."
+    ],
+    "source_hash": "ec4dd14bd2fbe472ac338770df0bdf848373148e37c52bb097b1b9aa92b55517"
+  },
+  "dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.7,
+    "invariants": 0.6,
+    "io_semantics": 0.7,
+    "side_effects": 0.75
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file60.py",
+  "gated_score": 0.69562,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.69562,
+  "original_hash": "ec4dd14bd2fbe472ac338770df0bdf848373148e37c52bb097b1b9aa92b55517",
+  "rationale": "The program fulfills the main intent and most I/O handling, but omits required logging, returns 404 instead of an empty string for missing data, and lacks some edge\u2011case handling, reducing scores on invariants, io_semantics, side_effects, and edge_cases.",
+  "schema": 1,
+  "stability_abs_difference": 0.04676,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.85,
+    "invariants": 0.75,
+    "io_semantics": 0.67,
+    "side_effects": 0.75
+  },
+  "stability_score": 0.74238,
+  "weighted_mean": 0.7275,
+  "worst_dimension": 0.6
+}

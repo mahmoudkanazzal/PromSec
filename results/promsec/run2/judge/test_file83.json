@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "1a2eb9e64578c71e5ab335ec15f43f690205ae72c4c575c2fb32828f3e5e6bef",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Non\u2011numeric or missing stock_quantity causes a ValueError and a 500 error.",
+      "Missing username in the session raises a KeyError and a 500 error.",
+      "Database connection failure raises an exception and results in a 500 error.",
+      "Negative or zero quantities are accepted because there is no validation.",
+      "Concurrent requests for the same username may lead to race conditions.",
+      "Very large quantities could overflow the integer conversion."
+    ],
+    "entrypoints": [],
+    "intent": "Handle a POST request to record a buy order by updating or creating the user's stock portfolio in a MySQL database.",
+    "invariants": [
+      "Exactly one database connection is opened and closed per request.",
+      "The response is always either \"updated\" or \"initialized\" on successful operation.",
+      "Only one row per username exists in user_portfolio after the request.",
+      "The route only accepts the POST HTTP method.",
+      "Stock quantity stored is always a string representation of an integer."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST to /buy_order with form fields 'stock_name' and 'stock_quantity' and a session key 'username'.",
+      "Returns the plain\u2011text string \"updated\" when an existing portfolio row is modified.",
+      "Returns the plain\u2011text string \"initialized\" when a new portfolio row is inserted.",
+      "If required form fields or session data are missing, Flask returns a 400/500 error (implicit).",
+      "No HTML or JSON payload is rendered; the response body is a simple string."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Executes a SELECT on the user_portfolio table.",
+      "Performs an INSERT or UPDATE on user_portfolio depending on existence.",
+      "Commits the transaction to persist changes.",
+      "Closes the MySQL database connection before responding.",
+      "May raise exceptions that become HTTP 500 responses."
+    ],
+    "source_hash": "8f8582e327b09bad38bbe3adc8c22caea22ee2d220c765fc6fb258469061e46e"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file83.py",
+  "gated_score": 0.39875,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.39875,
+  "original_hash": "8f8582e327b09bad38bbe3adc8c22caea22ee2d220c765fc6fb258469061e46e",
+  "rationale": "The program deviates from the contract on key edge cases (non\u2011numeric/missing quantity, missing username, zero/negative quantities, large quantity overflow) and stores quantity as an integer instead of a string, but it preserves the main side\u2011effects, uses a single DB connection, and returns the required plain\u2011text responses.",
+  "schema": 1,
+  "stability_abs_difference": 0.26088,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.33,
+    "invariants": 0.6,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.65963,
+  "weighted_mean": 0.465,
+  "worst_dimension": 0.2
+}

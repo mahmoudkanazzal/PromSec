@@ -1,0 +1,75 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "79e1790c6eb3b9030c4580c90b1f15634ca207408be9ddacd8bccb8a672c2568",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields result in a server error (unhandled KeyError).",
+      "Attempting to add a member whose name already exists returns \"Member already exists\".",
+      "Login with incorrect name or email returns \"Invalid credentials\".",
+      "Updating the email of a non\u2011existent name still reports success (no row affected).",
+      "Searching with an empty term returns all member names.",
+      "Removing a name that does not exist still reports \"Member removed successfully\"."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for managing community members, allowing addition, authentication, profile updates, searching, and removal of members via HTTP requests.",
+    "invariants": [
+      "Member names are treated as unique identifiers; duplicate names are not added.",
+      "Each stored member record contains a name and an associated email address.",
+      "Database connections are opened, used, and closed for each request.",
+      "Successful write operations are committed; failures trigger a rollback."
+    ],
+    "io_behavior": [
+      "POST /add_member with form fields 'name' and 'email' returns a plain\u2011text message indicating success, duplicate, or failure.",
+      "POST /login_member with form fields 'name' and 'email' returns \"Login successful\" or \"Invalid credentials\".",
+      "POST /update_member_profile with form fields 'name' and 'new_email' returns \"Profile updated successfully\".",
+      "GET /search_members?term=... returns a string representation of a list of member names matching the term.",
+      "POST /remove_member with form field 'name' returns \"Member removed successfully\"."
+    ],
+    "public_api": {
+      "route:GET /search_members": "",
+      "route:POST /add_member": "",
+      "route:POST /login_member": "",
+      "route:POST /remove_member": "",
+      "route:POST /update_member_profile": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the members table when a unique name is added.",
+      "Commits updates to a member's email address.",
+      "Deletes a row from the members table for the given name.",
+      "Reads rows from the members table for login checks and searches."
+    ],
+    "source_hash": "2f00a8a0eeaa9a8317ae9d6ebfc23b6a24b31f8a7b3914bd4807a398fd0ad8ff"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.83,
+    "invariants": 0.8,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file88.py",
+  "gated_score": 0.88213,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.88213,
+  "original_hash": "2f00a8a0eeaa9a8317ae9d6ebfc23b6a24b31f8a7b3914bd4807a398fd0ad8ff",
+  "rationale": "All routes and responses match the contract, but missing-field handling and lack of explicit rollback on update/remove errors deviate from the specified edge case and invariant requirements.",
+  "schema": 1,
+  "stability_abs_difference": 0.01813,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.83,
+    "invariants": 0.75,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.864,
+  "weighted_mean": 0.9095,
+  "worst_dimension": 0.8
+}

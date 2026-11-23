@@ -1,0 +1,78 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "068907c4a1d000ff0d92db5006806d1f451ea6d7ee0f512052e9ae11fb67140f",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required JSON fields results in a server error (unhandled KeyError).",
+      "Empty ingredients list creates a recipe with no associated ingredient rows.",
+      "Non\u2011numeric or nonexistent recipe_id in /submit_review or /get_recipe_reviews may return no rows or cause a query error.",
+      "Very long title, ingredient, or review strings may exceed database column limits.",
+      "Repeated calls with the same data create duplicate rows (no deduplication).",
+      "SQL injection via crafted title, ingredient, or review strings could alter queries."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for storing recipes, adding reviews, and fetching reviews using a SQLite backend.",
+    "invariants": [
+      "Each recipe receives a unique integer recipe_id.",
+      "Ingredients are linked to a recipe via the recipe_id foreign key.",
+      "Reviews are linked to a recipe via the recipe_id foreign key.",
+      "Database schema (tables recipes, ingredients, reviews) must exist for the API to function.",
+      "Responses are always JSON\u2011encoded.",
+      "HTTP status codes reflect operation outcome (201 for creation, 200 for retrieval)."
+    ],
+    "io_behavior": [
+      "POST /add_recipe with JSON {title, ingredients} returns 201 and JSON {message, recipe_id}.",
+      "POST /submit_review with JSON {recipe_id, review, reviewer_id} returns 200 and JSON {message}.",
+      "GET /get_recipe_reviews?recipe_id=ID returns 200 and JSON array of review objects.",
+      "All endpoints read request data (JSON body or query string) and write JSON responses.",
+      "Successful calls persist data in the SQLite database.",
+      "Responses include HTTP status codes indicating success."
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:GET /get_recipe_reviews": "",
+      "route:POST /add_recipe": "",
+      "route:POST /submit_review": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the recipes table.",
+      "Inserts one row per ingredient into the ingredients table.",
+      "Inserts a new row into the reviews table.",
+      "Commits transactions to the SQLite file 'recipe.db'.",
+      "Closes the database connection after each request."
+    ],
+    "source_hash": "05a8f2728379041b6e2e15e634979a3fa87f110fe73dca5cd6b12c3a325c1542"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 1.0,
+    "io_semantics": 0.5,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file99.py",
+  "gated_score": 0.53,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.53,
+  "original_hash": "05a8f2728379041b6e2e15e634979a3fa87f110fe73dca5cd6b12c3a325c1542",
+  "rationale": "The program implements the main API endpoints, uses JSON responses and correct status codes, and performs the required database side\u2011effects, preserving invariants. However it deviates on edge\u2011case handling (it aborts with 400 instead of unhandled errors, validates numeric IDs, and prevents SQL injection) and returns aggregated review data rather than raw review objects, reducing IO semantics and edge\u2011case preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.33688,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.7,
+    "invariants": 0.85,
+    "io_semantics": 0.95,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.86688,
+  "weighted_mean": 0.64,
+  "worst_dimension": 0.2
+}

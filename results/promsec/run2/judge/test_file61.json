@@ -1,0 +1,66 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "5fbb8f9502f137c30951f8c8723b4f88a934b06d9a8810c3b1d7adf19f7ca760",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'payload' parameter results in an error message.",
+      "Malformed YAML or missing keys cause an exception during parsing.",
+      "Non\u2011integer latitude, longitude, or date values raise a conversion error.",
+      "No matching row in the database leads to a None fetch and potential crash.",
+      "Database connection failure produces an unhandled exception."
+    ],
+    "entrypoints": [],
+    "intent": "Provide the temperature for a specific latitude, longitude, and date by reading a YAML payload from an HTTP request and querying a MySQL database.",
+    "invariants": [
+      "The request must include a 'payload' query parameter.",
+      "The YAML must contain 'lat', 'lon', and 'date' keys that can be cast to integers.",
+      "The response is always a string (either temperature or an error message).",
+      "Database connection parameters (host, user, password, db) are fixed."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP GET request to /api/temperature_for_location with a 'payload' query parameter containing YAML.",
+      "Parses the YAML to extract integer fields 'lat', 'lon', and 'date'.",
+      "Queries the MySQL 'cwe' database for a matching temperature record.",
+      "Returns the temperature value as a plain\u2011text string in the HTTP response.",
+      "If the payload is missing, returns the string \"YAML payload missing from request\"."
+    ],
+    "public_api": {
+      "route:GET /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Creates a new MySQL connection on each request.",
+      "Executes a SELECT query against the 'temperature' table.",
+      "Reads data from the database but does not modify it."
+    ],
+    "source_hash": "b360cf04d2e65eae8542baff1da7038fcf535b689d5b42c3e5e53d93e0fc91e5"
+  },
+  "dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.4,
+    "invariants": 0.6,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file61.py",
+  "gated_score": 0.62875,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.62875,
+  "original_hash": "b360cf04d2e65eae8542baff1da7038fcf535b689d5b42c3e5e53d93e0fc91e5",
+  "rationale": "The program implements the main route, parses YAML, queries the database and returns a string, preserving core behavior and side\u2011effects. However it handles malformed YAML, non\u2011integer fields, and missing rows with custom error strings instead of the exceptions or crashes described in the contract, and it allows configurable DB parameters rather than fixed ones, reducing scores for invariants and edge\u2011case handling.",
+  "schema": 1,
+  "stability_abs_difference": 0.335,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.9,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.96375,
+  "weighted_mean": 0.705,
+  "worst_dimension": 0.4
+}

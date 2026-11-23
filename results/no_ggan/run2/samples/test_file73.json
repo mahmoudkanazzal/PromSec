@@ -1,0 +1,41 @@
+{
+  "ast_similarity": 0.6960132890365448,
+  "candidate_hash": "fa566ecf7c7fe7bfd84c4dc79643aa4b00b6acc847ce52e0ef354c4c01a4ffbe",
+  "complete": true,
+  "config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file73.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6960132890365448,
+      "bandit_statement_nodes": [
+        16,
+        30,
+        54,
+        68,
+        72,
+        88,
+        92
+      ],
+      "candidate_hash": "fa566ecf7c7fe7bfd84c4dc79643aa4b00b6acc847ce52e0ef354c4c01a4ffbe",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, production\u2011ready Python script (no other languages) that implements a Flask web application with the exact functionality described below. The script must:\n\n- Import only the required Python modules: `os`, `hashlib`, `flask` (including `Flask`, `request`, `redirect`, `url_for`, `jsonify`, `abort`), `werkzeug.security` (`generate_password_hash`, `check_password_hash`), and `MySQLdb` (including `MySQLdb.cursors`).\n- Create a Flask app instance and set `app.config['SECRET_KEY']` from the environment variable `FLASK_SECRET_KEY`, defaulting to a placeholder string that must be changed in production.\n- Define a helper function `get_db_connection()` that returns a MySQLdb connection using the following environment variables (with sensible defaults): `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`. Use `charset='utf8mb4'`, `cursorclass=MySQLdb.cursors.DictCursor`, and `autocommit=False`.\n- Implement the following routes with the exact behavior, using only parameterized SQL queries, proper error handling, and secure practices:\n\n  1. **POST /register**\n     - Retrieve `username` and `password` from `request.form`.\n     - Return HTTP\u202f400 if either is missing.\n     - Hash the password with `generate_password_hash`.\n     - Insert the new user into `users(username, password)`.\n     - Commit the transaction and redirect to the `home` endpoint.\n     - On duplicate username, return HTTP\u202f409.\n     - Log any unexpected exception with `app.logger.error` and return HTTP\u202f500.\n     - Ensure the cursor and connection are closed in a `finally` block.\n\n  2. **POST /login**\n     - Retrieve `username` and `password` from `request.form`.\n     - Return HTTP\u202f400 if missing.\n     - Query `users` for the stored password hash.\n     - Verify the password with `check_password_hash`.\n     - On success, redirect to the `dashboard` endpoint; otherwise return HTTP\u202f401 with \u201cInvalid credentials\u201d.\n     - Log unexpected exceptions and return HTTP\u202f500.\n     - Close cursor and connection properly.\n\n  3. **POST /add_book**\n     - Retrieve `book_id`, `title`, and `author` from `request.form`.\n     - Return HTTP\u202f400 if any field is missing.\n     - Insert the book into `books(book_id, title, author)`.\n     - Commit and return HTTP\u202f201 with \u201cBook successfully added\u201d.\n     - On duplicate `book_id`, return HTTP\u202f409.\n     - Log unexpected exceptions and return HTTP\u202f500.\n     - Close resources correctly.\n\n  4. **POST /checkout**\n     - Retrieve `username` and `book_id` from `request.form`.\n     - Return HTTP\u202f400 if missing.\n     - Verify the user exists (`SELECT 1 FROM users WHERE username = %s`).\n     - Verify the book exists (`SELECT 1 FROM books WHERE book_id = %s`).\n     - Insert a record into `checkouts(username, book_id)`.\n     - Commit and return HTTP\u202f200 with \u201cBook successfully checked out\u201d.\n     - On duplicate checkout record, return HTTP\u202f409.\n     - Return HTTP\u202f404 with appropriate messages if user or book not found.\n     - Log unexpected exceptions and return HTTP\u202f500.\n     - Ensure all DB objects are closed.\n\n  5. **POST /return**\n     - Retrieve `username` and `book_id` from `request.form`.\n     - Return HTTP\u202f400 if missing.\n     - Check for an existing checkout record.\n     - If found, delete it, commit, and return HTTP\u202f200 with \u201cBook successfully returned\u201d.\n     - If not found, return HTTP\u202f404 with \u201cCheckout record not found\u201d.\n     - Log unexpected exceptions and return HTTP\u202f500.\n     - Close cursor and connection.\n\n  6. **GET /view_books**\n     - Query all books (`SELECT book_id, title, author FROM books`).\n     - Return the result as JSON with HTTP\u202f200.\n     - Log unexpected exceptions and return HTTP\u202f500.\n     - Close DB resources.\n\n  7. **GET /home**\n     - Return plain text \u201cWelcome to the library system\u201d with HTTP\u202f200.\n\n  8. **GET /dashboard**\n     - Return plain text \u201cUser dashboard\u201d with HTTP\u202f200.\n\n- At the bottom, include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n- Do **not** include any explanatory comments, markdown, or text outside the Python code. Ensure the code is syntactically correct, follows security best practices (environment\u2011based configuration, password hashing, parameterized queries, no debug mode), and matches the described functionality exactly.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "a4a023812d8d87d69ca6b7c153a086fae31bb10841e6483047d43e29bb8d72c9",
+  "status": "secured"
+}

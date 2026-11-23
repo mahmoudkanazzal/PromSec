@@ -1,0 +1,67 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "9cd3dd234eff5947ad207064d4603721b3731c5bdf3551fb870dda33b8af0c4c",
+  "compile_ok": true,
+  "confidence": 0.96,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields or missing session username cause a KeyError before the database step.",
+      "Database connection failure or authentication error results in the generic \"failure\" response.",
+      "SQL execution errors (e.g., duplicate keys, constraint violations) also trigger \"failure\".",
+      "Non\u2011numeric or excessively large stock_quantity values are accepted as strings and may cause DB errors.",
+      "SQL injection is possible because values are interpolated directly into the query string."
+    ],
+    "entrypoints": [],
+    "intent": "Process a buy order request by recording the requested stock and quantity for the logged\u2011in user in a MySQL database and return a simple success or failure message.",
+    "invariants": [
+      "The request method must be POST; other methods are not handled.",
+      "All three values (username, stock_name, stock_quantity) must be present for the INSERT to be attempted.",
+      "The response is always a short string, never a JSON object or HTML page.",
+      "Database connection parameters (host, user, password, db) are fixed and do not change at runtime.",
+      "The route does not perform any input validation or sanitisation."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST requests at the path /buy_order.",
+      "Reads form fields 'stock_name' and 'stock_quantity' from the request body.",
+      "Reads the current user's identifier from the session under 'username'.",
+      "Returns a plain\u2011text response body of either \"successfull\" or \"failure\".",
+      "Sets the HTTP status code to 200 for both outcomes."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection to localhost with hard\u2011coded credentials.",
+      "Executes an INSERT statement that adds a row to the `my_stocks` table.",
+      "Commits the transaction on successful execution."
+    ],
+    "source_hash": "7e999ded708c14fff95eb91a5e678da1e20c0b73b18025c94bab835c02c3767e"
+  },
+  "dimensions": {
+    "behavior": 0.0,
+    "edge_cases": 0.0,
+    "invariants": 0.2,
+    "io_semantics": 0.0,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file85.py",
+  "gated_score": 0.07875,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.07875,
+  "original_hash": "7e999ded708c14fff95eb91a5e678da1e20c0b73b18025c94bab835c02c3767e",
+  "rationale": "The program diverges from the contract in response format (JSON instead of plain text), adds input validation, uses different error codes, aborts on missing session instead of raising KeyError, employs parameterized queries (preventing SQL injection), and obtains DB credentials from environment variables rather than fixed hard\u2011coded values; only the basic INSERT side\u2011effect is preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.22,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.3,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.29875,
+  "weighted_mean": 0.105,
+  "worst_dimension": 0.0
+}

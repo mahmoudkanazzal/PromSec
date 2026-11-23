@@ -1,0 +1,75 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "3c7e2083c84e746d3e7d1b9d37c2d6e673c7f032c0c1875792d6fba236c9e1ef",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields (title, date, or new_date) will raise a KeyError and result in a 500 error.",
+      "Attempting to add an event with a title that already exists triggers a redirect back to the add form.",
+      "Providing an empty search term returns all events (because LIKE '%%' matches everything).",
+      "If no event matches the title in update_event_date or delete_event, the operation succeeds silently with no rows affected.",
+      "Database connection failures or query errors propagate as unhandled exceptions."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple web API for creating, updating, deleting, searching, and listing event records stored in a MySQL database.",
+    "invariants": [
+      "Database connections and cursors are always closed before the request handler returns.",
+      "Each request operates independently; no shared mutable state is kept in the Flask app.",
+      "add_event enforces title uniqueness by checking for an existing row before insertion.",
+      "All modifications are committed to the database before the response is sent."
+    ],
+    "io_behavior": [
+      "POST /add_event with form fields title and date redirects to /add_event if the title already exists, otherwise redirects to /view_events after inserting the new record.",
+      "POST /update_event_date with form fields title and new_date returns a plain\u2011text confirmation after updating the matching record's date.",
+      "POST /delete_event with form field title returns a plain\u2011text confirmation after removing the matching record.",
+      "GET /search_events?term=... returns the string representation of all records whose titles contain the supplied term.",
+      "GET /view_events returns the string representation of all records in the Events table."
+    ],
+    "public_api": {
+      "route:GET /search_events": "",
+      "route:GET /view_events": "",
+      "route:POST /add_event": "",
+      "route:POST /delete_event": "",
+      "route:POST /update_event_date": ""
+    },
+    "side_effects": [
+      "Inserts a new row into Events on successful add_event.",
+      "Updates the Date column of an existing row on update_event_date.",
+      "Deletes a row from Events on delete_event.",
+      "Issues HTTP redirects for add_event outcomes.",
+      "Opens and closes a MySQL connection for each request."
+    ],
+    "source_hash": "d84a9609bbb8f855b34f74858f98b2d52127ee7a0edd954cac0ab277af3ac497"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.5,
+    "invariants": 1.0,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file92.py",
+  "gated_score": 0.65375,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.65375,
+  "original_hash": "d84a9609bbb8f855b34f74858f98b2d52127ee7a0edd954cac0ab277af3ac497",
+  "rationale": "The program follows most invariants and side\u2011effects, correctly handles duplicate titles, commits changes, and closes resources. However it deviates from the contract on missing form fields (returns 400 instead of raising KeyError/500) and returns JSON rather than plain\u2011text string representations for search/view endpoints, breaking the specified I/O semantics and edge\u2011case handling.",
+  "schema": 1,
+  "stability_abs_difference": 0.16375,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.8,
+    "invariants": 1.0,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.8175,
+  "weighted_mean": 0.705,
+  "worst_dimension": 0.5
+}

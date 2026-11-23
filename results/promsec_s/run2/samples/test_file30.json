@@ -1,0 +1,76 @@
+{
+  "ast_similarity": 0.912,
+  "candidate_hash": "a443d82cfc3a72f6c3673d870fb087529884adb79b44ac73ac94a31b87c1496f",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 2,
+  "cwes_after": [],
+  "cwes_before": [
+    377,
+    400
+  ],
+  "error": "",
+  "file": "test_file30.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.912,
+      "bandit_statement_nodes": [
+        26,
+        37,
+        54,
+        66,
+        77
+      ],
+      "candidate_hash": "a443d82cfc3a72f6c3673d870fb087529884adb79b44ac73ac94a31b87c1496f",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.9569,
+          "end_lineno": 64,
+          "lineno": 64,
+          "node": 23
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.989,
+          "end_lineno": 191,
+          "lineno": 191,
+          "node": 67
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.8773,
+          "end_lineno": 192,
+          "lineno": 192,
+          "node": 68
+        },
+        {
+          "ast_type": "Assign",
+          "change": 1.0,
+          "end_lineno": 219,
+          "lineno": 219,
+          "node": 77
+        },
+        {
+          "ast_type": "Return",
+          "change": 0.7385,
+          "end_lineno": 232,
+          "lineno": 228,
+          "node": 81
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module (compatible with Python\u202f3) that implements a secure wrapper around the Server Density API, preserving the exact functionality of the reference implementation below. The module must:\n\n1. Begin with the UTF\u20118 coding declaration and a module\u2011level docstring describing the wrapper and its version.\n2. Import only the required standard\u2011library modules (`json`, `logging`, `tempfile`, `shutil`, `shlex`) and third\u2011party modules (`requests`) plus `CommandExecutionError` from `salt.exceptions`.\n3. Define a module\u2011level logger named `log` using `logging.getLogger(__name__)`.\n4. Implement the following functions with identical signatures, behavior, and docstrings (including the Sphinx\u2011style sections) as in the reference code, but improve security and robustness:\n   - `get_sd_auth(val, sd_auth_pillar_name='serverdensity')`  \n     * Retrieve authentication data from the Salt pillar `__pillar__`.  \n     * Log debug information without exposing secrets.  \n     * Raise `CommandExecutionError` with clear messages if the pillar or key is missing.  \n   - `_clean_salt_variables(params, variable_prefix=\"__\")`  \n     * Remove any keys from the `params` dict that start with `variable_prefix` and return the cleaned dict.  \n   * Ensure the function does not modify the original dict unintentionally.\n   - `create(name, **params)`  \n     * Clean Salt variables, add the device `name`, and send a POST request to `https://api.serverdensity.io/inventory/devices/`.  \n     * Include the API token as a query parameter using `get_sd_auth('api_token')`.  \n     * Use `requests.post` with a reasonable timeout (e.g., `timeout=10`).  \n     * Log the response status and content length safely.  \n     * On HTTP\u202f200, parse JSON safely, handling `json.JSONDecodeError`.  \n     * On any error, log and raise `CommandExecutionError` with a sanitized message.  \n   - `delete(device_id)`  \n     * Send a DELETE request to `https://api.serverdensity.io/inventory/devices/{device_id}` with the token.  \n     * Apply the same timeout, logging, JSON parsing, and error handling as `create`.  \n   - `ls(**params)`  \n     * Clean Salt variables, decide the endpoint (`devices` or `resources`) based on whether filters are present, and convert all parameter values to strings.  \n     * Send a GET request to `https://api.serverdensity.io/inventory/{endpoint}` with `token` and a `filter` parameter containing a JSON\u2011encoded string of the filters.  \n     * Use the same timeout, logging, JSON parsing, and error handling pattern.  \n   - `update(device_id, **params)`  \n     * Clean Salt variables and send a PUT request to `https://api.serverdensity.io/inventory/devices/{device_id}` with the token and the cleaned parameters as form data.  \n     * Apply the same timeout, logging, JSON parsing, and error handling as the other CRUD functions.  \n   - `install_agent(agent_key)`  \n     * Create a temporary working directory using `tempfile.mkdtemp()`.  \n     * Retrieve `account_url` via `get_sd_auth('account_url')`.  \n     * Use the Salt `cmd.run` execution module (`__salt__['cmd.run']`) to download the installer script with `curl`, ensuring the command is constructed safely (no shell injection).  \n     * Make the script executable.  \n     * Build a safe command string for the installer using `shlex.quote` on both `account_url` and `agent_key`.  \n     * Execute the installer script with `cmd.run`, passing the temporary directory as `cwd`.  \n     * Ensure the temporary directory is removed in a `finally` block using `shutil.rmtree(..., ignore_errors=True)`.  \n     * Include appropriate logging and raise `CommandExecutionError` if any step fails.  \n5. All network calls must include a timeout and verify SSL certificates (default behavior of `requests`).  \n6. Do not expose sensitive values (e.g., API tokens, account URLs, agent keys) in log messages; mask them if necessary.  \n7. Use explicit exception handling for network errors (`requests.RequestException`) and JSON parsing errors, converting them to `CommandExecutionError` with non\u2011sensitive messages.  \n8. Ensure the code follows PEP\u202f8 style, uses type hints where helpful, and contains only the required docstrings (no additional comments).  \n9. The final output must be pure Python code; do not include any explanatory text, markdown, or non\u2011code content.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "9a7814512e2bc5f67a9fe142b80d8be93e1d5eca2b8f9bd58b82309698b5d16e",
+  "status": "secured"
+}

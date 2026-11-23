@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "d840dc0aaf8ffbc991c6858c8e09f951a454ff60b4ab7fede0f719d8d5af7de2",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payload to /config/load results in a 400 error.",
+      "Missing or empty required parameters (e.g., config_id, module, user_id) cause 400 responses.",
+      "Providing an incorrect secret to any auth\u2011protected endpoint yields a 401 response.",
+      "Updating the secret with an empty new_secret returns a 400 error and does not change the secret.",
+      "Calling /system/start or /data/backup with malicious arguments could invoke unintended shell commands."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a RESTful API for loading/retrieving/removing configurations, starting modules, checking system status, managing authentication secrets, configuring auth settings, fetching logs, backing up data, and retrieving user profiles.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" field.",
+      "Endpoints that require authentication compare the provided secret against the current ADMIN_SECRET.",
+      "Required query or form parameters must be present; otherwise a 400 error is returned.",
+      "The ADMIN_SECRET is initialized to a fixed string and can only be changed via the update_secret endpoint with correct current secret.",
+      "The Flask app runs with debug mode disabled."
+    ],
+    "io_behavior": [
+      "POST /config/load with raw YAML body \u2192 JSON response with config_id and config_value or 400 error on invalid YAML/missing fields.",
+      "GET /system/start?module=&param= \u2192 triggers a shell script via os.system and returns JSON status.",
+      "POST /auth/validate with form field secret \u2192 JSON success or 401 failure.",
+      "POST /auth/update_secret with form fields current_secret and new_secret \u2192 updates in\u2011memory secret and returns JSON status or error codes.",
+      "GET /config/retrieve?config_id= \u2192 returns a sample configuration JSON or 400 error if missing.",
+      "GET /user/profile?user_id= \u2192 returns static user profile JSON or 400 error if missing."
+    ],
+    "public_api": {
+      "route:GET /config/retrieve": "",
+      "route:GET /data/backup": "",
+      "route:GET /system/logs": "",
+      "route:GET /system/start": "",
+      "route:GET /system/status": "",
+      "route:GET /user/profile": "",
+      "route:POST /auth/configure": "",
+      "route:POST /auth/update_secret": "",
+      "route:POST /auth/validate": "",
+      "route:POST /config/load": "",
+      "route:POST /config/remove": ""
+    },
+    "side_effects": [
+      "Execution of external commands: start_module.sh, backup_data.py via os.system.",
+      "Modification of the global ADMIN_SECRET variable at runtime.",
+      "Potential creation of subprocesses that may affect the host environment.",
+      "No persistent storage; all state is kept in memory for the process lifetime."
+    ],
+    "source_hash": "1df6d907f426eca2d05825dfef5ac8252ca575c55947c17926a7d09df5a454bb"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.8,
+    "invariants": 0.2,
+    "io_semantics": 0.5,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file13.py",
+  "gated_score": 0.345,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.345,
+  "original_hash": "1df6d907f426eca2d05825dfef5ac8252ca575c55947c17926a7d09df5a454bb",
+  "rationale": "Most endpoints exist and handle required parameters, but the implementation omits the expected external command execution, violates the invariant that every JSON response includes a \"status\" field, and initializes ADMIN_SECRET differently from the contract. Edge cases are largely covered except the malicious\u2011argument vulnerability, leading to partial preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.23125,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 1.0,
+    "invariants": 0.4,
+    "io_semantics": 0.6,
+    "side_effects": 0.4
+  },
+  "stability_score": 0.57625,
+  "weighted_mean": 0.46,
+  "worst_dimension": 0.0
+}

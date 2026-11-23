@@ -1,0 +1,87 @@
+{
+  "ast_similarity": 0.7692307692307693,
+  "candidate_hash": "f73ba1c97567ebd79906376b1153aaff7ffa376906e566db6caf08986536670e",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file72.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9805825242718447,
+      "bandit_statement_nodes": [
+        21
+      ],
+      "candidate_hash": "ec14b66f3634ca0f77d9729b392c481b82dd54b8ae3d59d09bf7175c22f98e71",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.9958,
+          "end_lineno": 17,
+          "lineno": 17,
+          "node": 9
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9905,
+          "end_lineno": 24,
+          "lineno": 24,
+          "node": 13
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.7036,
+          "end_lineno": 32,
+          "lineno": 32,
+          "node": 21
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a Python script that uses Flask to create a web application with a `/register` endpoint handling only POST requests. The script must:\n\n- Import the following modules: `Flask`, `request`, `redirect` from `flask`; `re`; `hashlib`; `MySQLdb`; `os`; and `secrets`.\n- Initialize a Flask app instance named `app`.\n- Define a route `@app.route('/register', methods=['POST'])` with a function `register()` that:\n  1. Retrieves `username` and `password` from `request.form`.\n  2. Generates a 16\u2011byte cryptographic salt using `secrets.token_bytes(16)`.\n  3. Creates a SHA\u2011256 hash object, updates it with the UTF\u20118 encoded password concatenated with the salt, and then forms the stored password value by concatenating the hash digest with the salt.\n  4. Connects to a MySQL database on `localhost` with user `root`, password `cisco123`, and database `mysite` using `MySQLdb.connect`.\n  5. Executes a parameterized SQL statement to insert the `username` and the hashed password into the `user` table: `INSERT INTO user (username,password) VALUES (%s, %s)`.\n  6. Commits the transaction.\n  7. Returns a redirect to `/home` on success.\n  8. Catches any exception, performs no sensitive logging, and also redirects to `/home`.\n\nThe code must be valid Python, contain no explanatory comments or extra text, and must follow security best practices such as using parameterized queries, not printing or exposing raw passwords, and handling errors without leaking details. Output only the complete Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.9805825242718447,
+      "bandit_statement_nodes": [
+        4
+      ],
+      "candidate_hash": "2fca6cd0253537afa99849111893c315befd444a3074bc2ff955ec4baeb608e5",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that uses Flask to implement a POST `/register` endpoint. The script must:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect`, `re`, `hashlib`, `MySQLdb`, `os`, `secrets`.\n- Create a Flask app instance.\n- Define a route `'/register'` that accepts only POST.\n- Inside the view function:\n  * Retrieve `username` and `password` from `request.form`.\n  * If either is missing, immediately `redirect` to `'/home'`.\n  * Generate a 16\u2011byte cryptographic salt using `secrets.token_bytes`.\n  * Compute a SHA\u2011256 hash of the password concatenated with the salt (encode password as UTF\u20118).\n  * Store the hash concatenated with the salt (binary) as the password value.\n  * Connect securely to a MySQL database on `localhost` using user `'root'` and password taken from the environment variable `DB_PASSWORD`, database name `'mysite'`.\n  * Use a cursor and a parameterized `INSERT` statement to add the username and stored password into the table `user`.\n  * Commit the transaction, then close cursor and connection.\n  * Wrap the whole operation in a `try/except` that catches generic `Exception`, does not expose details, and still redirects to `'/home'`.\n- After the `try/except`, return a `redirect` to `'/home'`.\n- Include the usual `if __name__ == '__main__':` block that runs the Flask app.\n- Ensure the code contains no comments, no explanatory text, and is pure Python code.\n\nThe output must be only the Python code, nothing else.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.7692307692307693,
+      "bandit_statement_nodes": [
+        12
+      ],
+      "candidate_hash": "f73ba1c97567ebd79906376b1153aaff7ffa376906e566db6caf08986536670e",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, secure Python script (no other language) that implements a Flask web application with the following specifications:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect` from `flask`; `os`; `re`; `logging`; `generate_password_hash` from `werkzeug.security`; and `MySQLdb`.\n- Configure basic logging at INFO level and obtain a logger named `__name__`.\n- Define a compiled regular expression `USERNAME_PATTERN` that matches usernames consisting of 3 to 30 characters, allowing only letters, numbers, and underscores.\n- Create a Flask app instance named `app`.\n- Implement a route `/register` that accepts only POST requests.\n- Inside the route handler:\n  - Retrieve `username` and `password` from `request.form`.\n  - If either field is missing, redirect to `/home`.\n  - Validate the username against `USERNAME_PATTERN`; if it fails, redirect to `/home`.\n  - Enforce a maximum password length of 256 characters; if exceeded, redirect to `/home`.\n  - Generate a secure password hash using `generate_password_hash` (default PBKDF2 with SHA256).\n  - Establish a MySQL connection using `MySQLdb.connect` with the following parameters:\n    - `host='localhost'`\n    - `user='root'`\n    - `passwd` obtained from the environment variable `DB_PASSWORD`\n    - `db='mysite'`\n    - `charset='utf8mb4'`\n    - `use_unicode=True`\n  - Use a cursor to execute a parameterized INSERT statement that stores the `username` and hashed password into the `user` table.\n  - Commit the transaction.\n  - Include comprehensive exception handling: log any exception with stack trace using the configured logger, but do not expose details to the client.\n  - Ensure that both the cursor and the database connection are properly closed in a `finally` block, even if an error occurs.\n  - After successful registration (or after handling errors), redirect the client to `/home`.\n- Add the standard `if __name__ == '__main__':` block to run the Flask app with default settings.\n- Ensure the code follows best security practices: use parameterized queries, never log sensitive data, obtain database credentials from environment variables, and use a strong password hashing algorithm.\n- Output only the Python code, without any additional explanation, markup, or comments.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 3,
+  "schema": 1,
+  "selected_iteration": 3,
+  "source_hash": "1d85cc97c3c3687ad4e1f27b1e2cf9944d891a79de7a2dc960b45beaf7549667",
+  "status": "secured"
+}

@@ -1,0 +1,85 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "e0fd1702f4054c4bf36c029f38ca2bb49c4269e86fc3e81fdbca0d3768c83c5a",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Empty or whitespace\u2011only request bodies causing all fields to be missing.",
+      "YAML containing unexpected types (e.g., list instead of string) leading to missing\u2011field errors.",
+      "Providing an unknown section or report type; scripts may fail but API still returns 200.",
+      "Incorrect admin password triggers 401 without revealing the correct password.",
+      "Omitting the 'action' form field in /librarian_panel yields 400 \"Invalid action\".",
+      "Large payloads or extremely long query parameters may cause performance issues but are not validated by the API."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a RESTful HTTP API for library management tasks such as adding, updating, deleting books and members, triggering inventory/report scripts, and performing admin\u2011only operations like backup and restore.",
+    "invariants": [
+      "All successful responses are JSON objects containing a \"status\" key.",
+      "Endpoints that require YAML payload reject malformed YAML with HTTP 400.",
+      "Missing mandatory fields (e.g., title, author, isbn for books) result in HTTP 400.",
+      "Admin access requires the exact hard\u2011coded password; otherwise HTTP 401 is returned.",
+      "Unsupported actions in /librarian_panel return HTTP 400 with \"Invalid action\".",
+      "Successful operations return HTTP 200 (except admin denial which returns 401)."
+    ],
+    "io_behavior": [
+      "POST /add_new_book with YAML body \u2192 JSON response containing book details or 400 error on invalid YAML/missing fields.",
+      "GET /execute_inventory?section=NAME \u2192 JSON acknowledgement; triggers execution of run_inventory.py.",
+      "POST /admin_access with form field password \u2192 JSON success or 401 error.",
+      "POST /update_book_details with YAML body \u2192 JSON acknowledgement of update or 400 error.",
+      "GET /generate_reports?type=TYPE \u2192 JSON acknowledgement; runs report_generator.py.",
+      "POST /librarian_panel with form field action=backup|restore \u2192 JSON acknowledgement or 400 error."
+    ],
+    "public_api": {
+      "route:GET /execute_inventory": "",
+      "route:GET /generate_reports": "",
+      "route:GET /view_books": "",
+      "route:POST /add_new_book": "",
+      "route:POST /add_new_member": "",
+      "route:POST /admin_access": "",
+      "route:POST /delete_book": "",
+      "route:POST /librarian_panel": "",
+      "route:POST /update_book_details": "",
+      "route:POST /update_member_details": ""
+    },
+    "side_effects": [
+      "os.system call to run_inventory.py with supplied section.",
+      "os.system call to report_generator.py with supplied type.",
+      "os.system call to backup_script.py when action=backup.",
+      "os.system call to restore_script.py when action=restore.",
+      "os.system call to view_books.py with supplied category.",
+      "Potential creation/modification of external files or databases by the invoked scripts."
+    ],
+    "source_hash": "76dd5602682d017e8d799027a76b3dc516f12e33666b851d5e47359bb6ab8bf7"
+  },
+  "dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.8,
+    "invariants": 0.95,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file27.py",
+  "gated_score": 0.8675,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.8675,
+  "original_hash": "76dd5602682d017e8d799027a76b3dc516f12e33666b851d5e47359bb6ab8bf7",
+  "rationale": "All required routes and JSON responses are present and follow most contract rules; token validation adds stricter checks than specified and script failures return 500 instead of 200, slightly breaking edge\u2011case and I/O expectations, but side\u2011effects and invariants are otherwise preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.05188,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.85,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.91938,
+  "weighted_mean": 0.89,
+  "worst_dimension": 0.8
+}

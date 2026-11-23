@@ -1,0 +1,84 @@
+{
+  "ast_similarity": 0.49019607843137253,
+  "candidate_hash": "60ce54958047085f52d96957d2b875d4fcb8e3b0fafd87b480b886279a75253a",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    89,
+    259,
+    327
+  ],
+  "error": "",
+  "file": "test_file65.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.49800796812749004,
+      "bandit_statement_nodes": [
+        9,
+        10,
+        12
+      ],
+      "candidate_hash": "a293d87f6ab68b1d3ab2b542087873bf06641b9b0ec4d5a3ce46cd889c63405c",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9868,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 3
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9371,
+          "end_lineno": 23,
+          "lineno": 23,
+          "node": 9
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9996,
+          "end_lineno": 28,
+          "lineno": 28,
+          "node": 12
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a POST `/register` route. The script must:\n\n- Import only Python standard library modules and the following third\u2011party packages: `flask`, `re`, `hashlib`, `os`, `mysql.connector`, `werkzeug.security.generate_password_hash`.\n- Define a Flask app instance.\n- In the `/register` view function:\n  * Retrieve `username` and `password` from `request.form`.\n  * Validate that `username` matches the regex `^[A-Za-z0-9_]{3,30}$` and that `password` is at least 8 characters long.\n  * Hash the password using `werkzeug.security.generate_password_hash` with the default method.\n  * Connect to a MySQL database using `mysql.connector`. All connection parameters (`host`, `user`, `password`, `database`) must be read from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`.\n  * Use a prepared statement with placeholders to insert the new user into the table `User` (columns `Username`, `Password`, `Email`). Use the `username` as the email value as in the original code.\n  * Commit the transaction, close the cursor and connection, and handle any database errors with `try/except`, returning an appropriate Flask response.\n  * After successful registration, redirect the client to `'/'`.\n- Ensure the code follows security best practices: no hard\u2011coded credentials, input validation, use of parameterized queries, proper resource cleanup, and minimal exposure of internal errors.\n- The script must be runnable as a standalone program (include `if __name__ == '__main__': app.run(...)`).\n- Do not include any explanatory comments, markdown, or additional text; output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.49019607843137253,
+      "bandit_statement_nodes": [
+        28
+      ],
+      "candidate_hash": "60ce54958047085f52d96957d2b875d4fcb8e3b0fafd87b480b886279a75253a",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 43,
+          "lineno": 43,
+          "node": 28
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the following exact specifications and security requirements:\n\n- Use only Python standard library modules and the publicly available packages: `flask`, `werkzeug.security`, `mysql.connector`, `os`, `re`, and `hashlib`.\n- Create a Flask app instance named `app`.\n- Define a route `/register` that only accepts HTTP POST requests.\n- Inside the route handler:\n  1. Retrieve the form fields `username` and `password` from `request.form`, defaulting to empty strings if missing.\n  2. Validate `username` with a regular expression that allows only letters, numbers, and underscores, with a length between 3 and 30 characters. If validation fails, return a response with status code 400 and body \u201cInvalid username\u201d.\n  3. Validate that `password` is at least 8 characters long. If not, return a response with status code 400 and body \u201cPassword too short\u201d.\n  4. Hash the password securely using `werkzeug.security.generate_password_hash`.\n  5. Build a database configuration dictionary named `db_config` whose keys are `host`, `user`, `password`, and `database`. Populate each value from the corresponding environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`. If an environment variable is missing, use an empty string as the default.\n  6. Connect to a MySQL database using `mysql.connector.connect(**db_config)`. Use a `try/except/finally` block to ensure resources are cleaned up.\n  7. Within the `try` block, create a cursor and execute a parameterized INSERT statement to add a new row to the table `User` with columns `Username`, `Password`, and `Email`. Use the same value for `Email` as the provided `username`. The SQL must use placeholders (`%s`) to prevent SQL injection.\n  8. Commit the transaction.\n  9. If any `mysql.connector.Error` occurs, catch it and return a response with status code 500 and body \u201cDatabase error\u201d.\n 10. In the `finally` block, close the cursor if it was created and close the connection if it is still open.\n 11. After successful insertion, redirect the client to the root path `/` using Flask\u2019s `redirect` function.\n\n- At the bottom of the script, include the standard `if __name__ == '__main__':` guard that runs the Flask app on host `127.0.0.1` and port `5000`.\n\nAdditional constraints:\n- Do not include any code in languages other than Python.\n- Do not add any explanatory comments, docstrings, or markdown formatting.\n- Ensure the code follows best security practices: input validation, password hashing, use of environment variables for secrets, parameterized SQL queries, proper exception handling, and clean resource shutdown.\n- The script must be ready to run as\u2011is (assuming the required packages are installed and the environment variables are set).",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "1ec38e4c642a37d2cb64a04549047e30fcca03ab84852352f032a6ece72b73f8",
+  "status": "secured"
+}

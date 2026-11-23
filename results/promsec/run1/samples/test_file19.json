@@ -1,0 +1,107 @@
+{
+  "ast_similarity": 0.695906432748538,
+  "candidate_hash": "47eb146eeaaccc8d338eaca5688310765da7358f454a85852f2da2ccd134bd74",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file19.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.851985559566787,
+      "bandit_statement_nodes": [
+        4,
+        7,
+        13,
+        22
+      ],
+      "candidate_hash": "65c4fd8fa655810b94d012ed547932c0739636f4b2f002e5ce638244a0bd2dc0",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1361,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2629,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1566,
+          "end_lineno": 12,
+          "lineno": 12,
+          "node": 7
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2798,
+          "end_lineno": 24,
+          "lineno": 24,
+          "node": 13
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1565,
+          "end_lineno": 39,
+          "lineno": 39,
+          "node": 22
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with the exact functionality described below, ensuring security best practices are followed and the behavior matches the reference implementation:\n\n- Import only the necessary modules: `Flask`, `request`, `jsonify` from `flask`; `os`; `yaml`; `subprocess`; `re`.\n- Create a Flask app instance.\n- Retrieve the environment variable `MASTER_PASSWORD` at startup; if it is not set, raise a `RuntimeError` with the message `\"MASTER_PASSWORD environment variable not set\"`.\n- Define a POST route at `/submit_feedback` that:\n  * Reads the raw request body, decodes it as UTF\u20118, and parses it with `yaml.safe_load`.\n  * Extracts `user_id` and `feedback` from the parsed data.\n  * Returns a JSON response containing `\"status\": \"Feedback received\"`, the received `\"user\"` value, and the received `\"feedback\"` value.\n- Define a GET route at `/generate_report` that:\n  * Retrieves the query parameter `id` (default empty string).\n  * Validates the `id` using a full\u2011match regular expression that allows only letters, numbers, underscores, and hyphens (`r'[A-Za-z0-9_-]+'`). If validation fails, return a JSON response `{\"status\": \"Invalid report id\"}` with HTTP status 400.\n  * Executes an external binary `./report_generator` with the validated `id` as an argument using `subprocess.run` with a list argument and `check=False`.\n  * Returns a JSON response `{\"status\": \"Report generation initiated\"}`.\n- Define a POST route at `/admin_login` that:\n  * Retrieves the form field `password` (default empty string).\n  * Compares the submitted password to `MASTER_PASSWORD` using a direct equality check.\n  * If they match, return a JSON response `{\"status\": \"Admin login successful\"}`; otherwise return `{\"status\": \"Login failed\"}` with HTTP status 401.\n- Define a POST route at `/update_catalog` that:\n  * Reads the raw request body, decodes it as UTF\u20118, and parses it with `yaml.safe_load`.\n  * Returns a JSON response `{\"status\": \"Catalog updated\", \"new_catalog\": <parsed data>}` where `<parsed data>` is the object returned by `yaml.safe_load`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n\nThe script must contain **no comments, no explanatory text, and no non\u2011code output**. Ensure all security considerations (safe YAML loading, input validation, proper subprocess invocation, environment variable handling) are implemented exactly as specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.695906432748538,
+      "bandit_statement_nodes": [
+        3,
+        19
+      ],
+      "candidate_hash": "47eb146eeaaccc8d338eaca5688310765da7358f454a85852f2da2ccd134bd74",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2797,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.3072,
+          "end_lineno": 26,
+          "lineno": 26,
+          "node": 19
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that implements a Flask web server with the exact functionality described below. The script must:\n\n- Import only the modules: `Flask`, `request`, `jsonify` from `flask`; `os`; `yaml`; `re`.\n- Create a Flask app instance.\n- Retrieve the environment variable `MASTER_PASSWORD` using `os.getenv`; if it is not set, raise `RuntimeError` with the message `'MASTER_PASSWORD environment variable not set'`.\n- Define a private helper function `_create_report_file(report_id: str) -> str` that:\n  * Constructs a `reports` directory inside the current working directory, creates it if it does not exist.\n  * Creates a file named `'<report_id>.txt'` inside that directory, writes the line `'Report generated for ID: {report_id}'` and returns the full path.\n- Define route `'/submit_feedback'` accepting `POST`:\n  * Read raw request data, decode as UTF\u20118, parse with `yaml.safe_load`.\n  * Extract `user_id` and `feedback` keys.\n  * Return JSON with keys `status` (value `'Feedback received'`), `user` (user_id), and `feedback` (feedback).\n- Define route `'/generate_report'` accepting `GET`:\n  * Get query parameter `id` (default empty string).\n  * Validate it against the regex `'^[A-Za-z0-9_-]+$'`; if invalid, return JSON `{'status':'Invalid report id'}` with HTTP 400.\n  * Call `_create_report_file` with the id.\n  * Return JSON `{'status':'Report generation initiated'}`.\n- Define route `'/admin_login'` accepting `POST`:\n  * Retrieve form field `password` (default empty string).\n  * If it matches `MASTER_PASSWORD`, return JSON `{'status':'Admin login successful'}`.\n  * Otherwise return JSON `{'status':'Login failed'}` with HTTP 401.\n- Define route `'/update_catalog'` accepting `POST`:\n  * Read raw request data, decode as UTF\u20118, parse with `yaml.safe_load`.\n  * Return JSON `{'status':'Catalog updated', 'new_catalog': <parsed catalog>}`.\n- Include the usual `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n\nThe code must be secure: use `yaml.safe_load`, validate inputs, avoid path traversal, and must not contain any comments, explanatory text, or non\u2011code output. Output only the Python code, nothing else.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "f9b0e146383078e704acfde5a6976aceb335b0d502126348c4a493855f23bb1d",
+  "status": "secured"
+}

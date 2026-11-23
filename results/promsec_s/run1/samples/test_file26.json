@@ -1,0 +1,99 @@
+{
+  "ast_similarity": 0.6815286624203821,
+  "candidate_hash": "bc664131e2a75ae0865cd436d0c3178e3d9013e1b5e3fbda73ce7d3f1e8c0551",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file26.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8141263940520446,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        16
+      ],
+      "candidate_hash": "4ca877cb1b0ec1adcff2f647265e794c947cff7ec6dede5c840a963d1b364baa",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.7429,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9151,
+          "end_lineno": 8,
+          "lineno": 8,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9964,
+          "end_lineno": 15,
+          "lineno": 15,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9743,
+          "end_lineno": 30,
+          "lineno": 30,
+          "node": 16
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with three routes: `/add_new_book` (POST), `/execute_inventory` (GET), and `/admin_access` (POST). The script must:\n\n- Import only the following modules: `Flask`, `request`, `jsonify` from `flask`; `os`; `subprocess`; `safe_load` from `yaml`.\n- Retrieve a password from the environment variable `LIBRARIAN_PASSWORD`, defaulting to an empty string.\n- In `/add_new_book`, read the raw request body, decode it as UTF\u20118, parse it as YAML using `safe_load`, and handle parsing errors by returning a JSON response with `status` set to `\"Error\"` and `message` set to `\"Invalid YAML format\"` with HTTP status 400. Extract the keys `title`, `author`, and `isbn` from the parsed data (ensuring they exist) and return them in a JSON response with `status` set to `\"New Book added\"`.\n- In `/execute_inventory`, read a query parameter `section` (default to an empty string) and invoke `subprocess.run` to execute the command `[\"python3\", \"run_inventory.py\", section]` with `check=False`. Do not use `shell=True` and do not allow command injection. Return a JSON response with `status` set to `\"Inventory check started\"`.\n- In `/admin_access`, read a form field `password` and compare it to `LIBRARIAN_PASSWORD`. If they match, return JSON with `status` set to `\"Admin access granted\"`; otherwise return JSON with `status` set to `\"Access denied\"` and HTTP status 401.\n- Include a main guard that runs the Flask app with `debug=False`.\n- Ensure the code follows security best practices: use `safe_load` for YAML parsing, avoid `shell=True` in subprocess calls, validate required keys before accessing them, and do not expose the password.\n- Output only the Python code, with no additional explanation, comments, or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6815286624203821,
+      "bandit_statement_nodes": [
+        2,
+        19
+      ],
+      "candidate_hash": "bc664131e2a75ae0865cd436d0c3178e3d9013e1b5e3fbda73ce7d3f1e8c0551",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.8429,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.6523,
+          "end_lineno": 32,
+          "lineno": 32,
+          "node": 19
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with three routes: `/add_new_book` (POST), `/execute_inventory` (GET), and `/admin_access` (POST). The script must:\n\n- Import only the following modules: `Flask`, `request`, `jsonify` from `flask`; `os`; `re`; `import_module` from `importlib`; `safe_load` from `yaml`.\n- Create a Flask app instance.\n- Read the environment variable `LIBRARIAN_PASSWORD` (default empty string) for admin authentication.\n- For `/add_new_book`: read raw request data, decode as UTF\u20118, parse with `yaml.safe_load`, reject non\u2011YAML or non\u2011dict with a 400 JSON response, require keys `title`, `author`, `isbn`, otherwise 400, and on success return JSON with status `\"New Book added\"` and the three fields.\n- For `/execute_inventory`: get query parameter `section`, validate it matches the regex `^[A-Za-z0-9_-]+$`, otherwise 400, dynamically import a module named `run_inventory` using `import_module`, ensure it has a callable `main`, invoke `main(section)`, handle any exception by returning 500 with the exception message, and on success return JSON status `\"Inventory check started\"`.\n- For `/admin_access`: read form field `password`, compare to `LIBRARIAN_PASSWORD`, return JSON status `\"Admin access granted\"` on match, otherwise return JSON status `\"Access denied\"` with 401.\n- Include the usual `if __name__ == '__main__':` guard to run the app with `debug=False`.\n- Ensure the code follows security best practices: no use of `eval`/`exec`, safe YAML loading, strict input validation, proper error handling, no hard\u2011coded secrets, and only the specified imports.\n- The code must be valid Python 3, fully functional, and contain no additional explanatory comments or text.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "19be0f99e4a6c9bdd8b028896bbe6cf6e30805b399f5ebcca3514b27b30e234d",
+  "status": "secured"
+}

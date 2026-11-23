@@ -1,0 +1,71 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "f5674fbd63023d21b343e0f587624edf091434cae73d50a3c149f877cedac64b",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError before any database access.",
+      "If the username does not exist, the query returns no rows and the comparison defaults to false.",
+      "An empty password stored in the database is treated as a valid credential only if the supplied password is also empty.",
+      "SQL injection is possible because the username is interpolated directly into the query string.",
+      "Database connection failures or query errors result in a false response after printing an error.",
+      "Multiple rows for the same username cause the last retrieved password to be used."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by checking the supplied username and password against stored credentials and return a simple success indicator.",
+    "invariants": [
+      "The response is always a plain\u2011text string \"true\" or \"false\".",
+      "A database connection is closed in the finally block regardless of outcome.",
+      "Only the 'username' and 'password' form fields are consulted; other inputs are ignored.",
+      "The endpoint only responds to POST requests.",
+      "No session or cookie state is created or modified."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /login with form fields 'username' and 'password'.",
+      "Queries a MySQL database for the password associated with the given username.",
+      "Compares the stored password to the supplied password.",
+      "Returns the string \"true\" if they match, otherwise returns \"false\".",
+      "If a database error occurs, returns \"false\".",
+      "Closes the database connection before completing the request."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to a local MySQL server.",
+      "Executes a SELECT statement on the 'users' table.",
+      "Writes error messages to the server's standard output on failure.",
+      "Potentially logs the request handling by the Flask framework.",
+      "Consumes network bandwidth for the HTTP request and response."
+    ],
+    "source_hash": "55839422c7e82b0affceca53de499b8c424c0256b63e5d5cec1b9eb6abce93b4"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 1.0,
+    "io_semantics": 0.4,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file57.py",
+  "gated_score": 0.425,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.425,
+  "original_hash": "55839422c7e82b0affceca53de499b8c424c0256b63e5d5cec1b9eb6abce93b4",
+  "rationale": "The program matches high\u2011level invariants and side\u2011effects but deviates on key edge cases and core behavior: it defaults missing fields to empty strings, uses parameterized queries (preventing the intended SQL injection), hashes passwords instead of raw comparison, and fetches only the first row rather than the last, violating several contract specifications.",
+  "schema": 1,
+  "stability_abs_difference": 0.14988,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.33,
+    "invariants": 1.0,
+    "io_semantics": 0.66,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.57488,
+  "weighted_mean": 0.5,
+  "worst_dimension": 0.2
+}

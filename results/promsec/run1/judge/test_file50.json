@@ -1,0 +1,73 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "ee7641705494027a546539e49ac3a5fb14db4b869656dbc8ad9ed74429cf7043",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and a 500 error.",
+      "Empty username results in a query that may return no rows, yielding \"Wrong Password\".",
+      "Multiple rows for the same username cause the first matching hash to determine success.",
+      "SQL injection via crafted username can alter the query or expose data.",
+      "Database connection failures raise exceptions and abort the request.",
+      "Non\u2011ASCII characters in the password are encoded before MD5 hashing, which may affect matching."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via a POST /login endpoint by checking the supplied password against the stored MD5 hash in a MySQL database.",
+    "invariants": [
+      "The endpoint always returns one of the three fixed strings.",
+      "The database connection is closed regardless of success or failure.",
+      "Password comparison uses MD5 of the supplied password.",
+      "Only POST method is accepted; other methods are ignored.",
+      "The response content type is plain text (default Flask behavior).",
+      "No modification of database state occurs (read\u2011only query)."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST requests to /login with form fields 'username' and 'password'.",
+      "Queries the MySQL 'user' table for the password hash of the given username.",
+      "Compares the MD5 hash of the supplied password to the stored hash.",
+      "Returns a plain\u2011text response: \"Login Success\", \"Wrong Password\", or \"Wrong Username\".",
+      "Closes the database connection before responding.",
+      "Prints the stored password hash to the server's standard output."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to the local MySQL server.",
+      "Executes a SELECT statement that may be vulnerable to SQL injection.",
+      "Writes the retrieved password hash to the process stdout (console log).",
+      "Consumes CPU cycles for MD5 hashing and database I/O.",
+      "Potentially logs authentication attempts via the web server's access logs.",
+      "Closes the database connection after each request."
+    ],
+    "source_hash": "09aca3c6166bdcc516a66d879bb0aac9df98b471667b05821c3cd7ebdf79fde0"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.5,
+    "io_semantics": 0.4,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file50.py",
+  "gated_score": 0.26125,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.26125,
+  "original_hash": "09aca3c6166bdcc516a66d879bb0aac9df98b471667b05821c3cd7ebdf79fde0",
+  "rationale": "The program deviates from the contract on key points: it defaults missing fields instead of raising KeyError, uses SHA\u2011256 not MD5, does not print the stored hash, and prevents SQL injection. Only some invariants (POST\u2011only, connection closing) and side\u2011effects (DB connection) are preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.14125,
+  "stability_dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.67,
+    "io_semantics": 0.67,
+    "side_effects": 0.67
+  },
+  "stability_score": 0.4025,
+  "weighted_mean": 0.315,
+  "worst_dimension": 0.1
+}

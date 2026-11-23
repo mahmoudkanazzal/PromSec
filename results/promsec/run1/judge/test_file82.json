@@ -1,0 +1,77 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "7692974f7a5682cb6b0e93e9e4ecd923bebc74499672c212fc9bd02200617b1b",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'stock_name', 'stock_quantity', or session 'username' leads to a request error.",
+      "Non\u2011numeric 'stock_quantity' causes a ValueError when converting to int.",
+      "Database connection failure or query error results in a 500 response.",
+      "Running a command that exits with non\u2011zero status raises an exception and returns a 500 error.",
+      "Very large command output may be truncated by the HTTP response buffer.",
+      "Shell special characters in 'command' can alter execution (command injection)."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a web service with two POST endpoints: one to record or update a user's stock quantity in a MySQL table, and another to run an arbitrary shell command and return its output.",
+    "invariants": [
+      "The MySQL connection always uses the same host, user, password, and database.",
+      "The 'user_portfolio' table always contains at most one row per username.",
+      "The 'stock_quantity' column is stored as a string representation of an integer.",
+      "The endpoint returns exactly 'updated' when a row existed and was modified.",
+      "The endpoint returns exactly 'initialized' when a new row is inserted.",
+      "The command output is returned unchanged (binary data may be decoded as UTF\u20118 by Flask)."
+    ],
+    "io_behavior": [
+      "POST /buy_order with form fields 'stock_name', 'stock_quantity' and a session containing 'username' returns plain text 'updated' or 'initialized'.",
+      "POST /run_command with form field 'command' returns the raw stdout of the executed command.",
+      "Both endpoints read data from HTTP request bodies (application/x\u2011www\u2011form\u2011urlencoded).",
+      "Responses are sent as HTTP 200 with a text/plain body containing either a status string or command output.",
+      "If required form fields are missing, Flask will raise a 400 Bad Request.",
+      "If the database or subprocess call fails, Flask propagates an exception resulting in a 500 Internal Server Error."
+    ],
+    "public_api": {
+      "route:POST /buy_order": "",
+      "route:POST /run_command": ""
+    },
+    "side_effects": [
+      "Inserts a new row or updates an existing row in the MySQL 'user_portfolio' table.",
+      "Commits the transaction to persist changes in the database.",
+      "Executes the supplied command string in the host OS shell via subprocess.check_output.",
+      "Potentially creates or modifies files, processes, or system state as a result of the executed command.",
+      "Closes the database connection after each request.",
+      "Relies on a hard\u2011coded secret key for Flask session handling."
+    ],
+    "source_hash": "e576461dff16c5a9ae90c7112659bd9a52879a53ccc7eb60a35471d13d2187b9"
+  },
+  "dimensions": {
+    "behavior": 0.1,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.1,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file82.py",
+  "gated_score": 0.15625,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.15625,
+  "original_hash": "e576461dff16c5a9ae90c7112659bd9a52879a53ccc7eb60a35471d13d2187b9",
+  "rationale": "The program deviates from the contract: it reads stock data from the session instead of POST form fields, returns custom 400 bodies rather than letting Flask raise errors, validates quantity differently, stores quantity as integer not string, and restricts command execution to a whitelist using internal functions instead of arbitrary shell commands via subprocess. Consequently most behavioral, I/O, invariant, and edge\u2011case expectations are not met, though it still performs DB updates and some si",
+  "schema": 1,
+  "stability_abs_difference": 0.31125,
+  "stability_dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.5,
+    "invariants": 0.6,
+    "io_semantics": 0.4,
+    "side_effects": 0.7
+  },
+  "stability_score": 0.4675,
+  "weighted_mean": 0.175,
+  "worst_dimension": 0.1
+}

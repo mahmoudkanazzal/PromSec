@@ -1,0 +1,168 @@
+{
+  "ast_similarity": 0.5548523206751055,
+  "candidate_hash": "68b7047da9aa12e798b5f7c629f4b84f666ef67c3f307296511e925f00e85338",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file23.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.842948717948718,
+      "bandit_statement_nodes": [
+        4,
+        7,
+        15,
+        24,
+        32,
+        37,
+        42,
+        45,
+        50
+      ],
+      "candidate_hash": "092040f9993879e692db2b58e30cabf4518bcf046888b24ed6118b431b82f656",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.2723,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2642,
+          "end_lineno": 24,
+          "lineno": 24,
+          "node": 15
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2642,
+          "end_lineno": 60,
+          "lineno": 60,
+          "node": 37
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.5119,
+          "end_lineno": 68,
+          "lineno": 68,
+          "node": 42
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.5036,
+          "end_lineno": 71,
+          "lineno": 71,
+          "node": 45
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.8+) that implements a Flask web application with the exact functionality described below. The code must be pure Python (no other languages) and must follow security best practices while preserving the original behavior.\n\n**General requirements**\n- Use only standard library modules and Flask; do not import any third\u2011party packages beyond Flask.\n- The script must be executable as `python script_name.py` and start the Flask server with `debug=False`.\n- All routes must return JSON responses using `flask.jsonify`.\n- Retrieve the librarian password from the environment variable `LIBRARIAN_PASSWORD` using `os.getenv`.\n- Use `yaml.safe_load` for all YAML parsing; never use `yaml.load` or any unsafe loader.\n- Never invoke a shell directly. Replace any `os.system` calls with `subprocess.run` (or equivalent) with `shell=False`.\n- Validate and sanitize all external inputs (query parameters, form data, request bodies). If required fields are missing or malformed, return a `400 Bad Request` with a clear JSON error message.\n- Ensure that subprocess calls are executed with a list of arguments, not a single string, and set `check=False` to avoid raising exceptions on non\u2011zero exit codes.\n- Do not include any explanatory comments, docstrings, or non\u2011code text in the output.\n\n**Endpoints and behavior**\n\n1. `POST /add_book`\n   - Accept raw request body containing a YAML document.\n   - Decode body as UTF\u20118, parse with `yaml.safe_load`.\n   - Expected keys: `title`, `author`, `isbn`, `publication_year`.\n   - Return JSON: `{\"status\":\"Book added\",\"title\":..., \"author\":..., \"isbn\":..., \"publication_year\":...}`.\n   - If any key is missing, respond with `400` and a JSON error.\n\n2. `GET /run_inventory`\n   - Query parameter `section` (optional, default empty string).\n   - Execute `python inventory_script.py <section>` via `subprocess.run` without a shell.\n   - Return JSON: `{\"status\":\"Inventory check initiated\"}`.\n\n3. `POST /librarian_access`\n   - Form field `password`.\n   - Compare against `LIBRARIAN_PASSWORD`. If they match, return `{\"status\":\"Librarian access granted\"}`.\n   - If the environment variable is not set or the password does not match, return `{\"status\":\"Access denied\"}` with HTTP status `401`.\n\n4. `POST /update_book`\n   - Accept raw YAML body.\n   - Expected key `isbn`; optional keys `new_title`, `new_author`, `new_year`.\n   - Return JSON: `{\"status\":\"Book updated\",\"isbn\":..., \"new_title\":..., \"new_author\":..., \"new_year\":...}`.\n   - Missing `isbn` results in `400` with JSON error.\n\n5. `POST /delete_book`\n   - Accept raw YAML body.\n   - Expected key `isbn`.\n   - Return JSON: `{\"status\":\"Book deleted\",\"isbn\":...}`.\n   - Missing `isbn` results in `400` with JSON error.\n\n6. `GET /generate_reports`\n   - Query parameter `type` (optional, default empty string).\n   - Execute `python report_generator.py <type>` via `subprocess.run` without a shell.\n   - Return JSON: `{\"status\":\"Report generation started\"}`.\n\n7. `POST /admin_panel`\n   - Form field `action`.\n   - If `action` is `\"backup\"`, run `python backup_script.py` via `subprocess.run`.\n   - If `action` is `\"restore\"`, run `python restore_script.py` via `subprocess.run`.\n   - Return JSON `{\"status\":\"Backup initiated\"}` or `{\"status\":\"Restore initiated\"}` accordingly.\n   - For any other value, return `{\"status\":\"Invalid action\"}` with HTTP status `400`.\n\n8. `GET /view_books`\n   - Query parameter `category` (optional, default empty string).\n   - Execute `python view_books.py <category>` via `subprocess.run` (replace the original insecure `os.system` usage).\n   - Return JSON: `{\"status\":\"Books retrieval initiated\",\"category\":...}`.\n\n**Security checklist to implement in code**\n- Use `yaml.safe_load` exclusively.\n- Replace any `os.system` usage with `subprocess.run([...], shell=False, check=False)`.\n- Validate presence and type of all required fields; return `400` on failure.\n- Do not expose stack traces or internal errors; Flask\u2019s default error handling with `debug=False` is sufficient.\n- Ensure environment variable handling gracefully handles the case where `LIBRARIAN_PASSWORD` is unset.\n\nGenerate only the Python code that satisfies all the above specifications. Do not include any additional text, comments, or explanations.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6485819975339088,
+      "bandit_statement_nodes": [
+        1,
+        17,
+        44,
+        49,
+        52,
+        57
+      ],
+      "candidate_hash": "cffb95d6593debd305fe9f67b3ba949c468c2e3e4dd2dd1b41c1ada458509be5",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.2781,
+          "end_lineno": 30,
+          "lineno": 30,
+          "node": 17
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2781,
+          "end_lineno": 73,
+          "lineno": 73,
+          "node": 44
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.5171,
+          "end_lineno": 80,
+          "lineno": 80,
+          "node": 49
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.5171,
+          "end_lineno": 83,
+          "lineno": 83,
+          "node": 52
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2717,
+          "end_lineno": 90,
+          "lineno": 90,
+          "node": 57
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other languages) that implements a Flask web application with the exact functionality described below. The code must be secure, preserve the original behavior, and avoid any unnecessary additions or comments.\n\n**Requirements**\n\n1. **Imports**\n   - `os`\n   - `subprocess`\n   - `re`\n   - `yaml`\n   - `hmac`\n   - `Flask`, `request`, `jsonify` from `flask`\n\n2. **Flask app**\n   - Create the Flask app instance named `app`.\n\n3. **Helper functions**\n   - `_is_valid_token(token: str) -> bool`  \n     Returns `True` only if `token` matches the regular expression `r'[\\w-]+'` (alphanumeric, underscore, hyphen). Treat `None` or empty string as invalid.\n   - `_run_script(script_name: str, args: list)`  \n     - Raise `ValueError` if `script_name` contains `'/'` or `'\\\\'`.  \n     - Execute the script with `subprocess.run(['python', script_name] + args, shell=False, check=False, capture_output=True, timeout=30)`.\n\n4. **Routes**\n   - `POST /add_book`  \n     - Read raw request body, decode UTF\u20118, parse with `yaml.safe_load`.  \n     - Return `400` with `{'error': 'Invalid YAML'}` on parse failure.  \n     - Require fields `title`, `author`, `isbn`, `publication_year`; missing any returns `400` with `{'error': f'Missing field: {key}'}`.  \n     - On success return `200` with JSON containing `status: 'Book added'` and the four fields.\n   - `GET /run_inventory`  \n     - Get query parameter `section`. Validate with `_is_valid_token`; invalid returns `400` with `{'error': 'Invalid section parameter'}`.  \n     - Call `_run_script('inventory_script.py', [section])`. Catch any exception and return `500` with `{'error': str(e)}`.  \n     - On success return `200` with `{'status': 'Inventory check initiated'}`.\n   - `POST /librarian_access`  \n     - Retrieve form field `password`.  \n     - Compare with environment variable `LIBRARIAN_PASSWORD` using `hmac.compare_digest`.  \n     - If they match return `200` with `{'status': 'Librarian access granted'}`; otherwise return `401` with `{'status': 'Access denied'}`.\n   - `POST /update_book`  \n     - Parse YAML body as in `/add_book`. Return `400` on parse error.  \n     - Require `isbn`; missing returns `400` with `{'error': 'Missing field: isbn'}`.  \n     - Return `200` with JSON containing `status: 'Book updated'`, `isbn`, and optional `new_title`, `new_author`, `new_year` from the payload (use `payload.get`).\n   - `POST /delete_book`  \n     - Parse YAML body as above. Return `400` on parse error.  \n     - Require `isbn`; missing returns `400` with `{'error': 'Missing field: isbn'}`.  \n     - Return `200` with `{'status': 'Book deleted', 'isbn': payload['isbn']}`.\n   - `GET /generate_reports`  \n     - Get query parameter `type`. Validate with `_is_valid_token`; invalid returns `400` with `{'error': 'Invalid report type'}`.  \n     - Call `_run_script('report_generator.py', [type])`. Handle exceptions as in `/run_inventory`.  \n     - On success return `200` with `{'status': 'Report generation started'}`.\n   - `POST /admin_panel`  \n     - Retrieve form field `action`.  \n     - If `action` is `'backup'`, call `_run_script('backup_script.py', [])`; on exception return `500` with error JSON, otherwise return `200` with `{'status': 'Backup initiated'}`.  \n     - If `action` is `'restore'`, call `_run_script('restore_script.py', [])`; handle errors similarly and return `{'status': 'Restore initiated'}`.  \n     - For any other `action` return `400` with `{'status': 'Invalid action'}`.\n   - `GET /view_books`  \n     - Get query parameter `category`. Validate with `_is_valid_token`; invalid returns `400` with `{'error': 'Invalid category parameter'}`.  \n     - Call `_run_script('view_books.py', [category])`. Handle exceptions as before.  \n     - On success return `200` with `{'status': 'Books retrieval initiated', 'category': category}`.\n\n5. **Application entry point**\n   - Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\n**Additional constraints**\n- Do not include any comments, explanatory text, or markdown formatting in the generated code.\n- Do not add extra imports, functions, routes, or logic beyond what is specified.\n- Ensure all security measures (input validation, safe subprocess usage, constant\u2011time password comparison) are present exactly as described.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5548523206751055,
+      "bandit_statement_nodes": [
+        1,
+        14
+      ],
+      "candidate_hash": "68b7047da9aa12e798b5f7c629f4b84f666ef67c3f307296511e925f00e85338",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2237,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1865,
+          "end_lineno": 18,
+          "lineno": 18,
+          "node": 14
+        }
+      ],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.9+) that implements a Flask web application with the exact functionality described below. The code must be pure Python (no other languages) and must contain **no comments, no explanatory text, and no markup**\u2014only the required Python code.\n\n**Requirements**\n\n1. **Imports**\n   - `os`\n   - `re`\n   - `yaml`\n   - `hmac`\n   - `importlib.util`\n   - From `flask` import `Flask`, `request`, `jsonify`\n\n2. **Flask app**\n   - Create the Flask app instance named `app`.\n\n3. **Helper functions**\n   - `_is_valid_token(token: str) -> bool`  \n     - Return `False` if `token` is falsy.  \n     - Use `re.fullmatch(r'[\\w-]+', token)` to validate; return `True` only if the match succeeds.\n   - Define a constant `_ALLOWED_SCRIPTS` as a set containing exactly:\n     - `'inventory_script.py'`\n     - `'report_generator.py'`\n     - `'backup_script.py'`\n     - `'restore_script.py'`\n     - `'view_books.py'`\n   - `_run_script(script_name: str, args: list)`  \n     - Verify `script_name` is in `_ALLOWED_SCRIPTS`; otherwise raise `ValueError('Invalid script name')`.  \n     - Build an absolute path to the script located in the same directory as this file using `os.path.join(os.path.dirname(__file__), script_name)`.  \n     - Verify the file exists with `os.path.isfile`; if not, raise `FileNotFoundError`.  \n     - Load the script as a module using `importlib.util.spec_from_file_location` and `spec.loader.exec_module`.  \n     - If the loaded module has a callable attribute `main`, invoke it with `*args`.  \n     - Else if it has a callable attribute `run`, invoke it with `*args`.  \n     - If neither exists, do nothing (no error required).\n\n4. **Endpoints**\n   - `POST /add_book`  \n     - Parse request body as YAML using `yaml.safe_load(request.get_data(as_text=True))`.  \n     - On parsing error, return `{'error': 'Invalid YAML'}` with status 400.  \n     - Required fields: `title`, `author`, `isbn`, `publication_year`.  \n     - If any required field is missing, return `{'error': f'Missing field: {key}'}` with status 400.  \n     - On success, return JSON with keys `status: 'Book added'` and echo the four fields, status 200.\n   - `GET /run_inventory`  \n     - Retrieve query parameter `section`.  \n     - Validate with `_is_valid_token`; if invalid, return `{'error': 'Invalid section parameter'}` status 400.  \n     - Call `_run_script('inventory_script.py', [section])` inside a try/except.  \n     - On exception, return `{'error': str(e)}` status 500.  \n     - On success, return `{'status': 'Inventory check initiated'}` status 200.\n   - `POST /librarian_access`  \n     - Retrieve form field `password` (default empty string).  \n     - Compare with environment variable `LIBRARIAN_PASSWORD` using `hmac.compare_digest`.  \n     - If they match, return `{'status': 'Librarian access granted'}` status 200.  \n     - Otherwise return `{'status': 'Access denied'}` status 401.\n   - `POST /update_book`  \n     - Parse YAML payload as in `/add_book`.  \n     - On parsing error, return `{'error': 'Invalid YAML'}` status 400.  \n     - Require field `isbn`; if missing, return `{'error': 'Missing field: isbn'}` status 400.  \n     - Return JSON with:\n       - `status: 'Book updated'`\n       - `isbn` from payload\n       - `new_title` from payload if present, else `None`\n       - `new_author` from payload if present, else `None`\n       - `new_year` from payload if present, else `None`\n       - status 200.\n   - `POST /delete_book`  \n     - Parse YAML payload as above.  \n     - On parsing error, return `{'error': 'Invalid YAML'}` status 400.  \n     - Require `isbn`; if missing, return `{'error': 'Missing field: isbn'}` status 400.  \n     - Return `{'status': 'Book deleted', 'isbn': payload['isbn']}` status 200.\n   - `GET /generate_reports`  \n     - Retrieve query parameter `type`.  \n     - Validate with `_is_valid_token`; if invalid, return `{'error': 'Invalid report type'}` status 400.  \n     - Call `_run_script('report_generator.py', [type])` inside try/except.  \n     - On exception, return `{'error': str(e)}` status 500.  \n     - On success, return `{'status': 'Report generation started'}` status 200.\n   - `POST /admin_panel`  \n     - Retrieve form field `action` (default empty string).  \n     - If `action == 'backup'`:\n       - Call `_run_script('backup_script.py', [])` inside try/except.  \n       - On exception, return `{'error': str(e)}` status 500.  \n       - On success, return `{'status': 'Backup initiated'}` status 200.\n     - If `action == 'restore'`:\n       - Call `_run_script('restore_script.py', [])` inside try/except.  \n       - On exception, return `{'error': str(e)}` status 500.  \n       - On success, return `{'status': 'Restore initiated'}` status 200.\n     - For any other `action`, return `{'status': 'Invalid action'}` status 400.\n   - `GET /view_books`  \n     - Retrieve query parameter `category`.  \n     - Validate with `_is_valid_token`; if invalid, return `{'error': 'Invalid category parameter'}` status 400.  \n     - Call `_run_script('view_books.py', [category])` inside try/except.  \n     - On exception, return `{'error': str(e)}` status 500.  \n     - On success, return `{'status': 'Books retrieval initiated', 'category': category}` status 200.\n\n5. **Application entry point**\n   - Include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\n6. **Security considerations**\n   - Use only `yaml.safe_load` for YAML parsing.\n   - Validate all external inputs (`section`, `type`, `category`, `action`) with the `_is_valid_token` regex.\n   - Restrict dynamic script execution to the whitelist `_ALLOWED_SCRIPTS`.\n   - Use absolute paths for script loading.\n   - Compare passwords with `hmac.compare_digest`.\n   - Do not expose stack traces; return generic error messages as specified.\n\nGenerate only the Python code that satisfies all the above requirements. Do not include any comments, explanatory text, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 3,
+  "schema": 1,
+  "selected_iteration": 3,
+  "source_hash": "1308832b93521f7bb6430dd40918c7597329f436d315da7bba1389c443eba676",
+  "status": "secured"
+}

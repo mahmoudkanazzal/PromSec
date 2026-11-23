@@ -1,0 +1,67 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "1be1892f943c2976b0b2d8f307a11a344bf661c80b7926fb784a4cde3334196a",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'username' or 'password' fields cause a server error (KeyError) before any database action.",
+      "SQL injection is possible because the query is built with string interpolation.",
+      "Database connection failures raise an exception and prevent the redirect.",
+      "Duplicate usernames may cause a database constraint violation.",
+      "Very long input strings may exceed column size limits and cause insertion errors.",
+      "An empty password results in the well\u2011known MD5 hash of an empty string being stored."
+    ],
+    "entrypoints": [],
+    "intent": "Create a new user account by storing the supplied username and a hashed password in a MySQL database, then redirect the client to the home page.",
+    "invariants": [
+      "Each successful request results in exactly one row being added to the User table.",
+      "The redirect location is always '/' regardless of input.",
+      "The stored password is always the MD5 hexadecimal digest of the submitted password.",
+      "The submitted username is used for both the Username and Email columns."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to the path /register with form fields 'username' and 'password'.",
+      "Returns an HTTP 302 redirect response pointing to '/' after processing.",
+      "If required form fields are absent, the request fails with a client error (e.g., 400 Bad Request).",
+      "No response body is sent beyond the redirect headers."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Inserts a new record into the User table of the MySQL database.",
+      "Commits the transaction, persisting the new user data.",
+      "Closes the database connection after the insert.",
+      "Stores the password as an MD5 hash, making the original password unrecoverable from the stored value."
+    ],
+    "source_hash": "1ec38e4c642a37d2cb64a04549047e30fcca03ab84852352f032a6ece72b73f8"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.75,
+    "io_semantics": 0.5,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file65.py",
+  "gated_score": 0.35187,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.35187,
+  "original_hash": "1ec38e4c642a37d2cb64a04549047e30fcca03ab84852352f032a6ece72b73f8",
+  "rationale": "The program deviates from the contract on key edge cases (missing fields cause redirect instead of error, uses safe parameterized query instead of vulnerable interpolation, stores a Werkzeug hash not MD5, and handles empty passwords incorrectly). It preserves some invariants and side\u2011effects like insertion, commit, and redirect, but overall the core behavioral contract is not met.",
+  "schema": 1,
+  "stability_abs_difference": 0.26813,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.5,
+    "invariants": 0.75,
+    "io_semantics": 0.75,
+    "side_effects": 0.75
+  },
+  "stability_score": 0.62,
+  "weighted_mean": 0.4025,
+  "worst_dimension": 0.2
+}

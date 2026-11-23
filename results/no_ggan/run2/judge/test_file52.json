@@ -1,0 +1,66 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "eded7cde0ee26821678cb349542ff9dd2713f4706cd017a22a024f870b354141",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty \"username\" or \"password\" fields cause a Bad Request error.",
+      "Providing a non\u2011string password (e.g., bytes) may raise a TypeError when hashing.",
+      "SQL injection via the username field can cause unexpected query results or errors.",
+      "If the MySQL server is unreachable or credentials are wrong, the request fails with a server error.",
+      "If multiple rows share the same username, only the first fetched row is considered."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by checking the supplied username and password against stored credentials and redirect to a success or failure page.",
+    "invariants": [
+      "The endpoint never modifies database state; it only reads data.",
+      "Redirect destinations are always exactly \"/success\" or \"/wrong\".",
+      "Password comparison is performed using an MD5 hash of the supplied password.",
+      "The username lookup is performed before the password check.",
+      "A successful login requires both the username to exist and the password hash to match."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to the path /login with form fields \"username\" and \"password\".",
+      "Returns an HTTP 302 redirect to \"/success\" when authentication succeeds.",
+      "Returns an HTTP 302 redirect to \"/wrong\" when authentication fails.",
+      "If required form fields are missing, the request results in a 400 Bad Request error.",
+      "If the database query raises an exception, the server returns a 500 Internal Server Error."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to a local MySQL server using the root credentials.",
+      "Executes SELECT queries against the \"usr\" table to retrieve the stored username and password hash."
+    ],
+    "source_hash": "8c96e5cf69da3fbe6e443e3be1ae77760b89a8ba49a54a5c0f8a5c0c0d9d3d82"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.3,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file52.py",
+  "gated_score": 0.3275,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.3275,
+  "original_hash": "8c96e5cf69da3fbe6e443e3be1ae77760b89a8ba49a54a5c0f8a5c0c0d9d3d82",
+  "rationale": "The program deviates from the contract on error handling (returns 302 instead of 400/500), uses a secure hash check instead of MD5, prevents SQL injection, and connects with non\u2011root credentials, while still performing a SELECT on the usr table and redirecting to the required URLs.",
+  "schema": 1,
+  "stability_abs_difference": 0.09,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.6,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.4175,
+  "weighted_mean": 0.37,
+  "worst_dimension": 0.2
+}

@@ -1,0 +1,78 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "ea493d6de35e7e22888999cc3e181492979dd6407a6832fb4724d278cc781403",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing required YAML keys (e.g., title, isbn) leads to a server error or uncaught exception.",
+      "Malformed YAML in request bodies causes yaml.load to raise an exception, resulting in a 500 response.",
+      "Omitting the password field in /librarian_access results in access denied (401).",
+      "Providing an unknown action to /admin_panel returns a 400 with \"Invalid action\".",
+      "Empty or missing query parameters (e.g., section, type, category) still trigger the corresponding script with an empty argument.",
+      "Large or malicious input could cause the invoked scripts to behave unexpectedly, as the app does not sanitize command arguments."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple library management web API that can add, update, delete, view books, run inventory and report scripts, and perform limited admin actions via HTTP requests.",
+    "invariants": [
+      "All endpoints always respond with a JSON payload containing a \"status\" field.",
+      "Successful responses use HTTP 200; authentication failure uses 401 and invalid admin actions use 400.",
+      "YAML payloads are parsed with yaml.FullLoader; required keys (e.g., isbn) must be present for the request to succeed.",
+      "The admin_panel endpoint only accepts the actions \"backup\" or \"restore\"; any other value results in a 400 error."
+    ],
+    "io_behavior": [
+      "POST /add_book with a YAML body containing title, author, isbn, and publication_year returns a JSON object echoing those fields and a success status.",
+      "GET /run_inventory?section=NAME triggers a system call to run an inventory script for the given section and returns a JSON status message.",
+      "POST /librarian_access with form field password returns a JSON success message if the password matches the hard\u2011coded admin password, otherwise a 401 error.",
+      "POST /update_book with a YAML body containing isbn and optional new_title, new_author, new_year returns a JSON object summarizing the update request.",
+      "POST /delete_book with a YAML body containing isbn returns a JSON object confirming deletion of that ISBN.",
+      "GET /generate_reports?type=TYPE triggers a report\u2011generation script with the given type and returns a JSON status message."
+    ],
+    "public_api": {
+      "route:GET /generate_reports": "",
+      "route:GET /run_inventory": "",
+      "route:GET /view_books": "",
+      "route:POST /add_book": "",
+      "route:POST /admin_panel": "",
+      "route:POST /delete_book": "",
+      "route:POST /librarian_access": "",
+      "route:POST /update_book": ""
+    },
+    "side_effects": [
+      "Execution of external Python scripts via os.system for inventory, report generation, backup, restore, and book viewing.",
+      "Potential creation of backup or restore files performed by the invoked backup_script.py and restore_script.py.",
+      "No persistent data is stored by the Flask app itself; all state is external to the process."
+    ],
+    "source_hash": "1308832b93521f7bb6430dd40918c7597329f436d315da7bba1389c443eba676"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.7,
+    "invariants": 0.8,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file23.py",
+  "gated_score": 0.69375,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.69375,
+  "original_hash": "1308832b93521f7bb6430dd40918c7597329f436d315da7bba1389c443eba676",
+  "rationale": "All routes exist and return JSON with a status field; HTTP codes and script calls match the contract. Deviations: uses yaml.safe_load instead of FullLoader and defaults missing keys to empty strings rather than erroring, so required\u2011key edge case and invariant are broken. Admin password is read from env instead of hard\u2011coded, a minor divergence. Side\u2011effects (external script execution) are preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.17025,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.83,
+    "invariants": 0.75,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.864,
+  "weighted_mean": 0.725,
+  "worst_dimension": 0.6
+}

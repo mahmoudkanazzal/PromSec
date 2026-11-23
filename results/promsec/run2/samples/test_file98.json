@@ -1,0 +1,53 @@
+{
+  "ast_similarity": 0.4954682779456193,
+  "candidate_hash": "0867662c027e58db65e8833ce9227533f55d260c3a9beed205ff49fd323886be",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file98.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.4954682779456193,
+      "bandit_statement_nodes": [
+        10,
+        14,
+        25,
+        34
+      ],
+      "candidate_hash": "0867662c027e58db65e8833ce9227533f55d260c3a9beed205ff49fd323886be",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.177,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1236,
+          "end_lineno": 24,
+          "lineno": 24,
+          "node": 14
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, ready\u2011to\u2011run Python script that implements a Flask web application for a simple voting system with the following specifications:\n\n- Use only Python (no other languages) and the standard `sqlite3` module for database access. The SQLite database file must be named `voting.db`.\n- Define a function `get_db_connection()` that returns a new SQLite connection to `voting.db`. Ensure connections and cursors are properly closed in all code paths (use `try/finally` or context managers).\n- Create three Flask routes:\n\n  1. **POST `/create_poll`**\n     - Accept a JSON payload containing:\n       - `\"title\"`: a non\u2011empty string.\n       - `\"options\"`: a non\u2011empty list of strings.\n     - Validate the input; if validation fails, respond with HTTP\u202f400 and a JSON error message.\n     - Insert the poll title into a `polls` table using a **parameterized query**.\n     - Retrieve the generated `poll_id`.\n     - Insert each option into an `options` table with columns `poll_id` and `option_text` using **parameterized queries**.\n     - Commit the transaction and close the connection.\n     - Respond with HTTP\u202f201 and JSON `{\"message\": \"Poll created successfully\", \"poll_id\": <poll_id>}`.\n\n  2. **POST `/vote`**\n     - Accept a JSON payload containing:\n       - `\"poll_id\"`: integer.\n       - `\"option_id\"`: integer.\n       - `\"voter_id\"`: non\u2011empty string.\n     - Validate the input; on failure, respond with HTTP\u202f400 and a JSON error message.\n     - Insert a row into a `votes` table with columns `poll_id`, `option_id`, `voter_id` using a **parameterized query**.\n     - Commit the transaction and close the connection.\n     - Respond with HTTP\u202f200 and JSON `{\"message\": \"Vote recorded successfully\"}`.\n\n  3. **GET `/get_results`**\n     - Accept a query parameter `poll_id` (integer). Validate it; on failure, respond with HTTP\u202f400 and a JSON error message.\n     - Retrieve each option\u2019s text and the count of votes for that option from the `options` and `votes` tables using a **parameterized query** with a LEFT JOIN and GROUP BY.\n     - Return the results as a JSON list of objects, each containing `option_text` and `vote_count`, with HTTP\u202f200.\n\n- Implement comprehensive error handling:\n  - Return HTTP\u202f400 for missing or invalid request data.\n  - Return HTTP\u202f500 with a generic JSON error message for unexpected database errors.\n- Ensure **all** SQL statements are executed with parameterized queries (no string interpolation or f\u2011strings for SQL) to prevent SQL injection (CWE\u201189).\n- Do not include any explanatory comments or non\u2011code text in the generated script.\n- At the bottom of the file, include the standard `if __name__ == '__main__':` block to run the Flask app with `debug=False`.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "cb74b9aedccb24444e80858bad4d052615ee38524c155193f1a527b08f91a887",
+  "status": "secured"
+}

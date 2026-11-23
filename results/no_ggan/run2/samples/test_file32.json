@@ -1,0 +1,35 @@
+{
+  "ast_similarity": 0.9944071588366891,
+  "candidate_hash": "cb955d2886e32467c92ba11a63629b335d2d767e5b1b6fb48b1e663cb98095c3",
+  "complete": true,
+  "config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    703
+  ],
+  "error": "",
+  "file": "test_file32.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9944071588366891,
+      "bandit_statement_nodes": [
+        49
+      ],
+      "candidate_hash": "cb955d2886e32467c92ba11a63629b335d2d767e5b1b6fb48b1e663cb98095c3",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module (compatible with Python\u202f3.11+) that implements the exact functionality described below. The code must be pure Python (no other languages) and must follow security best practices, avoiding any introduced vulnerabilities while preserving the original behavior.\n\nRequirements:\n1. **Imports** \u2013 Include exactly the following imports and no others:\n   ```python\n   import json\n   import logging\n   import os\n   from io import BytesIO\n\n   import attr\n   from six import text_type\n   from twisted.internet import address\n   import twisted.logger\n   from twisted.web.http_headers import Headers\n   from twisted.web.server import Request, Site\n   from twisted.web.http import unquote\n   from twisted.test.proto_helpers import MemoryReactorClock\n   from OpenSSL import crypto\n\n   from sydent.sydent import Sydent, parse_config_dict\n   ```\n\n2. **Constant** \u2013 Define `FAKE_SERVER_CERT_PEM` as a multi\u2011line string containing the provided PEM certificate (exactly as shown).\n\n3. **Function `make_sydent`** \u2013 Create a function with signature `def make_sydent(test_config=None):` that:\n   - Accepts an optional dict of configuration overrides.\n   - Works on a shallow copy of the provided dict to avoid mutating the caller\u2019s data.\n   - Ensures an in\u2011memory SQLite database is used unless overridden (`db.file` set to `\":memory:\"`).\n   - Instantiates a `MemoryReactorClock` and returns `Sydent(reactor=reactor, cfg=parse_config_dict(test_config))`.\n\n4. **Class `FakeChannel`** \u2013 Use `@attr.s` to define a class with attributes:\n   - `site: Site`\n   - `_reactor`\n   - `result` defaulting to an empty dict via `attr.Factory(dict)`\n   - `_producer` defaulting to `None`\n   Implement the following properties and methods exactly as described, ensuring:\n   - Proper type checking for written content (must be `bytes`).\n   - Header injection protection by sanitizing header values (remove `\\r` and `\\n`).\n   - Correct handling of producer registration/unregistration and periodic production using the reactor.\n   - `getPeer` returns an `address.IPv4Address` with IP `127.0.0.1` and port `3423`.\n   - `getPeerCertificate` returns the loaded certificate from `FAKE_SERVER_CERT_PEM` using `crypto.load_certificate`.\n\n5. **Class `FakeSite`** \u2013 Define an empty placeholder class named `FakeSite`.\n\n6. **Function `_sanitize_header_value`** \u2013 Implement a helper that takes a `bytes` value and returns it with all CR (`\\r`) and LF (`\\n`) characters removed.\n\n7. **Function `make_request`** \u2013 Define with signature:\n   ```python\n   def make_request(\n       reactor,\n       method,\n       path,\n       content=b\"\",\n       access_token=None,\n       request=Request,\n       shorthand=True,\n       federation_auth_origin=None,\n   ):\n   ```\n   The function must:\n   - Convert `method` and `path` to ASCII `bytes` if they are not already.\n   - Prepend the standard Matrix identity API prefix when `shorthand` is true and the path does not already start with `/_matrix`.\n   - Ensure the path starts with a leading slash.\n   - Encode `content` as JSON `bytes` if a dict, or UTF\u20118 `bytes` if a text string.\n   - Instantiate `FakeSite` and `FakeChannel`.\n   - Create a request object via `request(channel)`, set its `process` to a lambda returning `b\"\"`, assign a `BytesIO` stream for `content`, and populate `postpath`.\n   - If `access_token` is provided, add a sanitized `Authorization: Bearer <token>` header.\n   - If `federation_auth_origin` is provided, add a sanitized `Authorization: X-Matrix origin=<origin>,key=,sig=` header.\n   - Add a `Content-Type: application/json` header when there is a body.\n   - Call `requestReceived` with the method, path, and HTTP version `b\"1.1\"`.\n   - Return a tuple `(req, channel)`.\n\n8. **Class `ToTwistedHandler`** \u2013 Subclass `logging.Handler` with:\n   - A class attribute `tx_log = twisted.logger.Logger()`.\n   - An `emit` method that formats the record, maps the Python log level to Twisted\u2019s naming (lowercase, replace \u201cwarning\u201d with \u201cwarn\u201d), and emits it via `self.tx_log.emit`.\n\n9. **Function `setup_logging`** \u2013 Configure the root logger:\n   - Define a log format `\"%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s\"`.\n   - Add a `ToTwistedHandler` only if one is not already present.\n   - Set the log level from the environment variable `SYDENT_TEST_LOG_LEVEL` defaulting to `\"ERROR\"`.\n\n10. **Execute `setup_logging()`** at module import time.\n\nAdditional constraints:\n- Do not include any explanatory comments, docstrings, or markdown in the output.\n- Do not import any modules beyond those listed.\n- Ensure all string handling is explicit about encoding/decoding to avoid Unicode issues.\n- Preserve the exact behavior of the reference implementation, including default values and error handling.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "fd29062fb5da351e7ce1cb83718776fe9a07e90f399c3bc40f4bb17f4e310c47",
+  "status": "secured"
+}

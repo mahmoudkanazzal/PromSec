@@ -1,0 +1,67 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "381ab9c699be72318613490cc58a1a89a515a969771b0ac65f571efaa4cff553",
+  "compile_ok": true,
+  "confidence": 0.8,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields or missing session username cause a KeyError before DB interaction.",
+      "Database connection failure results in a \"failure\" response.",
+      "SQL execution errors (e.g., duplicate keys, type mismatches) also yield \"failure\".",
+      "Non\u2011numeric stock_quantity is accepted as a string and stored as\u2011is.",
+      "SQL injection is possible because values are interpolated directly into the query."
+    ],
+    "entrypoints": [],
+    "intent": "Process a buy order request by recording the requested stock and quantity for the logged\u2011in user in a MySQL database and return a simple success or failure message.",
+    "invariants": [
+      "The request method must be POST.",
+      "Form data must contain both 'stock_name' and 'stock_quantity'.",
+      "A valid 'username' must exist in the session.",
+      "The MySQL server must be reachable and the `my_stocks` table must exist.",
+      "The response is always a short string, never a JSON object."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST requests at the path /buy_order.",
+      "Reads form fields 'stock_name' and 'stock_quantity' from the request body.",
+      "Retrieves the current username from the session data.",
+      "Returns a plain\u2011text response \"successfull\" on successful insertion.",
+      "Returns a plain\u2011text response \"failure\" if the insertion raises an exception."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection to localhost with credentials root/root.",
+      "Executes an INSERT statement that adds a row to the `my_stocks` table.",
+      "Commits the transaction on success."
+    ],
+    "source_hash": "7e999ded708c14fff95eb91a5e678da1e20c0b73b18025c94bab835c02c3767e"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.7,
+    "io_semantics": 0.4,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file85.py",
+  "gated_score": 0.295,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.295,
+  "original_hash": "7e999ded708c14fff95eb91a5e678da1e20c0b73b18025c94bab835c02c3767e",
+  "rationale": "Program deviates from contract in error handling (returns failure instead of KeyError), uses a different success string, validates and rejects non\u2011numeric quantities, prevents SQL injection, and reads DB credentials from env instead of fixed root/root, though it still performs the POST insert with plain\u2011text responses.",
+  "schema": 1,
+  "stability_abs_difference": 0.24625,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.2,
+    "invariants": 1.0,
+    "io_semantics": 0.6,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.54125,
+  "weighted_mean": 0.36,
+  "worst_dimension": 0.1
+}

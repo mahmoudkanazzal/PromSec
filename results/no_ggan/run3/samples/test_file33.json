@@ -1,0 +1,35 @@
+{
+  "ast_similarity": 0.8455008488964346,
+  "candidate_hash": "ce325318c6d667438ba4190b04346faf1c1f86b84b5423c81c65c8cae4c0712c",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    703
+  ],
+  "error": "",
+  "file": "test_file33.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8455008488964346,
+      "bandit_statement_nodes": [
+        55
+      ],
+      "candidate_hash": "ce325318c6d667438ba4190b04346faf1c1f86b84b5423c81c65c8cae4c0712c",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 module that reproduces the exact functionality of the code snippet below. The module must:\n\n1. Import only the listed standard\u2011library and third\u2011party packages:\n   - `json`, `logging`, `os`, `io.BytesIO`, `typing.Dict`, `typing.Optional`\n   - `attr`, `six.text_type`\n   - `twisted.internet._resolver.SimpleResolverComplexifier`\n   - `twisted.internet.defer.fail`, `twisted.internet.defer.succeed`\n   - `twisted.internet.error.DNSLookupError`\n   - `twisted.internet.interfaces.IHostnameResolver`, `twisted.internet.interfaces.IReactorPluggableNameResolver`, `twisted.internet.interfaces.IResolverSimple`\n   - `twisted.internet.address`\n   - `twisted.logger`\n   - `twisted.web.http_headers.Headers`\n   - `twisted.web.server.Request`, `twisted.web.server.Site`\n   - `twisted.web.http.unquote`\n   - `twisted.test.proto_helpers.MemoryReactorClock`\n   - `OpenSSL.crypto`\n   - `zope.interface.implementer`\n   - `sydent.sydent.Sydent`, `sydent.sydent.parse_config_dict`\n\n2. Define a constant `FAKE_SERVER_CERT_PEM` containing the provided PEM certificate string (including the leading and trailing newline characters).\n\n3. Implement `make_sydent(test_config: Optional[Dict] = None) -> Sydent` that:\n   - Accepts an optional configuration dictionary.\n   - Ensures an in\u2011memory SQLite database is used unless overridden, defaulting `db.file` to `\":memory:\"`.\n   - Instantiates a `ResolvingMemoryReactorClock` and returns a `Sydent` object with `reactor`, parsed configuration, and `use_tls_for_federation=False`.\n\n4. Create an `@attr.s` class `FakeChannel` with attributes `site`, `_reactor`, `result` (default empty dict), and `_producer`. Implement:\n   - `json_body`, `code`, `headers` properties that raise an exception if `result` is empty and otherwise return parsed JSON, integer status code, and a `Headers` object built from stored header tuples.\n   - `writeHeaders`, `write`, `registerProducer`, `unregisterProducer`, `requestDone`, `getPeer`, `getHost`, `transport` property, and `getPeerCertificate` method that returns the loaded certificate from `FAKE_SERVER_CERT_PEM`.\n   - All byte handling must be explicit and safe; raise clear errors on type mismatches.\n\n5. Define an empty placeholder class `FakeSite` that represents a Twisted Web site.\n\n6. Implement `make_request(reactor, method, path, content=b\"\", access_token=None, request=Request, shorthand=True, federation_auth_origin=None)` that:\n   - Normalizes `method` and `path` to ASCII\u2011encoded `bytes`, ignoring non\u2011ASCII characters.\n   - Prepends the Matrix identity API prefix (`b\"/_matrix/identity/v2/\"`) when `shorthand` is true and the path does not already start with `b\"/_matrix\"`.\n   - Guarantees the path starts with a single leading slash.\n   - Serializes `content` to JSON bytes if a `dict` is supplied, or encodes Unicode strings to UTF\u20118.\n   - Instantiates `FakeSite` and `FakeChannel`, then creates a `request` object bound to the channel.\n   - Sets `req.process` to a no\u2011op lambda, assigns a `BytesIO` stream to `req.content`, and populates `req.postpath` by splitting and unquoting the path.\n   - Adds an `Authorization: Bearer <token>` header when `access_token` is provided, ensuring the token is ASCII\u2011safe.\n   - When `federation_auth_origin` is supplied, adds an `Authorization` header with the format `X-Matrix origin=<origin>,key=,sig=` where `<origin>` is safely encoded as bytes.\n   - Adds a `Content-Type: application/json` header when a body is present.\n   - Calls `req.requestReceived` with the normalized method, path, and HTTP version `b\"1.1\"`.\n   - Returns a tuple `(req, channel)`.\n\n7. Create a logging handler class `ToTwistedHandler(logging.Handler)` that:\n   - Holds a `twisted.logger.Logger` instance.\n   - In `emit`, formats the record, maps the Python log level name to a Twisted log level (lower\u2011casing and converting `\"warning\"` to `\"warn\"`), and emits the message using `self.tx_log.emit`.\n\n8. Write a helper `_resolve_log_level(level_name: str) -> int` that:\n   - Upper\u2011cases the input.\n   - Maps `\"CRITICAL\"`, `\"ERROR\"`, `\"WARNING\"`, `\"INFO\"`, `\"DEBUG\"`, `\"NOTSET\"` to the corresponding `logging` constants.\n   - Returns `logging.ERROR` for any unrecognised name.\n\n9. Implement `setup_logging()` that:\n   - Retrieves the root logger.\n   - Configures a log format `\"%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s\"`.\n   - Installs a `ToTwistedHandler` with the above formatter.\n   - Reads the environment variable `SYDENT_TEST_LOG_LEVEL` (default `\"ERROR\"`), resolves it via `_resolve_log_level`, and sets the root logger\u2019s level accordingly.\n   - Calls `setup_logging()` at import time.\n\n10. Define a class `ResolvingMemoryReactorClock` that:\n    - Inherits from `MemoryReactorClock`.\n    - Implements `IReactorPluggableNameResolver` via `@implementer`.\n    - Initializes an internal `lookups` dictionary.\n    - Defines an inner `FakeResolver` class implementing `IResolverSimple` with a `getHostByName(name, timeout=None)` method that returns a failed Deferred with `DNSLookupError` if the name is unknown, otherwise returns a succeeded Deferred with the stored address.\n    - Sets `self.nameResolver` to `SimpleResolverComplexifier(FakeResolver())`.\n    - Overrides `installNameResolver` to raise `NotImplementedError`.\n\n11. Ensure the entire module is secure:\n    - Validate and sanitize all external inputs (e.g., `method`, `path`, `access_token`, `federation_auth_origin`) before use.\n    - Avoid executing or evaluating any data received from callers.\n    - Use explicit byte handling to prevent injection attacks.\n    - Do not expose any mutable default arguments.\n    - Keep all logging and error handling robust and informative without leaking sensitive data.\n\n12. The final output must be pure Python code, syntactically correct, and ready to be saved as a `.py` file. Do not include any explanatory text, comments outside the code, or non\u2011Python content. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "1a39a4177928ac3d32e74a2ff0d447c7f6ce1c7a9a28105b4f5d40c44d317349",
+  "status": "secured"
+}

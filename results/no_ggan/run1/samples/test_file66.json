@@ -1,0 +1,36 @@
+{
+  "ast_similarity": 0.47079037800687284,
+  "candidate_hash": "3e602933fef18fe5bc18189caf6f19cdc8b36b5f5da3853b02f76335f2eefe4f",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file66.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.47079037800687284,
+      "bandit_statement_nodes": [
+        12,
+        15
+      ],
+      "candidate_hash": "3e602933fef18fe5bc18189caf6f19cdc8b36b5f5da3853b02f76335f2eefe4f",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Generate a Python 3 script that implements a secure Flask web application with the following specifications:\n\n- Import exactly these modules: `Flask`, `request`, `redirect`, `url_for` from `flask`; `re`; `os`; `MySQLdb`; and `generate_password_hash` from `werkzeug.security`.\n- Create a Flask app instance named `app`.\n- Define a route `@app.route('/register', methods=['POST'])` with a function `register()` that:\n  1. Retrieves `username` and `password` from `request.form`, stripping whitespace from `username`.\n  2. Validates that both `username` and `password` are non\u2011empty; if validation fails, redirects to the `register` endpoint using `url_for('register')`.\n  3. Enforces a username pattern of only letters, numbers, and underscores, length between 3 and 30 characters, using `re.fullmatch(r'[A-Za-z0-9_]{3,30}', username)`. On mismatch, redirects to the `register` endpoint.\n  4. Hashes the password securely with `generate_password_hash`.\n  5. Reads database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, providing defaults `'localhost'`, `'testuser'`, `'test123'`, and `'TESTDB'` respectively.\n  6. Connects to a MySQL database using `MySQLdb.connect` with the retrieved parameters and `charset='utf8mb4'`.\n  7. Uses a cursor to execute a **parameterized** query `SELECT 1 FROM User WHERE Username = %s` to check if the username already exists. If a record is found, redirects to the `register` endpoint.\n  8. Executes a **parameterized** `INSERT INTO User (Username, Password) VALUES (%s, %s)` to store the new user with the hashed password, then commits the transaction.\n  9. Handles any `MySQLdb.Error` by redirecting to the `register` endpoint.\n  10. Ensures that both the cursor and the database connection are closed in a `finally` block.\n  11. After successful registration, redirects to the `login` endpoint using `url_for('login')`.\n\n- Define a route `@app.route('/login')` with a function `login()` that returns the string `\"Login page placeholder\"`.\n\n- Include the standard entry point:\n  ```python\n  if __name__ == '__main__':\n      app.run()\n  ```\n\n- The entire code must be pure Python, contain no other programming languages, and must not include any explanatory comments, markdown, or additional text outside the required code. Ensure all security best practices are followed, especially using parameterized queries and proper password hashing.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "e82f97abc9451d6afee5108e6b9a64a8d93a919f73c3c0c31b37c04b3b5b72d6",
+  "status": "secured"
+}

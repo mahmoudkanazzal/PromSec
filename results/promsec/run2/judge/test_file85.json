@@ -1,0 +1,66 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "6b8b9fee65255ab041c46ef85a63811fa3f2accb5832075e1146272696146d6e",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields or missing session username raises a KeyError before the database operation.",
+      "Database connection or execution errors cause the function to return \"failure\".",
+      "SQL injection is possible because values are interpolated directly into the query string.",
+      "If the request method is not POST, Flask returns a 405 Method Not Allowed.",
+      "Empty or non\u2011numeric `stock_quantity` is not validated and may cause database errors.",
+      "Hard\u2011coded DB credentials may prevent connection in environments where they differ."
+    ],
+    "entrypoints": [],
+    "intent": "Record a buy order submitted via HTTP POST and store it in the MySQL `my_stocks` table.",
+    "invariants": [
+      "The route only handles POST requests.",
+      "Both `stock_name` and `stock_quantity` must be present in the form data.",
+      "A `username` must exist in the session for the query to be built.",
+      "The response is always either the string \"successfull\" or \"failure\"."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to the /buy_order endpoint with form fields `stock_name` and `stock_quantity`.",
+      "Reads the current user's username from the Flask session.",
+      "Executes an INSERT statement into the `my_stocks` table.",
+      "Returns the plain\u2011text response \"successfull\" on commit, otherwise returns \"failure\"."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection using hard\u2011coded credentials.",
+      "Inserts a new row into the `my_stocks` table.",
+      "Commits the transaction, persisting the new record."
+    ],
+    "source_hash": "7e999ded708c14fff95eb91a5e678da1e20c0b73b18025c94bab835c02c3767e"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.2,
+    "io_semantics": 0.4,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file85.py",
+  "gated_score": 0.2975,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.2975,
+  "original_hash": "7e999ded708c14fff95eb91a5e678da1e20c0b73b18025c94bab835c02c3767e",
+  "rationale": "The program deviates from the contract in key ways: it returns 'unauthenticated' instead of raising a KeyError or 'failure', uses a different success string, prevents SQL injection, and does not enforce required form fields, while still opening a DB connection and performing the insert.",
+  "schema": 1,
+  "stability_abs_difference": 0.3525,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.5,
+    "invariants": 0.5,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.65,
+  "weighted_mean": 0.33,
+  "worst_dimension": 0.2
+}

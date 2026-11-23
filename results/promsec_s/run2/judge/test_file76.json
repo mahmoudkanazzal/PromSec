@@ -1,0 +1,65 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "b522f7ade6d30be88165178a9e4046be5417cc938712e8535fa0ffb3fca4a870",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty form fields cause a server error (no explicit validation).",
+      "Database connection failures or query errors result in an unhandled exception.",
+      "SQL injection is possible because user input is concatenated directly into SQL statements.",
+      "Very long input values may exceed database column limits and cause insertion failures.",
+      "If random session_id generation fails, the session creation step will error.",
+      "If the redirect URL parameters exceed URL length limits, the client may reject the response."
+    ],
+    "entrypoints": [],
+    "intent": "Create a new user account and start a session for the user if the chosen username is not already taken.",
+    "invariants": [
+      "A username must be unique; duplicate usernames are rejected.",
+      "The password is always stored as a bcrypt hash, never in plain text.",
+      "All required form fields (username, password, name, email, cweid) must be present for successful registration.",
+      "A session record is created only after the user record is successfully inserted."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /register with form fields: username, password, name, email, cweid.",
+      "If registration succeeds, responds with an HTTP redirect to /login including username, session_id, and stake as query parameters.",
+      "If the username already exists, responds with a plain\u2011text message \"Username is already taken\"."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the users table with the supplied data and a bcrypt\u2011hashed password.",
+      "Inserts a new row into the sessions table containing a generated session_id linked to the new user.",
+      "Commits the above inserts to the MySQL database."
+    ],
+    "source_hash": "a00a27b7d592b11e9682a9850db8e3599255cdbc72ac01f2d99d62959b572c63"
+  },
+  "dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.3,
+    "invariants": 0.4,
+    "io_semantics": 0.6,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file76.py",
+  "gated_score": 0.43125,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.43125,
+  "original_hash": "a00a27b7d592b11e9682a9850db8e3599255cdbc72ac01f2d99d62959b572c63",
+  "rationale": "The program creates a user and redirects on success, but it validates fields differently, omits required session insertion, and uses safe SQL preventing injection, deviating from several contract edge cases and invariants.",
+  "schema": 1,
+  "stability_abs_difference": 0.43125,
+  "stability_dimensions": {
+    "behavior": 0.0,
+    "edge_cases": 0.0,
+    "invariants": 0.0,
+    "io_semantics": 0.0,
+    "side_effects": 0.0
+  },
+  "stability_score": 0.0,
+  "weighted_mean": 0.475,
+  "worst_dimension": 0.3
+}

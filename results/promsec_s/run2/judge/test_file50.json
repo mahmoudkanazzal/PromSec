@@ -1,0 +1,67 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "77ad3fecd1c54bdb6ef2d61450f70a013377c0db8129c42923075a7e04c6ce4b",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty form fields may raise a KeyError or result in a \"Wrong Username\" response.",
+      "If the username does not exist, the function returns \"Wrong Password\".",
+      "Multiple rows for the same username cause the first matching hash to determine success.",
+      "SQL injection via the username field can alter query results or cause errors.",
+      "Database connection failures raise an uncaught exception.",
+      "Extremely long input values may degrade performance or exceed request size limits."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via an HTTP POST request to the /login endpoint and report whether the credentials are valid.",
+    "invariants": [
+      "The endpoint always returns one of the three fixed strings.",
+      "Both \"username\" and \"password\" form fields must be present for normal operation.",
+      "Password comparison uses the MD5 hash of the supplied password.",
+      "The database connection is closed before the function returns."
+    ],
+    "io_behavior": [
+      "Accepts a POST request with form fields \"username\" and \"password\".",
+      "Queries a MySQL database for the stored password hash of the supplied username.",
+      "Returns a plain\u2011text response: \"Login Success\", \"Wrong Password\", or \"Wrong Username\".",
+      "Writes the matching password hash to the server's standard output."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection to localhost as root.",
+      "Executes a SELECT query that concatenates the supplied username into SQL.",
+      "Closes the database connection after the query.",
+      "Prints the stored MD5 hash to the console."
+    ],
+    "source_hash": "09aca3c6166bdcc516a66d879bb0aac9df98b471667b05821c3cd7ebdf79fde0"
+  },
+  "dimensions": {
+    "behavior": 0.1,
+    "edge_cases": 0.1,
+    "invariants": 0.3,
+    "io_semantics": 0.4,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file50.py",
+  "gated_score": 0.2125,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.2125,
+  "original_hash": "09aca3c6166bdcc516a66d879bb0aac9df98b471667b05821c3cd7ebdf79fde0",
+  "rationale": "The candidate deviates from the contract in key ways: uses bcrypt instead of MD5, returns 'Error' for missing fields and DB errors, returns 'Wrong Username' when user not found (contract expects 'Wrong Password'), prevents SQL injection, catches DB exceptions, and does not print the stored hash. Only the basic request handling and connection closing are preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.045,
+  "stability_dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.5,
+    "side_effects": 0.4
+  },
+  "stability_score": 0.2575,
+  "weighted_mean": 0.25,
+  "worst_dimension": 0.1
+}

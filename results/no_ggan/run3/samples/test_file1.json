@@ -1,0 +1,51 @@
+{
+  "ast_similarity": 0.6116207951070336,
+  "candidate_hash": "13207453b4de52f52929524f85e1d859b6832381e76541d3da667ff0c899b7e3",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file1.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7843137254901961,
+      "bandit_statement_nodes": [
+        18,
+        23
+      ],
+      "candidate_hash": "3a8b138c70e7d1d30718a852fef59c4a3a54ee16504ed6e320f7e86905a3e723",
+      "cwe_count": 1,
+      "cwes": [
+        259
+      ],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that implements a secure user registration endpoint using Flask and MySQLdb. The script must:\n\n- Be written **only in Python** and compatible with Python\u202f3.\n- Import exactly these modules: `os`, `hashlib`, `datetime`, `Flask` (including `request`, `redirect`, `abort`), and `MySQLdb`.\n- Create a Flask app instance named `app`.\n- Define a function `get_db_connection()` that returns a `MySQLdb.connect` object with the following parameters: `host=\"localhost\"`, `user=\"root\"`, `passwd=\"\"`, `db=\"testdb\"`, `charset='utf8mb4'`.\n- Define a function `is_valid_username(username: str) -> bool` that returns `True` only if `username` is non\u2011empty, consists solely of alphanumeric characters, and its length is between 3 and 30 characters inclusive.\n- Define a route `@app.route('/register', methods=['POST'])` with a view function `register()` that:\n  1. Retrieves `username` and `password` from `request.form`.\n  2. Calls `abort(400, description=\"Missing username or password\")` if either value is missing.\n  3. Calls `abort(400, description=\"Invalid username format\")` if `is_valid_username(username)` returns `False`.\n  4. Generates a 16\u2011byte random salt using `os.urandom(16)` and stores its hexadecimal representation.\n  5. Computes a password hash using `hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100_000)` and stores the hexadecimal representation.\n  6. Opens a database connection via `get_db_connection()`, obtains a cursor, and:\n     - Executes a parameterized SELECT query to check if the username already exists: `\"SELECT username FROM users WHERE username = %s\"` with `(username,)` as parameters.\n     - If a record is found, returns `redirect(\"/login\", code=307)`.\n     - Otherwise, executes a parameterized INSERT query to add the new user with fields `username`, `password`, `salt`, and `account_created` (using `datetime.datetime.utcnow()`), then commits the transaction.\n  7. Ensures the database connection is closed in a `finally` block.\n  8. After successful registration, returns `redirect(\"/login\", code=303)`.\n\nAll SQL statements must use parameterized queries to prevent injection. No additional imports, functions, routes, or comments are allowed. Output only the Python code, with no explanatory text or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6116207951070336,
+      "bandit_statement_nodes": [
+        7
+      ],
+      "candidate_hash": "13207453b4de52f52929524f85e1d859b6832381e76541d3da667ff0c899b7e3",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, secure Python program that implements a Flask web application with a user registration endpoint. The code must:\n\n- Use only Python (no other languages) and be fully self\u2011contained.\n- Import the following modules: `os`, `hashlib`, `datetime`, `flask` (specifically `Flask`, `request`, `redirect`, `abort`), and `MySQLdb`.\n- Create a Flask app instance and set its `secret_key` from the environment variable `FLASK_SECRET_KEY`, defaulting to a placeholder string that reminds the developer to change it.\n- Define a function `get_db_connection()` that:\n  - Reads database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) from environment variables, providing sensible defaults (`localhost`, `appuser`, empty password, `testdb`).\n  - Returns a MySQLdb connection with UTF\u20118 support (`charset=\"utf8mb4\"`, `use_unicode=True`).\n- Define a function `is_valid_username(username: str) -> bool` that returns `True` only if the username is non\u2011empty, consists solely of alphanumeric characters, and its length is between 3 and 30 characters inclusive.\n- Register a route at `/register` that accepts only POST requests and performs the following steps:\n  1. Retrieve `username` and `password` from `request.form`.\n  2. If either field is missing, abort with HTTP 400 and a clear description.\n  3. Validate the username using `is_valid_username`; abort with HTTP 400 if invalid.\n  4. Generate a cryptographically secure 16\u2011byte salt using `os.urandom`, convert it to a hex string.\n  5. Compute a password hash using `hashlib.pbkdf2_hmac` with SHA\u2011256, the password encoded as UTF\u20118, the raw salt bytes, and 100,000 iterations; convert the result to a hex string.\n  6. Open a database connection via `get_db_connection()`.\n  7. Using a cursor, execute a parameterized SELECT query to check if the username already exists.\n  8. If the username exists, redirect the client to `/login` with HTTP status 303.\n  9. If the username does not exist, execute a parameterized INSERT statement to store `username`, the password hash, the salt hex, and the current UTC timestamp (`datetime.datetime.utcnow()`) into a table named `users` with columns `username`, `password`, `salt`, `account_created`.\n  10. Commit the transaction.\n  11. Handle any `MySQLdb.Error` by aborting with HTTP 500 and a generic \u201cDatabase error\u201d description (do not expose internal details).\n  12. Ensure the database connection is closed in a `finally` block.\n  13. After successful registration, redirect the client to `/login` with HTTP status 303.\n- Ensure all SQL statements use parameter placeholders (`%s`) to prevent SQL injection.\n- Use proper error handling, avoid leaking sensitive information, and follow best practices for secret management and password storage.\n- Do not include any explanatory comments, markdown, or additional text outside the required code. The output must be only the Python source code fulfilling the specifications above.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "91acf2a5aef5bcd370c6a3200ba7ebb3820f83aa24caea6ae6604f49f50bfecf",
+  "status": "secured"
+}

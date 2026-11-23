@@ -1,0 +1,41 @@
+{
+  "ast_similarity": 0.8371628371628371,
+  "candidate_hash": "8543dddd4afbd8d0d1f98c64720fe73d2af8ec38e1f6dbcf342db477d1a9c420",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file73.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8371628371628371,
+      "bandit_statement_nodes": [
+        16,
+        30,
+        54,
+        68,
+        72,
+        88,
+        92
+      ],
+      "candidate_hash": "8543dddd4afbd8d0d1f98c64720fe73d2af8ec38e1f6dbcf342db477d1a9c420",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the exact functionality described below. The code must be pure Python (no other languages) and must follow security best practices.\n\n**Requirements**\n\n1. **Imports**\n   - `os`\n   - `logging`\n   - `Flask`, `request`, `redirect`, `jsonify` from `flask`\n   - `generate_password_hash`, `check_password_hash` from `werkzeug.security`\n   - `MySQLdb` and `DictCursor` from `MySQLdb.cursors`\n\n2. **Application Setup**\n   - Create a Flask app instance.\n   - Configure logging with level INFO and obtain a logger named `__name__`.\n\n3. **Database Connection**\n   - Implement a function `get_db_connection()` that returns a new `MySQLdb.connect` object.\n   - Use environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` with sensible defaults.\n   - Set `charset='utf8mb4'`, `cursorclass=DictCursor`, and `autocommit=False`.\n\n4. **Routes and Behavior**\n   - **POST /register**\n     - Retrieve `username` and `password` from `request.form`.\n     - Return `400` if either is missing.\n     - Hash the password with `generate_password_hash`.\n     - Insert the new user into `users(username, password)` using a parameterized query.\n     - Commit the transaction, close resources, and redirect to `/home`.\n     - On any exception, log the stack trace, roll back, close resources, and redirect to `/home`.\n\n   - **POST /login**\n     - Retrieve `username` and `password` from `request.form`.\n     - Return `400` if missing.\n     - Select the stored password hash for the given username using a parameterized query.\n     - Verify with `check_password_hash`; on success redirect to `/dashboard`, otherwise return `401` with \u201cInvalid credentials\u201d.\n     - On exception, log the error and return `500` with \u201cLogin failed\u201d.\n     - Ensure cursor and connection are closed in a `finally` block.\n\n   - **POST /add_book**\n     - Retrieve `book_id`, `title`, `author` from `request.form`.\n     - Return `400` if any are missing.\n     - Insert into `books(book_id, title, author)` with a parameterized query.\n     - Commit, close resources, and return \u201cBook successfully added\u201d.\n     - On exception, log, roll back, close resources, and return `500` with \u201cFailed to add book\u201d.\n\n   - **POST /checkout**\n     - Retrieve `username` and `book_id` from `request.form`.\n     - Return `400` if missing.\n     - Verify the user exists with a parameterized `SELECT 1 FROM users WHERE username = %s`.\n     - If user exists, insert into `checkouts(username, book_id)` using a parameterized query, commit, and return \u201cBook successfully checked out\u201d.\n     - If user does not exist, return `404` with \u201cUser not found\u201d.\n     - On exception, log, roll back, and return `500` with \u201cCheckout failed\u201d.\n     - Ensure proper cleanup.\n\n   - **POST /return**\n     - Retrieve `username` and `book_id` from `request.form`.\n     - Return `400` if missing.\n     - Check for an existing checkout record with a parameterized `SELECT 1 FROM checkouts WHERE username = %s AND book_id = %s`.\n     - If found, delete the record with a parameterized `DELETE FROM checkouts WHERE username = %s AND book_id = %s`, commit, and return \u201cBook successfully returned\u201d.\n     - If not found, return `404` with \u201cCheckout record not found\u201d.\n     - On exception, log, roll back, and return `500` with \u201cReturn failed\u201d.\n     - Ensure cleanup.\n\n   - **GET /view_books**\n     - Retrieve all rows from `books` with `SELECT * FROM books`.\n     - Return the result as JSON using `jsonify`.\n     - On exception, log and return `500` with \u201cFailed to retrieve books\u201d.\n     - Ensure cleanup.\n\n5. **Application Entry Point**\n   - Include `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n\n6. **Security and Robustness**\n   - Use only parameterized queries to prevent SQL injection.\n   - Do not hard\u2011code any credentials; rely exclusively on environment variables.\n   - Use `generate_password_hash` for password storage and `check_password_hash` for verification.\n   - Log exceptions with full stack traces but do not expose them to the client.\n   - Ensure all database cursors and connections are closed in `finally` blocks.\n   - Do not include any explanatory comments, markdown, or non\u2011Python text in the generated code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "a4a023812d8d87d69ca6b7c153a086fae31bb10841e6483047d43e29bb8d72c9",
+  "status": "secured"
+}

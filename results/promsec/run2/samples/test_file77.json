@@ -1,0 +1,891 @@
+{
+  "ast_similarity": 0.45813282001924927,
+  "candidate_hash": "1e224c18c5f7c666a92cc410fc9fb5432091b7bc56063dad23ad66d12d6153fd",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 1,
+  "cwe_count_before": 1,
+  "cwes_after": [
+    89
+  ],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file77.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.45813282001924927,
+      "bandit_statement_nodes": [
+        11,
+        20,
+        31,
+        39,
+        48
+      ],
+      "candidate_hash": "1e224c18c5f7c666a92cc410fc9fb5432091b7bc56063dad23ad66d12d6153fd",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1752,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1346,
+          "end_lineno": 63,
+          "lineno": 63,
+          "node": 39
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web API for a task manager with the exact same functionality as the code below, but with security best practices applied:\n\n- Use `sqlite3` for the database stored in `task_manager.db`.\n- Provide a `get_db_connection()` function that returns a connection object and is used with a context manager (`with` statement) to ensure proper closing.\n- All SQL statements must be **parameterized** (use `?` placeholders) to prevent SQL injection; never construct queries with f\u2011strings or string concatenation.\n- Validate and sanitize incoming JSON payloads and query parameters:\n  * `task_name`, `description`, and `due_date` must be non\u2011empty strings; `due_date` should match the format `YYYY\u2011MM\u2011DD`.\n  * For the `keyword` search parameter, allow any string but escape it properly via parameters.\n  * For the `task_id` path parameter, ensure it is a positive integer.\n- Return JSON responses with appropriate HTTP status codes:\n  * 201 for successful task creation.\n  * 200 for successful reads, updates, and deletions.\n  * 400 for bad requests (e.g., missing fields, invalid formats).\n  * 404 when a requested task does not exist.\n  * 500 for unexpected server errors.\n- Include comprehensive error handling:\n  * Wrap database operations in `try/except` blocks.\n  * Log exceptions (you may use `print` for simplicity) without exposing internal details to the client.\n- Use type hints for all functions and variables.\n- Define the following routes with the exact signatures and behavior:\n  * `POST /add_task` \u2013 expects JSON with `task_name`, `description`, `due_date`; inserts a new row.\n  * `GET /search_tasks` \u2013 accepts query parameter `keyword`; returns all tasks where `task_name` or `description` contains the keyword (case\u2011insensitive).\n  * `PUT /update_task/<int:task_id>` \u2013 expects JSON with any of `task_name`, `description`, `due_date`; updates the specified task.\n  * `DELETE /delete_task/<int:task_id>` \u2013 deletes the specified task.\n  * `GET /get_tasks_by_due_date` \u2013 accepts query parameter `due_date`; returns all tasks with that exact due date.\n- Ensure the script runs with `if __name__ == '__main__': app.run(debug=False)`.\n- Do not include any explanatory text, comments, or markdown formatting in the output; only provide the Python code as the result of the prompt.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4135534317984361,
+      "bandit_statement_nodes": [
+        74
+      ],
+      "candidate_hash": "720ba6eb73190e093ac1644c13acee34d4e4dcfbde1eac10d0a1d69e72238f3d",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1042,
+          "end_lineno": 108,
+          "lineno": 108,
+          "node": 74
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.9+) that implements a Flask web application for managing tasks, using an SQLite database stored in a file named `task_manager.db`. The script must meet **all** of the following requirements exactly:\n\n1. **Imports**  \n   - Import only the necessary standard\u2011library modules (`os`, `re`, `sqlite3`, `logging`) and the required Flask components (`Flask`, `request`, `jsonify`, `abort`).  \n   - Import typing helpers (`Any`, `Dict`, `List`, `Optional`) for type annotations.\n\n2. **Logging**  \n   - Configure basic logging at INFO level.  \n   - Create a module\u2011level logger named after `__name__`.\n\n3. **Flask App Configuration**  \n   - Instantiate a Flask app.  \n   - Set `app.secret_key` from the environment variable `FLASK_SECRET_KEY`, defaulting to `'default_secret'` if not set.\n\n4. **Database Handling**  \n   - Define a constant `DB_PATH = 'task_manager.db'`.  \n   - Implement `get_db_connection() -> sqlite3.Connection` that opens a connection to `DB_PATH`, sets `row_factory` to `sqlite3.Row`, and returns the connection.  \n   - Implement `init_db() -> None` that creates a table `tasks` with columns:  \n     - `id` \u2013 INTEGER PRIMARY KEY AUTOINCREMENT  \n     - `task_name` \u2013 TEXT NOT NULL  \n     - `description` \u2013 TEXT NOT NULL  \n     - `due_date` \u2013 TEXT NOT NULL (ISO format `YYYY\u2011MM\u2011DD`)  \n   - Ensure `init_db()` is called before the server starts.\n\n5. **Input Validation Functions**  \n   - `validate_non_empty_string(value: Any) -> bool` \u2013 returns `True` only for non\u2011empty, non\u2011whitespace strings.  \n   - `validate_due_date(date_str: Any) -> bool` \u2013 returns `True` only for strings matching the regex `^\\d{4}-\\d{2}-\\d{2}$`.  \n   - `validate_task_id(task_id: Any) -> bool` \u2013 returns `True` only for positive integers.\n\n6. **Utility**  \n   - `task_to_dict(row: sqlite3.Row) -> Dict[str, Any]` \u2013 converts a DB row to a dictionary with keys `id`, `task_name`, `description`, `due_date`.\n\n7. **Endpoints** (all responses must be JSON, with appropriate HTTP status codes, and must never expose internal exceptions):\n   - `POST /add_task`  \n     - Accept JSON payload with `task_name`, `description`, `due_date`.  \n     - Validate each field using the functions above.  \n     - Insert the task using a **parameterized** SQL statement (`?` placeholders).  \n     - Return `{'message': 'Task created'}` with status 201 on success, `{'error': 'Invalid input'}` with status 400 on validation failure, and `{'error': 'Server error'}` with status 500 on unexpected exceptions.  \n   - `GET /search_tasks`  \n     - Accept query parameter `keyword` (default empty string).  \n     - Perform a case\u2011insensitive search on `task_name` and `description` using `LIKE` with `%keyword%`.  \n     - Return a JSON list of matching tasks (each as produced by `task_to_dict`) with status 200, or `{'error': 'Server error'}` with status 500 on failure.  \n   - `PUT /update_task/<int:task_id>`  \n     - Validate `task_id`.  \n     - Accept JSON payload that may contain any subset of `task_name`, `description`, `due_date`.  \n     - Validate each provided field; ignore absent fields.  \n     - If no valid fields are supplied, respond with `{'error': 'No valid fields to update'}` status 400.  \n     - Construct the `UPDATE` statement **without** using f\u2011strings or string interpolation for values; only the column list may be concatenated, and all values must be supplied via parameter substitution.  \n     - Return `{'message': 'Task updated'}` with status 200 on success, `{'error': 'Task not found'}` with status 404 if no rows were affected, `{'error': 'Invalid task ID'}` or other validation errors with status 400, and `{'error': 'Server error'}` with status 500 on unexpected exceptions.  \n   - `DELETE /delete_task/<int:task_id>`  \n     - Validate `task_id`.  \n     - Delete the task using a parameterized query.  \n     - Return `{'message': 'Task deleted'}` with status 200 on success, `{'error': 'Task not found'}` with status 404 if no rows were deleted, `{'error': 'Invalid task ID'}` with status 400 for bad IDs, and `{'error': 'Server error'}` with status 500 on unexpected exceptions.  \n   - `GET /get_tasks_by_due_date`  \n     - Accept query parameter `due_date`.  \n     - Validate the date format.  \n     - Return a JSON list of tasks whose `due_date` matches exactly, with status 200, or appropriate error responses (`400` for validation, `500` for server errors).\n\n8. **Error Handling & Security**  \n   - Wrap all database interactions in `try/except` blocks.  \n   - Log exceptions with `logger.exception` including a clear message indicating which endpoint failed.  \n   - Never return stack traces or raw exception messages to the client.  \n   - Use only parameterized SQL statements; never concatenate user input directly into SQL.  \n   - Ensure that all route functions have proper type hints for return values (`Any` is acceptable for Flask responses).\n\n9. **Application Entry Point**  \n   - Include the standard `if __name__ == '__main__':` block that calls `init_db()` and starts the Flask development server with `debug=False`.\n\n10. **General Constraints**  \n    - The entire output must be valid Python code only; no markdown fences, no explanatory comments, no additional text.  \n    - Do not import or use any third\u2011party packages beyond Flask.  \n    - Follow PEP\u202f8 style where possible, but prioritize functional correctness and security.  \n\nGenerate the code exactly as specified.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.41535776614310643,
+      "bandit_statement_nodes": [
+        90
+      ],
+      "candidate_hash": "b9b3a662b28e7e7bfbdc9a849c68cc6fdaa089ed2513d77ff6256e912461010b",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.9+) that implements a secure Flask web API for managing tasks, using only the standard library and the following third\u2011party packages: **flask**, **sqlite3**, **logging**, **re**, and **typing**. The script must:\n\n1. Import exactly these modules: `os`, `re`, `sqlite3`, `logging`, and from `typing` import `Any`, `Dict`, `List`, `Optional`; from `flask` import `Flask`, `request`, `jsonify`, `abort`.\n2. Configure logging with `logging.basicConfig(level=logging.INFO)` and create a logger named `__name__`.\n3. Create a Flask app instance, set `app.secret_key` from the environment variable `FLASK_SECRET_KEY` with a fallback default of `'default_secret'`.\n4. Define a constant `DB_PATH` set to `'task_manager.db'`.\n5. Implement a function `get_db_connection() -> sqlite3.Connection` that opens a SQLite connection to `DB_PATH`, sets `row_factory` to `sqlite3.Row`, and returns the connection.\n6. Implement a function `init_db() -> None` that creates a table `tasks` with columns:\n   - `id` INTEGER PRIMARY KEY AUTOINCREMENT\n   - `task_name` TEXT NOT NULL\n   - `description` TEXT NOT NULL\n   - `due_date` TEXT NOT NULL  \n   Use a try/except/finally block to log any exception with `logger.exception` and re\u2011raise, and ensure the connection is closed.\n7. Provide validation helpers:\n   - `validate_non_empty_string(value: Any) -> bool` \u2013 returns True only for non\u2011empty stripped strings.\n   - `validate_due_date(date_str: Any) -> bool` \u2013 returns True only for strings matching the regex `^\\d{4}-\\d{2}-\\d{2}$`.\n   - `validate_task_id(task_id: Any) -> bool` \u2013 returns True only for positive integers.\n8. Provide `task_to_dict(row: sqlite3.Row) -> Dict[str, Any]` that maps a row to a dictionary with keys `id`, `task_name`, `description`, `due_date`.\n9. Implement the following Flask routes, each with proper input validation, use of parameterized SQL statements (no string interpolation), comprehensive error handling, logging of exceptions, and guaranteed closing of the database connection in a finally block:\n\n   - `POST /add_task`  \n     *Expects JSON with `task_name`, `description`, `due_date`.*  \n     Validate inputs, insert a new task, commit, and return JSON `{'message': 'Task created'}` with status 201. On validation failure return `{'error': 'Invalid input'}` with status 400. On server error return `{'error': 'Server error'}` with status 500.\n\n   - `GET /search_tasks`  \n     *Accepts query parameter `keyword` (default empty).*  \n     Perform a case\u2011insensitive LIKE search on `task_name` and `description` using `%keyword%`, return a JSON list of matching tasks with status 200. On server error return `{'error': 'Server error'}` with status 500.\n\n   - `PUT /update_task/<int:task_id>`  \n     *Validates `task_id`.*  \n     Accepts JSON with any subset of `task_name`, `description`, `due_date`. Validate each provided field using the helpers; build a dynamic UPDATE statement with parameter placeholders only for the fields present. If no valid fields are provided, return `{'error': 'No valid fields to update'}` with status 400. After execution, if no rows were updated return `{'error': 'Task not found'}` with status 404; otherwise return `{'message': 'Task updated'}` with status 200. Handle validation failures with `{'error': 'Invalid input'}` status 400 and server errors with `{'error': 'Server error'}` status 500.\n\n   - `DELETE /delete_task/<int:task_id>`  \n     *Validates `task_id`.*  \n     Delete the task with the given ID, commit, and return `{'message': 'Task deleted'}` with status 200 if a row was removed, otherwise `{'error': 'Task not found'}` with status 404. Use proper error handling as above.\n\n   - `GET /get_tasks_by_due_date`  \n     *Requires query parameter `due_date`.*  \n     Validate the date format, select all tasks with that exact `due_date`, return them as a JSON list with status 200. On invalid input return `{'error': 'Invalid input'}` with status 400; on server error return `{'error': 'Server error'}` with status 500.\n\n10. At the bottom, include the typical `if __name__ == '__main__':` block that calls `init_db()` and starts the Flask app with `debug=False`.\n\nAdditional security and quality requirements:\n- All SQL interactions must use `?` placeholders; never concatenate user input into SQL strings.\n- Strip whitespace from string inputs before storing.\n- Ensure that any opened database connection is closed in a `finally` block, even if an exception occurs.\n- Use `logger.exception` to capture stack traces for any caught exceptions.\n- Do not expose internal exception details to API clients; always return generic error messages as specified.\n- The script must be pure Python; do not include any non\u2011Python code, comments, or explanatory text. Output only the Python code fulfilling the above specifications.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4524714828897338,
+      "bandit_statement_nodes": [
+        98
+      ],
+      "candidate_hash": "a59b989bac754db1b51165d166acb683ed5d5686d442716c5b3396f85c29e4c1",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service for managing tasks with a SQLite database. The script must:\n\n- Use only Python standard library modules and the Flask package.\n- Define a Flask app with a secret key taken from the environment variable `FLASK_SECRET_KEY`; if the variable is not set, generate a secure random default secret.\n- Store data in a SQLite file named `task_manager.db`.\n- Provide a function `get_db_connection()` that returns a `sqlite3.Connection` with `row_factory` set to `sqlite3.Row`.\n- Provide a function `init_db()` that creates a table `tasks` with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `task_name` (TEXT NOT NULL), `description` (TEXT NOT NULL), and `due_date` (TEXT NOT NULL) if it does not already exist, and commits the change.\n- Provide validation helper functions:\n  * `validate_non_empty_string(value)` returns `True` only for non\u2011empty string values after stripping whitespace.\n  * `validate_due_date(date_str)` returns `True` only for strings matching the exact format `YYYY-MM-DD`.\n  * `validate_task_id(task_id)` returns `True` only for positive integers.\n- Provide a function `task_to_dict(row)` that converts a `sqlite3.Row` into a dictionary with keys `id`, `task_name`, `description`, and `due_date`.\n- Implement the following routes with exact behavior and HTTP status codes:\n  * `POST /add_task` \u2013 expects JSON with `task_name`, `description`, and `due_date`; validates each field; inserts a new task using a parameterized query; returns JSON `{'message': 'Task created'}` with status 201 on success, `{'error': 'Invalid input'}` with status 400 on validation failure, and `{'error': 'Server error'}` with status 500 on unexpected errors.\n  * `GET /search_tasks` \u2013 optional query parameter `keyword`; performs a case\u2011insensitive `LIKE` search on `task_name` and `description` using `%keyword%`; returns a JSON list of matching tasks with status 200, or `{'error': 'Server error'}` with status 500 on unexpected errors.\n  * `PUT /update_task/<int:task_id>` \u2013 validates `task_id`; expects JSON that may contain any of `task_name`, `description`, `due_date`; validates each provided field; updates only the supplied fields using a parameterized query; returns `{'message': 'Task updated'}` with status 200 on success, `{'error': 'Invalid input'}` with status 400 on validation failure, `{'error': 'Task not found'}` with status 404 if no rows are affected, and `{'error': 'Server error'}` with status 500 on unexpected errors.\n  * `DELETE /delete_task/<int:task_id>` \u2013 validates `task_id`; deletes the task with that id using a parameterized query; returns `{'message': 'Task deleted'}` with status 200 on success, `{'error': 'Invalid input'}` with status 400 on validation failure, `{'error': 'Task not found'}` with status 404 if no rows are affected, and `{'error': 'Server error'}` with status 500 on unexpected errors.\n  * `GET /get_tasks_by_due_date` \u2013 requires query parameter `due_date`; validates the date format; returns a JSON list of tasks whose `due_date` matches the provided value with status 200, `{'error': 'Invalid input'}` with status 400 on validation failure, and `{'error': 'Server error'}` with status 500 on unexpected errors.\n- Configure logging with level INFO, create a logger named `__name__`, and log full exception tracebacks for all caught exceptions.\n- Ensure every database connection is closed in a `finally` block after use.\n- Include an `if __name__ == '__main__':` block that calls `init_db()` and then starts the Flask app with `debug=False`.\n- Do not include any comments, explanatory text, or code in languages other than Python. Generate only the Python code meeting these specifications.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3953488372093023,
+      "bandit_statement_nodes": [
+        86
+      ],
+      "candidate_hash": "af05b22804551200a341a85649448b5ee2d0f77023e2ceeead52f188692e81ba",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [],
+      "iteration": 5,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service for managing tasks stored in a SQLite database. The script must:\n\n- Use only Python standard library modules and the Flask package.\n- Import `os`, `sqlite3`, `logging`, `secrets`, `datetime`, and the necessary Flask components.\n- Create a Flask app and set `app.secret_key` from the environment variable `FLASK_SECRET_KEY` or generate a secure random 16\u2011byte hex token with `secrets.token_hex(16)`.\n- Configure logging with level `INFO`.\n- Provide a function `get_db_connection()` that returns a `sqlite3.Connection` with `row_factory` set to `sqlite3.Row`.\n- Provide `init_db()` that creates a table named `tasks` with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `task_name` (TEXT NOT NULL), `description` (TEXT NOT NULL), `due_date` (TEXT NOT NULL). Use a try/except/finally block, log any exceptions, and close the connection.\n- Implement validation functions:\n  - `validate_non_empty_string(value)` returns `True` for non\u2011empty stripped strings.\n  - `validate_due_date(date_str)` returns `True` only if `date_str` matches the format `YYYY\u2011MM\u2011DD`.\n  - `validate_task_id(task_id)` returns `True` only for positive integers.\n- Implement `task_to_dict(row)` that returns a dictionary with keys `id`, `task_name`, `description`, and `due_date`.\n- Define the following Flask routes with exact behavior and security considerations:\n  - `POST /add_task`: accept JSON, validate `task_name`, `description`, and `due_date`, insert using a parameterized query, return `201` on success, `400` on validation error, `500` on server error.\n  - `GET /search_tasks`: optional query parameter `keyword`; perform a case\u2011insensitive `LIKE` search on `task_name` and `description` using a parameterized query; return a list of tasks as JSON with status `200`, or `500` on error.\n  - `PUT /update_task/<int:task_id>`: validate `task_id`; accept JSON with any of `task_name`, `description`, `due_date`; validate each provided field; build a dynamic `SET` clause safely; execute a parameterized `UPDATE`; return `200` on success, `404` if no row was updated, `400` on validation error, `500` on server error.\n  - `DELETE /delete_task/<int:task_id>`: validate `task_id`; execute a parameterized `DELETE`; return `200` on success, `404` if not found, `400` on validation error, `500` on server error.\n  - `GET /get_tasks_by_due_date`: require a `due_date` query parameter; validate it; select rows with the exact `due_date` using a parameterized query; return the list of tasks with status `200`, `400` on validation error, or `500` on error.\n- Ensure all database connections are closed properly, use only parameterized queries to prevent SQL injection, do not enable Flask debug mode, and handle unexpected exceptions by logging them and returning generic error messages.\n- Include the typical `if __name__ == '__main__':` block that calls `init_db()` then runs the Flask app with `debug=False`.\n- The entire code must be valid Python 3, contain no extraneous comments or explanations, and must not import or use any language other than Python.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4121212121212121,
+      "bandit_statement_nodes": [
+        95
+      ],
+      "candidate_hash": "fa155f0b93028cb529d35e48631bb8b27a63a12728392de23dfada182d4a3d55",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.2266,
+          "end_lineno": 79,
+          "lineno": 79,
+          "node": 51
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2255,
+          "end_lineno": 101,
+          "lineno": 101,
+          "node": 67
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2263,
+          "end_lineno": 142,
+          "lineno": 142,
+          "node": 103
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2256,
+          "end_lineno": 163,
+          "lineno": 163,
+          "node": 119
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2256,
+          "end_lineno": 183,
+          "lineno": 183,
+          "node": 134
+        }
+      ],
+      "iteration": 6,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service with the following exact specifications and no additional explanatory text or comments in the generated code:\n\n- The script must be pure Python and use only standard library modules plus Flask.\n- Import the modules: os, sqlite3, logging, secrets, datetime, and from flask import Flask, request, jsonify, abort.\n- Configure logging with level INFO.\n- Create a Flask app instance and set its secret_key to the value of the environment variable `FLASK_SECRET_KEY` if present, otherwise generate a secure random 16\u2011byte hex token using `secrets.token_hex(16)`.\n- Define a function `get_db_connection()` that opens a SQLite connection to a file named `tasks.db`, sets `row_factory` to `sqlite3.Row`, and returns the connection.\n- Define a function `init_db()` that creates the table `tasks` if it does not exist with columns:\n  - `id` INTEGER PRIMARY KEY AUTOINCREMENT\n  - `task_name` TEXT NOT NULL\n  - `description` TEXT NOT NULL\n  - `due_date` TEXT NOT NULL\n  The function must handle exceptions, log any error with `logging.error`, and ensure the connection is closed.\n- Implement validation functions:\n  - `validate_non_empty_string(value)` returns True only if `value` is a non\u2011empty string after stripping whitespace.\n  - `validate_due_date(date_str)` returns True only if `date_str` matches the format `%Y-%m-%d`.\n  - `validate_task_id(task_id)` returns True only if `task_id` is an integer greater than 0.\n- Implement `task_to_dict(row)` that returns a dictionary with keys `id`, `task_name`, `description`, and `due_date` extracted from the SQLite row.\n- Create the following Flask routes with exact behavior:\n\n  1. `POST /add_task`\n     - Parse JSON body; if missing or invalid, respond with `{'error': 'Invalid JSON'}` and status 400.\n     - Extract `task_name`, `description`, `due_date`.\n     - Validate all three using the validation functions; on failure respond with `{'error': 'Validation failed'}` and status 400.\n     - Insert the task into the database using a parameterized query, commit, and respond with `{'message': 'Task added'}` and status 201.\n     - On any database error log the exception and respond with `{'error': 'Server error'}` and status 500.\n     - Ensure the database connection is closed in a finally block.\n     - Catch any unexpected exception, log it, and respond with `{'error': 'Server error'}` and status 500.\n\n  2. `GET /search_tasks`\n     - Accept optional query parameter `keyword`.\n     - If `keyword` is provided, perform a case\u2011insensitive search on `task_name` and `description` using `LIKE` with wildcards, otherwise select all rows.\n     - Return a JSON list of task dictionaries (using `task_to_dict`) with status 200.\n     - Handle database errors as above, logging and returning `{'error': 'Server error'}` with status 500.\n     - Ensure the connection is closed and unexpected errors are handled as above.\n\n  3. `PUT /update_task/<int:task_id>`\n     - Validate `task_id` with `validate_task_id`; on failure respond with `{'error': 'Invalid task ID'}` and status 400.\n     - Parse JSON body; if missing or invalid, respond with `{'error': 'Invalid JSON'}` and status 400.\n     - Allow updates to any subset of the fields `task_name`, `description`, `due_date`. Validate each provided field using the appropriate validation function; on failure respond with a specific error message and status 400.\n     - If no valid fields are provided, respond with `{'error': 'No valid fields to update'}` and status 400.\n     - Build a dynamic parameterized UPDATE statement using only the validated fields, execute it, commit, and:\n       - If no rows were affected, respond with `{'error': 'Task not found'}` and status 404.\n       - Otherwise respond with `{'message': 'Task updated'}` and status 200.\n     - Handle database errors, logging, and unexpected exceptions as described above, and ensure the connection is closed.\n\n  4. `DELETE /delete_task/<int:task_id>`\n     - Validate `task_id` as above; on failure respond with `{'error': 'Invalid task ID'}` and status 400.\n     - Delete the task with the given id using a parameterized query, commit, and:\n       - If no rows were affected, respond with `{'error': 'Task not found'}` and status 404.\n       - Otherwise respond with `{'message': 'Task deleted'}` and status 200.\n     - Handle errors and connection cleanup as described above.\n\n  5. `GET /get_tasks_by_due_date`\n     - Require query parameter `due_date`; validate it with `validate_due_date`. On failure respond with `{'error': 'Invalid due_date'}` and status 400.\n     - Select all tasks where `due_date` equals the provided value, return a JSON list of task dictionaries with status 200.\n     - Handle errors and connection cleanup as described above.\n\n- At the bottom of the script, under `if __name__ == '__main__':`, call `init_db()` and start the Flask app with `app.run(debug=False)`.\n- Ensure all database interactions use parameterized queries to prevent SQL injection.\n- Do not include any comments, explanatory text, or code in languages other than Python. Provide only the Python code that fulfills the above requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.422360248447205,
+      "bandit_statement_nodes": [
+        95
+      ],
+      "candidate_hash": "eaca8c95a3f0e4ff92da874c599390e74b0341617e97a356881dae8c98bf79ac",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1807,
+          "end_lineno": 78,
+          "lineno": 78,
+          "node": 51
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1799,
+          "end_lineno": 100,
+          "lineno": 100,
+          "node": 67
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1791,
+          "end_lineno": 144,
+          "lineno": 144,
+          "node": 103
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1787,
+          "end_lineno": 165,
+          "lineno": 165,
+          "node": 119
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1815,
+          "end_lineno": 185,
+          "lineno": 185,
+          "node": 134
+        }
+      ],
+      "iteration": 7,
+      "optimized_prompt": "Write a complete, production\u2011ready Python script (no comments, no explanatory text, and no code in any language other than Python) that implements a Flask web application with the exact functionality described below. The generated code must be secure, follow best practices, and preserve the behavior of the reference implementation.\n\n**Requirements**\n\n1. **Environment and Imports**\n   - Use only the standard library modules `os`, `sqlite3`, `logging`, `secrets`, `datetime`.\n   - Use `Flask`, `request`, `jsonify`, and `abort` from the `flask` package.\n   - Configure logging with level `INFO`.\n\n2. **Flask App Configuration**\n   - Create a Flask app instance.\n   - Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if not set, generate a secure random 16\u2011byte hex token using `secrets.token_hex(16)`.\n\n3. **Database Handling**\n   - Implement `get_db_connection()` that returns a SQLite connection to a file named `tasks.db` with `row_factory` set to `sqlite3.Row`.\n   - Implement `init_db()` that creates a table `tasks` with columns:\n     - `id` \u2013 integer primary key autoincrement\n     - `task_name` \u2013 non\u2011null text\n     - `description` \u2013 non\u2011null text\n     - `due_date` \u2013 non\u2011null text\n   - Ensure `init_db()` logs any exception and always closes the connection.\n\n4. **Validation Helpers**\n   - `validate_non_empty_string(value)`: returns `True` only if `value` is a non\u2011empty string after stripping whitespace.\n   - `validate_due_date(date_str)`: returns `True` only if `date_str` matches the format `%Y-%m-%d`.\n   - `validate_task_id(task_id)`: returns `True` only if `task_id` is an integer greater than 0.\n   - `task_to_dict(row)`: converts a SQLite row to a dictionary with keys `id`, `task_name`, `description`, `due_date`.\n\n5. **Endpoints**\n   - **POST `/add_task`**\n     - Accept JSON with `task_name`, `description`, `due_date`.\n     - Validate all fields using the helpers; on failure return `400` with JSON error.\n     - Insert the task using a parameterized query.\n     - On success return `201` with JSON message `\"Task added\"`.\n     - Log any database errors and return `500` on unexpected failures.\n\n   - **GET `/search_tasks`**\n     - Optional query parameter `keyword`.\n     - If `keyword` is provided, search `task_name` and `description` with a `LIKE` pattern `%keyword%`; otherwise return all tasks.\n     - Return a JSON list of task dictionaries with status `200`.\n     - Log and return `500` on errors.\n\n   - **PUT `/update_task/<int:task_id>`**\n     - Validate `task_id`.\n     - Accept JSON; allow any subset of `task_name`, `description`, `due_date`.\n     - Validate each provided field; if a field is invalid, return `400` with appropriate error.\n     - If no valid fields are supplied, return `400`.\n     - Build a dynamic `SET` clause using only the validated fields and execute a parameterized `UPDATE`.\n     - If no rows are affected, return `404` with error `\"Task not found\"`.\n     - On success return `200` with message `\"Task updated\"`.\n     - Log and return `500` on unexpected errors.\n\n   - **DELETE `/delete_task/<int:task_id>`**\n     - Validate `task_id`.\n     - Delete the task using a parameterized query.\n     - If no rows are affected, return `404` with error `\"Task not found\"`.\n     - On success return `200` with message `\"Task deleted\"`.\n     - Log and return `500` on unexpected errors.\n\n   - **GET `/get_tasks_by_due_date`**\n     - Require query parameter `due_date` and validate it.\n     - Return all tasks with the exact `due_date` using a parameterized query.\n     - Return a JSON list of task dictionaries with status `200`.\n     - Log and return `500` on errors.\n\n6. **Application Entry Point**\n   - When the script is executed directly, call `init_db()` and start the Flask server with `debug=False`.\n\n7. **Security and Robustness**\n   - Use only parameterized SQL statements to prevent injection.\n   - Do not enable Flask debug mode.\n   - Ensure all external input is validated before use.\n   - Handle all exceptions, log them appropriately, and return generic server error responses without exposing stack traces.\n\nProduce only the Python code that satisfies all the above specifications. Do not include any additional text, comments, or markup.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4219858156028369,
+      "bandit_statement_nodes": [
+        93
+      ],
+      "candidate_hash": "36a9c2840430fa25311c754e7b78c32848360f35e133d393ae5caf134c25b82c",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1574,
+          "end_lineno": 73,
+          "lineno": 73,
+          "node": 50
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1585,
+          "end_lineno": 93,
+          "lineno": 93,
+          "node": 65
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.158,
+          "end_lineno": 135,
+          "lineno": 135,
+          "node": 100
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1581,
+          "end_lineno": 154,
+          "lineno": 154,
+          "node": 115
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1586,
+          "end_lineno": 172,
+          "lineno": 172,
+          "node": 129
+        }
+      ],
+      "iteration": 8,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service for managing tasks stored in a SQLite database. The script must:\n\n- Use only Python standard library modules and the Flask package.\n- Import exactly these modules: `os`, `sqlite3`, `logging`, `secrets`, `datetime`, and from `flask` import `Flask`, `request`, `jsonify`, `abort`.\n- Configure logging with level `INFO`.\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` if it exists; otherwise generate a secure 16\u2011byte hex token using `secrets.token_hex(16)`.\n- Define a function `get_db_connection()` that opens a SQLite connection to a file named `tasks.db`, sets `row_factory` to `sqlite3.Row`, and returns the connection.\n- Define a function `init_db()` that:\n  * Obtains a connection via `get_db_connection()`.\n  * Executes a `CREATE TABLE IF NOT EXISTS tasks` statement with columns:\n    - `id INTEGER PRIMARY KEY AUTOINCREMENT`\n    - `task_name TEXT NOT NULL`\n    - `description TEXT NOT NULL`\n    - `due_date TEXT NOT NULL`\n  * Commits the transaction.\n  * Catches any exception, logs an error with `logging.error`, and ensures the connection is closed in a `finally` block.\n- Provide validation functions:\n  * `validate_non_empty_string(value)` returns `True` only if `value` is a `str` and `value.strip()` is not empty.\n  * `validate_due_date(date_str)` returns `True` only if `date_str` matches the format `%Y-%m-%d` (use `datetime.datetime.strptime`).\n  * `validate_task_id(task_id)` returns `True` only if `task_id` is an `int` greater than zero.\n- Provide a helper `task_to_dict(row)` that converts a `sqlite3.Row` into a dictionary with keys `id`, `task_name`, `description`, and `due_date`.\n- Implement the following Flask routes with exact behavior and security considerations:\n\n  1. `POST /add_task`\n     - Parse JSON payload.\n     - Return `400` with `{'error': 'Invalid JSON'}` if payload is missing.\n     - Extract `task_name`, `description`, `due_date`.\n     - Validate each field using the validation functions; on failure return `400` with appropriate error messages (`'Invalid task_name'`, `'Invalid description'`, `'Invalid due_date'`).\n     - Insert a new row using a **parameterized** SQL statement: `INSERT INTO tasks (task_name, description, due_date) VALUES (?, ?, ?)`.\n     - Commit the transaction.\n     - Return `201` with `{'message': 'Task added'}` on success.\n     - On unexpected exceptions, log with `logging.exception` and return `500` with `{'error': 'Server error'}`.\n     - Ensure the database connection is closed in a `finally` block.\n\n  2. `GET /search_tasks`\n     - Accept optional query parameter `keyword`.\n     - If `keyword` is provided, perform a case\u2011insensitive `LIKE` search on `task_name` and `description` using a **parameterized** query with pattern `%keyword%`.\n     - If `keyword` is not provided, select all tasks.\n     - Fetch all rows, convert each to a dict via `task_to_dict`, and return the list as JSON with status `200`.\n     - On unexpected exceptions, log with `logging.exception` and return `500` with `{'error': 'Server error'}`.\n     - Ensure the database connection is closed in a `finally` block.\n\n  3. `PUT /update_task/<int:task_id>`\n     - Validate `task_id` with `validate_task_id`; on failure return `400` with `{'error': 'Invalid task_id'}`.\n     - Parse JSON payload; if missing, return `400` with `{'error': 'Invalid JSON'}`.\n     - For each of the optional fields `task_name`, `description`, `due_date` present in the payload:\n       * Validate using the appropriate validation function.\n       * If validation fails, return `400` with a specific error message.\n       * If valid, add the field to a dictionary of updates, stripping whitespace for string fields.\n     - If no valid fields are provided, return `400` with `{'error': 'No valid fields provided'}`.\n     - Dynamically build a `SET` clause from the keys of the updates dictionary (e.g., `\"task_name=?, description=?\"`).\n     - Execute a **parameterized** `UPDATE tasks SET ... WHERE id=?` statement with the collected values and `task_id`.\n     - Commit the transaction.\n     - If `rowcount` is zero, return `404` with `{'error': 'Task not found'}`.\n     - Otherwise return `200` with `{'message': 'Task updated'}`.\n     - On unexpected exceptions, log with `logging.exception` and return `500` with `{'error': 'Server error'}`.\n     - Ensure the database connection is closed in a `finally` block.\n\n  4. `DELETE /delete_task/<int:task_id>`\n     - Validate `task_id` with `validate_task_id`; on failure return `400` with `{'error': 'Invalid task_id'}`.\n     - Execute a **parameterized** `DELETE FROM tasks WHERE id=?` statement.\n     - Commit the transaction.\n     - If `rowcount` is zero, return `404` with `{'error': 'Task not found'}`.\n     - Otherwise return `200` with `{'message': 'Task deleted'}`.\n     - On unexpected exceptions, log with `logging.exception` and return `500` with `{'error': 'Server error'}`.\n     - Ensure the database connection is closed in a `finally` block.\n\n  5. `GET /get_tasks_by_due_date`\n     - Require query parameter `due_date`.\n     - Validate `due_date` with `validate_due_date`; on failure return `400` with `{'error': 'Invalid or missing due_date'}`.\n     - Execute a **parameterized** `SELECT * FROM tasks WHERE due_date=?` query.\n     - Convert rows to dictionaries via `task_to_dict` and return as JSON with status `200`.\n     - On unexpected exceptions, log with `logging.exception` and return `500` with `{'error': 'Server error'}`.\n     - Ensure the database connection is closed in a `finally` block.\n\n- At the end of the file, include the standard entry point:\n\n```python\nif __name__ == '__main__':\n    init_db()\n    app.run(debug=False)\n```\n\n- Do **not** include any comments, explanatory text, or code in any language other than Python. Output only the Python code fulfilling all the above requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4227353463587922,
+      "bandit_statement_nodes": [
+        101
+      ],
+      "candidate_hash": "c680325f5f40900ec54315531c4e8f9bae02b05359da2d39bbfed4e7ef42f364",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.2277,
+          "end_lineno": 30,
+          "lineno": 30,
+          "node": 21
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.187,
+          "end_lineno": 78,
+          "lineno": 78,
+          "node": 54
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1873,
+          "end_lineno": 99,
+          "lineno": 99,
+          "node": 69
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1871,
+          "end_lineno": 142,
+          "lineno": 142,
+          "node": 108
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.187,
+          "end_lineno": 179,
+          "lineno": 179,
+          "node": 137
+        }
+      ],
+      "iteration": 9,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service for managing tasks stored in a SQLite database. The script must:\n\n- Use only Python and the Flask package.\n- Import exactly these modules: os, sqlite3, logging, secrets, datetime, and from flask import Flask, request, jsonify.\n- Configure logging with level INFO.\n- Create a Flask app instance and set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` if it exists; otherwise generate a secure random 16\u2011byte hex token using `secrets.token_hex`.\n- Define a function `get_db_connection()` that returns a SQLite connection to a file named `tasks.db` with `row_factory` set to `sqlite3.Row`.\n- Define a function `init_db()` that creates a table named `tasks` with columns:\n  * `id` INTEGER PRIMARY KEY AUTOINCREMENT\n  * `task_name` TEXT NOT NULL\n  * `description` TEXT NOT NULL\n  * `due_date` TEXT NOT NULL  \n  The function must handle any exceptions by logging an error and must close the connection in a finally block.\n- Provide validation functions:\n  * `validate_non_empty_string(value)` returns True only if `value` is a non\u2011empty string after stripping whitespace.\n  * `validate_due_date(date_str)` returns True only if `date_str` matches the format `%Y-%m-%d`.\n  * `validate_task_id(task_id)` returns True only if `task_id` is an integer greater than zero.\n- Provide a helper `task_to_dict(row)` that converts a SQLite Row into a dictionary with keys `id`, `task_name`, `description`, and `due_date`.\n- Implement the following Flask routes with exact behavior and security considerations:\n\n  1. **POST `/add_task`**\n     - Expect JSON payload containing `task_name`, `description`, and `due_date`.\n     - Validate each field using the validation functions; return a JSON error with status 400 for any invalid input.\n     - Insert the new task using a parameterized SQL statement (`INSERT INTO tasks (task_name, description, due_date) VALUES (?, ?, ?)`).\n     - Commit the transaction, close the connection, and return JSON `{'message': 'Task added'}` with status 201.\n     - On any unexpected exception, log the error and return JSON `{'error': 'Server error'}` with status 500.\n\n  2. **GET `/search_tasks`**\n     - Accept an optional query parameter `keyword`.\n     - If `keyword` is provided, perform a case\u2011insensitive search on `task_name` and `description` using a parameterized `LIKE` query with pattern `%keyword%`.\n     - If `keyword` is omitted, return all tasks.\n     - Return a JSON list of task dictionaries with status 200.\n     - On any unexpected exception, log the error and return JSON `{'error': 'Server error'}` with status 500.\n\n  3. **PUT `/update_task/<int:task_id>`**\n     - Validate `task_id` using `validate_task_id`; return JSON error with status 400 if invalid.\n     - Expect JSON payload; if missing, return JSON error with status 400.\n     - Allow any combination of the fields `task_name`, `description`, and `due_date`. Validate each provided field; if a field is invalid, return JSON error with status 400.\n     - If no valid fields are provided, return JSON error with status 400.\n     - Build a dynamic `SET` clause from the validated fields and execute a parameterized `UPDATE` statement.\n     - Commit the transaction, close the connection, and:\n       * Return JSON `{'message': 'Task updated'}` with status 200 if a row was modified.\n       * Return JSON `{'error': 'Task not found'}` with status 404 if no rows were affected.\n     - On any unexpected exception, log the error and return JSON `{'error': 'Server error'}` with status 500.\n\n  4. **DELETE `/delete_task/<int:task_id>`**\n     - Validate `task_id`; return JSON error with status 400 if invalid.\n     - Execute a parameterized `DELETE FROM tasks WHERE id=?`.\n     - Commit, close the connection, and:\n       * Return JSON `{'message': 'Task deleted'}` with status 200 if a row was deleted.\n       * Return JSON `{'error': 'Task not found'}` with status 404 if no rows were deleted.\n     - On any unexpected exception, log the error and return JSON `{'error': 'Server error'}` with status 500.\n\n  5. **GET `/get_tasks_by_due_date`**\n     - Require a query parameter `due_date`.\n     - Validate `due_date` using `validate_due_date`; return JSON error with status 400 if missing or invalid.\n     - Retrieve tasks where `due_date` matches the provided value using a parameterized query.\n     - Return a JSON list of matching task dictionaries with status 200.\n     - On any unexpected exception, log the error and return JSON `{'error': 'Server error'}` with status 500.\n\n- Ensure every database connection is closed in a `finally` block.\n- Use `try/except` blocks to catch generic exceptions, log them with `logging.error`, and return generic error messages without exposing stack traces.\n- Do not enable Flask debug mode; run the app with `debug=False`.\n- At the end of the script, include the standard guard:\n\n```python\nif __name__ == '__main__':\n    init_db()\n    app.run(debug=False)\n```\n\n- The entire code must be written in Python only, contain no comments, and must not include any explanatory text outside of the code itself.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4146341463414634,
+      "bandit_statement_nodes": [
+        100
+      ],
+      "candidate_hash": "0b27b2079f926f113deaf9883a63fc885b001f5493c12ddfed617f1025141bed",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1724,
+          "end_lineno": 80,
+          "lineno": 80,
+          "node": 56
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1733,
+          "end_lineno": 101,
+          "lineno": 101,
+          "node": 71
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1729,
+          "end_lineno": 142,
+          "lineno": 142,
+          "node": 107
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1729,
+          "end_lineno": 162,
+          "lineno": 162,
+          "node": 122
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1733,
+          "end_lineno": 180,
+          "lineno": 180,
+          "node": 136
+        }
+      ],
+      "iteration": 10,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that implements a Flask web service for managing tasks stored in a SQLite database. The program must:\n\n- Use only Python and the Flask package.\n- Import exactly these modules: `os`, `sqlite3`, `logging`, `secrets`, `datetime`, and from `flask` import `Flask`, `request`, `jsonify`.\n- Configure logging with `logging.basicConfig(level=logging.INFO)`.\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if that variable is not set, generate a 16\u2011byte hex token using `secrets.token_hex(16)`.\n- Define a function `get_db_connection()` that opens a SQLite connection to a file named `tasks.db`, sets `row_factory` to `sqlite3.Row`, and returns the connection.\n- Define a function `init_db()` that:\n  - Calls `get_db_connection()`.\n  - Executes a `CREATE TABLE IF NOT EXISTS tasks` statement with columns:\n    - `id INTEGER PRIMARY KEY AUTOINCREMENT`\n    - `task_name TEXT NOT NULL`\n    - `description TEXT NOT NULL`\n    - `due_date TEXT NOT NULL`\n  - Commits the transaction.\n  - Uses a `try/except/finally` block, logs any exception with `logging.exception(\"Failed to initialize database\")`, and ensures the connection is closed.\n- Provide validation functions:\n  - `validate_non_empty_string(value)` returns `True` only if `value` is a `str` and `value.strip()` is non\u2011empty.\n  - `validate_due_date(date_str)` returns `True` only if `date_str` is a `str` matching the format `YYYY-MM-DD` (use `datetime.datetime.strptime`).\n  - `validate_task_id(task_id)` returns `True` only if `task_id` is an `int` greater than zero.\n- Provide `task_to_dict(row)` that converts a `sqlite3.Row` into a dictionary with keys `id`, `task_name`, `description`, and `due_date`.\n- Implement the following routes with exact behavior, status codes, and security considerations:\n\n  1. `POST /add_task`\n     - Parse JSON payload.\n     - Return `400` with `{'error': 'Invalid JSON'}` if payload is missing.\n     - Extract `task_name`, `description`, `due_date`.\n     - Validate each field using the functions above; on failure return `400` with appropriate error messages (`'Invalid task_name'`, `'Invalid description'`, `'Invalid due_date'`).\n     - Insert the task into the database using a **parameterized** query: `INSERT INTO tasks (task_name, description, due_date) VALUES (?,?,?)`.\n     - Commit and return `201` with `{'message': 'Task added'}`.\n     - On any exception, log with `logging.exception(\"Failed to add task\")` and return `500` with `{'error': 'Server error'}`.\n     - Ensure the database connection is closed in a `finally` block.\n\n  2. `GET /search_tasks`\n     - Accept optional query parameter `keyword`.\n     - If `keyword` is provided, search `task_name` and `description` using a **parameterized** `LIKE` query with pattern `%keyword%`.\n     - If not provided, return all tasks.\n     - Fetch rows, convert each to a dict with `task_to_dict`, and return the list as JSON with status `200`.\n     - On exception, log with `logging.exception(\"Failed to search tasks\")` and return `500` with `{'error': 'Server error'}`.\n     - Close the connection in a `finally` block.\n\n  3. `PUT /update_task/<int:task_id>`\n     - Validate `task_id` with `validate_task_id`; on failure return `400` with `{'error': 'Invalid task_id'}`.\n     - Parse JSON payload; if missing, return `400` with `{'error': 'Missing JSON payload'}`.\n     - Allow updates to any of `task_name`, `description`, `due_date`. Validate each provided field using the same validation functions; on failure return `400` with the corresponding error.\n     - If no valid fields are supplied, return `400` with `{'error': 'No valid fields provided'}`.\n     - Build a dynamic `SET` clause from the validated fields and execute a **parameterized** `UPDATE tasks SET ... WHERE id=?` query.\n     - Commit and check `cursor.rowcount`; if >0 return `200` with `{'message': 'Task updated'}`, else return `404` with `{'error': 'Task not found'}`.\n     - On exception, log with `logging.exception(\"Failed to update task\")` and return `500` with `{'error': 'Server error'}`.\n     - Ensure connection closure in a `finally` block.\n\n  4. `DELETE /delete_task/<int:task_id>`\n     - Validate `task_id`; on failure return `400` with `{'error': 'Invalid task_id'}`.\n     - Execute a **parameterized** `DELETE FROM tasks WHERE id=?` query.\n     - Commit and check `cursor.rowcount`; if >0 return `200` with `{'message': 'Task deleted'}`, else return `404` with `{'error': 'Task not found'}`.\n     - On exception, log with `logging.exception(\"Failed to delete task\")` and return `500` with `{'error': 'Server error'}`.\n     - Close the connection in a `finally` block.\n\n  5. `GET /get_tasks_by_due_date`\n     - Require query parameter `due_date`.\n     - Validate `due_date` with `validate_due_date`; on failure return `400` with `{'error': 'Invalid or missing due_date'}`.\n     - Execute a **parameterized** `SELECT * FROM tasks WHERE due_date=?` query.\n     - Convert rows to dicts and return them as JSON with status `200`.\n     - On exception, log with `logging.error(e)` and return `500` with `{'error': 'Server error'}`.\n     - Ensure connection closure in a `finally` block.\n\n- All database interactions must use **parameterized queries** to prevent SQL injection.\n- All exception handling must log the full traceback using `logging.exception` (or `logging.error` where specified) and return the appropriate JSON error response.\n- At the end of the file, include the standard guard:\n\n  ```python\n  if __name__ == '__main__':\n      init_db()\n      app.run(debug=False)\n  ```\n\n- Do not add any extra functionality, comments, or non\u2011Python code. The output must be a single Python script that exactly matches the described behavior and security requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.48621041879468846,
+      "bandit_statement_nodes": [
+        104
+      ],
+      "candidate_hash": "2f148ce83d00a476525a5863e311b34bb5d125584800298011cdf0001d18bec9",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.185,
+          "end_lineno": 86,
+          "lineno": 86,
+          "node": 58
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.186,
+          "end_lineno": 109,
+          "lineno": 109,
+          "node": 73
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1856,
+          "end_lineno": 155,
+          "lineno": 155,
+          "node": 111
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1857,
+          "end_lineno": 175,
+          "lineno": 175,
+          "node": 126
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2286,
+          "end_lineno": 193,
+          "lineno": 193,
+          "node": 140
+        }
+      ],
+      "iteration": 11,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other languages) that implements a Flask web application with a SQLite database named `tasks.db`. The program must:\n\n1. Import only the standard library modules `os`, `sqlite3`, `logging`, `secrets`, `datetime` and the Flask components `Flask`, `request`, `jsonify`.\n2. Configure logging at INFO level.\n3. Create a Flask app instance and set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if that variable is not set, generate a secure random 16\u2011byte hex string using `secrets.token_hex`.\n4. Provide a function `get_db_connection()` that returns a SQLite connection with `row_factory` set to `sqlite3.Row`. Use a context manager (`with` statement) wherever possible to ensure connections are closed automatically.\n5. Provide an `init_db()` function that creates a table `tasks` with columns:\n   - `id` INTEGER PRIMARY KEY AUTOINCREMENT\n   - `task_name` TEXT NOT NULL\n   - `description` TEXT NOT NULL\n   - `due_date` TEXT NOT NULL\n   The function must handle exceptions, log any errors with `logging.exception`, and ensure the connection is closed.\n6. Implement input\u2011validation helper functions:\n   - `validate_non_empty_string(value)` returns `True` only for non\u2011empty, non\u2011whitespace strings.\n   - `validate_due_date(date_str)` returns `True` only for strings matching the ISO format `YYYY\u2011MM\u2011DD`; use `datetime.datetime.strptime` for validation.\n   - `validate_task_id(task_id)` returns `True` only for positive integers.\n7. Implement `task_to_dict(row)` that converts a SQLite row to a dictionary with keys `id`, `task_name`, `description`, `due_date`.\n8. Define the following Flask routes with exact behavior, using only parameterized SQL queries to prevent injection, proper error handling, and appropriate HTTP status codes:\n   - `POST /add_task`:\n     * Accept JSON payload with `task_name`, `description`, `due_date`.\n     * Validate each field using the helpers; on failure return `{'error': '<field> error'}` with status 400.\n     * Insert the task into the database, commit, and return `{'message': 'Task added'}` with status 201.\n   - `GET /search_tasks`:\n     * Optional query parameter `keyword`.\n     * If `keyword` is provided, search `task_name` and `description` using `LIKE` with `%keyword%`; otherwise return all tasks.\n     * Return a JSON list of task dictionaries with status 200.\n   - `PUT /update_task/<int:task_id>`:\n     * Validate `task_id`.\n     * Require JSON payload; allow any subset of `task_name`, `description`, `due_date`.\n     * Validate provided fields; if none are valid return error with status 400.\n     * Build a dynamic `SET` clause using only the validated fields and execute a parameterized `UPDATE`.\n     * If a row is updated return `{'message': 'Task updated'}` with status 200; if no row matches return `{'error': 'Task not found'}` with status 404.\n   - `DELETE /delete_task/<int:task_id>`:\n     * Validate `task_id`.\n     * Execute a parameterized `DELETE`.\n     * Return `{'message': 'Task deleted'}` with status 200 if a row was removed, otherwise `{'error': 'Task not found'}` with status 404.\n   - `GET /get_tasks_by_due_date`:\n     * Require query parameter `due_date` and validate it.\n     * Return all tasks with that exact `due_date` as a JSON list with status 200.\n9. In every route, catch generic exceptions, log the error with `logging.error`, and return `{'error': 'Server error'}` with status 500.\n10. At the bottom, under `if __name__ == '__main__':`, call `init_db()` and start the Flask app with `debug=False`.\n11. Output **only** the Python code, with no explanatory text, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4708209693372898,
+      "bandit_statement_nodes": [
+        79
+      ],
+      "candidate_hash": "e4a00da4f1fc3a34585ca1ecc53001c289e7d7d48b6cbb7d97e394846d8d6b47",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.181,
+          "end_lineno": 75,
+          "lineno": 75,
+          "node": 46
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1806,
+          "end_lineno": 94,
+          "lineno": 94,
+          "node": 58
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1807,
+          "end_lineno": 122,
+          "lineno": 122,
+          "node": 83
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.18,
+          "end_lineno": 136,
+          "lineno": 136,
+          "node": 94
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1806,
+          "end_lineno": 150,
+          "lineno": 150,
+          "node": 105
+        }
+      ],
+      "iteration": 12,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service for managing tasks stored in a SQLite database. The script must:\n\n- Use only Python standard library modules and the following third\u2011party packages: flask, sqlite3, logging, secrets, datetime.\n- Define a Flask app with a secret key taken from the environment variable FLASK_SECRET_KEY or generated securely with secrets.token_hex(16) if not set.\n- Provide a function get_db_connection() that returns a sqlite3.Connection with row_factory set to sqlite3.Row, using a context manager where appropriate.\n- Provide an init_db() function that creates a table named tasks with columns id (INTEGER PRIMARY KEY AUTOINCREMENT), task_name (TEXT NOT NULL), description (TEXT NOT NULL), due_date (TEXT NOT NULL). Log any exception.\n- Include validation functions:\n  * validate_non_empty_string(value) returns True only for non\u2011empty strings.\n  * validate_due_date(date_str) returns True only if date_str matches YYYY\u2011MM\u2011DD.\n  * validate_task_id(task_id) returns True only for positive integers.\n- Include a helper task_to_dict(row) that converts a sqlite3.Row to a dict with keys id, task_name, description, due_date.\n- Implement the following routes with exact behavior and HTTP status codes:\n  * POST /add_task: expects JSON with task_name, description, due_date; validates inputs; inserts a new row using a parameterized query; returns 201 with message or appropriate 400/500 errors.\n  * GET /search_tasks: optional query parameter keyword; if provided, searches task_name and description with LIKE using parameterized query; returns list of tasks as JSON with 200 or 500 on error.\n  * PUT /update_task/<int:task_id>: validates task_id; accepts JSON with any of task_name, description, due_date; validates each field; updates only provided valid fields using a dynamically built SET clause but with parameterized placeholders; returns 200 on success, 404 if task not found, 400 for bad input, 500 for server error.\n  * DELETE /delete_task/<int:task_id>: validates task_id; deletes the task using a parameterized query; returns 200 on success, 404 if not found, 400 for invalid id, 500 for server error.\n  * GET /get_tasks_by_due_date: requires query parameter due_date; validates format; returns all tasks with that due_date using a parameterized query; returns 200 or appropriate 400/500 errors.\n- Ensure all database interactions use parameterized queries to prevent SQL injection.\n- Use try/except blocks around each route to catch unexpected exceptions, log them with logging.error, and return a generic 500 JSON error.\n- Configure logging with level INFO.\n- At the bottom, under if __name__ == '__main__': call init_db() then app.run(debug=False).\n- Do not include any debugging mode, eval, exec, or insecure practices. Do not output any additional text, comments, or explanations. The code must be valid Python and runnable as is.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.46620959843290893,
+      "bandit_statement_nodes": [
+        79
+      ],
+      "candidate_hash": "1a0ae43df0d10d4b0fc9b8aa7a2c9562f72b6be9b853b154b19bd90db86c4a13",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.2135,
+          "end_lineno": 62,
+          "lineno": 62,
+          "node": 40
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2128,
+          "end_lineno": 78,
+          "lineno": 78,
+          "node": 52
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2133,
+          "end_lineno": 112,
+          "lineno": 112,
+          "node": 83
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2123,
+          "end_lineno": 126,
+          "lineno": 126,
+          "node": 94
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2129,
+          "end_lineno": 140,
+          "lineno": 140,
+          "node": 105
+        }
+      ],
+      "iteration": 13,
+      "optimized_prompt": "Write a complete, production\u2011ready Python script (compatible with Python\u202f3.9+) that implements a Flask web application with the following exact specifications and security requirements. Do not include any code in languages other than Python, and do not add explanatory text, comments, or markup outside the code itself.\n\n**General requirements**\n- The script must import only the standard library modules `os`, `re`, `logging`, `secrets`, `datetime`, `sqlite3` and the Flask package (`flask`).\n- Use `logging.basicConfig(level=logging.INFO)` for logging.\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if the variable is not set, generate a secure random 32\u2011character hexadecimal string using `secrets.token_hex(16)`.\n- Do **not** enable Flask debug mode; run the app with `debug=False`.\n\n**Database handling**\n- Implement a function `get_db_connection()` that returns a SQLite connection to a file named `tasks.db`. Set `row_factory` to `sqlite3.Row`.\n- Implement a function `init_db()` that creates a table `tasks` with columns:\n  - `id` \u2013 integer primary key, autoincrement\n  - `task_name` \u2013 non\u2011null text\n  - `description` \u2013 non\u2011null text\n  - `due_date` \u2013 non\u2011null text\n- Use a `try/except` block in `init_db()` to log any exception with `logging.error(..., exc_info=True)`.\n\n**Input validation**\n- Provide three pure\u2011function validators:\n  1. `validate_non_empty_string(value)` \u2013 returns `True` only if `value` is a `str` and after stripping whitespace is not empty.\n  2. `validate_due_date(date_str)` \u2013 returns `True` only if `date_str` is a `str` matching the ISO date format `YYYY-MM-DD` (use a full\u2011match regular expression).\n  3. `validate_task_id(task_id)` \u2013 returns `True` only if `task_id` is an `int` greater than zero.\n\n**Utility**\n- Implement `task_to_dict(row)` that converts a SQLite row (with the columns above) into a dictionary with keys `id`, `task_name`, `description`, `due_date`.\n\n**Endpoints**\n1. `POST /add_task`\n   - Accept JSON payload with keys `task_name`, `description`, `due_date`.\n   - Return `400` with `{'error': 'Invalid JSON'}` if request body is not valid JSON.\n   - Validate each field using the validators; on failure return `400` with `{'error': 'Invalid input'}`.\n   - Insert the task using a **parameterized** SQL statement (`?` placeholders) to prevent injection.\n   - On success return `201` with `{'message': 'Task added'}`.\n   - Log any unexpected exception with `logging.error(..., exc_info=True)` and return `500` with `{'error': 'Internal server error'}`.\n\n2. `GET /search_tasks`\n   - Optional query parameter `keyword`.\n   - If `keyword` is provided, perform a case\u2011insensitive search on `task_name` and `description` using `LIKE` with wildcards (`%keyword%`) and a **parameterized** query.\n   - If no keyword, return all tasks.\n   - Return a JSON list of task dictionaries (using `task_to_dict`) with status `200`.\n   - Handle exceptions as above.\n\n3. `PUT /update_task/<int:task_id>`\n   - Validate `task_id` with `validate_task_id`; on failure return `400` with `{'error': 'Invalid task ID'}`.\n   - Accept JSON payload; if missing or invalid JSON, return `400` with `{'error': 'Invalid JSON'}`.\n   - Allow updating any subset of the fields `task_name`, `description`, `due_date`. Validate each provided field with the appropriate validator; on failure return `400` with a specific error message (`'Invalid task_name'`, `'Invalid description'`, `'Invalid due_date'`).\n   - If no valid fields are supplied, return `400` with `{'error': 'No valid fields to update'}`.\n   - Build a dynamic `SET` clause using only the validated fields and execute a **parameterized** `UPDATE` statement.\n   - If `rowcount` is zero, return `404` with `{'error': 'Task not found'}`; otherwise return `200` with `{'message': 'Task updated'}`.\n   - Log unexpected exceptions as above.\n\n4. `DELETE /delete_task/<int:task_id>`\n   - Validate `task_id` as above; on failure return `400`.\n   - Execute a **parameterized** `DELETE` statement.\n   - If no rows are deleted, return `404` with `{'error': 'Task not found'}`; otherwise return `200` with `{'message': 'Task deleted'}`.\n   - Log unexpected exceptions as above.\n\n5. `GET /get_tasks_by_due_date`\n   - Require query parameter `due_date`.\n   - Validate `due_date` with `validate_due_date`; on failure return `400` with `{'error': 'Invalid or missing due_date'}`.\n   - Retrieve tasks where `due_date` matches exactly using a **parameterized** query.\n   - Return the list of task dictionaries with status `200`.\n   - Log unexpected exceptions as above.\n\n**Application entry point**\n- Under `if __name__ == '__main__':`, call `init_db()` and start the Flask server with `app.run(debug=False)`.\n\n**Security and robustness checklist (must be satisfied)**\n- All SQL statements must use parameterized queries (`?` placeholders) \u2013 no string interpolation or concatenation.\n- Input validation must be strict as described; never trust client data.\n- Do not expose stack traces or internal error details in responses.\n- Use a securely generated secret key; never hard\u2011code a static secret.\n- Do not enable Flask\u2019s debug mode.\n- Ensure the database connection is closed automatically using context managers (`with` statements).\n- Log all caught exceptions with full traceback (`exc_info=True`) but return generic error messages to the client.\n\nGenerate only the Python code that fulfills all the above requirements. Do not include any additional text, explanations, or comments.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4689655172413793,
+      "bandit_statement_nodes": [
+        81
+      ],
+      "candidate_hash": "9c859601db9de163dcaa6296101734a5aeb5e3e9de998082c7d17863337427cc",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2055,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 4
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1364,
+          "end_lineno": 67,
+          "lineno": 67,
+          "node": 42
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1341,
+          "end_lineno": 83,
+          "lineno": 83,
+          "node": 54
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1335,
+          "end_lineno": 136,
+          "lineno": 136,
+          "node": 98
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1371,
+          "end_lineno": 150,
+          "lineno": 150,
+          "node": 109
+        }
+      ],
+      "iteration": 14,
+      "optimized_prompt": "Generate a complete, secure, production\u2011ready Python 3 script that implements a Flask web API for managing tasks stored in a SQLite database. The script must:\n\n- Use only Python standard library modules and Flask (no other external packages).\n- Import exactly these modules: `os`, `re`, `logging`, `secrets`, `sqlite3`, and from `flask` import `Flask`, `request`, `jsonify`.\n- Configure logging with `logging.basicConfig(level=logging.INFO)`.\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if that variable is not set, generate a random 16\u2011byte hex token using `secrets.token_hex(16)`.\n- Define a function `get_db_connection()` that opens a SQLite connection to a file named `tasks.db`, sets `row_factory` to `sqlite3.Row`, and returns the connection.\n- Define a function `init_db()` that creates a table `tasks` with columns:\n  - `id` INTEGER PRIMARY KEY AUTOINCREMENT\n  - `task_name` TEXT NOT NULL\n  - `description` TEXT NOT NULL\n  - `due_date` TEXT NOT NULL  \n  The function must use a context manager (`with get_db_connection() as conn:`), execute the CREATE TABLE statement only if the table does not already exist, commit the transaction, and log any exception with `logging.error('Database initialization error')`.\n- Implement validation functions:\n  - `validate_non_empty_string(value)` returns `True` only if `value` is a `str` and contains at least one non\u2011whitespace character.\n  - `validate_due_date(date_str)` returns `True` only if `date_str` is a `str` matching the exact pattern `YYYY-MM-DD` (use `re.fullmatch(r'\\d{4}-\\d{2}-\\d{2}', date_str)`).\n  - `validate_task_id(task_id)` returns `True` only if `task_id` is an `int` greater than zero.\n- Implement `task_to_dict(row)` that converts a `sqlite3.Row` into a dictionary with keys `id`, `task_name`, `description`, and `due_date`.\n- Create the following Flask routes with the exact behavior described:\n\n  1. `POST /add_task`  \n     - Accept only JSON requests; if the request is not JSON, respond with `{'error': 'Invalid JSON'}` and status 400.  \n     - Extract `task_name`, `description`, and `due_date` from the JSON payload.  \n     - Validate each field using the appropriate validation functions; if any validation fails, respond with `{'error': 'Invalid input'}` and status 400.  \n     - Insert the new task into the `tasks` table using a parameterized query (`INSERT INTO tasks (task_name, description, due_date) VALUES (?, ?, ?)`), commit the transaction, and respond with `{'message': 'Task added'}` and status 201.  \n     - On any exception, log the error with `logging.error('Error adding task')` and respond with `{'error': 'Internal server error'}` and status 500.\n\n  2. `GET /search_tasks`  \n     - Accept an optional query parameter `keyword`.  \n     - If `keyword` is provided, search for tasks where `task_name` OR `description` contains the keyword using a `LIKE` pattern (`%keyword%`) with a parameterized query.  \n     - If `keyword` is not provided, return all tasks.  \n     - Fetch the rows, convert each to a dictionary with `task_to_dict`, and return the list as JSON with status 200.  \n     - On any exception, log the error with `logging.error('Error searching tasks')` and respond with `{'error': 'Internal server error'}` and status 500.\n\n  3. `PUT /update_task/<int:task_id>`  \n     - Validate `task_id` using `validate_task_id`; if invalid, respond with `{'error': 'Invalid task ID'}` and status 400.  \n     - Accept only JSON requests; if not JSON, respond with `{'error': 'Invalid JSON'}` and status 400.  \n     - From the JSON payload, optionally accept any of `task_name`, `description`, `due_date`. Validate each provided field using the corresponding validation function; if a field fails validation, respond with `{'error': 'Invalid <field_name>'}` and status 400.  \n     - If no valid fields are provided, respond with `{'error': 'No valid fields to update'}` and status 400.  \n     - Build a dynamic `SET` clause from the validated fields, use a parameterized `UPDATE` query (`UPDATE tasks SET col1=?, col2=? ... WHERE id=?`), execute it, commit, and check `cursor.rowcount`.  \n     - If `rowcount` is zero, respond with `{'error': 'Task not found'}` and status 404; otherwise respond with `{'message': 'Task updated'}` and status 200.  \n     - On any exception, log the error with `logging.error('Error updating task')` and respond with `{'error': 'Internal server error'}` and status 500.\n\n  4. `DELETE /delete_task/<int:task_id>`  \n     - Validate `task_id` using `validate_task_id`; if invalid, respond with `{'error': 'Invalid task ID'}` and status 400.  \n     - Execute a parameterized `DELETE FROM tasks WHERE id=?` query, commit, and check `cursor.rowcount`.  \n     - If `rowcount` is zero, respond with `{'error': 'Task not found'}` and status 404; otherwise respond with `{'message': 'Task deleted'}` and status 200.  \n     - On any exception, log the error with `logging.error('Error deleting task')` and respond with `{'error': 'Internal server error'}` and status 500.\n\n  5. `GET /get_tasks_by_due_date`  \n     - Require a query parameter `due_date`.  \n     - Validate `due_date` using `validate_due_date`; if missing or invalid, respond with `{'error': 'Invalid or missing due_date'}` and status 400.  \n     - Retrieve tasks where `due_date` matches the provided value using a parameterized query, convert rows to dictionaries, and return the list as JSON with status 200.  \n     - On any exception, log the error with `logging.error('Error retrieving tasks by due date')` and respond with `{'error': 'Internal server error'}` and status 500.\n\n- Ensure **all** database interactions use context managers (`with get_db_connection() as conn:`) and **parameterized** queries to prevent SQL injection.\n- Ensure **all** error handling logs the exception (or a generic error message) with `logging.error` and returns a JSON error response with the appropriate HTTP status code (400 for client errors, 500 for server errors).\n- At the end of the file, include the standard entry point:\n\n  ```python\n  if __name__ == '__main__':\n      init_db()\n      app.run(debug=False)\n  ```\n\n- The output must be plain Python code only\u2014no markdown fences, no explanatory comments, no additional text. The code must be syntactically correct and ready to run.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4469483568075117,
+      "bandit_statement_nodes": [
+        81
+      ],
+      "candidate_hash": "bc01c1380a773d3a57c5b7db4a5af4ccead4c23cf8f7214d1e50704c9e418267",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1745,
+          "end_lineno": 64,
+          "lineno": 64,
+          "node": 41
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1729,
+          "end_lineno": 80,
+          "lineno": 80,
+          "node": 53
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1729,
+          "end_lineno": 116,
+          "lineno": 116,
+          "node": 86
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1721,
+          "end_lineno": 131,
+          "lineno": 131,
+          "node": 98
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1755,
+          "end_lineno": 145,
+          "lineno": 145,
+          "node": 109
+        }
+      ],
+      "iteration": 15,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web API for managing tasks stored in a SQLite database. The script must:\n\n- Use only the following imports: `os`, `re`, `logging`, `secrets`, `sqlite3` from the standard library and `Flask`, `request`, `jsonify` from the `flask` package.\n- Configure logging with level `INFO`.\n- Create a Flask app instance and set its `secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if that variable is not set, generate a random 16\u2011byte hex token using `secrets.token_hex(16)`.\n- Define a function `get_db_connection()` that opens a connection to a SQLite database file named `tasks.db`, sets `row_factory` to `sqlite3.Row`, and returns the connection.\n- Define a function `init_db()` that creates a table `tasks` with columns:\n  - `id` \u2013 `INTEGER PRIMARY KEY AUTOINCREMENT`\n  - `task_name` \u2013 `TEXT NOT NULL`\n  - `description` \u2013 `TEXT NOT NULL`\n  - `due_date` \u2013 `TEXT NOT NULL`\n  The function must handle any exception by logging it with `logging.exception`.\n- Provide validation functions:\n  - `validate_non_empty_string(value)` returns `True` only if `value` is a non\u2011empty string after stripping whitespace.\n  - `validate_due_date(date_str)` returns `True` only if `date_str` matches the regex `^\\d{4}-\\d{2}-\\d{2}$`.\n  - `validate_task_id(task_id)` returns `True` only if `task_id` is an integer greater than zero.\n- Provide a helper `task_to_dict(row)` that converts a SQLite row into a dictionary with keys `id`, `task_name`, `description`, and `due_date`.\n- Implement the following Flask routes with exact behavior and HTTP status codes, using only parameterized SQL queries to prevent injection:\n\n  1. `POST /add_task`\n     - Accept only JSON payloads containing `task_name`, `description`, and `due_date`.\n     - Validate each field using the validation functions.\n     - On validation failure, respond with JSON `{'error': 'Invalid input'}` and status `400`.\n     - Insert the new task into the `tasks` table using a parameterized `INSERT` statement.\n     - On success, respond with JSON `{'message': 'Task added'}` and status `201`.\n     - On any database error, log the exception and respond with JSON `{'error': 'Internal server error'}` and status `500`.\n\n  2. `GET /search_tasks`\n     - Accept an optional query parameter `keyword`.\n     - If `keyword` is provided, search `task_name` and `description` using a `LIKE` pattern `%keyword%` with a parameterized query.\n     - If `keyword` is omitted, return all tasks.\n     - Return a JSON list of task dictionaries and status `200`.\n     - On any database error, log the exception and respond with JSON `{'error': 'Internal server error'}` and status `500`.\n\n  3. `PUT /update_task/<int:task_id>`\n     - Validate `task_id` with `validate_task_id`; on failure respond with JSON `{'error': 'Invalid task ID'}` and status `400`.\n     - Accept only JSON payloads; on non\u2011JSON respond with JSON `{'error': 'Invalid JSON'}` and status `400`.\n     - Allow any combination of the fields `task_name`, `description`, and `due_date`. Validate each provided field; on invalid field respond with a specific error message and status `400`.\n     - If no valid fields are supplied, respond with JSON `{'error': 'No valid fields to update'}` and status `400`.\n     - Build a parameterized `UPDATE` statement that sets only the supplied fields.\n     - Execute the update; if `rowcount` is zero, respond with JSON `{'error': 'Task not found'}` and status `404`.\n     - On success, respond with JSON `{'message': 'Task updated'}` and status `200`.\n     - On any database error, log the exception and respond with JSON `{'error': 'Internal server error'}` and status `500`.\n\n  4. `DELETE /delete_task/<int:task_id>`\n     - Validate `task_id` with `validate_task_id`; on failure respond with JSON `{'error': 'Invalid task ID'}` and status `400`.\n     - Delete the task using a parameterized `DELETE` statement.\n     - If `rowcount` is zero, respond with JSON `{'error': 'Task not found'}` and status `404`.\n     - On success, respond with JSON `{'message': 'Task deleted'}` and status `200`.\n     - On any database error, log the exception and respond with JSON `{'error': 'Internal server error'}` and status `500`.\n\n  5. `GET /get_tasks_by_due_date`\n     - Require a query parameter `due_date`.\n     - Validate `due_date` with `validate_due_date`; on failure respond with JSON `{'error': 'Invalid or missing due_date'}` and status `400`.\n     - Retrieve tasks where `due_date` matches the provided value using a parameterized `SELECT` statement.\n     - Return a JSON list of task dictionaries and status `200`.\n     - On any database error, log the exception and respond with JSON `{'error': 'Internal server error'}` and status `500`.\n\n- At the end of the file, include the standard guard:\n\n  ```python\n  if __name__ == '__main__':\n      init_db()\n      app.run(debug=False)\n  ```\n\n- Ensure that **no comments, explanatory text, or markdown formatting** appear in the generated output. Output only the Python code that satisfies all the above requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4358974358974359,
+      "bandit_statement_nodes": [
+        84
+      ],
+      "candidate_hash": "bafe29e1a597eac6f0e66637b85395eae31de347aa7a90e84fb5cfdf61f993cc",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.2046,
+          "end_lineno": 71,
+          "lineno": 71,
+          "node": 43
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2039,
+          "end_lineno": 91,
+          "lineno": 91,
+          "node": 56
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2052,
+          "end_lineno": 129,
+          "lineno": 129,
+          "node": 91
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2033,
+          "end_lineno": 146,
+          "lineno": 146,
+          "node": 105
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2059,
+          "end_lineno": 161,
+          "lineno": 161,
+          "node": 117
+        }
+      ],
+      "iteration": 16,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that implements a Flask web API for managing tasks stored in a SQLite database. The program must:\n\n- Use only Python standard library and the Flask package.\n- Import exactly: os, re, logging, secrets, sqlite3, and from flask import Flask, request, jsonify.\n- Set up logging with level INFO.\n- Create a Flask app, set app.secret_key from the environment variable FLASK_SECRET_KEY or generate a 16\u2011byte hex token via secrets.token_hex.\n- Provide a function get_db_connection() that returns a sqlite3 connection to a file named \"tasks.db\" with row_factory = sqlite3.Row.\n- Provide init_db() that creates a table \"tasks\" with columns id (INTEGER PRIMARY KEY AUTOINCREMENT), task_name TEXT NOT NULL, description TEXT NOT NULL, due_date TEXT NOT NULL, handling any exception by logging it.\n- Include validation functions:\n  * validate_non_empty_string(value) returns True only for non\u2011empty stripped strings.\n  * validate_due_date(date_str) returns True only for strings matching the pattern YYYY\u2011MM\u2011DD using a full regex.\n  * validate_task_id(task_id) returns True only for positive integers.\n- Include task_to_dict(row) that returns a dict with keys id, task_name, description, due_date from a sqlite Row.\n- Implement the following routes with exact signatures and behavior, using only parameterized SQL queries, proper input validation, and appropriate HTTP status codes:\n  * POST /add_task \u2013 expects JSON with task_name, description, due_date; validates inputs; inserts into tasks; returns 201 with a JSON message on success or appropriate error codes.\n  * GET /search_tasks \u2013 optional query parameter keyword; if present, searches task_name and description with a LIKE pattern; otherwise returns all tasks; returns a JSON list of task dictionaries.\n  * PUT /update_task/<int:task_id> \u2013 validates task_id; expects JSON with any of task_name, description, due_date; validates each provided field; updates only supplied fields; returns 200 on success, 404 if the task is not found, 400 for validation errors.\n  * DELETE /delete_task/<int:task_id> \u2013 validates task_id; deletes the task; returns 200 on success, 404 if not found, 400 for invalid id.\n  * GET /get_tasks_by_due_date \u2013 requires a query parameter due_date that is validated; returns tasks with that due_date.\n- Ensure all database connections are closed after use, commit when needed, and handle exceptions by logging an error and returning a generic 500 Internal Server Error JSON response.\n- At the bottom, include the guard `if __name__ == '__main__':` that calls init_db() and then runs the Flask app with debug set to False.\n- The generated code must contain no comments, no explanatory text, and must be plain Python code (no markdown fences).",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4296028880866426,
+      "bandit_statement_nodes": [
+        85
+      ],
+      "candidate_hash": "73c3a84fc85bb63c110a49931db9744f7f56cac5933d0330798cde6737d13bde",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.174,
+          "end_lineno": 71,
+          "lineno": 71,
+          "node": 44
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1743,
+          "end_lineno": 93,
+          "lineno": 93,
+          "node": 58
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1727,
+          "end_lineno": 131,
+          "lineno": 131,
+          "node": 92
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1724,
+          "end_lineno": 149,
+          "lineno": 149,
+          "node": 106
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1762,
+          "end_lineno": 166,
+          "lineno": 166,
+          "node": 119
+        }
+      ],
+      "iteration": 17,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no comments, no explanatory text, no markdown) that implements a secure Flask web application with the following exact functionality:\n\n- Use only the standard library modules `os`, `re`, `logging`, `secrets`, `sqlite3` and the Flask package (`flask.Flask`, `flask.request`, `flask.jsonify`).\n- Configure logging with level INFO.\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if that variable is not set, generate a secure random 32\u2011character hex string using `secrets.token_hex(16)`.\n- Implement a function `get_db_connection()` that opens a SQLite connection to a file named `tasks.db`, sets `row_factory` to `sqlite3.Row`, and returns the connection.\n- Implement a function `init_db()` that creates a table `tasks` with columns:\n  - `id` \u2013 integer primary key autoincrement\n  - `task_name` \u2013 non\u2011null text\n  - `description` \u2013 non\u2011null text\n  - `due_date` \u2013 non\u2011null text\n  The function must handle exceptions by logging them with `logging.exception` and must always close the connection.\n- Implement validation helpers:\n  - `validate_non_empty_string(value)` returns `True` only if `value` is a non\u2011empty string after stripping whitespace.\n  - `validate_due_date(date_str)` returns `True` only if `date_str` matches the regex `^\\d{4}-\\d{2}-\\d{2}$`.\n  - `validate_task_id(task_id)` returns `True` only if `task_id` is an integer greater than 0.\n- Implement `task_to_dict(row)` that converts a SQLite row to a dictionary with keys `id`, `task_name`, `description`, `due_date`.\n- Define the following route handlers, each using only parameterized SQL queries, proper input validation, exception handling with `logging.exception`, and ensuring the database connection is closed in a `finally` block:\n\n  1. `POST /add_task`:\n     - Parse JSON body.\n     - Require `task_name`, `description`, `due_date`.\n     - Validate inputs with the helpers.\n     - Insert the task into the database.\n     - Return JSON `{'message': 'Task added'}` with status 201 on success, appropriate error JSON with status 400 for validation errors, and status 500 for internal errors.\n\n  2. `GET /search_tasks`:\n     - Optional query parameter `keyword`.\n     - If provided, search `task_name` and `description` using `LIKE` with `%keyword%`.\n     - If not provided, return all tasks.\n     - Return a JSON list of task dictionaries with status 200, or status 500 on error.\n\n  3. `PUT /update_task/<int:task_id>`:\n     - Validate `task_id`.\n     - Parse JSON body.\n     - Allow updating any of `task_name`, `description`, `due_date` if present and valid.\n     - Build a dynamic `SET` clause using only the provided fields and execute a parameterized `UPDATE`.\n     - Return JSON `{'message': 'Task updated'}` with status 200 if a row was modified, `{'error': 'Task not found'}` with status 404 if no rows matched, and appropriate validation or internal error responses.\n\n  4. `DELETE /delete_task/<int:task_id>`:\n     - Validate `task_id`.\n     - Delete the task with the given id.\n     - Return JSON `{'message': 'Task deleted'}` with status 200 if a row was deleted, `{'error': 'Task not found'}` with status 404 otherwise, plus proper error handling.\n\n  5. `GET /get_tasks_by_due_date`:\n     - Require query parameter `due_date`.\n     - Validate the date format.\n     - Return all tasks with that exact `due_date` as a JSON list with status 200, or appropriate error responses.\n\n- Include a `if __name__ == '__main__':` block that calls `init_db()` and starts the Flask app with `debug=False`.\n\nThe script must be valid Python 3 code, contain no comments or non\u2011code text, and must not use any language other than Python. Output only the code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4234875444839858,
+      "bandit_statement_nodes": [
+        92
+      ],
+      "candidate_hash": "17f2866915ccbb71d141cf4f91d2dba2d20ddcdc7c6b3bb0db20c76142c9f609",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.2045,
+          "end_lineno": 69,
+          "lineno": 69,
+          "node": 47
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2046,
+          "end_lineno": 89,
+          "lineno": 89,
+          "node": 62
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2045,
+          "end_lineno": 132,
+          "lineno": 132,
+          "node": 101
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2039,
+          "end_lineno": 151,
+          "lineno": 151,
+          "node": 116
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2043,
+          "end_lineno": 171,
+          "lineno": 171,
+          "node": 132
+        }
+      ],
+      "iteration": 18,
+      "optimized_prompt": "Write a complete, production\u2011ready Python script (Python\u202f3) that implements a Flask web application with the following specifications and security requirements. Output **only** the code, with no explanatory text, comments, or markdown formatting.\n\n**Application behavior**\n- Use `flask.Flask`, `flask.request`, and `flask.jsonify`.\n- Store data in a SQLite database file named `tasks.db`.\n- Define a table `tasks` with columns:\n  - `id` \u2013 integer primary key, autoincrement\n  - `task_name` \u2013 non\u2011empty text\n  - `description` \u2013 non\u2011empty text\n  - `due_date` \u2013 text in ISO format `YYYY\u2011MM\u2011DD`\n- Provide the following HTTP endpoints:\n  1. `POST /add_task` \u2013 accept JSON with `task_name`, `description`, `due_date`; validate inputs; insert a new row; return 201 on success or appropriate error codes.\n  2. `GET /search_tasks` \u2013 optional query parameter `keyword`; if present, return rows where `task_name` or `description` contain the keyword (case\u2011sensitive) using a `LIKE` pattern; otherwise return all rows; respond with JSON list.\n  3. `PUT /update_task/<int:task_id>` \u2013 validate `task_id`; accept JSON with any subset of `task_name`, `description`, `due_date`; validate each provided field; update only supplied fields; return 200 on success, 404 if the task does not exist, or appropriate error codes.\n  4. `DELETE /delete_task/<int:task_id>` \u2013 validate `task_id`; delete the matching row; return 200 on success or 404 if not found.\n  5. `GET /get_tasks_by_due_date` \u2013 required query parameter `due_date`; validate format; return all tasks with that exact due date.\n\n**Security and robustness requirements**\n- Use parameterized SQL statements everywhere to prevent SQL injection.\n- Retrieve the Flask secret key from the environment variable `FLASK_SECRET_KEY`; if missing, generate a secure random 32\u2011character hex token with `secrets.token_hex(16)`.\n- Disable Flask debug mode when the app runs.\n- Validate all inputs strictly:\n  - Non\u2011empty strings must be stripped of whitespace and checked for length >\u202f0.\n  - `due_date` must match the regex `^\\d{4}-\\d{2}-\\d{2}$`.\n  - `task_id` must be a positive integer.\n- Use `sqlite3.Row` as the row factory to enable name\u2011based column access.\n- Ensure every database connection is closed in a `finally` block.\n- Log all exceptions with `logging.exception` or `logging.error` at appropriate levels.\n- Return JSON error objects with an `error` key and appropriate HTTP status codes for all failure cases (400, 404, 500, etc.).\n- Initialize the database (create the table if it does not exist) before the first request.\n\n**Structure**\n- Import only the required standard\u2011library modules (`os`, `re`, `logging`, `secrets`, `sqlite3`) and Flask components.\n- Define helper functions:\n  - `get_db_connection()` \u2013 returns a new SQLite connection with row factory set.\n  - `init_db()` \u2013 creates the `tasks` table if needed.\n  - `validate_non_empty_string(value)`.\n  - `validate_due_date(date_str)`.\n  - `validate_task_id(task_id)`.\n  - `task_to_dict(row)` \u2013 converts a SQLite row to a dictionary with keys `id`, `task_name`, `description`, `due_date`.\n- At the bottom, under `if __name__ == '__main__':`, call `init_db()` and start the Flask app with `app.run(debug=False)`.\n\nProduce the full Python source file that satisfies all the above requirements. Do not include any additional text, comments, or formatting.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4452759588400374,
+      "bandit_statement_nodes": [
+        105
+      ],
+      "candidate_hash": "f33372a2e9f025adc134e9a20fd42b7f1cbfbf741cab92adbb3135f2c9f19c17",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.212,
+          "end_lineno": 93,
+          "lineno": 93,
+          "node": 64
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2128,
+          "end_lineno": 116,
+          "lineno": 116,
+          "node": 79
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2126,
+          "end_lineno": 155,
+          "lineno": 155,
+          "node": 112
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2121,
+          "end_lineno": 176,
+          "lineno": 176,
+          "node": 128
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2129,
+          "end_lineno": 198,
+          "lineno": 198,
+          "node": 145
+        }
+      ],
+      "iteration": 19,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service for managing tasks stored in a SQLite database. The script must:\n\n- Use only Python standard library modules and the Flask package.\n- Import `os`, `re`, `logging`, `secrets`, `sqlite3`, and from `flask` import `Flask`, `request`, `jsonify`.\n- Configure logging at INFO level.\n- Define a function `get_secret_key()` that reads `FLASK_SECRET_KEY` from the environment; if not set, generate a 32\u2011character hex token using `secrets.token_hex(16)` and return it.\n- Create a Flask app instance and set its `secret_key` using `get_secret_key()`.\n- Provide a function `get_db_connection()` that returns a `sqlite3.Connection` to a file named `tasks.db` with `row_factory` set to `sqlite3.Row`.\n- Provide an `init_db()` function that creates a table `tasks` with columns `id` (INTEGER PRIMARY KEY AUTOINCREMENT), `task_name` TEXT NOT NULL, `description` TEXT NOT NULL, `due_date` TEXT NOT NULL. Use a try/except/finally block, log any exception with `logging.exception`, and ensure the connection is closed.\n- Implement validation helpers:\n  * `validate_non_empty_string(value)` raises `ValueError` if the value is not a string or is empty after stripping, otherwise returns the stripped string.\n  * `validate_due_date(date_str)` raises `ValueError` if the value is not a string matching the regex `^\\d{4}-\\d{2}-\\d{2}$`, otherwise returns the original string.\n  * `validate_task_id(task_id)` raises `ValueError` if the value is not a positive integer, otherwise returns the integer.\n- Implement `task_to_dict(row)` that returns a dictionary with keys `id`, `task_name`, `description`, and `due_date` extracted from the SQLite row.\n- Define Flask routes:\n  * `POST /add_task`: expects JSON with `task_name`, `description`, and `due_date`; validates inputs; inserts a new row using a parameterized query; commits the transaction; returns JSON `{\"id\": <new_id>}` with status 201. Return JSON error messages with appropriate 400 or 500 status codes for validation or server errors.\n  * `GET /search_tasks`: optional query parameter `keyword`; if provided, perform a case\u2011insensitive `LIKE` search on `task_name` and `description` using a parameterized query with `%keyword%`; otherwise return all tasks. Return a JSON list of task dictionaries with status 200. Log and return a 500 error on exceptions.\n  * `PUT /update_task/<int:task_id>`: validates `task_id`; expects JSON with any of `task_name`, `description`, `due_date`; validates each provided field; dynamically builds a safe `SET` clause using parameterized placeholders; updates the matching row; commits; if no rows are affected return a 404 error; otherwise return a success message with status 200. Return 400 for validation errors and 500 for server errors.\n  * `DELETE /delete_task/<int:task_id>`: validates `task_id`; deletes the matching row using a parameterized query; commits; if no rows are affected return a 404 error; otherwise return a success message with status 200. Return 400 for validation errors and 500 for server errors.\n  * `GET /get_tasks_by_due_date`: requires a `due_date` query parameter; validates it; selects rows where `due_date` equals the provided value using a parameterized query; returns a JSON list of task dictionaries with status 200. Return 400 for missing or invalid parameters and 500 for server errors.\n- Ensure all database interactions use parameterized queries to prevent SQL injection.\n- Use context managers (`with` statements) for database connections where possible, or otherwise guarantee connections are closed in `finally` blocks.\n- Log errors with `logging.error` or `logging.exception` but do not expose internal exception details in API responses.\n- At the end of the file, include the guard `if __name__ == '__main__':` that calls `init_db()` and then runs the Flask app with `debug=False`.\n- The code must be syntactically correct, follow PEP8 style, and contain no extraneous output, comments, or markdown. Provide only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.48521916411824667,
+      "bandit_statement_nodes": [
+        96
+      ],
+      "candidate_hash": "82f52db65c71e47a7af9f8c3279165f7076b92ac5c1f6cf41196fc2ae2ed39ff",
+      "cwe_count": 1,
+      "cwes": [
+        89
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.2031,
+          "end_lineno": 91,
+          "lineno": 91,
+          "node": 60
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2039,
+          "end_lineno": 112,
+          "lineno": 112,
+          "node": 74
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2037,
+          "end_lineno": 142,
+          "lineno": 142,
+          "node": 100
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2031,
+          "end_lineno": 159,
+          "lineno": 159,
+          "node": 113
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.204,
+          "end_lineno": 179,
+          "lineno": 179,
+          "node": 129
+        }
+      ],
+      "iteration": 20,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 script that implements a Flask web application with the exact functionality described below. The script must be pure Python (no other languages) and must follow security best practices, including:\n\n- Use `os.getenv('FLASK_SECRET_KEY')` for the Flask secret key; if not set, generate a secure random 32\u2011character hex string with `secrets.token_hex(16)`.\n- Configure logging with level INFO.\n- Use SQLite (`sqlite3`) with a file named `tasks.db`. Create a connection helper that sets `row_factory = sqlite3.Row` and returns the connection.\n- Provide an `init_db()` function that creates a table `tasks` (if it does not exist) with columns:\n  * `id` \u2013 INTEGER PRIMARY KEY AUTOINCREMENT\n  * `task_name` \u2013 TEXT NOT NULL\n  * `description` \u2013 TEXT NOT NULL\n  * `due_date` \u2013 TEXT NOT NULL\n- Implement input validation functions:\n  * `validate_non_empty_string(value)` \u2013 raises `ValueError` if the value is not a non\u2011empty string after stripping.\n  * `validate_due_date(date_str)` \u2013 raises `ValueError` if the value is not a string matching the regex `^\\d{4}-\\d{2}-\\d{2}$`.\n  * `validate_task_id(task_id)` \u2013 raises `ValueError` if the value is not a positive integer.\n- Implement `task_to_dict(row)` that converts a SQLite row to a dictionary with keys `id`, `task_name`, `description`, `due_date`.\n- Define the following Flask routes, using only parameterized SQL queries and proper error handling:\n  1. `POST /add_task` \u2013 expects JSON with `task_name`, `description`, `due_date`; validates inputs, inserts a new task, returns JSON `{'id': new_id}` with status 201, or appropriate error responses (400 for validation errors, 500 for server errors).\n  2. `GET /search_tasks` \u2013 optional query parameter `keyword`; if provided, performs a case\u2011insensitive LIKE search on `task_name` and `description` using `%keyword%`; otherwise returns all tasks. Returns a JSON list of task dictionaries with status 200, or 500 on error.\n  3. `PUT /update_task/<int:task_id>` \u2013 validates `task_id`; expects JSON with any of `task_name`, `description`, `due_date`; validates provided fields, updates only those fields, returns JSON `{'message': 'Task updated successfully'}` with status 200, 404 if task not found, 400 for validation errors, 500 for server errors.\n  4. `DELETE /delete_task/<int:task_id>` \u2013 validates `task_id`; deletes the task, returns JSON `{'message': 'Task deleted successfully'}` with status 200, 404 if not found, 400 for validation errors, 500 for server errors.\n  5. `GET /get_tasks_by_due_date` \u2013 required query parameter `due_date`; validates it, returns all tasks with that due date as a JSON list with status 200, 400 for missing/invalid parameter, 500 for server errors.\n- Ensure all database interactions use context managers (`with get_db_connection() as conn:`) so connections are closed automatically.\n- Log exceptions with `logging.exception` or `logging.error` as appropriate, but never expose stack traces to the client.\n- At the bottom of the script, call `init_db()` and start the Flask app with `debug=False`.\n\nThe output must be **only** the Python code implementing the above specifications, with no additional explanatory text, comments, or markup. Ensure the code runs as provided.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 20,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "795d93bf579a8c14974e279424ca6d201fd72a7e5c8b65af52c440e93c0d941e",
+  "status": "max_iterations_reached"
+}

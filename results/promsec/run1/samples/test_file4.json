@@ -1,0 +1,109 @@
+{
+  "ast_similarity": 0.8677811550151976,
+  "candidate_hash": "0137699e0f5317cf59f237e5761229a01e1c59467d8d84b275a480a79e372fe0",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file4.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9338775510204081,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        28,
+        33,
+        82,
+        94
+      ],
+      "candidate_hash": "9e9325ceb397e06f3366d1f061174cfb6845cf7fb413435d115dc70baeb8edf2",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.2759,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1675,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2077,
+          "end_lineno": 43,
+          "lineno": 43,
+          "node": 28
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1627,
+          "end_lineno": 139,
+          "lineno": 139,
+          "node": 82
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1648,
+          "end_lineno": 157,
+          "lineno": 157,
+          "node": 94
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.8+) that implements a Flask web application with the exact functionality described below. The code must be written **only in Python** and must follow security best practices, preserving the behavior of the reference implementation.\n\n**General requirements**\n- Use only standard library modules and the following third\u2011party packages: `flask`, `pyyaml`.\n- Do not import or use any other external libraries.\n- The script must be executable as `python script_name.py` and start the Flask server with `debug=False`.\n- All routes must return JSON responses using `flask.jsonify`.\n- All input validation, error handling, and security measures must match the reference behavior.\n\n**Environment variables**\n- Load `LIBRARIAN_PASSWORD` from the environment, defaulting to `\"default_password\"` for development.\n- Load `ADMIN_SECRET_KEY` from the environment, defaulting to `\"admin_secret_key_2024\"` for development.\n\n**Helper function**\n- Implement `_is_safe_path_component(value: str) -> bool` that returns `True` only if `value` matches the regex `^[A-Za-z0-9_-]+$`.\n\n**Routes**\n\n1. `POST /library/add_book`\n   - Accept raw request body as UTF\u20118 YAML.\n   - Parse with `yaml.safe_load`; on `yaml.YAMLError` return `400` with `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}`.\n   - Extract `title`, `author`, `isbn`, `publisher` (default `\"Unknown\"`), `year_published` (default `\"Unknown\"`).\n   - If any of `title`, `author`, `isbn` are missing or empty, return `400` with `{\"status\":\"Error\",\"message\":\"Missing book information\"}`.\n   - If `year_published` is not an `int`, return `400` with `{\"status\":\"Error\",\"message\":\"Invalid year published\"}`.\n   - On success return `200` with a JSON object containing all extracted fields and `\"status\":\"Book added\"`.\n\n2. `POST /library/remove_book`\n   - Read form field `isbn`.\n   - If missing, return `400` with `{\"status\":\"Error\",\"message\":\"ISBN is required\"}`.\n   - Return `200` with `{\"status\":\"Book removed\",\"isbn\":<isbn>}`.\n\n3. `GET /inventory/check`\n   - Read query parameters `section` and `location`.\n   - Validate both with `_is_safe_path_component`; if either fails, return `400` with `{\"status\":\"Error\",\"message\":\"Invalid parameters\"}`.\n   - Execute an external script safely using `subprocess.run` **without a shell**:\n     ```python\n     subprocess.run(\n         [\"python3\", \"inventory_check.py\", section, location],\n         check=True,\n         stdout=subprocess.DEVNULL,\n         stderr=subprocess.DEVNULL,\n     )\n     ```\n   - If the subprocess raises `CalledProcessError`, return `500` with `{\"status\":\"Error\",\"message\":\"Inventory check failed\"}`.\n   - On success return `200` with `{\"status\":\"Inventory check started\"}`.\n\n4. `POST /admin/login`\n   - Read form fields `password` and `secret_key`.\n   - If both match the loaded environment variables, return `200` with `{\"status\":\"Admin access granted\",\"message\":\"Welcome, Admin!\"}`.\n   - Otherwise return `401` with `{\"status\":\"Access denied\",\"message\":\"Invalid credentials\"}`.\n\n5. `POST /admin/change_password`\n   - Use a module\u2011level global `LIBRARIAN_PASSWORD`.\n   - Read form fields `old_password` and `new_password`.\n   - If `old_password` matches the current `LIBRARIAN_PASSWORD`, update the global variable to `new_password` and return `200` with `{\"status\":\"Password changed successfully\"}`.\n   - Otherwise return `401` with `{\"status\":\"Access denied\",\"message\":\"Invalid old password\"}`.\n\n6. `GET /library/book_info`\n   - Read query parameter `isbn`.\n   - If missing, return `400` with `{\"status\":\"Error\",\"message\":\"ISBN is required\"}`.\n   - Return `200` with a placeholder book dictionary:\n     ```json\n     {\n       \"title\":\"Sample Book\",\n       \"author\":\"John Doe\",\n       \"isbn\":<isbn>,\n       \"publisher\":\"Sample Publisher\",\n       \"year_published\":2023\n     }\n     ```\n     wrapped in `{\"status\":\"Book details\",\"book_info\":...}`.\n\n7. `POST /library/update_book`\n   - Read form fields `isbn`, `new_title`, `new_author`.\n   - If `isbn` missing, return `400` with `{\"status\":\"Error\",\"message\":\"ISBN is required\"}`.\n   - Return `200` with `{\"status\":\"Book updated\",\"isbn\":<isbn>,\"new_title\":<new_title>,\"new_author\":<new_author>}`.\n\n8. `GET /library/list_books`\n   - Read optional query parameter `section`.\n   - Return `200` with a static list of two book dictionaries (as shown in the reference) and include the received `section` in the response:\n     `{\"status\":\"Books listed\",\"section\":<section>,\"books\":[...]}`\n   \n9. `GET /api/check_availability`\n   - Read query parameter `isbn`.\n   - If missing, return `400` with `{\"status\":\"Error\",\"message\":\"ISBN is required\"}`.\n   - Return `200` with `{\"status\":\"Book availability\",\"isbn\":<isbn>,\"available\":true}` (placeholder).\n\n10. `POST /api/request_book`\n    - Read form fields `isbn` and `user_id`.\n    - If either missing, return `400` with `{\"status\":\"Error\",\"message\":\"ISBN and User ID are required\"}`.\n    - Return `200` with `{\"status\":\"Book requested\",\"isbn\":<isbn>,\"user_id\":<user_id>}`.\n\n11. `POST /api/return_book`\n    - Same validation as `/api/request_book`.\n    - Return `200` with `{\"status\":\"Book returned\",\"isbn\":<isbn>,\"user_id\":<user_id>}`.\n\n12. `POST /api/submit_review`\n    - Accept raw request body as UTF\u20118 YAML.\n    - Parse with `yaml.safe_load`; on error return `400` with `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}`.\n    - Extract `isbn`, `user_id`, `review_text`, `rating`.\n    - Validate that `isbn`, `user_id`, `review_text` are non\u2011empty and that `rating` is an integer between 1 and 5 inclusive; otherwise return `400` with `{\"status\":\"Error\",\"message\":\"Invalid review information\"}`.\n    - Return `200` with `{\"status\":\"Review submitted\",\"isbn\":<isbn>,\"user_id\":<user_id>,\"review_text\":<review_text>,\"rating\":<rating>}`.\n\n13. `POST /api/submit_event`\n    - Accept raw request body as UTF\u20118 YAML.\n    - Parse with `yaml.safe_load`; on error return `400` with `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}`.\n    - Extract `event_id`, `event_name`, `event_date`.\n    - If any are missing or empty, return `400` with `{\"status\":\"Error\",\"message\":\"Invalid event information\"}`.\n    - Return `200` with `{\"status\":\"Event submitted\",\"event_id\":<event_id>,\"event_name\":<event_name>,\"event_date\":<event_date>}`.\n\n**Security and correctness**\n- Use `yaml.safe_load` everywhere YAML is parsed.\n- Never invoke a shell when running external commands; always pass a list to `subprocess.run`.\n- Validate all user\u2011supplied strings that become path components with `_is_safe_path_component`.\n- Ensure proper HTTP status codes as specified.\n- Do not include any additional routes, logging, or debug output beyond what is described.\n- The script must be ready to run without modification (aside from providing the optional environment variables).",
+      "syntax_repair_rounds": 1
+    },
+    {
+      "ast_similarity_to_original": 0.8677811550151976,
+      "bandit_statement_nodes": [
+        2,
+        36
+      ],
+      "candidate_hash": "0137699e0f5317cf59f237e5761229a01e1c59467d8d84b275a480a79e372fe0",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.3504,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2652,
+          "end_lineno": 59,
+          "lineno": 54,
+          "node": 36
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program (compatible with Python\u202f3.9+) that implements a Flask web server with the exact functionality described below. The code must be written entirely in Python, must not contain any other language, and must follow security best practices (use yaml.safe_load for parsing YAML, validate all user\u2011supplied data, avoid executing shell commands, use regular expressions to whitelist path components, store secret values in environment variables, never expose them in responses, etc.). The program should:\n\n- Import `os`, `re`, `Flask`, `request`, `jsonify`, and `yaml`.\n- Define `LIBRARIAN_PASSWORD = os.getenv('LIBRARIAN_PASSWORD', 'default_password')` and `ADMIN_SECRET_KEY = os.getenv('ADMIN_SECRET_KEY', 'admin_secret_key_2024')`.\n- Provide a helper function `_is_safe_path_component(value: str) -> bool` that returns `True` only if the value matches the regex `^[A-Za-z0-9_-]+$`.\n- Provide a placeholder function `_run_inventory_check(section: str, location: str) -> bool` that returns `True`.\n- Create a Flask app instance.\n\nImplement the following routes with exact signatures, request methods, input handling, validation, and JSON responses:\n\n1. **POST /library/add_book**  \n   - Read request body as text and parse with `yaml.safe_load`.  \n   - Extract `title`, `author`, `isbn`, optional `publisher` (default `'Unknown'`), optional `year_published` (default `'Unknown'`).  \n   - Validate required fields; if `year_published` is not `'Unknown'`, ensure it is an `int`.  \n   - On success, return JSON with `status: 'Book added'` and the supplied fields, HTTP\u202f200.  \n   - On error, return appropriate JSON error messages with HTTP\u202f400.\n\n2. **POST /library/remove_book**  \n   - Read `isbn` from form data, require it.  \n   - Return JSON `status: 'Book removed'` with `isbn`, HTTP\u202f200.  \n   - If missing, return JSON error, HTTP\u202f400.\n\n3. **GET /inventory/check**  \n   - Read `section` and `location` from query parameters.  \n   - Validate presence and that both pass `_is_safe_path_component`.  \n   - Call `_run_inventory_check(section, location)`.  \n   - On success, return JSON `status: 'Inventory check started'`, HTTP\u202f200.  \n   - Validation error \u2192 JSON error, HTTP\u202f400.  \n   - Check failure \u2192 JSON error, HTTP\u202f500.\n\n4. **POST /admin/login**  \n   - Read `password` and `secret_key` from form data.  \n   - Compare with `LIBRARIAN_PASSWORD` and `ADMIN_SECRET_KEY`.  \n   - On match, return JSON `status: 'Admin access granted'` with welcome message, HTTP\u202f200.  \n   - Otherwise, return JSON `status: 'Access denied'`, HTTP\u202f401.\n\n5. **POST /admin/change_password**  \n   - Use `global LIBRARIAN_PASSWORD`.  \n   - Read `old_password` and `new_password` from form data.  \n   - If `old_password` matches current `LIBRARIAN_PASSWORD`, update it to `new_password` and return JSON `status: 'Password changed successfully'`, HTTP\u202f200.  \n   - Otherwise, return JSON `status: 'Access denied'`, HTTP\u202f401.\n\n6. **GET /library/book_info**  \n   - Read `isbn` from query, require it.  \n   - Return JSON `status: 'Book details'` and a static book dictionary containing `title: 'Sample Book'`, `author: 'John Doe'`, the provided `isbn`, `publisher: 'Sample Publisher'`, `year_published: 2023`, HTTP\u202f200.  \n   - If missing, return JSON error, HTTP\u202f400.\n\n7. **POST /library/update_book**  \n   - Read `isbn`, `new_title`, `new_author` from form data.  \n   - Require `isbn`.  \n   - Return JSON `status: 'Book updated'` with the provided fields, HTTP\u202f200.  \n   - If missing `isbn`, return JSON error, HTTP\u202f400.\n\n8. **GET /library/list_books**  \n   - Read optional `section` from query.  \n   - Return JSON `status: 'Books listed'`, include the `section` value and a static list of two book dictionaries:\n     - `{ 'title': 'First Book', 'author': 'Alice', 'isbn': '111-1111111111', 'publisher': 'Publisher A', 'year_published': 2020 }`\n     - `{ 'title': 'Second Book', 'author': 'Bob', 'isbn': '222-2222222222', 'publisher': 'Publisher B', 'year_published': 2021 }`\n   - HTTP\u202f200.\n\n9. **GET /api/check_availability**  \n   - Read `isbn` from query, require it.  \n   - Return JSON `status: 'Book availability'`, `isbn`, `available: true`, HTTP\u202f200.  \n   - If missing, return JSON error, HTTP\u202f400.\n\n10. **POST /api/request_book**  \n    - Read `isbn` and `user_id` from form data, require both.  \n    - Return JSON `status: 'Book requested'` with `isbn` and `user_id`, HTTP\u202f200.  \n    - If missing, return JSON error, HTTP\u202f400.\n\n11. **POST /api/return_book**  \n    - Same pattern as `/api/request_book` but `status: 'Book returned'`.\n\n12. **POST /api/submit_review**  \n    - Parse request body as YAML with `yaml.safe_load`.  \n    - Extract `isbn`, `user_id`, `review_text`, `rating`.  \n    - Require all fields; `rating` must be an `int` between 1 and 5.  \n    - On success, return JSON `status: 'Review submitted'` with the data, HTTP\u202f200.  \n    - On YAML parse error or validation error, return JSON error, HTTP\u202f400.\n\n13. **POST /api/submit_event**  \n    - Parse request body as YAML with `yaml.safe_load`.  \n    - Extract `event_id`, `event_name`, `event_date`.  \n    - Require all fields.  \n    - On success, return JSON `status: 'Event submitted'` with the data, HTTP\u202f200.  \n    - On error, return JSON error, HTTP\u202f400.\n\n- Include the standard Flask entry point:\n  ```python\n  if __name__ == '__main__':\n      app.run(debug=False)\n  ```\n\n- Ensure all responses use `jsonify`, proper HTTP status codes, and no sensitive information is leaked.\n\n- Do not add any extra functionality, comments, or explanatory text. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "79f06a718f9233fb94588d4ef4a2c9ddacb133ad2041110188b3de4c6ce1c069",
+  "status": "secured"
+}

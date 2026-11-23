@@ -1,0 +1,42 @@
+{
+  "ast_similarity": 0.7039603960396039,
+  "candidate_hash": "f1788a72d6019465336505a97b760edce721d06928df48efddeb14a1b6b1ec81",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file44.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7039603960396039,
+      "bandit_statement_nodes": [
+        9,
+        15,
+        28,
+        45,
+        48,
+        62,
+        75,
+        90
+      ],
+      "candidate_hash": "f1788a72d6019465336505a97b760edce721d06928df48efddeb14a1b6b1ec81",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, production\u2011ready Flask web application in **Python only** that provides the following functionality and security measures, matching the behavior of the reference code exactly:\n\n- Import `Flask`, `request`, `redirect`, `jsonify`, `abort` from `flask`; `MySQLdb`; `os`; and `generate_password_hash`, `check_password_hash` from `werkzeug.security`.\n- Create a Flask app instance.\n- Configure database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) using `os.getenv` with sensible defaults.\n- Implement a helper function `get_db_connection()` that returns a new `MySQLdb.connect` object with `charset='utf8mb4'` and `use_unicode=True`.\n- Define the following routes with exact signatures, request handling, and responses:\n\n  1. **POST /register**\n     - Retrieve `username` and `password` from `request.form`.\n     - Return `400` if either is missing.\n     - Hash the password with `generate_password_hash`.\n     - Use a parameterized query to check if the username already exists; if so, return `409`.\n     - Insert the new user with a parameterized query, commit, and redirect to `/home`.\n     - On any `MySQLdb.Error`, return `500`.\n     - Ensure cursor and connection are closed in a `finally` block.\n\n  2. **POST /login**\n     - Retrieve `username` and `password` from `request.form`.\n     - Return `400` if missing.\n     - Query the stored password hash for the given username using a parameterized query.\n     - Verify the password with `check_password_hash`; on success, redirect to `/dashboard`, otherwise return `401`.\n     - Handle `MySQLdb.Error` with `500` and close resources in `finally`.\n\n  3. **POST /add_task**\n     - Retrieve `username`, `task_name`, and `task_description` from `request.form`.\n     - Return `400` if any are missing.\n     - Verify the user exists with a parameterized query; if not, return `404`.\n     - Insert the task using a parameterized query, commit, and return `201` with message \u201cTask successfully added\u201d.\n     - Handle `MySQLdb.Error` with `500` and close resources in `finally`.\n\n  4. **GET /view_tasks**\n     - Retrieve `username` from `request.args`.\n     - Return `400` if missing.\n     - Use a `DictCursor` to select `task_id`, `task_name`, `task_description` for the user with a parameterized query.\n     - Return the result as JSON.\n     - Handle `MySQLdb.Error` with `500` and close resources in `finally`.\n\n  5. **POST /delete_task**\n     - Retrieve `username` and `task_id` from `request.form`.\n     - Return `400` if missing.\n     - Delete the task with a parameterized query, commit, and:\n       - If `cursor.rowcount` is 0, return `404` with \u201cTask not found or not owned by user\u201d.\n       - Otherwise return `200` with \u201cTask successfully deleted\u201d.\n     - Handle `MySQLdb.Error` with `500` and close resources in `finally`.\n\n  6. **POST /update_task**\n     - Retrieve `username`, `task_id`, `new_task_name`, and `new_task_description` from `request.form`.\n     - Return `400` if any are missing.\n     - Update the task using a parameterized query, commit, and:\n       - If `cursor.rowcount` is 0, return `404` with \u201cTask not found or not owned by user\u201d.\n       - Otherwise return `200` with \u201cTask successfully updated\u201d.\n     - Handle `MySQLdb.Error` with `500` and close resources in `finally`.\n\n- Include the standard `if __name__ == '__main__':` block to run the app with `debug=False`.\n- Do **not** include any explanatory text, comments, markdown formatting, or code in any language other than Python. Output only the raw Python source code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "fd8d3f80dfea0f7dacbff0e4f889261b1c0df6f0eae8c3c6b8814d368e3b41ef",
+  "status": "secured"
+}

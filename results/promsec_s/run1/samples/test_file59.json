@@ -1,0 +1,91 @@
+{
+  "ast_similarity": 0.29065040650406504,
+  "candidate_hash": "64844b12388e31d4df40fb3f3435ae45283364abbe1e8831a3077d20897b6428",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file59.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.3036093418259023,
+      "bandit_statement_nodes": [
+        2,
+        9,
+        14
+      ],
+      "candidate_hash": "cb0ea53a509be96d26a107f836c2a7f747da6e5fe2e1fedb23896079002c64e4",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9993,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.5041,
+          "end_lineno": 21,
+          "lineno": 21,
+          "node": 9
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program that implements a Flask web service with a single endpoint `/api/temperature_for_location`. The program must:\n\n1. **Import only the required modules**: `flask.Flask`, `flask.request`, `os`, `yaml.safe_load`, and a MySQL client library (e.g., `MySQLdb` or `pymysql`). Do not import any unnecessary or unsafe modules.\n\n2. **Create a Flask app** using `app = Flask(__name__)`.\n\n3. **Define the endpoint** with `@app.route('/api/temperature_for_location')` and a function named `temperature_for_location`.\n\n4. **Handle the incoming request**:\n   - Retrieve a query\u2011string parameter named `payload`. If it is missing, return a 400 response with a clear error message.\n   - Safely parse the `payload` as YAML using `yaml.safe_load`. Do not use `yaml.load` or any unsafe loader.\n   - Validate that the parsed object is a dictionary containing the keys `latitude`, `longitude`, and `date`. If any key is missing or the values are not of the expected type (latitude and longitude as numbers, date as a string in `YYYY\u2011MM\u2011DD` format), return a 400 response with an appropriate error message.\n\n5. **Connect securely to a MySQL database**:\n   - Read database connection parameters (`host`, `user`, `password`, `database`) from environment variables (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`). Do not hard\u2011code credentials.\n   - Use a context manager or explicit `try/finally` block to ensure the connection and cursor are closed after the query, even if an error occurs.\n   - Use a parameterized query to prevent SQL injection:  \n     ```sql\n     SELECT temp FROM temperatures WHERE date=%s AND latitude=%s AND longitude=%s\n     ```\n   - Execute the query with the validated `date`, `latitude`, and `longitude` values.\n\n6. **Process the query result**:\n   - If no row is found, return a 404 response with a message indicating that the temperature data is unavailable.\n   - If a row is found, extract the temperature value and return it as a plain\u2011text response (`str(temp)`).\n\n7. **Implement comprehensive error handling**:\n   - Catch database connection errors, query execution errors, and any unexpected exceptions.\n   - Log errors to standard error using `print(..., file=sys.stderr)` without exposing sensitive details to the client.\n   - Return a 500 response for internal server errors with a generic message.\n\n8. **Run the Flask app** only when the script is executed directly (`if __name__ == '__main__':`) and listen on `0.0.0.0` port `5000`.\n\n9. **Security and best practices**:\n   - Do not use `print` for debugging output that could leak sensitive data; limit console output to non\u2011sensitive information.\n   - Ensure the YAML payload is parsed with `yaml.safe_load` to avoid arbitrary code execution.\n   - Use parameterized queries to avoid SQL injection.\n   - Do not expose database credentials in the source code.\n   - Validate and sanitize all external inputs before using them.\n\nProvide the full Python source code that meets all the above requirements, with no additional explanatory text, comments, or markup. The code must be ready to run as a standalone script.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.29065040650406504,
+      "bandit_statement_nodes": [
+        59
+      ],
+      "candidate_hash": "64844b12388e31d4df40fb3f3435ae45283364abbe1e8831a3077d20897b6428",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.8063,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9012,
+          "end_lineno": 55,
+          "lineno": 49,
+          "node": 41
+        },
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 78,
+          "lineno": 78,
+          "node": 59
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web service with the following exact specifications and security requirements:\n\n- Use only the standard library plus `flask`, `pyyaml` (specifically `yaml.safe_load`), `pymysql`, and `os`.\n- Create a Flask app instance named `app`.\n- Define three helper functions that return Flask responses with the appropriate status codes:\n  * `_bad_request(message)` \u2192 400\n  * `_not_found(message)` \u2192 404\n  * `_internal_error()` \u2192 500 (message body: \u201cInternal server error\u201d)\n- Implement a single route `GET /api/temperature_for_location` with the function name `temperature_for_location`.\n- Inside the route handler:\n  1. Retrieve the query parameter `payload`. If missing, return `_bad_request('Missing payload parameter')`.\n  2. Parse `payload` as YAML using `yaml.safe_load`. If parsing fails, return `_bad_request('Invalid YAML payload')`.\n  3. Verify that the parsed data is a dictionary; otherwise return `_bad_request('Payload must be a YAML mapping')`.\n  4. Ensure the dictionary contains the keys `latitude`, `longitude`, and `date`. If any are missing, return `_bad_request(f'Missing key: {key}')` for the first missing key.\n  5. Validate the types:\n     - `latitude` and `longitude` must be `int` or `float`; otherwise `_bad_request('Latitude must be a number')` or `_bad_request('Longitude must be a number')`.\n     - `date` must be a string; otherwise `_bad_request('Date must be a string')`.\n  6. Validate that `date` follows the exact format `YYYY-MM-DD` (three dash\u2011separated numeric parts). If not, return `_bad_request('Date must be in YYYY-MM-DD format')`.\n- Database connection:\n  * Load the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`. If any are missing, write \u201cDatabase configuration missing\u201d to file descriptor 2 and return `_internal_error()`.\n  * Connect to a MySQL database using `pymysql.connect` with:\n    - `host`, `user`, `password`, `database` from the environment variables,\n    - `cursorclass=pymysql.cursors.DictCursor`,\n    - `charset='utf8mb4'`,\n    - `autocommit=True`.\n  * If the connection fails, write the exception message to file descriptor 2 and return `_internal_error()`.\n- Query execution:\n  * Use a context manager (`with conn.cursor() as cur:`) and a parameterized SQL statement:\n    ```sql\n    SELECT temp FROM temperatures WHERE date=%s AND latitude=%s AND longitude=%s\n    ```\n  * Execute the query with the tuple `(date, latitude, longitude)`.\n  * If no row is returned, respond with `_not_found('Temperature data not found')`.\n  * If a row is returned, extract `temp` and return it as a plain string with status 200.\n  * Catch any query exception, log it to file descriptor 2, and return `_internal_error()`.\n  * Ensure the database connection is closed in a `finally` block.\n- Wrap the entire route logic in a top\u2011level `try/except` that catches any unexpected exception, logs it to file descriptor 2, and returns `_internal_error()`.\n- At the bottom of the script, include the standard `if __name__ == '__main__':` guard to run the Flask app on host `127.0.0.1` and port `5000`.\n- Security constraints:\n  * Do **not** use `eval`, `exec`, or any dynamic code execution.\n  * Use only `yaml.safe_load` for YAML parsing.\n  * Use parameterized queries to prevent SQL injection.\n  * Do not expose internal exception details to the client; only log them to stderr.\n  * Ensure all inputs are validated before use.\n- The script must contain no comments, no explanatory text, and no extraneous code beyond what is required to meet the specifications above.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "feadbd807376c4203d264d5b124013b8fa5e0e9fe545fae11c6f503748cfce63",
+  "status": "secured"
+}

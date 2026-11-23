@@ -1,0 +1,77 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "2f29d8f96cffd4f2888780a29a18add5140eedb6a9b43c293d6b3dccd234b917",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Submitting a username that already exists causes the register endpoint to return \"Username already exists\".",
+      "Missing or empty 'username'/'password' fields trigger an exception and return a generic failure message.",
+      "Database connection failures or query errors cause the handlers to return \"Registration failed\" or \"Login failed\".",
+      "Providing credentials that do not match any record results in \"Invalid credentials\" from the login endpoint.",
+      "SQL injection strings can alter query behavior because inputs are concatenated directly into SQL statements.",
+      "Running the app with debug disabled prevents detailed error pages from being shown to the client."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple web service that allows users to register new accounts and log in using a MySQL backend.",
+    "invariants": [
+      "Both routes accept only HTTP POST requests.",
+      "The 'username' and 'password' values are taken directly from request.form without transformation.",
+      "Database connections are always closed before the request handler returns.",
+      "A successful registration always results in a redirect to /home.",
+      "A successful login always results in a redirect to /dashboard.",
+      "Any uncaught exception in a handler results in a generic failure message."
+    ],
+    "io_behavior": [
+      "POST /register with form fields 'username' and 'password' returns a redirect to /home on success or a plain\u2011text message on failure.",
+      "POST /login with form fields 'username' and 'password' returns a redirect to /dashboard on successful authentication or a plain\u2011text message on failure.",
+      "Both endpoints respond with HTTP 200 for messages and HTTP 302 for redirects.",
+      "If required form fields are missing, the server raises an exception and returns a generic failure message.",
+      "All responses are plain text or HTTP redirects; no JSON is emitted.",
+      "The server runs as a Flask application listening on the default port."
+    ],
+    "public_api": {
+      "route:POST /login": "",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the 'user' table on successful registration.",
+      "Queries the 'user' table to check for existing usernames during registration.",
+      "Queries the 'user' table to verify credentials during login.",
+      "Commits the transaction after a successful registration insert.",
+      "Closes the database connection after each request.",
+      "Issues HTTP redirects that cause the client to navigate to other URLs."
+    ],
+    "source_hash": "961a470c675273769ee3c7a270f64fbb8430961a14be43b8a5919a306f1f5f86"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.1,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file43.py",
+  "gated_score": 0.2725,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.2725,
+  "original_hash": "961a470c675273769ee3c7a270f64fbb8430961a14be43b8a5919a306f1f5f86",
+  "rationale": "Program diverges from the contract on required messages, error handling, input validation, and SQL injection behavior, breaking most edge cases and I/O semantics, though core DB inserts/queries, connection closing, and redirects are largely preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.11875,
+  "stability_dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.4,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.39125,
+  "weighted_mean": 0.33,
+  "worst_dimension": 0.1
+}

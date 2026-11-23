@@ -1,0 +1,109 @@
+{
+  "ast_similarity": 0.9726027397260274,
+  "candidate_hash": "d7df166ff1b722a901c20b5777688fcd971b11981197a74ba8b3cc52b6859b1d",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file14.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9773299748110831,
+      "bandit_statement_nodes": [
+        1,
+        4,
+        8,
+        29,
+        75
+      ],
+      "candidate_hash": "5b3b8206bd3ee427278cf3ba6571f293917cd87967bfef5209e7ef86a81cef6d",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9959,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9999,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Return",
+          "change": 0.9676,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.7269,
+          "end_lineno": 46,
+          "lineno": 46,
+          "node": 29
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.8667,
+          "end_lineno": 124,
+          "lineno": 124,
+          "node": 75
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python Flask application that implements the following functionality exactly as described, using only Python code (no other languages). The application must:\n\n- Import Flask, request, jsonify, subprocess, yaml, and os.\n- Create a Flask app instance.\n- Load a secret key from an environment variable named `SECRET_KEY`, defaulting to a placeholder value `\"change_me_to_a_secure_value\"` if not set.\n- Define a `ConfigManager` class with two static methods:\n  - `load_config(yaml_data)`: safely parse YAML using `yaml.safe_load`; return `None` on parsing errors.\n  - `validate_config(config)`: return `True` only if the dictionary contains both keys `config_name` and `config_value`.\n- Define an `AdminManager` class with two static methods:\n  - `check_secret(secret)`: return `True` if the provided secret matches the loaded `SECRET_KEY`.\n  - `update_secret(new_secret)`: update the global `SECRET_KEY` variable to the new value.\n- Implement the following routes with exact behavior:\n\n  1. `POST /config/upload`:\n     - Read raw request data, decode as UTF\u20118, and load it with `ConfigManager.load_config`.\n     - Validate the config; on failure return JSON `{\"status\":\"Error\",\"message\":\"Invalid configuration data\"}` with HTTP 400.\n     - On success return JSON `{\"status\":\"Configuration uploaded\",\"config_name\":<config_name>,\"config_value\":<config_value>}`.\n\n  2. `GET /system/execute`:\n     - Accept query parameters `command` and `param`.\n     - Execute an external script `./execute_script.sh` using `subprocess.run` with a list argument (no shell) and `check=False`.\n     - Return JSON `{\"status\":\"System execution started\"}`.\n\n  3. `POST /admin/verify`:\n     - Read form field `secret`.\n     - If `AdminManager.check_secret(secret)` is true, return JSON `{\"status\":\"Verification successful\"}`; otherwise return JSON `{\"status\":\"Verification failed\"}` with HTTP 401.\n\n  4. `POST /admin/change_secret`:\n     - Read form fields `current_secret` and `new_secret`.\n     - Verify `current_secret` with `AdminManager.check_secret`; if verification fails or `new_secret` is empty, return JSON `{\"status\":\"Verification failed\"}` with HTTP 401.\n     - Call `AdminManager.update_secret(new_secret)` and return JSON `{\"status\":\"Secret changed successfully\"}`.\n\n  5. `GET /config/get`:\n     - Require query parameter `config_name`; if missing, return JSON `{\"status\":\"Error\",\"message\":\"Configuration name is required\"}` with HTTP 400.\n     - Return JSON `{\"status\":\"Configuration retrieved\",\"config\":{\"config_name\":<config_name>,\"config_value\":\"Example Value\"}}`.\n\n  6. `POST /config/delete`:\n     - Read form field `config_name`; if missing, return JSON `{\"status\":\"Error\",\"message\":\"Configuration name is required\"}` with HTTP 400.\n     - Return JSON `{\"status\":\"Configuration deleted\",\"config_name\":<config_name>}`.\n\n  7. `GET /system/status`:\n     - Require query parameter `job_id`; if missing, return JSON `{\"status\":\"Error\",\"message\":\"Job ID is required\"}` with HTTP 400.\n     - Return JSON `{\"status\":\"System status\",\"job_id\":<job_id>,\"status\":\"Running\"}`.\n\n  8. `POST /admin/settings`:\n     - Read form field `secret`; if it fails `AdminManager.check_secret`, return JSON `{\"status\":\"Access denied\"}` with HTTP 401.\n     - Read form field `setting`; if missing, return JSON `{\"status\":\"Error\",\"message\":\"Invalid setting\"}` with HTTP 400.\n     - Return JSON `{\"status\":\"Setting updated\",\"setting\":<setting>}`.\n\n  9. `GET /system/logs`:\n     - Require query parameter `job_id`; if missing, return JSON `{\"status\":\"Error\",\"message\":\"Job ID is required\"}` with HTTP 400.\n     - Return JSON `{\"status\":\"System logs\",\"job_id\":<job_id>,\"logs\":\"Sample logs for job \" + <job_id>}`.\n\n  10. `GET /data/backup`:\n      - Accept optional query parameter `format` defaulting to `\"json\"`.\n      - Run `backup_data.py` with the format argument using `subprocess.run([\"python3\",\"backup_data.py\",format_type], check=False)` (no shell).\n      - Return JSON `{\"status\":\"Data backup started\"}`.\n\n  11. `GET /user/details`:\n      - Require query parameter `user_id`; if missing, return JSON `{\"status\":\"Error\",\"message\":\"User ID is required\"}` with HTTP 400.\n      - Return JSON `{\"status\":\"User details retrieved\",\"user\":{\"user_id\":<user_id>,\"name\":\"Jane Smith\",\"email\":\"jane.smith@example.com\"}}`.\n\n- Run the Flask app with `debug=False`.\n\nAdditional security requirements:\n- Use `yaml.safe_load` exclusively for YAML parsing.\n- Never invoke subprocesses with `shell=True`; always pass argument lists.\n- Ensure all secret handling uses the environment variable and never hard\u2011codes secrets.\n- Validate all required inputs and return appropriate HTTP status codes as specified.\n- The entire code must be valid Python and must not contain any non\u2011Python language fragments.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.9726027397260274,
+      "bandit_statement_nodes": [
+        1,
+        31,
+        75
+      ],
+      "candidate_hash": "d7df166ff1b722a901c20b5777688fcd971b11981197a74ba8b3cc52b6859b1d",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9933,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.7632,
+          "end_lineno": 105,
+          "lineno": 105,
+          "node": 75
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.8+) that implements a Flask web service with the exact functionality described below. The code must be written **only in Python** and must not include any explanatory text, comments, or markup outside the code itself.\n\n**General requirements**\n- Import only the standard library modules `os` and `yaml`, and the Flask classes `Flask`, `request`, and `jsonify`.\n- Do **not** use the `subprocess` module or any other external process\u2011execution facilities.\n- Use `os.getenv('SECRET_KEY', 'change_me_to_a_secure_value')` to obtain a secret key, with a fallback placeholder.\n- All input handling must be validated to prevent injection or malformed data.\n- Use `yaml.safe_load` for parsing YAML data.\n- Return JSON responses with appropriate HTTP status codes.\n- The Flask app must be instantiated as `app = Flask(__name__)` and run with `app.run(debug=False)` inside the usual `if __name__ == '__main__':` guard.\n\n**Classes**\n1. `ConfigManager` with two static methods:\n   - `load_config(yaml_data)`: safely load YAML using `yaml.safe_load`; on `yaml.YAMLError` return `None`.\n   - `validate_config(config)`: return `True` only if `config` is a dict containing the keys `'config_name'` and `'config_value'`.\n\n2. `AdminManager` with two static methods:\n   - `check_secret(secret)`: return `True` if `secret` equals the current `SECRET_KEY`.\n   - `update_secret(new_secret)`: update the global `SECRET_KEY` variable to `new_secret`.\n\n**Endpoints**\n- `POST /config/upload`  \n  *Read raw request body, decode as UTF\u20118, load and validate YAML configuration via `ConfigManager`. Return JSON with status `\"Configuration uploaded\"` and echo `config_name` and `config_value`. On any error return status `\"Error\"` with an appropriate message and HTTP\u202f400.*\n\n- `GET /system/execute`  \n  *Accept query parameters `command` and `param`. Allow only commands in the set `{'start', 'stop', 'restart'}`. If the command is not allowed, respond with status `\"Error\"` and HTTP\u202f400. Otherwise return JSON with status `\"System execution started\"`.*\n\n- `POST /admin/verify`  \n  *Read form field `secret`. If `AdminManager.check_secret(secret)` is true, respond with JSON status `\"Verification successful\"`. Otherwise respond with status `\"Verification failed\"` and HTTP\u202f401.*\n\n- `POST /admin/change_secret`  \n  *Read form fields `current_secret` and `new_secret`. Verify `current_secret` with `AdminManager.check_secret`. If verification fails or `new_secret` is empty, respond with status `\"Verification failed\"` and HTTP\u202f401. On success, call `AdminManager.update_secret(new_secret)` and respond with JSON status `\"Secret changed successfully\"`.*\n\n- `GET /config/get`  \n  *Require query parameter `config_name`. If missing, respond with status `\"Error\"` and HTTP\u202f400. Otherwise return JSON with status `\"Configuration retrieved\"` and a `config` object containing the supplied `config_name` and a placeholder `config_value` of `\"Example Value\"`.*\n\n- `POST /config/delete`  \n  *Read form field `config_name`. If missing, respond with status `\"Error\"` and HTTP\u202f400. Otherwise return JSON with status `\"Configuration deleted\"` and echo the `config_name`.*\n\n- `GET /system/status`  \n  *Require query parameter `job_id`. If missing, respond with status `\"Error\"` and HTTP\u202f400. Otherwise return JSON with status `\"System status\"`, the provided `job_id`, and a placeholder `status` of `\"Running\"`.*\n\n- `POST /admin/settings`  \n  *Read form field `secret`. If the secret is invalid, respond with status `\"Access denied\"` and HTTP\u202f401. Then read form field `setting`. If missing, respond with status `\"Error\"` and HTTP\u202f400. On success, return JSON with status `\"Setting updated\"` and echo the `setting`.*\n\n- `GET /system/logs`  \n  *Require query parameter `job_id`. If missing, respond with status `\"Error\"` and HTTP\u202f400. Otherwise return JSON with status `\"System logs\"`, the `job_id`, and a placeholder `logs` string `\"Sample logs for job \"` concatenated with the `job_id`.*\n\n- `GET /data/backup`  \n  *Accept query parameter `format` with default `'json'`. Allow only formats in the set `{'json', 'yaml', 'csv'}`. If the format is not allowed, respond with status `\"Error\"` and HTTP\u202f400. Otherwise return JSON with status `\"Data backup started\"`.*\n\n- `GET /user/details`  \n  *Require query parameter `user_id`. If missing, respond with status `\"Error\"` and HTTP\u202f400. Otherwise return JSON with status `\"User details retrieved\"` and a `user` object containing the supplied `user_id`, a placeholder name `\"Jane Smith\"`, and a placeholder email `\"jane.smith@example.com\"`.*\n\n**Security constraints**\n- All user\u2011supplied data must be validated as described; no direct execution of shell commands or external scripts.\n- Use only the allowed command and format allowlists.\n- Do not expose the secret key in any response.\n- Ensure that the Flask app does not run in debug mode.\n\n**Output**\n- Provide only the Python source code that fulfills all the above specifications. Do not include any additional explanation, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "d2a45383f48e5bb90e5fcbef12ed0fee4780907eb0698a4a431aa0e4938d041c",
+  "status": "secured"
+}

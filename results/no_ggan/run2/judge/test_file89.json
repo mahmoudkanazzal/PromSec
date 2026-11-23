@@ -1,0 +1,79 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "35c3730f11278f237aae8ac46ec3ab181fae753257ca93c9b231adebffb81ee9",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Submitting a username that already exists triggers a redirect back to the registration page.",
+      "Omitting required form fields results in a server error (e.g., KeyError).",
+      "An empty search term returns all users because the LIKE pattern matches any username.",
+      "Extremely long input values may cause MySQL errors or request timeouts.",
+      "SQL injection payloads can alter query logic, potentially exposing or modifying unintended data.",
+      "Database connection failures produce a 500 Internal Server Error response."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a basic user\u2011management HTTP API that can register, authenticate, update, delete, and search user records in a MySQL database.",
+    "invariants": [
+      "Each request creates a new MySQL connection using the same host, user, password, and database.",
+      "All database cursors and connections are closed before the response is sent.",
+      "The service expects the required form fields; missing fields cause a request error.",
+      "Responses are plain\u2011text strings or HTTP redirects; no JSON is produced.",
+      "The same database credentials are used for every operation.",
+      "All routes are reachable via HTTP without authentication."
+    ],
+    "io_behavior": [
+      "POST /register with form fields username and password redirects to ./register if the username already exists, otherwise redirects to ./login.",
+      "POST /login with form fields username and password returns the plain\u2011text string \"Login successful\" when credentials match, otherwise returns \"Invalid credentials\".",
+      "POST /update_profile with form fields username and email returns the plain\u2011text string \"Profile updated successfully\".",
+      "POST /delete_user with form field username returns the plain\u2011text string \"User deleted successfully\".",
+      "GET /search_users?term=... returns a string representation of a list of user rows whose usernames contain the supplied term."
+    ],
+    "public_api": {
+      "route:GET /search_users": "",
+      "route:POST /delete_user": "",
+      "route:POST /login": "",
+      "route:POST /register": "",
+      "route:POST /update_profile": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the User table on successful registration.",
+      "Commits updates to the Email column on profile updates.",
+      "Deletes a row from the User table on user deletion.",
+      "Performs SELECT queries that do not modify state but may affect response content.",
+      "Issues HTTP redirects for registration flow.",
+      "Opens and closes a MySQL connection for each request."
+    ],
+    "source_hash": "fdcfb580cb033ecb594cc18d05c20a28b63c8fa9fcd5f471a8049ce5015b5728"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.4,
+    "invariants": 1.0,
+    "io_semantics": 0.3,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file89.py",
+  "gated_score": 0.4725,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.4725,
+  "original_hash": "fdcfb580cb033ecb594cc18d05c20a28b63c8fa9fcd5f471a8049ce5015b5728",
+  "rationale": "Core routes work and redirects match, but missing-field handling returns a redirect instead of a server error, search endpoint returns JSON not plain\u2011text, and parameterized queries prevent the SQL\u2011injection edge case, violating several contract specifications.",
+  "schema": 1,
+  "stability_abs_difference": 0.23975,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.5,
+    "invariants": 0.67,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.71225,
+  "weighted_mean": 0.53,
+  "worst_dimension": 0.3
+}

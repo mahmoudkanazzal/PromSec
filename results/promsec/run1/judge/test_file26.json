@@ -1,0 +1,66 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "a43fa6f06d8fbe7810076015ac5f314bdde8fb10ec50e55121428eee7cb5c417",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Malformed YAML in /add_new_book returns HTTP 400 with an error message.",
+      "Missing or empty required keys in the parsed YAML may cause an internal server error.",
+      "Omitting the password field in /admin_access results in \"Access denied\" (401).",
+      "Providing an empty or specially crafted \"section\" value to /execute_inventory may lead to unexpected command execution."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a simple web API with three endpoints: add a new book record, trigger an inventory script, and grant admin access based on a hard\u2011coded password.",
+    "invariants": [
+      "All responses are JSON objects with a \"status\" key.",
+      "The admin endpoint only succeeds when the supplied password exactly matches the hard\u2011coded string.",
+      "The add_new_book endpoint expects the YAML to contain the keys \"title\", \"author\", and \"isbn\"."
+    ],
+    "io_behavior": [
+      "POST /add_new_book with a YAML body \u2192 JSON response containing status, title, author, isbn (400 on malformed YAML).",
+      "GET /execute_inventory?section=VALUE \u2192 JSON response confirming start of inventory check.",
+      "POST /admin_access with form field password \u2192 JSON response granting or denying admin access (401 on denial)."
+    ],
+    "public_api": {
+      "route:GET /execute_inventory": "",
+      "route:POST /add_new_book": "",
+      "route:POST /admin_access": ""
+    },
+    "side_effects": [
+      "Executes the external command `python3 run_inventory.py <section>` via the operating system.",
+      "Potentially writes to server logs or stdout/stderr as part of Flask request handling."
+    ],
+    "source_hash": "19be0f99e4a6c9bdd8b028896bbe6cf6e30805b399f5ebcca3514b27b30e234d"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.5,
+    "invariants": 0.7,
+    "io_semantics": 0.9,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file26.py",
+  "gated_score": 0.4275,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.4275,
+  "original_hash": "19be0f99e4a6c9bdd8b028896bbe6cf6e30805b399f5ebcca3514b27b30e234d",
+  "rationale": "The program implements the three required endpoints and returns JSON with a status key, but deviates from the contract on several points: it uses an environment variable instead of a hard\u2011coded admin password, returns 400 for missing book fields rather than an internal error, validates the 'section' parameter preventing the described command\u2011injection edge case, and does not execute the external `python3 run_inventory.py` command, breaking the specified side\u2011effect.",
+  "schema": 1,
+  "stability_abs_difference": 0.18937,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.4,
+    "invariants": 0.8,
+    "io_semantics": 1.0,
+    "side_effects": 0.3
+  },
+  "stability_score": 0.61687,
+  "weighted_mean": 0.57,
+  "worst_dimension": 0.0
+}

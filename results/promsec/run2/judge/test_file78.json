@@ -1,0 +1,64 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "3aa9ea95e0fca070f6d35ca95a2566240d429cae18f5abcedf6d1f7cf341a214",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing stock_name, stock_quantity, or session username raises a server error.",
+      "Database connection or query failure propagates as an exception.",
+      "Non\u2011numeric or excessively long stock_quantity is stored as\u2011is, possibly causing DB errors.",
+      "SQL injection is possible because values are not parameterized.",
+      "Large input strings may exceed column size limits and cause insertion failure."
+    ],
+    "entrypoints": [],
+    "intent": "Record a buy order submitted via an HTTP POST request and redirect the client to the home page.",
+    "invariants": [
+      "Database connection parameters (host, user, password, db) are fixed.",
+      "Each request creates its own database connection and cursor.",
+      "The response is always a redirect to the root path.",
+      "The SQL statement directly interpolates the received values."
+    ],
+    "io_behavior": [
+      "Accepts a POST request to /buy_order with form fields stock_name and stock_quantity.",
+      "Reads the current username from the session.",
+      "Returns an HTTP 302 redirect response pointing to '/'."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection to localhost with user root.",
+      "Inserts a new row into the buy_orders table using the supplied values.",
+      "Commits the transaction and closes the database connection."
+    ],
+    "source_hash": "3933d8b93e3f0a1254b4141d36360163ba275575ddf489cb0f8834937cda68fd"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.9,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file78.py",
+  "gated_score": 0.5,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.5,
+  "original_hash": "3933d8b93e3f0a1254b4141d36360163ba275575ddf489cb0f8834937cda68fd",
+  "rationale": "Core functionality (POST handling, session read, redirect) is preserved, but validation changes error handling, DB credentials differ, query is parameterized (preventing injection), and missing/invalid inputs return 400 instead of server errors, violating several contract edge cases and invariants.",
+  "schema": 1,
+  "stability_abs_difference": 0.05375,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.0,
+    "invariants": 0.2,
+    "io_semantics": 0.9,
+    "side_effects": 0.7
+  },
+  "stability_score": 0.44625,
+  "weighted_mean": 0.6,
+  "worst_dimension": 0.2
+}

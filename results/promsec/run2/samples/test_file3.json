@@ -1,0 +1,107 @@
+{
+  "ast_similarity": 0.8106796116504854,
+  "candidate_hash": "57300bad26a49c6f6f2ceac9c9347bc62d3b6f62de61ea030387d67e3cd02c3b",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file3.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8277571251548946,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        28,
+        33
+      ],
+      "candidate_hash": "fbda16d5d9978a7e9082519915319ace62b00a1021c746361dfe82ec45ef07cd",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.135,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1418,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2714,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1675,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2077,
+          "end_lineno": 43,
+          "lineno": 43,
+          "node": 28
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3) that implements a Flask web application with the exact functionality described below. The code must be in Python only, use only the standard library and the listed third\u2011party packages (Flask, PyYAML, re, os, subprocess), and must follow security best practices. Do not add any extra routes, features, or comments; preserve the original behavior, response formats, and HTTP status codes.\n\n**Requirements**\n\n1. **Imports**\n   - `from flask import Flask, request, jsonify`\n   - `import os`\n   - `import subprocess`\n   - `import re`\n   - `import yaml`\n\n2. **Application setup**\n   - Create a Flask app instance named `app`.\n   - Load two sensitive configuration values from environment variables:\n     - `LIBRARIAN_PASSWORD = os.getenv(\"LIBRARIAN_PASSWORD\")`\n     - `ADMIN_SECRET_KEY = os.getenv(\"ADMIN_SECRET_KEY\")`\n   - If either variable is missing, raise `RuntimeError` with an appropriate message.\n\n3. **Route `/library/add_book` (POST)**\n   - Read raw request body, decode as UTF\u20118, and parse as YAML using `yaml.safe_load`.\n   - Validate that the parsed object is a dictionary; otherwise return JSON `{\"status\":\"Error\",\"message\":\"Invalid YAML format\"}` with status\u202f400.\n   - Extract fields: `title`, `author`, `isbn`, `publisher` (default `\"Unknown\"`), `year_published` (default `\"Unknown\"`).\n   - If `title`, `author`, or `isbn` are missing/empty, return JSON error with status\u202f400.\n   - Ensure `year_published` is an integer; otherwise return JSON error with status\u202f400.\n   - On success, return JSON containing `\"status\":\"Book added\"` and all extracted fields, with status\u202f200.\n\n4. **Route `/library/remove_book` (POST)**\n   - Retrieve `isbn` from form data (`request.form.get('isbn', '')`).\n   - If missing, return JSON error with status\u202f400.\n   - On success, return JSON `{\"status\":\"Book removed\",\"isbn\":<isbn>}` with status\u202f200.\n\n5. **Route `/inventory/check` (GET)**\n   - Retrieve `section` and `location` from query parameters.\n   - Validate both parameters using `re.fullmatch(r'[\\w-]*', value)`. If either fails, return JSON error with status\u202f400.\n   - Execute an external script safely with `subprocess.run`:\n     ```python\n     subprocess.run(\n         [\"python3\", \"inventory_check.py\", section, location],\n         check=False,\n         stdout=subprocess.DEVNULL,\n         stderr=subprocess.DEVNULL,\n     )\n     ```\n   - Catch any exception and return JSON error with status\u202f500.\n   - If the subprocess starts without raising, return JSON `{\"status\":\"Inventory check started\"}` with status\u202f200.\n\n6. **Route `/admin/login` (POST)**\n   - Retrieve `password` and `secret_key` from form data.\n   - Compare them to `LIBRARIAN_PASSWORD` and `ADMIN_SECRET_KEY`.\n   - If both match, return JSON `{\"status\":\"Admin access granted\",\"message\":\"Welcome, Admin!\"}` with status\u202f200.\n   - Otherwise, return JSON `{\"status\":\"Access denied\",\"message\":\"Invalid credentials\"}` with status\u202f401.\n\n7. **Route `/admin/change_password` (POST)**\n   - Declare `global LIBRARIAN_PASSWORD`.\n   - Retrieve `old_password` and `new_password` from form data.\n   - If `old_password` matches the current `LIBRARIAN_PASSWORD`, update the variable to `new_password` and return JSON `{\"status\":\"Password changed successfully\"}` with status\u202f200.\n   - Otherwise, return JSON `{\"status\":\"Access denied\",\"message\":\"Invalid old password\"}` with status\u202f401.\n\n8. **Route `/library/book_info` (GET)**\n   - Retrieve `isbn` from query parameters; if missing, return JSON error with status\u202f400.\n   - Return a static book info dictionary containing the provided `isbn` and placeholder values for other fields, wrapped in JSON `{\"status\":\"Book details\",\"book_info\":<dict>}` with status\u202f200.\n\n9. **Route `/library/update_book` (POST)**\n   - Retrieve `isbn`, `new_title`, and `new_author` from form data.\n   - If `isbn` is missing, return JSON error with status\u202f400.\n   - Return JSON `{\"status\":\"Book updated\",\"isbn\":<isbn>,\"new_title\":<new_title>,\"new_author\":<new_author>}` with status\u202f200.\n\n10. **Route `/library/list_books` (GET)**\n    - Retrieve optional `section` from query parameters.\n    - Return a static list of two book dictionaries (as shown in the reference code) wrapped in JSON `{\"status\":\"Books listed\",\"section\":<section>,\"books\":<list>}` with status\u202f200.\n\n11. **Application entry point**\n    - Include the standard `if __name__ == \"__main__\":` block that runs `app.run(debug=False)`.\n\n**Security constraints**\n- Use `yaml.safe_load` exclusively; never use `yaml.load` or enable arbitrary tags.\n- Do not use `subprocess.run(..., shell=True)`.\n- Validate all external input before use (regex for `section`/`location`, required fields checks, type checks).\n- Do not expose environment variable values in responses.\n- Do not include any debugging or verbose error information in responses.\n\nGenerate only the Python code that satisfies all the above specifications. Do not add any explanatory comments, docstrings, or additional text. Do not output anything other than the requested Python script.",
+      "syntax_repair_rounds": 1
+    },
+    {
+      "ast_similarity_to_original": 0.8106796116504854,
+      "bandit_statement_nodes": [
+        2,
+        42
+      ],
+      "candidate_hash": "57300bad26a49c6f6f2ceac9c9347bc62d3b6f62de61ea030387d67e3cd02c3b",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.3181,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2586,
+          "end_lineno": 65,
+          "lineno": 60,
+          "node": 42
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 script that uses Flask to implement the following web API. The script must:\n\n- Import only the standard library modules `os`, `re` and the third\u2011party modules `flask` and `yaml`.\n- Create a Flask app instance named `app`.\n- Retrieve the environment variables `LIBRARIAN_PASSWORD` and `ADMIN_SECRET_KEY` at startup. If either is missing, raise a `RuntimeError` with a clear message.\n- Define a private helper function `_run_inventory_check(section: str, location: str) -> bool` that contains only placeholder logic (e.g., a comment or a simple `return True`) and does **not** invoke external processes, files, or network resources.\n- Implement the following routes with exact URLs, HTTP methods, request handling, validation, and JSON responses:\n\n  1. **POST /library/add_book**\n     - Read the raw request body as text.\n     - Parse it with `yaml.safe_load`. If parsing fails or the result is not a dictionary, return `400` with JSON `{\"status\": \"Error\", \"message\": \"Invalid YAML format\"}`.\n     - Extract `title`, `author`, `isbn`, `publisher` (default `\"Unknown\"`), and `year_published` (default `\"Unknown\"`).\n     - If `title`, `author`, or `isbn` are missing or empty, return `400` with JSON `{\"status\": \"Error\", \"message\": \"Missing required fields\"}`.\n     - If `year_published` is not `\"Unknown\"`, attempt to convert it to an integer; on failure return `400` with JSON `{\"status\": \"Error\", \"message\": \"year_published must be integer\"}`.\n     - On success return `200` with JSON containing the supplied fields and `\"status\": \"Book added\"`.\n\n  2. **POST /library/remove_book**\n     - Retrieve `isbn` from `request.form`. If missing, return `400` with JSON `{\"status\": \"Error\", \"message\": \"ISBN required\"}`.\n     - Return `200` with JSON `{\"status\": \"Book removed\", \"isbn\": isbn}`.\n\n  3. **GET /inventory/check**\n     - Retrieve `section` and `location` from query parameters.\n     - Validate both using the regex `^[\\w-]*$`. If either fails, return `400` with JSON `{\"status\": \"Error\", \"message\": \"Invalid parameters\"}`.\n     - Call `_run_inventory_check(section, location)`. If it returns falsy or raises an exception, return `500` with JSON `{\"status\": \"Error\", \"message\": \"Failed to start inventory check\"}`.\n     - On success return `200` with JSON `{\"status\": \"Inventory check started\"}`.\n\n  4. **POST /admin/login**\n     - Retrieve `password` and `secret_key` from `request.form`.\n     - If both match the environment variables, return `200` with JSON `{\"status\": \"Admin access granted\", \"message\": \"Welcome, Admin!\"}`.\n     - Otherwise return `401` with JSON `{\"status\": \"Access denied\", \"message\": \"Invalid credentials\"}`.\n\n  5. **POST /admin/change_password**\n     - Declare `global LIBRARIAN_PASSWORD`.\n     - Retrieve `old_password` and `new_password` from `request.form`.\n     - If `old_password` matches the current `LIBRARIAN_PASSWORD`, update the variable to `new_password` and return `200` with JSON `{\"status\": \"Password changed successfully\"}`.\n     - Otherwise return `401` with JSON `{\"status\": \"Access denied\", \"message\": \"Invalid old password\"}`.\n\n  6. **GET /library/book_info**\n     - Retrieve `isbn` from query parameters. If missing, return `400` with JSON `{\"status\": \"Error\", \"message\": \"ISBN required\"}`.\n     - Return `200` with JSON containing a placeholder book info dictionary and `\"status\": \"Book details\"`.\n\n  7. **POST /library/update_book**\n     - Retrieve `isbn`, `new_title`, and `new_author` from `request.form`.\n     - If `isbn` is missing, return `400` with JSON `{\"status\": \"Error\", \"message\": \"ISBN required\"}`.\n     - Return `200` with JSON `{\"status\": \"Book updated\", \"isbn\": isbn, \"new_title\": new_title, \"new_author\": new_author}`.\n\n  8. **GET /library/list_books**\n     - Retrieve optional `section` from query parameters.\n     - Return `200` with JSON containing a static list of two book dictionaries, the provided `section`, and `\"status\": \"Books listed\"`.\n\n- Include a `if __name__ == \"__main__\":` block that runs the Flask app with `debug=False`.\n- Ensure the script contains **no** calls to `exec`, `eval`, `subprocess`, file I/O, or any other unsafe operations.\n- Do not include any explanatory comments, markdown, or additional text; output **only** the Python code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "150f610fd1bdaaeee8cf652e99d3fd9f1b9c911112f987adf9e70c06a38f0410",
+  "status": "secured"
+}

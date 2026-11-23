@@ -1,0 +1,86 @@
+{
+  "ast_similarity": 0.47706422018348627,
+  "candidate_hash": "8992666a6a4477907698a5d2b687c3b4aaf61fcb5312ce46d68da0cad6db4aad",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 4,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    89,
+    259,
+    327
+  ],
+  "error": "",
+  "file": "test_file53.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.4779874213836478,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        12,
+        18
+      ],
+      "candidate_hash": "e07c2a0fec2d273adbb735bcbafd3b958a3d759fcd03dc5e3b958d1a638beefc",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9993,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.7083,
+          "end_lineno": 24,
+          "lineno": 24,
+          "node": 10
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9538,
+          "end_lineno": 26,
+          "lineno": 26,
+          "node": 12
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a single POST endpoint at `/login`. The script must:\n\n1. Import only Python standard library modules and the following third\u2011party packages: `flask`, `pymysql` (or `mysqlclient`), and a modern password\u2011hashing library such as `bcrypt` or `argon2-cffi`.\n2. Create a Flask app instance.\n3. Define the `/login` route to accept only POST requests.\n4. Retrieve `username` and `password` from `request.form`. Validate that both fields are present; if not, return an appropriate error response with HTTP status 400.\n5. Load database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, providing sensible defaults only for non\u2011sensitive values (e.g., host defaults to `localhost`). If any required variable is missing, raise a clear exception.\n6. Establish a MySQL connection using a context manager (or explicit `try/finally`) to ensure the connection is closed properly. Use parameterized queries (prepared statements) to prevent SQL injection.\n7. Execute a query that selects the stored password hash for the given username: `SELECT password_hash FROM user WHERE username = %s`. Fetch at most one row.\n8. If no row is returned, respond with the exact string `\"username not found\"`.\n9. If a row is returned, compare the stored password hash with the supplied password using the chosen hashing library\u2019s safe verification function (e.g., `bcrypt.checkpw` or `argon2.verify`). Use a constant\u2011time comparison to avoid timing attacks.\n10. If the password matches, return the exact string `\"success\"`. If it does not match, return the exact string `\"wrong pw\"`.\n11. Ensure that any database or unexpected errors are caught and result in a generic error response with HTTP status 500, without leaking stack traces or sensitive information.\n12. The script must be runnable as a standalone program (`if __name__ == \"__main__\": app.run(...)`) and must not contain any code in languages other than Python.\n13. Do not include any explanatory comments, markdown, or additional text\u2014output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.47706422018348627,
+      "bandit_statement_nodes": [
+        42
+      ],
+      "candidate_hash": "8992666a6a4477907698a5d2b687c3b4aaf61fcb5312ce46d68da0cad6db4aad",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 50,
+          "lineno": 50,
+          "node": 42
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (no other languages) that implements a Flask web service with a single POST endpoint at `/login`. The program must:\n\n- Import only the standard library modules `os` and any required third\u2011party packages: `flask`, `pymysql`, and `bcrypt`.\n- Define a Flask app instance.\n- Provide a function `get_db_config()` that reads the environment variables `DB_HOST` (default\u202f`localhost`), `DB_USER`, `DB_PASS`, and `DB_NAME`. If any of `DB_USER`, `DB_PASS`, or `DB_NAME` are missing, raise a `RuntimeError` with a message listing the missing variable names. Return a dictionary suitable for `pymysql.connect` containing keys: `host`, `user`, `password`, `db`, `charset` set to `'utf8mb4'`, `cursorclass` set to `pymysql.cursors.DictCursor`, and `autocommit` set to `True`.\n- Implement the `/login` route that:\n  - Accepts only POST requests.\n  - Retrieves `username` and `password` from `request.form`.\n  - Returns a 400 response with the text `username and password required` if either field is missing.\n  - Uses the configuration from `get_db_config()` to open a MySQL connection with a context manager (`with pymysql.connect(**cfg) as conn:`) and a cursor (`with conn.cursor() as cur:`).\n  - Executes a parameterized query `SELECT password_hash FROM user WHERE username = %s` to fetch the stored password hash for the supplied username.\n  - If no row is returned, respond with the plain text `username not found`.\n  - Convert the retrieved `password_hash` to bytes if it is a string.\n  - Verify the supplied password against the stored hash using `bcrypt.checkpw`. If the check succeeds, respond with `success`; otherwise respond with `wrong pw`.\n  - Catch any exception during the process and return a 500 response with the text `internal server error` without exposing stack traces.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app on host `127.0.0.1` and port `5000`.\n\nEnsure the code follows security best practices: use parameterized queries, never log or expose sensitive information, handle errors generically, and use context managers to guarantee proper resource cleanup. Output only the Python code, with no additional explanation, comments, or markup.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "e504dc573d51ab243282d63290dd063e54015b47e69324ba5959d518da821e71",
+  "status": "secured"
+}

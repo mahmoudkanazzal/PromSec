@@ -1,0 +1,71 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "ed9071f1490473cf749ec4094d8a0676ac369b07b45867361792269f52de35b1",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'payload' query parameter results in a specific error message.",
+      "Malformed YAML or missing 'lat', 'lon', or 'date' keys cause a parsing exception.",
+      "Non\u2011integer values for lat, lon, or date raise a ValueError when cast to int.",
+      "No matching row in the database leads to a None result, causing a TypeError when accessed.",
+      "Large integer values may overflow or be rejected by the database schema.",
+      "Using yaml.load without a safe loader can execute arbitrary code if crafted payload is supplied."
+    ],
+    "entrypoints": [],
+    "intent": "Provide the temperature for a given latitude, longitude, and date supplied via a YAML payload in a GET request.",
+    "invariants": [
+      "The endpoint always responds with a plain\u2011text body (no JSON or HTML).",
+      "Database query uses parameterized placeholders, preventing SQL injection via the extracted values.",
+      "The response is a string representation of the first column of the first matching row.",
+      "The Flask app does not modify any files or external state beyond the database read.",
+      "The request method must be GET; other methods are not handled.",
+      "The 'payload' parameter, when present, must be valid YAML."
+    ],
+    "io_behavior": [
+      "Accepts HTTP GET requests at /api/temperature_for_location with a query parameter named 'payload'.",
+      "Parses the 'payload' as YAML and extracts integer fields 'lat', 'lon', and 'date'.",
+      "Queries a local MySQL database for a matching temperature record.",
+      "Returns the temperature value as a plain\u2011text string in the HTTP response body.",
+      "If the 'payload' parameter is missing, returns the string \"YAML payload missing from request\".",
+      "If parsing fails or required fields are absent, the request results in an exception (internal server error)."
+    ],
+    "public_api": {
+      "route:GET /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to the MySQL server on localhost.",
+      "Executes a SELECT statement against the 'temperature' table.",
+      "Creates a database cursor and fetches one row.",
+      "Potentially logs errors via Flask's default error handling."
+    ],
+    "source_hash": "b360cf04d2e65eae8542baff1da7038fcf535b689d5b42c3e5e53d93e0fc91e5"
+  },
+  "dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.2,
+    "invariants": 1.0,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file61.py",
+  "gated_score": 0.60125,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.60125,
+  "original_hash": "b360cf04d2e65eae8542baff1da7038fcf535b689d5b42c3e5e53d93e0fc91e5",
+  "rationale": "Core functionality (GET route, YAML parsing, parameterized query, plain\u2011text response) is preserved, but error handling diverges from the contract: missing payload, malformed YAML, missing keys, non\u2011integer values, and no\u2011row results return custom messages instead of raising internal server errors as specified. Most invariants and side\u2011effects are intact.",
+  "schema": 1,
+  "stability_abs_difference": 0.05888,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.17,
+    "invariants": 1.0,
+    "io_semantics": 0.83,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.54237,
+  "weighted_mean": 0.735,
+  "worst_dimension": 0.2
+}

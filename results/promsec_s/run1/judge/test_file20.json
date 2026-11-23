@@ -1,0 +1,78 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "7199d90a05c424f3bba7f2a732308f8d674f650eb952f82cb41bb48fe4e37a4b",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed YAML in /upload_readings leads to a server error (500).",
+      "Absent or misspelled fields (station_id, temperature, humidity) cause a KeyError and 500 response.",
+      "Providing an empty or unknown report type still invokes the external tool with an empty argument.",
+      "Incorrect token in /station_login returns a 401 response with status \"Authentication failed\".",
+      "Large request bodies may exceed Flask's default limits and be rejected.",
+      "Concurrent calls to /generate_report may spawn multiple instances of the external tool."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a web API for weather stations to authenticate, upload sensor readings, and trigger generation of weather reports.",
+    "invariants": [
+      "The JSON response always contains a \"status\" key.",
+      "Successful station login always returns status \"Station authenticated\".",
+      "Upload endpoint always echoes back the station_id supplied in the YAML payload.",
+      "Report generation endpoint always returns status \"Report generation started\" regardless of the report type.",
+      "The authentication token value never changes during runtime.",
+      "The Flask app runs on a single host and port as configured by Flask defaults."
+    ],
+    "io_behavior": [
+      "POST /station_login with form field 'token' \u2192 JSON status, 200 on correct token, 401 otherwise.",
+      "POST /upload_readings with raw YAML body containing station_id, temperature, humidity \u2192 JSON with status and echoed station_id.",
+      "GET /generate_report?type=TYPE \u2192 JSON status indicating report start.",
+      "All responses are JSON objects with a \"status\" field.",
+      "HTTP method mismatches (e.g., GET on /upload_readings) result in standard 405 errors.",
+      "Invalid request bodies (malformed YAML, missing keys) cause a 500 error from the server."
+    ],
+    "public_api": {
+      "route:GET /generate_report": "",
+      "route:POST /station_login": "",
+      "route:POST /upload_readings": ""
+    },
+    "side_effects": [
+      "When /generate_report is called, the server executes an external command './weather_report_tool TYPE' via the OS shell.",
+      "Authentication check compares the supplied token against a hard\u2011coded constant.",
+      "The server reads request payloads from the network but does not persist data to disk or a database.",
+      "Flask may log request details to its default logger.",
+      "The process may spawn a child process for the report tool, affecting system resources.",
+      "No file system modifications are performed by the upload endpoint."
+    ],
+    "source_hash": "aa4714f15323cdd76b1378a472537f5b2e740582b4227b12140c8b1ca6d25c1c"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.2,
+    "io_semantics": 0.3,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file20.py",
+  "gated_score": 0.1425,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.1425,
+  "original_hash": "aa4714f15323cdd76b1378a472537f5b2e740582b4227b12140c8b1ca6d25c1c",
+  "rationale": "The program deviates from the contract on error handling (returns 400 instead of 500), omits required status fields on errors, uses a different key for echoing station_id, validates report types instead of always invoking the external tool, and does not execute the external command at all, breaking several invariants and side\u2011effect expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.17,
+  "stability_dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.4,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.3125,
+  "weighted_mean": 0.19,
+  "worst_dimension": 0.0
+}

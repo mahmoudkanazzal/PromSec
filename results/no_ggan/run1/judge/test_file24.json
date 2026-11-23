@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "b4a5c8230ad8385b14f5dc311883bf4fcfe969314c2455e6fc3f7c0096f3da79",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Malformed or non\u2011YAML request bodies to /add_book cause a server error (500).",
+      "Missing or empty required fields in /add_book result in a 400 error.",
+      "Omitting the password field in /librarian_access results in a 401 denial.",
+      "Providing an empty or missing 'section' query parameter still triggers the inventory script with an empty argument.",
+      "Requests using HTTP methods other than those defined (e.g., GET on /add_book) receive a 405 Method Not Allowed."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple web API for a library system that can add book records, trigger an inventory script, and grant librarian access based on a password.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" key.",
+      "The /add_book endpoint only succeeds when title, author, and isbn are non\u2011empty strings.",
+      "Librarian access is granted only when the supplied password exactly matches the hard\u2011coded value.",
+      "The /run_inventory endpoint always returns a 200 response with the same status message, regardless of command outcome."
+    ],
+    "io_behavior": [
+      "POST /add_book with a YAML payload returns JSON indicating success or a 400 error for missing fields.",
+      "GET /run_inventory?section=NAME returns JSON confirming the inventory check was started.",
+      "POST /librarian_access with form field 'password' returns JSON granting or denying access (401 on denial).",
+      "The Flask server listens on the default host/port when the script is executed directly."
+    ],
+    "public_api": {
+      "route:GET /run_inventory": "",
+      "route:POST /add_book": "",
+      "route:POST /librarian_access": ""
+    },
+    "side_effects": [
+      "Executes the external command `python inventory_script.py <section>` via the OS shell.",
+      "Creates a new process for the inventory script, which may read/write files or produce output.",
+      "Sends HTTP responses to clients (JSON payloads and status codes)."
+    ],
+    "source_hash": "4251288cddc13a68efb62bf4d36cdff4d2878f85e27fdeb199093c399c6e410b"
+  },
+  "dimensions": {
+    "behavior": 0.35,
+    "edge_cases": 0.6,
+    "invariants": 0.5,
+    "io_semantics": 0.4,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file24.py",
+  "gated_score": 0.46437,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.46437,
+  "original_hash": "4251288cddc13a68efb62bf4d36cdff4d2878f85e27fdeb199093c399c6e410b",
+  "rationale": "The program returns JSON with a status key and enforces non\u2011empty book fields, but deviates from the contract on several edge cases (malformed YAML returns 400 instead of 500, missing section returns 400 instead of invoking the script, unsupported methods are handled correctly). Librarian access uses a hashed password from an env var rather than a hard\u2011coded exact match, and the server binds to 0.0.0.0 instead of the default host. It does execute the inventory script, satisfying side\u2011effects, bu",
+  "schema": 1,
+  "stability_abs_difference": 0.11938,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.4,
+    "invariants": 0.5,
+    "io_semantics": 0.75,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.58375,
+  "weighted_mean": 0.5025,
+  "worst_dimension": 0.35
+}

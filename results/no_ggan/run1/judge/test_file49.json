@@ -1,0 +1,68 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "82c3bf9a33b3df5f2fb7abc558969d4c47ebd3a743aedbd7a50ee1ee1268f01f",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a BadRequestKeyError and a 400 response.",
+      "Empty strings for username/password still produce a query and may match an empty record.",
+      "SQL injection strings can alter the query logic or cause errors.",
+      "Database connection failures raise an exception and result in a 500 error.",
+      "If multiple rows match, only the first is fetched; the redirect still goes to '/dashboard'.",
+      "Non\u2011ASCII characters in the form fields may affect query encoding."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user by checking supplied credentials against a MySQL users table and redirect them based on the result.",
+    "invariants": [
+      "The endpoint always responds with a redirect, never with a body payload.",
+      "Database credentials (host, user, password, db) are fixed in the code.",
+      "The SQL query format remains constant: SELECT * FROM users WHERE username='\u2026' AND pass='\u2026'.",
+      "The Flask app runs in a single\u2011process mode unless otherwise configured."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to the path /login with form fields 'username' and 'password'.",
+      "Returns an HTTP 302 redirect to '/' when no matching record is found.",
+      "Returns an HTTP 302 redirect to '/dashboard' when a matching record is found.",
+      "Uses the request's form data as plain strings in the SQL query.",
+      "Relies on the Flask request/response cycle for input and output."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a new MySQL connection on each request.",
+      "Executes a SELECT query against the 'users' table.",
+      "Potentially consumes database resources (connections, CPU).",
+      "May trigger MySQL logging or audit mechanisms."
+    ],
+    "source_hash": "b30096ed0fe299fe2d327a65ed18c147d00dd4e7971f82a42eb6bdc3e9f8de1d"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.4,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file49.py",
+  "gated_score": 0.26125,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.26125,
+  "original_hash": "b30096ed0fe299fe2d327a65ed18c147d00dd4e7971f82a42eb6bdc3e9f8de1d",
+  "rationale": "The program deviates from the contract: it uses parameterized queries and password hashing instead of raw string interpolation, reads DB credentials from env vars, returns redirects for missing fields instead of a 400 BadRequestKeyError, adds rate\u2011limiting and session handling, and serves a body on /dashboard, violating the invariant that responses are always redirects. Required side\u2011effects (DB connection and SELECT) are present, but most edge\u2011case behaviors are not preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.20875,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.8,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.47,
+  "weighted_mean": 0.315,
+  "worst_dimension": 0.1
+}

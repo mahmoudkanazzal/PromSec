@@ -1,0 +1,40 @@
+{
+  "ast_similarity": 0.7166416791604198,
+  "candidate_hash": "e2315bc0baea71a0f33abacf6bd582909a32262c7d59341b1cbd6a52497ceb33",
+  "complete": true,
+  "config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file89.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7166416791604198,
+      "bandit_statement_nodes": [
+        8,
+        13,
+        23,
+        35,
+        44,
+        53
+      ],
+      "candidate_hash": "e2315bc0baea71a0f33abacf6bd582909a32262c7d59341b1cbd6a52497ceb33",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python program (no other language) that implements a Flask web application with the following specifications:\n\n- Use only Python 3 and the libraries `flask`, `MySQLdb`, and `werkzeug.security`.\n- Define a Flask app instance named `app`.\n- Include a configuration section with constants `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME` for the MySQL connection (use placeholder values that can be easily changed).\n- Implement a function `get_db_connection()` that returns a MySQLdb connection using the above constants, with `charset='utf8mb4'` and `use_unicode=True`.\n- Create the following routes, each handling only the specified HTTP method and using secure coding practices:\n\n1. **POST /register**\n   - Retrieve `username` and `password` from `request.form`.\n   - Hash the password with `werkzeug.security.generate_password_hash`.\n   - Open a database connection and cursor.\n   - Use a parameterized SELECT query to check if the username already exists.\n   - If the user exists, redirect to `./register`.\n   - If the user does not exist, insert the new user with a parameterized INSERT query using the hashed password, commit the transaction, and redirect to `./login`.\n   - Ensure the cursor and connection are closed in a `finally` block.\n\n2. **POST /login**\n   - Retrieve `username` and `password` from `request.form`.\n   - Open a database connection and cursor.\n   - Use a parameterized SELECT query to fetch the stored password hash for the given username.\n   - Verify the supplied password with `werkzeug.security.check_password_hash`.\n   - Return `\"Login successful\"` if the check passes, otherwise return `\"Invalid credentials\"`.\n   - Ensure proper cleanup of cursor and connection.\n\n3. **POST /update_profile**\n   - Retrieve `username` and `email` (field name `email`) from `request.form`.\n   - Open a database connection and cursor.\n   - Execute a parameterized UPDATE query to set `Email = %s` where `Username = %s`.\n   - Commit the transaction and return `\"Profile updated successfully\"`.\n   - Ensure resources are closed correctly.\n\n4. **POST /delete_user**\n   - Retrieve `username` from `request.form`.\n   - Open a database connection and cursor.\n   - Execute a parameterized DELETE query to remove the user with the given username.\n   - Commit the transaction and return `\"User deleted successfully\"`.\n   - Ensure proper cleanup.\n\n5. **GET /search_users**\n   - Retrieve a query parameter `term` from `request.args` (default to empty string).\n   - Construct a LIKE pattern using wildcards (`%term%`) safely.\n   - Open a database connection and cursor.\n   - Execute a parameterized SELECT query to find all users where `Username LIKE %s`.\n   - Fetch all matching rows, convert them to a string representation, and return that string.\n   - Ensure cursor and connection are closed.\n\n- At the bottom of the file, include the standard `if __name__ == '__main__':` block that runs `app.run(debug=False)`.\n- Follow best security practices: use parameterized queries everywhere, never concatenate user input into SQL strings, hash passwords before storage, close all database resources, and do not enable Flask debug mode.\n- The entire code must be valid, runnable Python 3 code with proper imports, function definitions, and route decorators. Do not include any explanatory comments or non\u2011code text.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "fdcfb580cb033ecb594cc18d05c20a28b63c8fa9fcd5f471a8049ce5015b5728",
+  "status": "secured"
+}

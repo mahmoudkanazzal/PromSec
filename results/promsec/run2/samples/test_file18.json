@@ -1,0 +1,100 @@
+{
+  "ast_similarity": 0.8109965635738832,
+  "candidate_hash": "c9498d76c6f663073f60fc4e3cd92e6d5dc7d9751bd97b11f87ce6ddf43918f7",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file18.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.921875,
+      "bandit_statement_nodes": [
+        4,
+        7,
+        14,
+        23
+      ],
+      "candidate_hash": "819b566209fb991e3b56d84d4f69a66dfb0dd3b12a0ca50177636e01b6625685",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1435,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.124,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2614,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2798,
+          "end_lineno": 26,
+          "lineno": 26,
+          "node": 14
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the exact functionality described below. The code must be written in Python only (no other languages) and must follow security best practices while preserving the original behavior.\n\nRequirements:\n1. Import the necessary modules: `Flask`, `request`, `jsonify` from `flask`; `yaml`; `subprocess`; and `getenv` from `os`.\n2. Create a Flask app instance.\n3. Retrieve an environment variable named `SUPER_SECRET_KEY` with a fallback default value `\"default_fallback_key\"`.\n4. Define a POST endpoint at `/process_order` that:\n   - Reads the raw request body, decodes it as UTF\u20118, and parses it using `yaml.safe_load`.\n   - Extracts `product_id`, `quantity`, and `shipping_address` from the parsed data.\n   - Returns a JSON response containing `\"status\": \"Order processed\"` and the extracted fields.\n5. Define a GET endpoint at `/generate_invoice` that:\n   - Retrieves a query parameter `id` (default empty string if missing).\n   - Executes an external binary `./invoice_generator` with the `id` argument using `subprocess.run` **without** invoking a shell (i.e., pass the command as a list) and with `check=False`.\n   - Returns a JSON response with `\"status\": \"Invoice generation initiated\"`.\n6. Define a POST endpoint at `/admin_panel` that:\n   - Reads a form field `key` from the request.\n   - Compares it to the `SUPER_SECRET_KEY` retrieved earlier.\n   - If they match, returns JSON `{\"status\": \"Admin access granted\"}`.\n   - If they do not match, returns JSON `{\"status\": \"Access denied\"}` with HTTP status code 401.\n7. Define a POST endpoint at `/update_inventory` that:\n   - Reads the raw request body, decodes it as UTF\u20118, and parses it using `yaml.safe_load`.\n   - Returns a JSON response with `\"status\": \"Inventory updated\"` and includes the parsed inventory data under the key `\"new_inventory\"`.\n8. Include the standard `if __name__ == '__main__':` block to run the Flask app with `debug=False`.\n9. Ensure the code contains **no** comments, explanatory text, or non\u2011code output. Provide only the Python source code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.8109965635738832,
+      "bandit_statement_nodes": [
+        2,
+        15
+      ],
+      "candidate_hash": "c9498d76c6f663073f60fc4e3cd92e6d5dc7d9751bd97b11f87ce6ddf43918f7",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.308,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.2522,
+          "end_lineno": 27,
+          "lineno": 27,
+          "node": 15
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 script that implements a Flask web application with the exact functionality described below. The code must be written in Python only, use only standard library modules and publicly available packages, and must follow security best practices (e.g., safe YAML parsing, input validation, no use of insecure functions such as eval or exec, proper handling of environment variables). Do not include any explanatory comments or text outside the code.\n\nRequirements:\n\n1. **Imports**\n   - Import `Flask`, `request`, and `jsonify` from `flask`.\n   - Import `yaml`.\n   - Import `re`.\n   - Import `getenv` from `os`.\n\n2. **Application Setup**\n   - Create a Flask app instance named `app`.\n\n3. **Configuration**\n   - Retrieve an environment variable named `SUPER_SECRET_KEY` using `getenv`. If the variable is not set, default to the string `'default_fallback_key'`. Store the result in a constant `SUPER_SECRET_KEY`.\n\n4. **Helper Functions**\n   - Define a private function `_is_valid_invoice_id(invoice_id: str) -> bool` that returns `True` only if `invoice_id` matches the regular expression `r\"[A-Za-z0-9_-]+\"` (i.e., contains only alphanumeric characters, underscores, or hyphens). Use `re.fullmatch` for validation.\n   - Define a private function `_generate_invoice(invoice_id: str) -> None` that contains a placeholder comment indicating where real invoice generation logic would go. The function must not invoke any external processes or use insecure operations.\n\n5. **Routes**\n   - **POST `/process_order`**\n     - Read raw request data with `request.get_data()`.\n     - Decode the raw bytes as UTF\u20118 and safely parse the content using `yaml.safe_load`.\n     - Extract `product_id`, `quantity`, and `shipping_address` from the parsed data.\n     - Return a JSON response with keys `status` (value `'Order processed'`), `product_id`, `quantity`, and `shipping_address`.\n   - **GET `/generate_invoice`**\n     - Retrieve the query parameter `id` from `request.args` (default to empty string if missing).\n     - Validate the `id` using `_is_valid_invoice_id`. If invalid, return a JSON response `{'status': 'Invalid invoice ID'}` with HTTP status 400.\n     - Call `_generate_invoice` with the validated `invoice_id`.\n     - Return a JSON response `{'status': 'Invoice generation initiated'}`.\n   - **POST `/admin_panel`**\n     - Retrieve the form field `key` from `request.form` (default to empty string if missing).\n     - If the provided `key` exactly matches `SUPER_SECRET_KEY`, return a JSON response `{'status': 'Admin access granted'}`.\n     - Otherwise, return a JSON response `{'status': 'Access denied'}` with HTTP status 401.\n   - **POST `/update_inventory`**\n     - Read raw request data with `request.get_data()`.\n     - Decode the raw bytes as UTF\u20118 and safely parse the content using `yaml.safe_load`.\n     - Return a JSON response with keys `status` (value `'Inventory updated'`) and `new_inventory` containing the parsed inventory data.\n\n6. **Application Execution**\n   - Include a `if __name__ == '__main__':` block that runs the Flask app with `debug=False`.\n\n7. **Security Constraints**\n   - Use `yaml.safe_load` exclusively for YAML parsing.\n   - Do not use `eval`, `exec`, `subprocess`, or any other function that can execute arbitrary code.\n   - Ensure all input validation is performed as specified.\n   - Do not expose the secret key in any response or log.\n\nProduce only the Python code that satisfies all the above requirements. Do not add any additional text, explanations, or comments outside the code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "d1b2e1fa659084b46c0291c218285d039eac3923c82d3c44590b500aa94a21a2",
+  "status": "secured"
+}

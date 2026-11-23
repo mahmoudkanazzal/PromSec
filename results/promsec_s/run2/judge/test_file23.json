@@ -1,0 +1,83 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "789eb9820b42e7df526ee6222cd80e81080be0f7ef334250166314e96e5f7752",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing required YAML keys cause a KeyError and result in a 500 internal server error.",
+      "Malformed YAML triggers a yaml.YAMLError, also leading to a 500 response.",
+      "Providing an empty or incorrect password returns a 401 status.",
+      "Supplying an unsupported action to /admin_panel returns a 400 error.",
+      "Omitting query parameters results in empty strings being passed to the OS commands.",
+      "Large or specially crafted input may cause command injection because arguments are interpolated directly into os.system calls."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a Flask\u2011based HTTP API that lets clients add, update, delete, and view books, run inventory checks, generate reports, and perform admin backup/restore actions.",
+    "invariants": [
+      "The librarian password must exactly match the hard\u2011coded string to obtain access.",
+      "YAML payloads are parsed with yaml.FullLoader; required keys (e.g., title, author, isbn) must be present for successful responses.",
+      "Endpoints always return a JSON object with a \"status\" field.",
+      "POST endpoints read the raw request body as UTF\u20118 text before parsing.",
+      "GET endpoints read query parameters using request.args.get with a default empty string.",
+      "Admin actions accept only the strings 'backup' or 'restore'; any other value yields a 400 error."
+    ],
+    "io_behavior": [
+      "POST /add_book \u2013 accepts a YAML body with title, author, isbn, publication_year and returns those fields in JSON.",
+      "GET /run_inventory \u2013 takes optional query parameter 'section' and returns a JSON status message.",
+      "POST /librarian_access \u2013 expects form field 'password' and returns JSON indicating success or a 401 error.",
+      "POST /update_book \u2013 accepts a YAML body containing isbn and optional new_* fields, echoes the update info in JSON.",
+      "POST /delete_book \u2013 accepts a YAML body with isbn and returns a JSON confirmation.",
+      "GET /generate_reports \u2013 takes query parameter 'type' and returns a JSON status message."
+    ],
+    "public_api": {
+      "route:GET /generate_reports": "",
+      "route:GET /run_inventory": "",
+      "route:GET /view_books": "",
+      "route:POST /add_book": "",
+      "route:POST /admin_panel": "",
+      "route:POST /delete_book": "",
+      "route:POST /librarian_access": "",
+      "route:POST /update_book": ""
+    },
+    "side_effects": [
+      "GET /run_inventory executes `python inventory_script.py <section>` via the OS shell.",
+      "GET /generate_reports executes `python report_generator.py <type>` via the OS shell.",
+      "POST /admin_panel with action=backup runs `python backup_script.py`.",
+      "POST /admin_panel with action=restore runs `python restore_script.py`.",
+      "GET /view_books runs `python view_books.py <category>`.",
+      "All OS commands are invoked with os.system, exposing the host environment to the supplied arguments."
+    ],
+    "source_hash": "1308832b93521f7bb6430dd40918c7597329f436d315da7bba1389c443eba676"
+  },
+  "dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.9,
+    "side_effects": 0.2
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file23.py",
+  "gated_score": 0.47,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.47,
+  "original_hash": "1308832b93521f7bb6430dd40918c7597329f436d315da7bba1389c443eba676",
+  "rationale": "Endpoints exist and return required JSON, but key contract details differ: missing required YAML keys no longer raise KeyError, password is env\u2011var not hard\u2011coded, yaml.safe_load replaces FullLoader, and arguments are validated before OS calls, eliminating the intended injection risk.",
+  "schema": 1,
+  "stability_abs_difference": 0.06938,
+  "stability_dimensions": {
+    "behavior": 0.75,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.9,
+    "side_effects": 0.7
+  },
+  "stability_score": 0.53938,
+  "weighted_mean": 0.56,
+  "worst_dimension": 0.2
+}

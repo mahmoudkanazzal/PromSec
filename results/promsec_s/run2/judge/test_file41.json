@@ -1,0 +1,71 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "ae45e0829788842eb13e2e9f277332989b42a610807fe8fc8f5efb1b76fe6c2f",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a server error (KeyError).",
+      "Providing a username that already exists returns \"Username already exists\".",
+      "Database errors (e.g., connection failure) result in \"Registration Failed\".",
+      "Extremely long or malformed input may cause query errors or truncation.",
+      "SQL injection strings can alter query behavior due to unsanitized concatenation."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Create a new user account via an HTTP POST request to the /register endpoint.",
+    "invariants": [
+      "A response string is always returned for any request that reaches the handler.",
+      "Username uniqueness is enforced by checking the SELECT result before INSERT.",
+      "Database connections are closed regardless of success or failure.",
+      "The endpoint only processes form\u2011encoded data; other content types are ignored.",
+      "Transaction is committed only when a new user is inserted."
+    ],
+    "io_behavior": [
+      "Accepts a POST request with form fields 'username' and 'password'.",
+      "Returns a plain\u2011text message indicating success, duplicate username, or failure.",
+      "If the request method is not POST, the endpoint is not invoked.",
+      "The response body is always a short string message."
+    ],
+    "public_api": {
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to a local MySQL server.",
+      "Executes a SELECT query to check for existing usernames.",
+      "May execute an INSERT query to add a new user record.",
+      "Commits the transaction on successful insertion or rolls back on error.",
+      "Closes the database cursor and connection after handling the request."
+    ],
+    "source_hash": "8f6905633ce84b756abc2530f40804adaa3e2210d0d61d05fcd07c4e1cd907ed"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.4,
+    "invariants": 1.0,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file41.py",
+  "gated_score": 0.6325,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.6325,
+  "original_hash": "8f6905633ce84b756abc2530f40804adaa3e2210d0d61d05fcd07c4e1cd907ed",
+  "rationale": "The program matches most invariants, side\u2011effects and entry\u2011points, but deviates on key edge cases: missing fields return a custom message instead of a KeyError, uses parameterised queries preventing the expected SQL\u2011injection behavior, and adds extra error messages not specified in the contract.",
+  "schema": 1,
+  "stability_abs_difference": 0.18625,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.5,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.81875,
+  "weighted_mean": 0.71,
+  "worst_dimension": 0.4
+}

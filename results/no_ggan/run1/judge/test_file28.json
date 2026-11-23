@@ -1,0 +1,83 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "4dd4e32818142bb7edc6963fa1238b973ac726ee5c3864a5f4f635a6fb78bd92",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payload to /api/add_book triggers a YAML parsing error and a 400 response.",
+      "Providing non\u2011integer year_published in add_book leads to a 400 error.",
+      "Omitting the secret_key or providing an incorrect one in admin login results in 401.",
+      "Calling /api/start_inventory with empty or malicious section/location values still launches the script (possible command injection).",
+      "Changing the password to an empty string is allowed (no validation on new_password).",
+      "Requests to admin/adjust_settings without a new_setting field return a 400 error."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a REST\u2011like API for basic library book management and admin operations such as adding, removing, listing, updating books, checking inventory, and changing the librarian password.",
+    "invariants": [
+      "All responses are JSON objects containing a \u2018status\u2019 field.",
+      "Missing required parameters result in a 400 Bad Request (or 401 for admin auth failures).",
+      "Year published must be an integer; otherwise the add_book request is rejected.",
+      "Admin login succeeds only when both password and secret_key match the expected constants.",
+      "Password change succeeds only if the provided old password matches the current LIBRARIAN_PASSWORD."
+    ],
+    "io_behavior": [
+      "POST /api/add_book \u2013 accepts raw YAML in the request body, returns JSON with book details or 400 on malformed YAML or missing/invalid fields.",
+      "POST /api/remove_book \u2013 expects form field \u2018isbn\u2019, returns JSON confirming removal or 400 if absent.",
+      "GET /api/start_inventory \u2013 reads query parameters \u2018section\u2019 and \u2018location\u2019, launches inventory_checker.py via os.system, returns JSON acknowledgment.",
+      "POST /admin/login \u2013 expects form fields \u2018password\u2019 and \u2018secret_key\u2019, returns JSON granting or denying admin access (401 on failure).",
+      "POST /admin/change_password \u2013 expects \u2018old_password\u2019 and \u2018new_password\u2019, updates the in\u2011memory password on success, returns JSON status.",
+      "Various GET/POST endpoints (/api/book_info, /api/update_book, /api/list_books, /admin/adjust_settings, /api/check_book_availability, /api/request_book, /api/return_book) that read query or form parameters and return JSON responses with appropriate status codes."
+    ],
+    "public_api": {
+      "route:GET /api/book_info": "",
+      "route:GET /api/check_book_availability": "",
+      "route:GET /api/list_books": "",
+      "route:GET /api/start_inventory": "",
+      "route:POST /admin/adjust_settings": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/login": "",
+      "route:POST /api/add_book": "",
+      "route:POST /api/remove_book": "",
+      "route:POST /api/request_book": "",
+      "route:POST /api/return_book": "",
+      "route:POST /api/update_book": ""
+    },
+    "side_effects": [
+      "Executes an external Python script (inventory_checker.py) with supplied arguments via os.system.",
+      "Mutates the global LIBRARIAN_PASSWORD variable when the admin changes the password.",
+      "Potentially logs requests through Flask\u2019s default logging (implicit side effect)."
+    ],
+    "source_hash": "57da26119eb9becbf1830dfb9351497ddbfeeaa09d2462e58b4bfbcd69099e12"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.2,
+    "invariants": 0.4,
+    "io_semantics": 0.5,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file28.py",
+  "gated_score": 0.39875,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.39875,
+  "original_hash": "57da26119eb9becbf1830dfb9351497ddbfeeaa09d2462e58b4bfbcd69099e12",
+  "rationale": "The program implements most endpoints and returns JSON with a status field, but it adds extra validation (e.g., password length, alphanumeric checks) and changes error codes (400 instead of 401 for missing secret_key) that diverge from the contract. It also prevents command injection in start_inventory and disallows empty new passwords, violating several specified edge cases and invariants.",
+  "schema": 1,
+  "stability_abs_difference": 0.39187,
+  "stability_dimensions": {
+    "behavior": 0.95,
+    "edge_cases": 0.5,
+    "invariants": 1.0,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.79062,
+  "weighted_mean": 0.465,
+  "worst_dimension": 0.2
+}

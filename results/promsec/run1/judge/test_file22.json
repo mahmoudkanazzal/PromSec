@@ -1,0 +1,69 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "cf0850ded59df3f829b6ad4fd4a0d059953efcf0b49a35e8d444736a97310580",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed YAML in /add_book leads to a server error (e.g., 500).",
+      "Absent title/author/isbn keys in the YAML payload cause a KeyError.",
+      "Omitting the 'section' query parameter in /run_inventory results in an empty argument passed to the script.",
+      "Providing an incorrect password to /librarian_access returns HTTP 401.",
+      "Extremely large request bodies may cause performance degradation or timeouts."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple library management web API with endpoints to add a book, trigger an inventory script, and verify librarian credentials.",
+    "invariants": [
+      "All responses are JSON objects with a \"status\" field.",
+      "The librarian password is fixed to the constant LIBRARIAN_PASSWORD.",
+      "The /add_book endpoint always echoes back the title from the submitted YAML.",
+      "The /run_inventory endpoint always returns a success status regardless of script outcome."
+    ],
+    "io_behavior": [
+      "POST /add_book with a YAML payload containing title, author, and isbn returns JSON {\"status\":\"Book added\",\"title\":<title>}.",
+      "GET /run_inventory?section=<name> starts a subprocess running \"python inventory_script.py <name>\" and returns JSON {\"status\":\"Inventory check initiated\"}.",
+      "POST /librarian_access with form field password returns JSON {\"status\":\"Librarian access granted\"} on correct password or JSON {\"status\":\"Access denied\"} with HTTP 401 on failure."
+    ],
+    "public_api": {
+      "route:GET /run_inventory": "",
+      "route:POST /add_book": "",
+      "route:POST /librarian_access": ""
+    },
+    "side_effects": [
+      "Executes an external Python script via the operating system when /run_inventory is called.",
+      "Potentially logs request data via Flask's default request handling (e.g., access logs).",
+      "May consume CPU and memory while parsing YAML and running the inventory script."
+    ],
+    "source_hash": "628bfae4caf2338a54a5f8ef7dc7334f333bb812ca122d3afea75a2734f26efc"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.4,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file22.py",
+  "gated_score": 0.14625,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.14625,
+  "original_hash": "628bfae4caf2338a54a5f8ef7dc7334f333bb812ca122d3afea75a2734f26efc",
+  "rationale": "The program deviates from the contract: it does not execute the inventory script, returns non\u2011status JSON on errors, uses a hashed password instead of a fixed constant, and handles edge cases (malformed YAML, missing keys, omitted section) differently than specified.",
+  "schema": 1,
+  "stability_abs_difference": 0.29675,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.67,
+    "side_effects": 0.5
+  },
+  "stability_score": 0.443,
+  "weighted_mean": 0.195,
+  "worst_dimension": 0.0
+}

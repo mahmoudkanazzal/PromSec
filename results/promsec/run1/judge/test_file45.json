@@ -1,0 +1,67 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "5f87e7b7d697edfbce20f0546b40ad72a84cf761b587e395c5df0aff55e5f85a",
+  "compile_ok": true,
+  "confidence": 0.7,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'username'/'password' fields cause a redirect to '/login'.",
+      "No matching user record results in a redirect to '/login'.",
+      "Multiple rows returned (unlikely) will set session values based on the last row iterated.",
+      "Database connection failure or query error triggers the exception handler and redirects to '/login'.",
+      "SQL injection via crafted username or password can alter query behavior."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via POST /login and redirect to the appropriate page based on credential verification.",
+    "invariants": [
+      "The route only responds to POST requests.",
+      "A redirect response is always returned, never a raw HTML page.",
+      "Session variables are set only after a successful query execution.",
+      "The SQL statement is built by directly interpolating the received username and password."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request with form fields 'username' and 'password'.",
+      "Queries the local MySQL database for a matching user record.",
+      "On successful match, stores user id and role in the session and issues an HTTP 302 redirect to '/dashboard'.",
+      "On any error or no match, issues an HTTP 302 redirect back to '/login'.",
+      "Returns only a redirect response; no body content is sent."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Executes a SELECT query against the MySQL 'users' table.",
+      "Creates or updates session keys 'id' and 'Role' on successful authentication.",
+      "Sends an HTTP redirect response to the client.",
+      "May raise and catch exceptions from the database operation."
+    ],
+    "source_hash": "82a598df24f20127548a17aeae223f565253b9c8deab6eb8a9c0ff434bc08957"
+  },
+  "dimensions": {
+    "behavior": 0.55,
+    "edge_cases": 0.35,
+    "invariants": 0.4,
+    "io_semantics": 0.6,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file45.py",
+  "gated_score": 0.485,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.485,
+  "original_hash": "82a598df24f20127548a17aeae223f565253b9c8deab6eb8a9c0ff434bc08957",
+  "rationale": "Route and redirects match, but query uses parameterization and password hashing, breaking direct\u2011interpolation invariant and altering authentication flow; multiple rows, DB errors, and injection scenarios are not handled as specified, reducing edge\u2011case and invariant scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.00563,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 0.8,
+    "side_effects": 0.75
+  },
+  "stability_score": 0.49063,
+  "weighted_mean": 0.53,
+  "worst_dimension": 0.35
+}

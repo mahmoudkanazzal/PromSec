@@ -1,0 +1,70 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "929df4a2f40a4d1abf470a8e4c297be3c04705c4f2d7e86e5d1da2aa83695729",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a server error (KeyError).",
+      "Usernames containing characters that affect the SQL LIKE pattern may lead to unexpected matches.",
+      "Very long usernames or passwords may exceed database column limits and cause insertion failures.",
+      "Database connection failures result in an internal server error.",
+      "If the random salt generation fails, the request cannot be completed."
+    ],
+    "entrypoints": [],
+    "intent": "Create a new user account when a POST request is made to /register, or redirect to the login page if the username already exists.",
+    "invariants": [
+      "Usernames are unique; a duplicate username never results in a new record.",
+      "Passwords are stored only as a SHA\u2011256 hash of (salt + password).",
+      "Each stored user record includes the generated salt and a non\u2011zero account_created flag.",
+      "The endpoint only processes POST requests; other methods are ignored.",
+      "The response type (redirect vs success) is determined solely by the existence of the username."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST with form fields 'username' and 'password'.",
+      "If the username is already present, responds with an HTTP 307 redirect to /login.",
+      "If the username is new, responds with a successful HTTP response (default 200) and no body.",
+      "Returns standard HTTP status codes and headers as defined by Flask.",
+      "Does not set cookies or session data in this endpoint."
+    ],
+    "public_api": {
+      "func:register": "()",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Generates a 16\u2011byte random salt for each request.",
+      "Queries the MySQL 'users' table to check for existing usernames.",
+      "Inserts a new row into the 'users' table with the username, hashed password, salt, and a flag indicating account creation.",
+      "Commits the transaction to persist the new user record.",
+      "Closes the database connection after insertion."
+    ],
+    "source_hash": "e74543c04541d3dcdf19b2647e08c7219671da9ae93285ddd645be4d5f294202"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.85,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file69.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.54312,
+  "original_hash": "e74543c04541d3dcdf19b2647e08c7219671da9ae93285ddd645be4d5f294202",
+  "rationale": "Core registration and redirect logic are correct, but missing-field handling, response body, and lack of edge\u2011case error handling diverge from the contract.",
+  "schema": 1,
+  "stability_abs_difference": 0.26313,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.6,
+    "invariants": 1.0,
+    "io_semantics": 0.85,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.80625,
+  "weighted_mean": 0.6575,
+  "worst_dimension": 0.2
+}

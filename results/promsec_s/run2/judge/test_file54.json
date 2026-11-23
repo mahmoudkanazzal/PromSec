@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "325f6ae7eb243aa327661c8a5a7cd87ebcc3f6970c20ed0646842cf410a9590f",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a server error (KeyError).",
+      "If the username does not exist, row[0] access raises an exception.",
+      "Database connection failures produce a 500 error response.",
+      "Empty password strings are still hashed and compared.",
+      "Non\u2011ASCII passwords are encoded as UTF\u20118 before hashing.",
+      "MD5 hash collisions are not mitigated, potentially allowing false positives."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via POST to /login and redirect to the home page on success or to an error page on failure.",
+    "invariants": [
+      "The endpoint only responds to POST requests.",
+      "Redirect destinations are fixed strings ('/' or '/error').",
+      "Password comparison is performed using MD5 hashes.",
+      "Database connection parameters (host, user, password, db) are constant.",
+      "SQL query uses a parameter placeholder to avoid literal injection.",
+      "A successful authentication always results in a redirect to '/'."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request with form fields 'username' and 'password'.",
+      "Queries the MySQL 'user_info' table for the stored password hash of the given username.",
+      "Computes the MD5 hash of the supplied password (UTF\u20118 encoded).",
+      "If the hashes match, returns an HTTP 302 redirect to '/'.",
+      "If the hashes do not match, returns an HTTP 302 redirect to '/error'.",
+      "Only the redirect response is sent back to the client."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a connection to a local MySQL server.",
+      "Executes a SELECT statement against the 'user_info' table.",
+      "Closes the database cursor/connection when the request ends (implicit)."
+    ],
+    "source_hash": "b2e18a09915013ea97ddd9cc2f500be31621fcde49a46a732060f7b6516dc55f"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.8,
+    "io_semantics": 0.5,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file54.py",
+  "gated_score": 0.5075,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.5075,
+  "original_hash": "b2e18a09915013ea97ddd9cc2f500be31621fcde49a46a732060f7b6516dc55f",
+  "rationale": "Core login flow works and uses MD5, redirects, and parameterized query, but missing-field handling, username-not-found, DB failures, and constant DB parameters deviate from the contract; edge\u2011case coverage is poor.",
+  "schema": 1,
+  "stability_abs_difference": 0.2175,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.5,
+    "invariants": 1.0,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.725,
+  "weighted_mean": 0.61,
+  "worst_dimension": 0.2
+}

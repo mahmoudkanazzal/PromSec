@@ -1,0 +1,82 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "a910bde343bf3b59765aa7eb696401edbd8b597639dc06f89ad9886bf5d0b34a",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML in /inventory/add yields a 400 error.",
+      "Empty or missing item_id/item_name in add request yields a 400 error.",
+      "Calling admin endpoints with wrong password returns 401.",
+      "Omitting required query parameters (e.g., item_id, process_id) returns 400.",
+      "Providing an empty new_password during password update returns 400.",
+      "Unsupported backup format defaults to \"json\" but still triggers the backup script."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for managing inventory items, controlling processes, and performing admin tasks such as login and password updates.",
+    "invariants": [
+      "All responses are JSON objects with a \"status\" field.",
+      "Admin\u2011protected endpoints require the current MASTER_PASSWORD to match the supplied password.",
+      "Missing required parameters result in a 400 response with an error message.",
+      "Successful admin login returns HTTP 200; failure returns HTTP 401.",
+      "The API does not persist data; inventory details are static or echo input."
+    ],
+    "io_behavior": [
+      "POST /inventory/add with YAML body returns JSON containing item_id and item_name or error on bad YAML/missing fields.",
+      "GET /process/start?process=...&parameter=... triggers a shell script and returns JSON status.",
+      "POST /admin/login with form field password returns success JSON or 401 failure.",
+      "POST /admin/update_password with correct current password and new_password updates the in\u2011memory password and returns JSON.",
+      "GET /inventory/details?item_id=... returns JSON with static item details or error if missing.",
+      "GET /process/logs?process_id=... returns JSON with a log string or error if missing."
+    ],
+    "public_api": {
+      "route:GET /data/backup": "",
+      "route:GET /inventory/details": "",
+      "route:GET /process/logs": "",
+      "route:GET /process/start": "",
+      "route:GET /process/status": "",
+      "route:GET /user/info": "",
+      "route:POST /admin/configure": "",
+      "route:POST /admin/login": "",
+      "route:POST /admin/update_password": "",
+      "route:POST /inventory/add": "",
+      "route:POST /inventory/delete": ""
+    },
+    "side_effects": [
+      "Executes external shell script start_process.sh via os.system.",
+      "Runs backup_inventory_data.py with chosen format via os.system.",
+      "Modifies the global MASTER_PASSWORD variable at runtime.",
+      "Potentially writes to system logs or stdout via Flask's request handling."
+    ],
+    "source_hash": "ae8d3d87484dcc4668d5093204765ae0ad7d2c7b7bf7aec8510f1c6dab934157"
+  },
+  "dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.5,
+    "invariants": 1.0,
+    "io_semantics": 0.85,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file12.py",
+  "gated_score": 0.75687,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.75687,
+  "original_hash": "ae8d3d87484dcc4668d5093204765ae0ad7d2c7b7bf7aec8510f1c6dab934157",
+  "rationale": "API largely follows contract, preserving invariants and side effects, but deviates on YAML handling for /inventory/add and backup format defaulting, leading to missing edge\u2011case behavior.",
+  "schema": 1,
+  "stability_abs_difference": 0.06575,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.83,
+    "invariants": 1.0,
+    "io_semantics": 0.67,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.82262,
+  "weighted_mean": 0.8425,
+  "worst_dimension": 0.5
+}

@@ -1,0 +1,73 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "669ad039cdc7e2b33d1bb2e1003e2ecba09c4deb451f04a209e5a43f7cbbcbd3",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and result in a 500 error.",
+      "Empty username string leads to a query that may match an empty username record.",
+      "Very long input values may exceed MySQL field limits or cause request timeouts.",
+      "SQL injection payloads in the username field can alter the query logic.",
+      "Non\u2011ASCII characters in the password may affect MD5 hashing if not encoded properly.",
+      "Database connection failures produce an unhandled exception and a 500 response."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via a POST request to /login and redirect authenticated users to /user.",
+    "invariants": [
+      "The endpoint only responds to POST requests; other methods result in a 405 error from Flask.",
+      "Exactly one of the three possible responses is returned for each request.",
+      "The database query string always includes the literal \"SELECT id, username, password, accesslevel FROM user WHERE username='\" followed by the raw username value and a closing quote.",
+      "The password comparison uses MD5 hashing of the raw password string.",
+      "A successful authentication always results in a 302 redirect.",
+      "No file system or external command execution occurs."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request with form fields 'username' and 'password'.",
+      "Queries the MySQL 'user' table for a row matching the supplied username.",
+      "Returns the plain\u2011text response \"User does not exist\" if no row is found.",
+      "Returns the plain\u2011text response \"Incorrect Password\" if the MD5 hash of the supplied password does not match the stored hash.",
+      "Issues an HTTP 302 redirect to \"/user\" when the password matches.",
+      "Closes the database connection implicitly when the request ends."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a TCP connection to the local MySQL server.",
+      "Executes a SELECT statement that may be vulnerable to SQL injection.",
+      "Computes an MD5 hash of the supplied password in memory.",
+      "Potentially logs the request via Flask's default logging.",
+      "Triggers Flask's request handling lifecycle (e.g., request context).",
+      "May cause MySQL connection errors that propagate as HTTP 500 responses."
+    ],
+    "source_hash": "eab027460cfa38735ab3752a9a2c224b29ac6214ceb144f47363617e22aab5ec"
+  },
+  "dimensions": {
+    "behavior": 0.1,
+    "edge_cases": 0.2,
+    "invariants": 0.2,
+    "io_semantics": 0.1,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file51.py",
+  "gated_score": 0.20125,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.20125,
+  "original_hash": "eab027460cfa38735ab3752a9a2c224b29ac6214ceb144f47363617e22aab5ec",
+  "rationale": "The program deviates from the contract in query construction, password hashing, response codes, and error handling, breaking most invariants and edge\u2011case expectations, though it still opens a DB connection and redirects on success.",
+  "schema": 1,
+  "stability_abs_difference": 0.13125,
+  "stability_dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.7,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.3325,
+  "weighted_mean": 0.235,
+  "worst_dimension": 0.1
+}

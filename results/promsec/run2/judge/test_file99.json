@@ -1,0 +1,78 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "469856b9f36be23ec12ec254ce43933e8382edb78ed260a7f67797ba6e9732e3",
+  "compile_ok": true,
+  "confidence": 0.75,
+  "contract": {
+    "edge_cases": [
+      "Missing required JSON fields results in a server error (unhandled KeyError).",
+      "Empty ingredients list creates a recipe with no associated ingredient rows.",
+      "Non\u2011numeric or nonexistent recipe_id in /submit_review or /get_recipe_reviews may return no rows or cause a query error.",
+      "Very long title, ingredient, or review strings may exceed database column limits.",
+      "Repeated calls with the same data create duplicate rows (no deduplication).",
+      "SQL injection via crafted title, ingredient, or review strings could alter queries."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API for storing recipes, adding reviews, and fetching reviews using a SQLite backend.",
+    "invariants": [
+      "Each recipe receives a unique integer recipe_id.",
+      "Ingredients are linked to a recipe via the recipe_id foreign key.",
+      "Reviews are linked to a recipe via the recipe_id foreign key.",
+      "Database schema (tables recipes, ingredients, reviews) must exist for the API to function.",
+      "Responses are always JSON\u2011encoded.",
+      "HTTP status codes reflect operation outcome (201 for creation, 200 for retrieval)."
+    ],
+    "io_behavior": [
+      "POST /add_recipe with JSON {title, ingredients} returns 201 and JSON {message, recipe_id}.",
+      "POST /submit_review with JSON {recipe_id, review, reviewer_id} returns 200 and JSON {message}.",
+      "GET /get_recipe_reviews?recipe_id=ID returns 200 and JSON array of review objects.",
+      "All endpoints read request data (JSON body or query string) and write JSON responses.",
+      "Successful calls persist data in the SQLite database.",
+      "Responses include HTTP status codes indicating success."
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:GET /get_recipe_reviews": "",
+      "route:POST /add_recipe": "",
+      "route:POST /submit_review": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the recipes table.",
+      "Inserts one row per ingredient into the ingredients table.",
+      "Inserts a new row into the reviews table.",
+      "Commits transactions to the SQLite file 'recipe.db'.",
+      "Closes the database connection after each request."
+    ],
+    "source_hash": "05a8f2728379041b6e2e15e634979a3fa87f110fe73dca5cd6b12c3a325c1542"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.2,
+    "invariants": 0.9,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file99.py",
+  "gated_score": 0.51125,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.51125,
+  "original_hash": "05a8f2728379041b6e2e15e634979a3fa87f110fe73dca5cd6b12c3a325c1542",
+  "rationale": "The program implements the required routes, JSON handling, and database side\u2011effects, preserving most core functionality and response codes. However, it diverges from the contract on several edge cases: missing fields, empty ingredient lists, and non\u2011numeric recipe_id values are rejected with 400 errors instead of causing unhandled errors or query failures, and it validates inputs more strictly than specified. These deviations lower the overall behavior and edge\u2011case preservation scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.04625,
+  "stability_dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.4,
+    "invariants": 0.7,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.5575,
+  "weighted_mean": 0.615,
+  "worst_dimension": 0.2
+}

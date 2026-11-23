@@ -9,13 +9,27 @@ from pathlib import Path
 from unittest.mock import patch
 
 from evaluation.calibration import CASES
-from evaluation.functional_similarity import extract_behavioral_contract, score_candidate_functionality, validated_scores
+from evaluation.functional_similarity import (
+    extract_behavioral_contract,
+    score_candidate_functionality,
+    validated_scores,
+)
 from promsec.config import load_config, relevant_config_hash
 from promsec.io import append_jsonl, atomic_write_json, sha256_text
-from promsec.judge import _reduced_negative_control, _score_stability, calibrate_judge, judge_run
+from promsec.judge import (
+    _reduced_negative_control,
+    _score_stability,
+    calibrate_judge,
+    judge_run,
+)
 from promsec.llm import LLMClient, LLMError, LLMValidationError
 from promsec.metrics import validate_python_source
-from promsec.records import RESULT_SCHEMA, TERMINAL_STATUSES, collect_records, record_issue
+from promsec.records import (
+    RESULT_SCHEMA,
+    TERMINAL_STATUSES,
+    collect_records,
+    record_issue,
+)
 from promsec.report import build_report
 from promsec.runner import _generate_valid_python
 from promsec.security import SecurityAnalysisError, scan_cwes
@@ -256,15 +270,14 @@ class EvaluationTests(unittest.TestCase):
         for cached in (False, True):
             append_jsonl(self.run / "calls.jsonl", dict(cached=cached, prompt_tokens=10, completion_tokens=5))
         result = build_report(self.cfg)
-        self.assertEqual(result["enforcement_success_rate"], 0.5)
-        self.assertEqual(result["completed_samples"], 1)
+        self.assertEqual(result["secured_programs"] / result["vulnerable_programs"], 0.5)
+        self.assertEqual(result["completed_programs"], 1)
+        self.assertEqual(result["failed_programs"], 1)
         self.assertEqual(result["prompt_tokens"], 10)
-        self.assertEqual(result["cached_prompt_tokens"], 10)
-        self.assertEqual(result["mean_cwe_count_before"], 2)
-        self.assertEqual(result["mean_cwe_count_after"], 0)
-        self.assertEqual(result["aggregate_unique_cwe_occurrences_before"], 2)
-        self.assertEqual(result["aggregate_unique_cwe_occurrences_after"], 0)
-        self.assertEqual(result["aggregate_cwe_reduction_rate"], 1.0)
+        self.assertEqual(result["llm_cache_hits"], 1)
+        self.assertEqual(result["cwes_before"], 2)
+        self.assertEqual(result["cwes_after"], 0)
+        self.assertEqual(result["cwe_reduction_rate"], 1.0)
 
     def test_performance_figure_written_and_regenerated(self):
         self.record()
@@ -273,7 +286,7 @@ class EvaluationTests(unittest.TestCase):
         figure = self.run / "report/performance_eval.png"
         self.assertTrue(figure.exists())
         self.assertTrue((self.run / "report/performance_eval.pdf").exists())
-        self.assertIn(str(figure), result["figures"])
+        self.assertIn("performance_eval.png", result["figures"])
         figure.write_bytes(b"")
         self.cfg["judge"]["temperature"] = 0.2
         build_report(self.cfg)
@@ -281,8 +294,10 @@ class EvaluationTests(unittest.TestCase):
 
     def test_interrupted_call_log_reported(self):
         self.record()
-        (self.run / "calls.jsonl").write_text('{"cached":', encoding="utf-8")
-        self.assertEqual(build_report(self.cfg)["invalid_call_log_lines"], [1])
+        (self.run / "calls.jsonl").write_text('{"cached": false, "prompt_tokens": 3}\n{"cached":', encoding="utf-8")
+        result = build_report(self.cfg)
+        self.assertEqual(result["llm_requests_logged"], 1)
+        self.assertEqual(result["prompt_tokens"], 3)
 
     def test_calibration_witnesses(self):
         for case in CASES:
@@ -303,15 +318,15 @@ class EvaluationTests(unittest.TestCase):
 
     def test_invalid_training_configuration_rejected(self):
         from promsec.config import validate_config
-        self.cfg["training"]["discriminator_steps"] = 0
+        self.cfg["ggan"]["discriminator_steps"] = 0
         with self.assertRaises(ValueError):
             validate_config(self.cfg)
-        self.cfg["training"]["discriminator_steps"] = 1
-        self.cfg["training"]["seed"] = -1
+        self.cfg["ggan"]["discriminator_steps"] = 1
+        self.cfg["ggan"]["seed"] = -1
         with self.assertRaises(ValueError):
             validate_config(self.cfg)
-        self.cfg["training"]["seed"] = 0
-        self.cfg["training"]["train_from_scratch"] = 2
+        self.cfg["ggan"]["seed"] = 0
+        self.cfg["ggan_s"]["holdout_fraction"] = 1.5
         with self.assertRaises(ValueError):
             validate_config(self.cfg)
 

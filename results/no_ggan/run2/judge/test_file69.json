@@ -1,0 +1,68 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "6bd458b5df7920cf4b736a0eb8a8eff8c428f1cb6c9fc68a5fb338e7fe3277a1",
+  "compile_ok": true,
+  "confidence": 0.8,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and result in a server error.",
+      "Extremely long or malformed usernames may break the regular\u2011expression construction or cause SQL errors.",
+      "Special characters in the username can interfere with the SQL LIKE pattern, potentially leading to false matches.",
+      "The concatenation of a binary salt with a string password may raise a TypeError in Python 3.",
+      "SQL injection is possible because user input is interpolated directly into SQL strings."
+    ],
+    "entrypoints": [],
+    "intent": "Create a new user account when a client sends a POST request to /register with a username and password.",
+    "invariants": [
+      "Each username must be unique in the 'users' table.",
+      "Password is stored as SHA\u2011256(salt + password) in hexadecimal form.",
+      "The generated salt is stored alongside the hashed password.",
+      "The 'account_created' column is always set to 1 for new rows.",
+      "The route only processes HTTP POST requests."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST to /register with form fields 'username' and 'password'.",
+      "On success, returns an HTTP 200 response with an empty body (no explicit content).",
+      "If the username already exists, returns an HTTP 307 redirect to /login.",
+      "May raise a server error (e.g., 500) if required form fields are missing or internal operations fail."
+    ],
+    "public_api": {
+      "func:register": "()",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Generates a 16\u2011byte random salt for each registration attempt.",
+      "Inserts a new row into the MySQL 'users' table (username, hashed password, salt, account_created).",
+      "Creates a MySQL connection and executes SELECT and INSERT statements.",
+      "Commits the transaction and closes the database connection on successful insertion."
+    ],
+    "source_hash": "e74543c04541d3dcdf19b2647e08c7219671da9ae93285ddd645be4d5f294202"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.0,
+    "invariants": 0.4,
+    "io_semantics": 0.2,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file69.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.21,
+  "original_hash": "e74543c04541d3dcdf19b2647e08c7219671da9ae93285ddd645be4d5f294202",
+  "rationale": "The program registers users but deviates from the contract: it returns 201 JSON instead of 200 empty body, handles missing fields with 400 not a server error, stores password with PBKDF2 not raw SHA\u2011256(salt+pwd), stores a timestamp instead of 1 for account_created, and mitigates many listed edge cases rather than reproducing them.",
+  "schema": 1,
+  "stability_abs_difference": 0.2725,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.1,
+    "invariants": 0.6,
+    "io_semantics": 0.2,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.4825,
+  "weighted_mean": 0.28,
+  "worst_dimension": 0.0
+}

@@ -1,0 +1,67 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "7900ae650def40d1e96d60fb3c4bb8f82834688f1e38423d74cc168e7fe47900",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty payload query parameter results in a server error.",
+      "Malformed YAML causes a parsing exception.",
+      "Absent latitude, longitude, or date keys raise a KeyError.",
+      "No database row matches the criteria, leading to a None fetch and potential IndexError.",
+      "Database connection failure raises an exception and aborts the request.",
+      "Unexpected data types (e.g., non\u2011numeric latitude) may cause query mismatches or errors."
+    ],
+    "entrypoints": [],
+    "intent": "Provide the temperature for a given latitude, longitude, and date via a web API endpoint.",
+    "invariants": [
+      "The payload must be a valid YAML document containing latitude, longitude, and date keys.",
+      "The database query uses parameterized placeholders, preventing SQL syntax errors from the input values.",
+      "If a matching record exists, exactly one temperature value is returned.",
+      "The endpoint always returns a string representation of the temperature when successful."
+    ],
+    "io_behavior": [
+      "Accepts HTTP GET requests at /api/temperature_for_location with a query parameter named payload.",
+      "Parses the payload as YAML to extract latitude, longitude, and date fields.",
+      "Queries a MySQL database for a temperature matching those coordinates and date.",
+      "Returns the temperature value as a plain\u2011text response.",
+      "Writes the extracted latitude, longitude, and date to the server's standard output."
+    ],
+    "public_api": {
+      "route:GET /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Opens a connection to a local MySQL database.",
+      "Executes a SELECT statement against the temperatures table.",
+      "Prints request data to the console (stdout)."
+    ],
+    "source_hash": "feadbd807376c4203d264d5b124013b8fa5e0e9fe545fae11c6f503748cfce63"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.5,
+    "invariants": 0.6,
+    "io_semantics": 0.3,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file59.py",
+  "gated_score": 0.4275,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.4275,
+  "original_hash": "feadbd807376c4203d264d5b124013b8fa5e0e9fe545fae11c6f503748cfce63",
+  "rationale": "The program implements the core API but deviates from the contract in response format (JSON vs plain\u2011text), error handling (400/404 instead of server errors/KeyError), and omits the required stdout logging; it does use parameterized queries and handles DB failures, so it partially preserves behavior.",
+  "schema": 1,
+  "stability_abs_difference": 0.11488,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.2,
+    "invariants": 0.75,
+    "io_semantics": 0.5,
+    "side_effects": 0.66
+  },
+  "stability_score": 0.54238,
+  "weighted_mean": 0.47,
+  "worst_dimension": 0.3
+}

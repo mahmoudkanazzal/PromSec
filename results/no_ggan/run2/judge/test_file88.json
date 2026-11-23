@@ -1,0 +1,75 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "fc1110c33e762836a060af3a9cd19ed3a4b42220652d866387b117cab03c1ce0",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields (e.g., name or email) may raise a KeyError or result in an empty string being used in SQL.",
+      "Attempting to add a member whose name already exists returns \"Member already exists\".",
+      "Login with incorrect name/email combination returns \"Invalid credentials\".",
+      "Search with an empty term returns all member names (due to LIKE '%%').",
+      "Removing a non\u2011existent member still returns \"Member removed successfully\" because DELETE succeeds with zero rows affected.",
+      "Database connection failures or SQL errors are not caught and may cause a 500 Internal Server Error."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple HTTP API for adding, authenticating, updating, searching, and removing community members stored in a MySQL database.",
+    "invariants": [
+      "Member names are expected to be unique; add_member refuses to insert a duplicate name.",
+      "Each stored member has both a name and an email value.",
+      "Database connections are opened at the start of each request and closed before the response is sent.",
+      "Successful write operations are committed; failures trigger a rollback."
+    ],
+    "io_behavior": [
+      "POST /add_member with form fields 'name' and 'email' returns a plain\u2011text message indicating success, duplicate, or failure.",
+      "POST /login_member with form fields 'name' and 'email' returns \"Login successful\" or \"Invalid credentials\".",
+      "POST /update_member_profile with form fields 'name' and 'new_email' returns \"Profile updated successfully\".",
+      "GET /search_members?term=... returns the string representation of a list of matching member names.",
+      "POST /remove_member with form field 'name' returns \"Member removed successfully\"."
+    ],
+    "public_api": {
+      "route:GET /search_members": "",
+      "route:POST /add_member": "",
+      "route:POST /login_member": "",
+      "route:POST /remove_member": "",
+      "route:POST /update_member_profile": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the members table on successful add_member.",
+      "Commits an email update for an existing member on update_member_profile.",
+      "Deletes a row from the members table on remove_member.",
+      "Read\u2011only SELECT queries on login_member, search_members, and duplicate\u2011check in add_member."
+    ],
+    "source_hash": "2f00a8a0eeaa9a8317ae9d6ebfc23b6a24b31f8a7b3914bd4807a398fd0ad8ff"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.5,
+    "invariants": 1.0,
+    "io_semantics": 0.3,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file88.py",
+  "gated_score": 0.50625,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.50625,
+  "original_hash": "2f00a8a0eeaa9a8317ae9d6ebfc23b6a24b31f8a7b3914bd4807a398fd0ad8ff",
+  "rationale": "Endpoints exist and core DB actions match the contract, but responses are JSON instead of plain text, error handling for missing fields and duplicate/addition differs, and some edge\u2011case handling (e.g., missing fields) is altered, reducing behavior and I/O scores.",
+  "schema": 1,
+  "stability_abs_difference": 0.15,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.9,
+    "invariants": 1.0,
+    "io_semantics": 0.3,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.65625,
+  "weighted_mean": 0.575,
+  "worst_dimension": 0.3
+}

@@ -24,7 +24,7 @@ import json, os
 from promsec.config import load_config
 from promsec.runner import status
 s=status(load_config(os.environ["PROMSEC_CONFIG"]))
-print(json.dumps({k:s[k] for k in ("run_dir","samples_done","samples_total","status_counts","in_progress")}, indent=2))
+print(json.dumps({k:s[k] for k in ("run","samples_done","samples_total","status_counts","in_progress")}, indent=2))
 PY2
 echo
 if tmux has-session -t "$PROMSEC_TMUX_SESSION" 2>/dev/null; then

@@ -1,0 +1,167 @@
+{
+  "ast_similarity": 0.4266917293233083,
+  "candidate_hash": "67891c4c2f5ceecab841052762f948846e53cf3de82e9bd5f361a38584cbd6ab",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    89,
+    259
+  ],
+  "error": "",
+  "file": "test_file79.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6950819672131148,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        12,
+        26
+      ],
+      "candidate_hash": "4a02ca019aba35c0d220c6e2092fe2cf6d5bd8921ae9a6a3aa57c2edc88c1013",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1809,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1587,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 3
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1566,
+          "end_lineno": 27,
+          "lineno": 27,
+          "node": 10
+        },
+        {
+          "ast_type": "AugAssign",
+          "change": 0.2401,
+          "end_lineno": 41,
+          "lineno": 41,
+          "node": 21
+        },
+        {
+          "ast_type": "AugAssign",
+          "change": 0.2275,
+          "end_lineno": 43,
+          "lineno": 43,
+          "node": 23
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a pure Python 3 script that implements the following functionality securely:\n\n- Use Flask to create a web application with a POST route at `/buy_order`.\n- In the route handler, retrieve `stock_name` and `stock_quantity` from `request.form` and the current `username` from the Flask session.\n- Connect to a MySQL database using `MySQLdb.connect`, obtaining connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME` with defaults of `'localhost'`, `'root'`, `'root'`, and `'db'` respectively.\n- Use a parameterized SQL `INSERT` statement to add a row to `db_table.order_table` with columns `username`, `stock_name`, and `stock_quantity`. Execute the query with `cursor.execute(sql, (username, stock_name, stock_quantity))`.\n- Commit the transaction on success, roll back on any exception, and ensure the database connection is closed in a `finally` block.\n- Build a command list to run an external Python script named `algorithm.py` located one directory above the current file. The command list should be: `['python3', <absolute_path_to_algorithm.py>, 'buy', username, stock_name, stock_quantity]`. Resolve the absolute path using `os.path.abspath` and `os.path.join`.\n- Execute the command with `subprocess.run` **without** using a shell (`shell=False`). Capture `stdout` and `stderr`, set `text=True`, and do not raise an exception on non\u2011zero exit codes (`check=False`).\n- If the subprocess returns a non\u2011zero exit code, respond with an HTTP 500 status and a message containing the error output. Otherwise, return the subprocess\u2019s standard output as the response body.\n- Ensure the code follows security best practices: no shell injection, use parameterized queries, avoid hard\u2011coded credentials, handle all exceptions, and close all resources properly.\n- The script must import only the required modules (`os`, `subprocess`, `MySQLdb`, and Flask components) and must be valid Python code without any additional languages or explanatory comments.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.49671772428884026,
+      "bandit_statement_nodes": [
+        2,
+        29
+      ],
+      "candidate_hash": "023d72e19cdbdcdacaaea69e51204efa47df01d7492961280b4f4841ef5096a1",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2002,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2446,
+          "end_lineno": 40,
+          "lineno": 40,
+          "node": 29
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1046,
+          "end_lineno": 46,
+          "lineno": 46,
+          "node": 34
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/buy_order` POST endpoint. The script must:\n\n- Use only Python (no other languages) and be compatible with Python\u202f3.9+.\n- Import `__future__ annotations`, `os`, `MySQLdb`, `importlib.util`, `pathlib`, and Flask components (`Flask`, `request`, `session`).\n- Set `app.secret_key` from the environment variable `FLASK_SECRET_KEY`, defaulting to an empty string.\n- Define a private function `_run_algorithm(action: str, username: str, stock_name: str, stock_quantity: str) -> str` that:\n  * Locates an external file named `algorithm.py` located two directories above the current file.\n  * Verifies the file exists and raises `FileNotFoundError` if it does not.\n  * Loads the module safely using `importlib.util.spec_from_file_location` and `exec_module`.\n  * Calls a function named `process` if present; otherwise calls `main`, passing the four arguments, and returns its string result.\n  * Raises `RuntimeError` if neither callable exists.\n- Implement the `/buy_order` route that:\n  * Retrieves `username` from the Flask session; returns `401 Unauthorized` if missing.\n  * Retrieves `stock_name` and `stock_quantity` from `request.form`; returns `400 Missing parameters` if either is absent.\n  * Connects to a MySQL database using `MySQLdb.connect` with `host`, `user`, `passwd`, and `db` taken from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`, defaulting to `localhost`, `root`, `root`, and `db`.\n  * Uses a cursor and a parameterized `INSERT` statement into `db_table.order_table` with columns `username`, `stock_name`, `stock_quantity`.\n  * Commits the transaction; on any exception rolls back, closes the connection, and returns the exception message with status `500`.\n  * After a successful DB insert, calls `_run_algorithm('buy', username, stock_name, stock_quantity)`; on exception returns the exception message with status `500`.\n  * Returns the algorithm result as the response.\n- Include a `if __name__ == '__main__':` guard that runs the app using a production\u2011ready WSGI server (`waitress`). Import `serve` from `waitress` and call `serve(app, host='0.0.0.0', port=int(os.getenv('PORT', '5000')))` .\n- Ensure all resources (database connections, cursors) are properly closed in `finally` blocks.\n- Do not use `subprocess`, `eval`, `exec` on untrusted input, or any insecure practices.\n- The code must be formatted according to PEP\u202f8, include type hints, and contain no additional explanatory comments.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5055679287305123,
+      "bandit_statement_nodes": [
+        52
+      ],
+      "candidate_hash": "019b8f3e016bdc05f1c1f6db4c3462c88746e9a3afb4ddf4ff239577c930c11b",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1109,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        }
+      ],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that implements the following functionality exactly as described, ensuring the code is secure, follows best practices, and uses only Python (no other languages). The program must:\n\n1. Import the required modules:\n   - `from __future__ import annotations`\n   - `from os import getenv`\n   - `import MySQLdb`\n   - `import importlib.util`\n   - `import pathlib`\n   - `from flask import Flask, request, session`\n   - `from waitress import serve`\n\n2. Create a Flask application instance named `app` and set its `secret_key` to the value of the environment variable `FLASK_SECRET_KEY`, defaulting to an empty string if not set.\n\n3. Define a private helper function `_run_algorithm(action: str, username: str, stock_name: str, stock_quantity: str) -> str` that:\n   - Resolves the path to a file named `algorithm.py` located two directory levels above the current file.\n   - Raises a `FileNotFoundError` with a clear message if the file does not exist.\n   - Loads the module safely using `importlib.util.spec_from_file_location` and `exec_module`.\n   - Verifies that the loaded module defines either a callable named `process` or `main`. If both exist, prefer `process`. If neither exists, raise a `RuntimeError` with an appropriate message.\n   - Calls the selected function with the arguments `(action, username, stock_name, stock_quantity)` and returns its result converted to a string.\n\n4. Define a Flask route `/buy_order` that accepts only POST requests and returns either a tuple `(message, status_code)` or a plain string:\n   - Retrieve the current username from the Flask session (`session.get('username')`). If missing, return `('Unauthorized', 401)`.\n   - Extract `stock_name` and `stock_quantity` from `request.form`. If either is missing, return `('Missing parameters', 400)`.\n   - Establish a MySQL connection using `MySQLdb.connect` with the following parameters, each read from environment variables with sensible defaults:\n     - `host` from `DB_HOST` (default `'localhost'`)\n     - `user` from `DB_USER` (default `'root'`)\n     - `passwd` from `DB_PASS` (default `'root'`)\n     - `db` from `DB_NAME` (default `'db'`)\n   - Use a cursor to execute a parameterized INSERT statement that adds a new row to `db_table.order_table` with columns `username`, `stock_name`, and `stock_quantity`. The SQL must use `%s` placeholders to prevent SQL injection.\n   - Commit the transaction. If any exception occurs during database operations, roll back the transaction, close any open resources, and return the exception message with a 500 status code.\n   - Ensure that both the cursor and connection are closed in a `finally` block, regardless of success or failure.\n\n5. After a successful database insert, call `_run_algorithm('buy', username, stock_name, stock_quantity)` inside a try/except block:\n   - If the call succeeds, return its result directly.\n   - If it raises an exception, return the exception message with a 500 status code.\n\n6. Include a standard `if __name__ == '__main__':` block that starts the application using `waitress.serve`, listening on host `'0.0.0.0'` and port taken from the environment variable `PORT` (default `5000`). Convert the port to an integer.\n\nAdditional security and quality requirements:\n- Use only parameterized queries; never concatenate user input into SQL strings.\n- Validate that `stock_quantity` is a string representation of a positive integer before inserting; if validation fails, return `('Invalid stock quantity', 400)`.\n- Ensure that all environment variable accesses use `getenv` with appropriate defaults.\n- Do not include any comments, docstrings, or explanatory text in the generated code.\n- Do not output any additional text before or after the code; output the code only.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4266917293233083,
+      "bandit_statement_nodes": [
+        52
+      ],
+      "candidate_hash": "67891c4c2f5ceecab841052762f948846e53cf3de82e9bd5f361a38584cbd6ab",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1411,
+          "end_lineno": 10,
+          "lineno": 10,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1626,
+          "end_lineno": 66,
+          "lineno": 66,
+          "node": 52
+        }
+      ],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web service with a single POST endpoint `/buy_order`. The script must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os.getenv`, `MySQLdb`, `importlib.util`, `pathlib`, `flask.Flask`, `flask.request`, `flask.session`, `waitress.serve`.\n- Create a Flask app and set `app.secret_key` from an environment variable `FLASK_SECRET_KEY`. If the variable is missing, raise a `RuntimeError` with a clear message.\n- Define a private function `_run_algorithm(action: str, username: str, stock_name: str, stock_quantity: str) -> str` that:\n  * Resolves the path to a sibling file `algorithm.py` located two directories up from the current file.\n  * Checks that the file exists; otherwise raise `FileNotFoundError`.\n  * Loads the module using `importlib.util.spec_from_file_location` and executes it.\n  * Retrieves a callable named `process` or, if absent, `main`. If neither exists or is not callable, raise `RuntimeError`.\n  * Calls the retrieved function with the provided arguments and returns its result converted to `str`.\n- Implement the `/buy_order` route that:\n  * Accepts only POST requests.\n  * Retrieves `username` from the Flask session; if missing, return a 401 response with the text `Unauthorized`.\n  * Reads `stock_name` and `stock_quantity` from `request.form`. If either is missing, return a 400 response with `Missing parameters`.\n  * Validates that `stock_quantity` consists only of digits and represents a positive integer; otherwise return a 400 response with `Invalid stock quantity`.\n  * Connects to a MySQL database using `MySQLdb.connect` with credentials taken from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`, defaulting to `localhost`, `root`, `root`, and `db` respectively.\n  * Uses a parameterized INSERT statement to add a row to `db_table.order_table` with columns `username`, `stock_name`, `stock_quantity`. Commit the transaction; on any exception, roll back, close the connection, and return a 500 response containing the exception message.\n  * After successful insertion, calls `_run_algorithm('buy', username, stock_name, stock_quantity)` and returns its result. If the algorithm call raises an exception, return a 500 response with the exception message.\n  * Ensures that both the cursor and connection are closed in a `finally` block.\n- Include a `if __name__ == '__main__':` block that:\n  * Reads `HOST` and `PORT` from environment variables, defaulting `HOST` to `127.0.0.1`.\n  * Requires `PORT` to be set; if missing, raise `RuntimeError`.\n  * Validates that `PORT` is an integer between 1 and 65535; otherwise raise `RuntimeError`.\n  * Starts the application with `waitress.serve(app, host=HOST, port=PORT)`.\n- Follow security best practices: never expose raw database errors to the client beyond the generic 500 response, validate all external input, use parameterized queries, and never hard\u2011code secrets.\n- The entire output must be valid Python code only, with no additional explanation, comments, or markup.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 4,
+  "schema": 1,
+  "selected_iteration": 4,
+  "source_hash": "af64aaef30e33624fe62fe243029377344aebc3fb5040c046582ee15c2712898",
+  "status": "secured"
+}

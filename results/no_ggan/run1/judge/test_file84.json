@@ -1,0 +1,64 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "743590572d10d2e0f0cbe76280e879da556d7cb0d28c9425ce65438ae927648b",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing 'stock_name' or 'stock_quantity' in the form causes a KeyError.",
+      "Non\u2011numeric 'stock_quantity' raises a ValueError when cast to int.",
+      "Absent or invalid session['username'] results in a KeyError.",
+      "Database connection failures raise an exception and prevent a response.",
+      "If the user_portfolio table contains duplicate usernames, the SELECT may return unexpected rows."
+    ],
+    "entrypoints": [],
+    "intent": "Handle a POST request to /buy_order by recording the requested stock purchase for the logged\u2011in user and updating their portfolio in a MySQL database.",
+    "invariants": [
+      "Each username has at most one row in user_portfolio.",
+      "The stored stock_quantity is always an integer representing the cumulative quantity for that user.",
+      "The HTTP response is always a short string (\"updated\" or \"initialized\").",
+      "The database connection is closed before the request handler returns."
+    ],
+    "io_behavior": [
+      "Accepts a POST request with form fields 'stock_name' and 'stock_quantity'.",
+      "Reads the current username from the Flask session.",
+      "Returns a plain\u2011text response: \"updated\" if the user already has a portfolio entry, otherwise \"initialized\"."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Creates or updates a row in the MySQL table user_portfolio.",
+      "Commits the transaction to persist changes.",
+      "Closes the database connection after each request."
+    ],
+    "source_hash": "8f8582e327b09bad38bbe3adc8c22caea22ee2d220c765fc6fb258469061e46e"
+  },
+  "dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.2,
+    "invariants": 0.7,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file84.py",
+  "gated_score": 0.53,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.53,
+  "original_hash": "8f8582e327b09bad38bbe3adc8c22caea22ee2d220c765fc6fb258469061e46e",
+  "rationale": "Core functionality and DB updates are correct, but error handling deviates from the contract (uses HTTP aborts instead of KeyError/ValueError), and duplicate username rows are not guarded against, violating several edge\u2011case and invariant expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.16875,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.2,
+    "invariants": 0.9,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.69875,
+  "weighted_mean": 0.64,
+  "worst_dimension": 0.2
+}

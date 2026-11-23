@@ -1,0 +1,84 @@
+{
+  "ast_similarity": 0.8080357142857143,
+  "candidate_hash": "cbc666432b2877510b9fce02950ae83ab454010b918b8d721ec09f49b925c48c",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    89,
+    259
+  ],
+  "error": "",
+  "file": "test_file58.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7801724137931034,
+      "bandit_statement_nodes": [
+        2,
+        11,
+        13
+      ],
+      "candidate_hash": "c65c5d69086ffc6b5e7a190b666a50f8f224bb4a0c07ec20458c3b7700fa6f73",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.7139,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9974,
+          "end_lineno": 21,
+          "lineno": 21,
+          "node": 11
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9969,
+          "end_lineno": 23,
+          "lineno": 23,
+          "node": 13
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 program that implements the following functionality exactly as described, while improving security where possible:\n\n- Use Flask to create a web application with a single route `'/login'` that only accepts `POST` requests.\n- Retrieve the `username` and `password` fields from `request.form`.\n- Connect to a MySQL database using `MySQLdb.connect`. All connection parameters (`host`, `user`, `passwd`, `db`) must be read from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`, providing sensible defaults (`'localhost'`, `'root'`, `'r0cknr0l'`, `'cwe200'`) if the variables are not set.\n- Use a context manager (`with` statement) for the database connection and cursor to ensure proper cleanup.\n- Execute a parameterized query to select the user record: `SELECT * FROM users WHERE username = %s`. Do **not** concatenate strings to build the query.\n- Fetch the result(s). Assume the first column is the username and the third column is the stored password hash.\n- Compare the supplied password to the stored password hash using a constant\u2011time comparison function from the `hmac` module (e.g., `hmac.compare_digest`). Do **not** compare passwords with `==` or store plain\u2011text passwords.\n- If the password matches, return a Flask `redirect` to `\"/cwe200/<username>\"` where `<username>` is the username from the database.\n- If the password does not match or the user is not found, return a Flask `redirect` to `\"/cwe200/\"`.\n- Handle any `MySQLdb.Error` exceptions by printing the error code and message to standard output in the format `Error <code>: <message>`; do **not** call `sys.exit` or terminate the process.\n- Ensure the script can be executed directly (i.e., include the `if __name__ == \"__main__\":` block to run `app.run()` with appropriate host and port settings).\n- The entire file must be valid Python code, contain no explanatory comments or text, and must not import or use any language other than Python.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.8080357142857143,
+      "bandit_statement_nodes": [
+        23
+      ],
+      "candidate_hash": "cbc666432b2877510b9fce02950ae83ab454010b918b8d721ec09f49b925c48c",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 29,
+          "lineno": 29,
+          "node": 23
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a single POST endpoint at `/login`. The script must:\n\n- Import only the modules `os`, `hmac`, `Flask` (specifically `Flask`, `request`, `redirect` from `flask`), `MySQLdb`, and `closing` from `contextlib`.\n- Create a Flask app instance named `app`.\n- Define a route `'/login'` that accepts only POST requests.\n- Inside the view function, retrieve `username` and `password` from `request.form` using `request.form.get('username', '')` and `request.form.get('password', '')`.\n- Read database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`, providing safe default values (`'localhost'`, `'root'`, `'r0cknr0l'`, `'cwe200'`) only for local testing; do not expose real production credentials.\n- Establish a MySQL connection using `MySQLdb.connect` with the retrieved parameters, wrapped in a `with closing(... ) as conn:` block to ensure the connection is closed.\n- Within the connection block, obtain a cursor using `with conn.cursor() as cursor:` and execute a **parameterized** query: `SELECT * FROM users WHERE username = %s`, passing the `username` as a single\u2011element tuple.\n- Fetch one row with `cursor.fetchone()`. If a row is returned, compare the supplied `password` with the stored password (assumed to be in column index `2`) using `hmac.compare_digest` for constant\u2011time comparison.\n- If the password comparison succeeds, return `redirect(f'/cwe200/{row[0]}')` where `row[0]` is the user ID. If it fails or no row is found, return `redirect('/cwe200/')`.\n- Catch any `MySQLdb.Error` exceptions, log the error code and message with a safe `print` statement that does not expose sensitive data, and then `redirect('/cwe200/')`.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app on host `127.0.0.1` and port `5000`.\n- Ensure the code follows security best practices: use parameterized queries, constant\u2011time password comparison, avoid logging passwords or full exception traces, do not hard\u2011code production secrets, and properly close all resources.\n- Output **only** the Python code, with no additional explanation, comments, or markdown formatting.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "5ff655af97023add1622ea6ebc2d3e83554414ad4d9064096674986a62f222ce",
+  "status": "secured"
+}

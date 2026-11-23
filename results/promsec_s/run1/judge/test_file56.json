@@ -1,0 +1,68 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "0b4d0ca0f0a50d804b6c35accc424142aca1421518e117c4ae229fdc77e1ab0d",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty \"username\" or \"password\" fields cause a KeyError or result in a failed query.",
+      "SQL injection is possible because the query concatenates raw input.",
+      "Database connection failure or MySQL errors are caught and treated as authentication failure.",
+      "Extremely long input strings may be truncated by the database schema or cause performance issues.",
+      "Non\u2011ASCII or special characters in credentials may affect query matching depending on collation."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via the POST /login endpoint and establish a session when the supplied username and password match a record in the database.",
+    "invariants": [
+      "The endpoint only processes POST requests.",
+      "Both \"username\" and \"password\" form fields must be present for the code to run without raising an exception.",
+      "The response is either a redirect or the exact string \"Incorrect username or password\".",
+      "Session state is modified only when a matching database row is found.",
+      "Database connection is attempted on every request regardless of input validity."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request with form fields \"username\" and \"password\".",
+      "Queries the MySQL database for a matching user record.",
+      "On a match, stores the username in the server-side session and returns an HTTP 302 redirect to \"/session\".",
+      "On no match or a database error, returns a plain\u2011text response \"Incorrect username or password\" with a 200 status.",
+      "The response body is either the redirect location header or the error string."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Creates a MySQL connection and executes a SELECT query.",
+      "Writes the key \"username\" into the Flask session object on successful authentication.",
+      "Triggers an HTTP redirect (302) to the client on success.",
+      "May log or expose database errors indirectly through the generic error message."
+    ],
+    "source_hash": "54b4a908d7f1247fd46a5202f5571fc186d5cba69bc007fe8d50b21b2702dea6"
+  },
+  "dimensions": {
+    "behavior": 0.1,
+    "edge_cases": 0.1,
+    "invariants": 0.1,
+    "io_semantics": 0.2,
+    "side_effects": 0.3
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file56.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.1375,
+  "original_hash": "54b4a908d7f1247fd46a5202f5571fc186d5cba69bc007fe8d50b21b2702dea6",
+  "rationale": "The candidate deviates from the contract: it allows GET, uses parameterized queries (removing injection), returns 401 with a different error string, skips DB connection on missing fields, and changes status codes, breaking most invariants and edge\u2011case handling.",
+  "schema": 1,
+  "stability_abs_difference": 0.29,
+  "stability_dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.6,
+    "invariants": 0.3,
+    "io_semantics": 0.4,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.4275,
+  "weighted_mean": 0.15,
+  "worst_dimension": 0.1
+}

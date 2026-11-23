@@ -1,0 +1,82 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "f98222ed76b1160327be36f32ea94ffab789dbb4b74e89fc1430b34bf889b181",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML in /service/create triggers a 400 error with message \"Invalid YAML format\".",
+      "Missing service_id or service_name in the create request yields a 400 error \"Missing service information\".",
+      "Incorrect admin password on login or protected actions returns a 401 error.",
+      "Providing an empty new_password in /admin/update_password results in a 400 error.",
+      "Omitting operation_id, service_id, or user_id in the respective GET endpoints returns a 400 error.",
+      "Calling /operations/start with empty operation or parameter still runs the shell script with empty arguments."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a Flask\u2011based HTTP API that lets clients create, query, and delete services, start and monitor operations, retrieve logs and user info, and perform admin authentication and configuration.",
+    "invariants": [
+      "MASTER_PASSWORD must match the stored value for any admin\u2011protected endpoint.",
+      "All required request parameters must be non\u2011empty; otherwise a 400 response is returned.",
+      "Every response is a JSON object that includes a \"status\" field.",
+      "HTTP status codes are 200 for success, 400 for client\u2011side errors, and 401 for unauthorized access.",
+      "The Flask application runs continuously on the default host/port."
+    ],
+    "io_behavior": [
+      "POST /service/create with a YAML body returns JSON containing the provided service_id and service_name or a 400 error for invalid YAML or missing fields.",
+      "GET /operations/start?operation=...&parameter=... runs a shell script and returns JSON {\"status\": \"Operation started\"}.",
+      "POST /admin/login with form field password returns JSON indicating success or a 401 error on failure.",
+      "GET /service/details?service_id=... returns JSON with static service details or a 400 error if the ID is missing.",
+      "GET /operations/status?operation_id=... returns JSON with the operation ID and a fixed \"In Progress\" status or a 400 error if missing.",
+      "GET /user/info?user_id=... returns JSON with mock user data or a 400 error if the ID is missing."
+    ],
+    "public_api": {
+      "route:GET /data/backup": "",
+      "route:GET /operations/logs": "",
+      "route:GET /operations/start": "",
+      "route:GET /operations/status": "",
+      "route:GET /service/details": "",
+      "route:GET /user/info": "",
+      "route:POST /admin/configure": "",
+      "route:POST /admin/login": "",
+      "route:POST /admin/update_password": "",
+      "route:POST /service/create": "",
+      "route:POST /service/delete": ""
+    },
+    "side_effects": [
+      "Executes external command run_operation.sh via os.system when /operations/start is called.",
+      "Executes external command backup_data.py via os.system when /data/backup is called.",
+      "Updates the in\u2011memory MASTER_PASSWORD variable when /admin/update_password succeeds.",
+      "Potential side effects of the invoked shell scripts (e.g., file creation, process launch)."
+    ],
+    "source_hash": "8b59bd3ae154e82072eb04f1a36d3460a25aeba4d36cf11d86af2f20fa25870c"
+  },
+  "dimensions": {
+    "behavior": 0.5,
+    "edge_cases": 0.2,
+    "invariants": 0.7,
+    "io_semantics": 0.6,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file11.py",
+  "gated_score": 0.47375,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.47375,
+  "original_hash": "8b59bd3ae154e82072eb04f1a36d3460a25aeba4d36cf11d86af2f20fa25870c",
+  "rationale": "Core endpoints exist and return JSON, but error responses lack the required \"status\" field and use different messages; /operations/start rejects empty inputs instead of running the script, violating an edge case; overall side\u2011effects and auth checks are present, yielding partial preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.17312,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.3,
+    "invariants": 0.6,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.64687,
+  "weighted_mean": 0.565,
+  "worst_dimension": 0.2
+}

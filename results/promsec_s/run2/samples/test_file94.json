@@ -1,0 +1,37 @@
+{
+  "ast_similarity": 0.5897887323943662,
+  "candidate_hash": "2b66fc92d94dc0995248b456f786ff58789de9901bad4351519abe1a77ded7e3",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file94.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5897887323943662,
+      "bandit_statement_nodes": [
+        10,
+        19,
+        29
+      ],
+      "candidate_hash": "2b66fc92d94dc0995248b456f786ff58789de9901bad4351519abe1a77ded7e3",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web API with the following specifications and security requirements:\n\n- The script must be written entirely in Python and use only the standard library modules and Flask.\n- Import `Flask`, `request`, and `jsonify` from `flask`, and import `sqlite3`.\n- Define a Flask application instance named `app`.\n- Implement a function `get_db_connection()` that:\n  - Connects to an SQLite database file named `library.db`.\n  - Sets the connection\u2019s `row_factory` to `sqlite3.Row`.\n  - Returns the connection object.\n- Create the following routes with exact functionality:\n\n  1. **POST `/add_book`**\n     - Parse JSON payload safely using `request.get_json(silent=True) or {}`.\n     - Extract `title` and `author`; both must be non\u2011empty strings.\n     - If validation fails, return `jsonify({\"error\": \"Missing title or author\"})` with status 400.\n     - Insert the new book into the `books` table using a parameterized query:\n       `INSERT INTO books (title, author) VALUES (?, ?)`\n     - Commit the transaction.\n     - On any `sqlite3.Error`, return `jsonify({\"error\": str(e)})` with status 500.\n     - On success, return `jsonify({\"message\": \"Book added successfully\"})` with status 201.\n\n  2. **GET `/get_book`**\n     - Retrieve the query parameter `id`.\n     - Validate that `id` exists and consists only of digits; otherwise return `jsonify({\"error\": \"Invalid or missing book id\"})` with status 400.\n     - Query the `books` table with a parameterized statement:\n       `SELECT * FROM books WHERE id = ?`\n     - If no row is found, return `jsonify({\"error\": \"Book not found\"})` with status 404.\n     - On any `sqlite3.Error`, return `jsonify({\"error\": str(e)})` with status 500.\n     - On success, return the row converted to a dictionary via `jsonify(dict(row))` with status 200.\n\n  3. **POST `/update_copies`**\n     - Parse JSON payload safely.\n     - Extract `book_id` and `copies`; both must be integers (`isinstance(..., int)`).\n     - If validation fails, return `jsonify({\"error\": \"Invalid book_id or copies\"})` with status 400.\n     - Update the `copies` column using a parameterized query:\n       `UPDATE books SET copies = copies + ? WHERE id = ?`\n     - If `cursor.rowcount` is 0, return `jsonify({\"error\": \"Book not found\"})` with status 404.\n     - Commit the transaction.\n     - On any `sqlite3.Error`, return `jsonify({\"error\": str(e)})` with status 500.\n     - On success, return `jsonify({\"message\": \"Copies updated successfully\"})` with status 200.\n\n  4. **GET `/get_catalog`**\n     - Query all books with a parameterized statement:\n       `SELECT title, author, copies FROM books ORDER BY title`\n     - Convert each row to a dictionary and collect them into a list.\n     - On any `sqlite3.Error`, return `jsonify({\"error\": str(e)})` with status 500.\n     - Return the list as JSON with status 200.\n\n- Ensure all database interactions use context managers (`with get_db_connection() as conn:`) to guarantee proper resource cleanup.\n- Use only parameterized SQL statements to prevent SQL injection.\n- Do not use `eval`, `exec`, or any dynamic code execution.\n- Return JSON responses with appropriate HTTP status codes as described.\n- At the end of the script, include the standard entry point:\n  ```python\n  if __name__ == '__main__':\n      app.run(debug=False)\n  ```\n- The script must maintain the exact functionality of the reference code while adhering to secure coding practices.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "e073dd9a61e0cb410dcefad0439b1bca1f2d3d6f7cbd533ee88fe43dc93f9972",
+  "status": "secured"
+}

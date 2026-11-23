@@ -1,0 +1,64 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "93e947df5d81c14b24c92431d9b0acc1632ab0b58aeb036ec05ab47c50bd7a6a",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty 'stock_name' or 'stock_quantity' results in a database error or exception.",
+      "Absent 'username' in the session causes a KeyError before any database operation.",
+      "Database connection failure raises an exception and prevents the redirect.",
+      "If the MySQL insert fails (e.g., duplicate entry or constraint violation), the request may return an error page.",
+      "Large or malformed input values could cause SQL syntax errors."
+    ],
+    "entrypoints": [],
+    "intent": "Create a buy order for a stock and redirect the user to the home page.",
+    "invariants": [
+      "The request must be a POST; other methods are not handled.",
+      "A valid session containing 'username' must exist.",
+      "The MySQL server must be reachable with the configured credentials.",
+      "Form fields 'stock_name' and 'stock_quantity' are expected to be present."
+    ],
+    "io_behavior": [
+      "Accepts a POST request at /buy_order with form fields 'stock_name' and 'stock_quantity'.",
+      "Reads the current user's username from the session.",
+      "Returns an HTTP 302 redirect response pointing to '/'."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the MySQL table 'buy_orders' containing the stock name, quantity, and username.",
+      "Commits the transaction to persist the new order.",
+      "Opens and closes a database connection for each request."
+    ],
+    "source_hash": "3933d8b93e3f0a1254b4141d36360163ba275575ddf489cb0f8834937cda68fd"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.6,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file78.py",
+  "gated_score": 0.82875,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.82875,
+  "original_hash": "3933d8b93e3f0a1254b4141d36360163ba275575ddf489cb0f8834937cda68fd",
+  "rationale": "The program fulfills the main intent, uses POST, reads required fields, inserts and commits, and redirects. It handles DB errors and missing inputs via aborts, but deviates from the contract on missing username (KeyError expected) and treats missing fields as a 400 abort rather than a DB error, so edge\u2011case coverage is partial.",
+  "schema": 1,
+  "stability_abs_difference": 0.02625,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.6,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.855,
+  "weighted_mean": 0.905,
+  "worst_dimension": 0.6
+}

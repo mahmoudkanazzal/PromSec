@@ -1,0 +1,84 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "050f38c3616ec8df3c12e786be9bf0b1cb7d76d09644053c021f141af31d01af",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML in /task/create triggers a 400 error with \"Invalid YAML format\".",
+      "Missing required fields (task_id, task_description, password, etc.) cause 400 or 401 errors depending on endpoint.",
+      "Providing an empty new_config or new_setting results in a 400 error.",
+      "Calling /task/execute or /task/export with empty parameters still runs the underlying shell command with empty arguments.",
+      "Changing the admin password to an empty string effectively locks out future admin access."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a lightweight HTTP API for creating, retrieving, updating, deleting, assigning, executing, and exporting tasks, with admin\u2011only endpoints protected by a password and simple in\u2011memory state changes.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" key.",
+      "Admin\u2011only routes reject requests unless the supplied password matches the current ADMIN_PASSWORD.",
+      "Required request parameters (e.g., task_id, task_name) must be non\u2011empty; otherwise a 400 error is returned.",
+      "YAML payloads are parsed with yaml.FullLoader; parsing failures result in a 400 error.",
+      "Password change only succeeds when the old password matches the current ADMIN_PASSWORD."
+    ],
+    "io_behavior": [
+      "POST /task/create \u2013 accepts raw YAML in the request body, returns JSON with task_id and description or error on bad format/missing fields.",
+      "GET /task/execute \u2013 reads task_name and task_param query strings, triggers a shell script via os.system, returns JSON status.",
+      "POST /admin/login \u2013 reads form field password, returns JSON indicating access granted or denied.",
+      "POST /admin/configure \u2013 requires admin password and new_config form field, returns JSON confirmation or error.",
+      "GET /task/retrieve \u2013 requires task_id query, returns JSON with sample task info.",
+      "GET /task/logs \u2013 requires task_id query, returns JSON with fabricated log string."
+    ],
+    "public_api": {
+      "route:GET /task/execute": "",
+      "route:GET /task/export": "",
+      "route:GET /task/logs": "",
+      "route:GET /task/retrieve": "",
+      "route:GET /task/status": "",
+      "route:GET /user/profile": "",
+      "route:POST /admin/change_password": "",
+      "route:POST /admin/configure": "",
+      "route:POST /admin/login": "",
+      "route:POST /admin/settings": "",
+      "route:POST /task/assign": "",
+      "route:POST /task/create": "",
+      "route:POST /task/delete": "",
+      "route:POST /task/update": ""
+    },
+    "side_effects": [
+      "os.system call to execute_task.sh with provided parameters.",
+      "os.system call to export_tasks.py with chosen format.",
+      "Global variable ADMIN_PASSWORD can be changed via /admin/change_password, affecting future admin authentication.",
+      "No persistent storage; all responses are generated on\u2011the\u2011fly."
+    ],
+    "source_hash": "6f7f42fcdfeb992e9bbe8a2cc5e9fd37dda5914349e632e695f6397675f28c28"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.3,
+    "invariants": 0.5,
+    "io_semantics": 0.8,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file6.py",
+  "gated_score": 0.52125,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.52125,
+  "original_hash": "6f7f42fcdfeb992e9bbe8a2cc5e9fd37dda5914349e632e695f6397675f28c28",
+  "rationale": "Core API endpoints exist and mostly follow the contract, but key details diverge: uses yaml.safe_load instead of FullLoader, subprocess.run instead of os.system, password handling via hash, and missing empty\u2011string checks for new_config, new_setting, and new_password, causing several edge\u2011case and invariant violations.",
+  "schema": 1,
+  "stability_abs_difference": 0.12438,
+  "stability_dimensions": {
+    "behavior": 0.75,
+    "edge_cases": 0.4,
+    "invariants": 0.6,
+    "io_semantics": 0.9,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.64563,
+  "weighted_mean": 0.595,
+  "worst_dimension": 0.3
+}

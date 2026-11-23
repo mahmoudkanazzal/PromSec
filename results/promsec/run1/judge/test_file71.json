@@ -1,0 +1,68 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "a9f7e7e5f804bfdc33e787da8689b5529ba4f378dfbf502be35e330be4e582d3",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields cause a KeyError or 400\u2011type error.",
+      "Database insertion failures (e.g., duplicate username) raise an exception and abort the request.",
+      "Extremely long usernames or passwords may exceed column limits and cause DB errors.",
+      "If the MySQL server is unreachable, the endpoint fails to respond successfully.",
+      "Using SHA\u20111 may be considered weak; hash collisions are theoretically possible."
+    ],
+    "entrypoints": [],
+    "intent": "Register a new user by storing a salted SHA\u20111 hash of their password in a MySQL database.",
+    "invariants": [
+      "Both 'username' and 'password' must be present in the POST data.",
+      "Password is never stored in plain text; only its SHA\u20111 hash with a random salt is saved.",
+      "The inserted record always includes created_at and updated_at timestamps set to NOW().",
+      "Database credentials (host, user, password, db) are fixed and used for every request."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /register with form fields 'username' and 'password'.",
+      "Generates a 16\u2011byte random salt and computes SHA\u20111(username+salt).",
+      "Inserts the username, hashed password, salt, and timestamps into the users table.",
+      "Commits the transaction and returns an HTTP redirect (e.g., 302) to the main page.",
+      "If required fields are missing or a database error occurs, the server returns an error response."
+    ],
+    "public_api": {
+      "func:register": "()",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Creates a new MySQL connection for each request.",
+      "Writes a new row to the users table in the database.",
+      "Commits the transaction, persisting the data.",
+      "Generates a random salt (internal state, not exposed)."
+    ],
+    "source_hash": "359bf4558a37b043a9986e5d5ee7d208b47b107dbde69c7955862c1fa79105c7"
+  },
+  "dimensions": {
+    "behavior": 0.4,
+    "edge_cases": 0.2,
+    "invariants": 0.3,
+    "io_semantics": 0.5,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "entrypoints_ok": true,
+  "file": "test_file71.py",
+  "gated_score": 0.39875,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.39875,
+  "original_hash": "359bf4558a37b043a9986e5d5ee7d208b47b107dbde69c7955862c1fa79105c7",
+  "rationale": "Registers users but uses PBKDF2\u2011SHA256 instead of salted SHA\u20111, silently redirects on missing fields or DB errors, reads DB credentials from env rather than fixed values, and does not return error responses, violating key contract requirements.",
+  "schema": 1,
+  "stability_abs_difference": 0.085,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.0,
+    "invariants": 1.0,
+    "io_semantics": 0.5,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.48375,
+  "weighted_mean": 0.465,
+  "worst_dimension": 0.2
+}

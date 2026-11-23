@@ -1,0 +1,74 @@
+{
+  "ast_similarity": 0.4597315436241611,
+  "candidate_hash": "62e8ca2eaecc58006cb67261dea6e4d0573c41a597ea821d83c8cdc35b92597e",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file66.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.45819397993311034,
+      "bandit_statement_nodes": [
+        12,
+        15
+      ],
+      "candidate_hash": "2d992adacf2e0febbe73f874db936230281370856ca60b47732eda22f5b803b4",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.9999,
+          "end_lineno": 29,
+          "lineno": 29,
+          "node": 12
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9669,
+          "end_lineno": 35,
+          "lineno": 35,
+          "node": 15
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.9+) that implements a Flask web application with a `/register` route handling only POST requests. The script must:\n\n1. Import only the necessary standard\u2011library modules and the following third\u2011party packages: `flask`, `pymysql` (or `mysqlclient`), `werkzeug.security`, and `python-dotenv`.\n2. Load all configuration values (Flask secret key, database host, user, password, and database name) securely from a `.env` file using `python-dotenv`. Do not hard\u2011code any credentials.\n3. Initialize a Flask app with a strong secret key from the environment.\n4. Define a `/register` view function that:\n   - Retrieves `username` and `password` from `request.form`.\n   - Validates that `username` matches the regular expression `^[A-Za-z0-9_]{3,30}$` and that `password` is at least 8 characters long; if validation fails, return a 400 response with an appropriate message.\n   - Uses `werkzeug.security.generate_password_hash` with the `pbkdf2:sha256` method (or a stronger algorithm like `argon2`) to hash the password securely.\n   - Connects to the MySQL database using a context manager (`with` statement) to ensure the connection and cursor are closed automatically.\n   - Executes a parameterized SELECT query to check if the username already exists. Use `%s` placeholders and pass parameters as a tuple to prevent SQL injection.\n   - If the user exists, return a 302 redirect to `./register` (or a JSON error) without revealing whether the username is taken.\n   - If the user does not exist, execute a parameterized INSERT query to store the new username and hashed password, commit the transaction, and close the connection.\n   - After successful registration, return a 302 redirect to `./login`.\n5. Ensure all database operations use prepared statements with placeholders to avoid SQL injection.\n6. Use proper error handling: catch database exceptions, log them (without exposing sensitive details to the client), and return a generic 500 error response if an unexpected error occurs.\n7. Include a `if __name__ == \"__main__\":` block that runs the Flask app on host `0.0.0.0` and port `5000` with `debug=False`.\n8. Do not include any additional routes, HTML templates, or client\u2011side code.\n9. The entire file must be valid Python code, contain no comments, and must not reference any other programming language.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.4597315436241611,
+      "bandit_statement_nodes": [
+        37
+      ],
+      "candidate_hash": "62e8ca2eaecc58006cb67261dea6e4d0573c41a597ea821d83c8cdc35b92597e",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 1.0,
+          "end_lineno": 43,
+          "lineno": 43,
+          "node": 37
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.9+) that implements a Flask web application with a `/register` POST endpoint. The program must:\n\n- Import only the following modules: `os`, `re`, `logging`, `contextlib.closing`, `flask.Flask`, `flask.request`, `flask.redirect`, `pymysql`, `werkzeug.security.generate_password_hash`, `dotenv.load_dotenv`.\n- Load environment variables from a `.env` file using `load_dotenv()`.\n- Create a Flask app and set its `secret_key` from the environment variable `FLASK_SECRET_KEY`.\n- Retrieve database connection parameters (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) from environment variables.\n- Configure logging to log errors only.\n- Define a `/register` route that:\n  * Reads `username` and `password` from `request.form`, defaulting to empty strings.\n  * Validates `username` with a regex that allows only letters, numbers, underscores, length 3\u201130. Return HTTP\u202f400 with message `Invalid username` if validation fails.\n  * Checks that `password` length is at least 8 characters; otherwise return HTTP\u202f400 with message `Password too short`.\n  * Generates a password hash using `generate_password_hash` with method `pbkdf2:sha256`.\n  * Connects to MySQL using `pymysql.connect` with the retrieved credentials, using a `DictCursor`, and ensures the connection is closed with `contextlib.closing`.\n  * Executes a parameterized `SELECT` query to check if the username already exists; if it does, redirect to `./register`.\n  * Executes a parameterized `INSERT` query to store the new username and password hash.\n  * Commits the transaction and redirects to `./login` on success.\n  * Catches any `pymysql.MySQLError`, logs the error with `logger.error`, and returns HTTP\u202f500 with message `Internal server error`.\n- Include the usual `if __name__ == '__main__':` block to run the app on `127.0.0.1:5000` with `debug=False`.\n- Ensure all SQL statements use parameter placeholders (`%s`) to prevent injection.\n- Do not include any additional functionality, comments, or non\u2011Python code.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "e82f97abc9451d6afee5108e6b9a64a8d93a919f73c3c0c31b37c04b3b5b72d6",
+  "status": "secured"
+}

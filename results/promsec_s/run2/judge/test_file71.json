@@ -1,0 +1,65 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "9763a71ae29d9ee08b7058a5b34714a31f83bc62a69d4a20af0d6161c363d243",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields raise a KeyError and abort the request.",
+      "Attempting to register a username that already exists may cause a SQL integrity error.",
+      "Database connection failures raise an exception and prevent registration.",
+      "Extremely long input values may exceed column limits or cause performance issues.",
+      "Non\u2011ASCII characters in the password may affect the SHA1 hash if not properly encoded."
+    ],
+    "entrypoints": [],
+    "intent": "Register a new user by storing a hashed password and salt in a MySQL database via a web request.",
+    "invariants": [
+      "Database connection parameters (host, user, password, database) are fixed in the code.",
+      "Password hashing always uses SHA1 over the raw password concatenated with the generated salt.",
+      "The endpoint only processes POST requests; other HTTP methods are ignored.",
+      "Each inserted record includes 'created_at' and 'updated_at' set to NOW()."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /register with form fields 'username' and 'password'.",
+      "Returns an HTTP redirect response (typically 302) to the main page after successful registration.",
+      "If required fields are missing or a database error occurs, the request results in an error status code."
+    ],
+    "public_api": {
+      "func:register": "()",
+      "route:POST /register": ""
+    },
+    "side_effects": [
+      "Creates a new 16\u2011byte random salt for each registration.",
+      "Inserts a row into the MySQL 'users' table containing username, SHA1 hash, salt, and timestamps.",
+      "Commits the transaction, persisting the new user record."
+    ],
+    "source_hash": "359bf4558a37b043a9986e5d5ee7d208b47b107dbde69c7955862c1fa79105c7"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.0,
+    "invariants": 0.6,
+    "io_semantics": 0.5,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file71.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.39,
+  "original_hash": "359bf4558a37b043a9986e5d5ee7d208b47b107dbde69c7955862c1fa79105c7",
+  "rationale": "The program registers users via POST, creates a 16\u2011byte salt, inserts a row with timestamps and commits, matching most side\u2011effects. However it uses PBKDF2\u2011SHA256 instead of SHA1, returns redirects on missing fields or DB errors rather than raising errors, and silently swallows integrity and connection failures, violating key edge\u2011case and invariant specifications.",
+  "schema": 1,
+  "stability_abs_difference": 0.06625,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.1,
+    "invariants": 0.5,
+    "io_semantics": 0.7,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.45625,
+  "weighted_mean": 0.52,
+  "worst_dimension": 0.0
+}

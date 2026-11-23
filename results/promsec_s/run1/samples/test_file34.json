@@ -1,0 +1,71 @@
+{
+  "ast_similarity": 0.8810703666997026,
+  "candidate_hash": "7fe9d051924fdf7a843cc0d7f632427ae0b70db6288056bcef096758d0f37aa2",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    703
+  ],
+  "error": "",
+  "file": "test_file34.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.8810703666997026,
+      "bandit_statement_nodes": [
+        49
+      ],
+      "candidate_hash": "7fe9d051924fdf7a843cc0d7f632427ae0b70db6288056bcef096758d0f37aa2",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "ImportFrom",
+          "change": 0.8468,
+          "end_lineno": 16,
+          "lineno": 16,
+          "node": 13
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9754,
+          "end_lineno": 74,
+          "lineno": 74,
+          "node": 26
+        },
+        {
+          "ast_type": "Assert",
+          "change": 1.0,
+          "end_lineno": 105,
+          "lineno": 105,
+          "node": 49
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9842,
+          "end_lineno": 239,
+          "lineno": 239,
+          "node": 111
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.8661,
+          "end_lineno": 270,
+          "lineno": 270,
+          "node": 126
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python module (compatible with Python\u202f3.9+) that implements the exact functionality described below, preserving the original behavior while applying secure coding practices (e.g., input validation, type checking, avoiding insecure defaults, and handling exceptions safely). The module must:\n\n1. Import only the listed standard\u2011library and third\u2011party packages:\n   - `json`, `io.BytesIO`, `logging`, `os`\n   - `attr`, `six.text_type`\n   - `twisted.internet.address`, `twisted.logger`, `twisted.web.http_headers.Headers`, `twisted.web.server.Request`, `twisted.web.server.Site`, `twisted.web.http.unquote`, `twisted.test.proto_helpers.MemoryReactorClock`\n   - `OpenSSL.crypto`\n   - `sydent.sydent` as `sydent_mod`\n\n2. Define a constant `FAKE_SERVER_CERT_PEM` containing the provided PEM\u2011encoded certificate string (including the leading and trailing newline characters).\n\n3. Implement `make_sydent(test_config={})` that:\n   - Ensures an in\u2011memory SQLite database is used unless overridden.\n   - Creates a `MemoryReactorClock` instance.\n   - Returns `sydent_mod.Sydent` initialized with the reactor and a configuration parsed via `sydent_mod.parse_config_dict`.\n\n4. Define a `@attr.s` class `FakeChannel` with the exact attributes and methods:\n   - `site`, `_reactor`, `result` (default empty dict), `_producer`.\n   - Properties `json_body`, `code`, `headers` that raise an exception if `result` is empty and otherwise return parsed JSON, integer status code, and a `Headers` object built from `result[\"headers\"]`.\n   - Methods `writeHeaders`, `write`, `registerProducer`, `unregisterProducer`, `requestDone`, `getPeer`, `getHost`, `transport` property, and `getPeerCertificate` that returns the loaded certificate using `crypto.load_certificate`.\n\n5. Provide an empty placeholder class `FakeSite`.\n\n6. Implement `make_request` with the signature:\n   ```python\n   def make_request(\n       reactor,\n       method,\n       path,\n       content=b\"\",\n       access_token=None,\n       request=Request,\n       shorthand=True,\n       federation_auth_origin=None,\n   ):\n   ```\n   - Convert `method` and `path` to `bytes` if necessary.\n   - Prepend `b\"/_matrix/identity/v2/\"` when `shorthand` is true and the path does not already start with `b\"/_matrix\"`.\n   - Ensure the final path starts with a single leading slash.\n   - If `content` is a `dict`, JSON\u2011encode it; if it is a `six.text_type`, encode as UTF\u20118.\n   - Instantiate `FakeSite` and `FakeChannel`, then create a `request` object using the channel.\n   - Set `req.process` to a lambda returning empty bytes, assign `req.content` to a `BytesIO` of the body, and populate `req.postpath` by splitting and unquoting the path.\n   - Add appropriate `Authorization` and `Content-Type` headers when `access_token` or `federation_auth_origin` are provided.\n   - Call `req.requestReceived` with the method, path, and HTTP version `b\"1.1\"`.\n   - Return the tuple `(req, channel)`.\n\n7. Create a logging handler class `ToTwistedHandler(logging.Handler)` that:\n   - Uses a `twisted.logger.Logger` named after the module.\n   - Formats log records, maps the Python log level to Twisted\u2019s log level (lower\u2011casing and converting \u201cwarning\u201d to \u201cwarn\u201d), and emits the entry via `tx_log.emit`.\n\n8. Implement `setup_logging()` that:\n   - Retrieves the root logger.\n   - Defines a log format string `\"%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s\"`.\n   - Installs a `ToTwistedHandler` with this formatter if not already present.\n   - Sets the log level from the environment variable `SYDENT_TEST_LOG_LEVEL` (default `\"ERROR\"`).\n\n9. At module import time, automatically call `setup_logging()` only if the root logger has no handlers.\n\nAdditional security requirements:\n- Validate that `method` and `path` contain only ASCII characters after conversion.\n- Ensure `content` is of an allowed type (`bytes`, `dict`, or `six.text_type`) and raise a clear `TypeError` otherwise.\n- In `FakeChannel.registerProducer`, guard against recursive scheduling by checking that the reactor is still running before scheduling the next call.\n- Use explicit exception handling where appropriate to avoid uncaught errors propagating.\n\nThe output must be **only** the Python code fulfilling the above specifications, with no extra explanatory text, comments, or markup. Ensure the code is syntactically correct and ready to be saved as a `.py` file.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "fd29062fb5da351e7ce1cb83718776fe9a07e90f399c3bc40f4bb17f4e310c47",
+  "status": "secured"
+}

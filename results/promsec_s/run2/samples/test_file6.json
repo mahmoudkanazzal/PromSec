@@ -1,0 +1,115 @@
+{
+  "ast_similarity": 0.9391217564870259,
+  "candidate_hash": "a8964a79b8eb968af761818b8e08aaf77b01bce7fd55a51ac7107cb71a698c4d",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file6.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9476334340382678,
+      "bandit_statement_nodes": [
+        4,
+        8,
+        18,
+        73
+      ],
+      "candidate_hash": "fee8be08575a14b3c95ea5b6e9a753d254fb2d9dd0a3c4a4a8fae545a769a77e",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.6472,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9568,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9956,
+          "end_lineno": 13,
+          "lineno": 13,
+          "node": 8
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9092,
+          "end_lineno": 29,
+          "lineno": 29,
+          "node": 18
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9743,
+          "end_lineno": 121,
+          "lineno": 121,
+          "node": 73
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python 3 script that implements a Flask web service with the exact functionality described below. The script must be written **only in Python** (no other languages, no embedded shell scripts) and must follow security best practices while preserving the original behavior.\n\n**Security requirements**\n1. Use `os.getenv` for configuration values (e.g., admin password) and provide a safe default.\n2. Parse YAML input with `yaml.safe_load` and handle `YAMLError` gracefully.\n3. Validate and sanitize all request parameters; reject missing or empty values with a `400` response and a clear JSON error message.\n4. When invoking external commands, use `subprocess.run` with a list of arguments, **never** with `shell=True`. Ensure that only the expected arguments are passed and that no user\u2011controlled data can lead to command injection.\n5. Do not expose sensitive information (e.g., passwords) in responses.\n6. Use appropriate HTTP status codes (`200` for success, `400` for client errors, `401` for unauthorized).\n7. Keep the admin password mutable only through a dedicated endpoint that checks the current password before updating it.\n8. Ensure that global mutable state (e.g., the admin password) is handled safely.\n\n**Functional specification (must be reproduced exactly)**\n- Import statements: `from flask import Flask, request, jsonify`, `import os`, `import subprocess`, `from yaml import safe_load, YAMLError`.\n- Initialize Flask app and set `ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'admin1234')`.\n- **POST /task/create**: Accept raw YAML in the request body, parse it, extract `task_id` and `task_description`. Return JSON with status \u201cTask created\u201d and the extracted fields, or a `400` error for invalid YAML or missing fields.\n- **GET /task/execute**: Accept query parameters `task_name` and `task_param`. Run `subprocess.run(['sh', 'execute_task.sh', task_name, task_param], check=False)`. Return JSON `{\"status\": \"Task execution started\"}`.\n- **POST /admin/login**: Accept form field `password`. If it matches `ADMIN_PASSWORD`, return `{\"status\": \"Access granted\"}`; otherwise return `{\"status\": \"Access denied\"}` with status `401`.\n- **POST /admin/configure**: Require correct `password` form field. Accept `new_config` form field; if missing, return `400`. On success, return `{\"status\": \"Configuration updated\", \"new_config\": new_config}`.\n- **GET /task/retrieve**: Require query parameter `task_id`. Return JSON with a sample task description, or `400` if missing.\n- **POST /task/delete**: Require form field `task_id`. Return JSON confirming deletion, or `400` if missing.\n- **POST /admin/change_password**: Require `old_password` and `new_password` form fields. If `old_password` matches `ADMIN_PASSWORD`, update the global variable and return success JSON; otherwise return `401` with an error message.\n- **GET /task/status**: Require query parameter `task_id`. Return JSON with status \u201cRunning\u201d, or `400` if missing.\n- **POST /admin/settings**: Require correct `password` form field and `new_setting` form field. Return JSON confirming the setting, or appropriate error responses.\n- **GET /task/logs**: Require query parameter `task_id`. Return JSON with sample logs string, or `400` if missing.\n- **GET /task/export**: Accept query parameter `format` (default `csv`). Run `subprocess.run(['python3', 'export_tasks.py', export_format], check=False)`. Return JSON `{\"status\": \"Task export started\"}`.\n- **GET /user/profile**: Require query parameter `user_id`. Return JSON with a static user profile, or `400` if missing.\n- **POST /task/update**: Require form fields `task_id` and `new_description`. Return JSON confirming update, or `400` if `task_id` missing.\n- **POST /task/assign**: Require form fields `task_id` and `user_id`. Return JSON confirming assignment, or `400` if either is missing.\n- Run the Flask app with `debug=False`.\n\n**Output format**\n- Provide only the Python source code, starting with the import statements and ending with `app.run(debug=False)`.\n- Do not include any explanatory text, comments, or markdown formatting.",
+      "syntax_repair_rounds": 1
+    },
+    {
+      "ast_similarity_to_original": 0.9391217564870259,
+      "bandit_statement_nodes": [
+        2,
+        26,
+        87
+      ],
+      "candidate_hash": "a8964a79b8eb968af761818b8e08aaf77b01bce7fd55a51ac7107cb71a698c4d",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.8375,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9589,
+          "end_lineno": 34,
+          "lineno": 34,
+          "node": 26
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.6523,
+          "end_lineno": 113,
+          "lineno": 113,
+          "node": 87
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "You must generate a complete, self\u2011contained Python script that implements a Flask web application with the exact functionality described below. The code must be written in Python only (no other languages) and must follow security best practices while preserving the original behavior.\n\n**General requirements**\n- Use only standard library modules and the following third\u2011party packages: `flask`, `pyyaml`.\n- The script must be executable as a standalone program (`if __name__ == '__main__': app.run(debug=False)`).\n- All routes must return JSON responses with appropriate HTTP status codes.\n- All error handling must be centralized through a helper function `error_response(message, status_code)` that returns `jsonify({'error': message})` and the given status code.\n- Do not include any explanatory comments, markdown, or additional text outside the code.\n\n**Environment**\n- Load an admin password from the environment variable `ADMIN_PASSWORD`; default to `'admin1234'` if not set.\n- Store the admin password in a module\u2011level variable `ADMIN_PASSWORD`.\n\n**Routes and behavior**\n\n1. `POST /task/create`\n   - Expect a YAML body in `request.data`.\n   - Parse with `yaml.safe_load`; on parsing error return 400 with \u201cInvalid YAML\u201d.\n   - Ensure the parsed data is a dictionary; otherwise 400 with \u201cYAML must be a mapping\u201d.\n   - Require keys `task_id` and `task_description`; missing keys \u2192 400 with \u201cMissing task_id or task_description\u201d.\n   - On success return JSON `{'status': 'Task created', 'task_id': task_id, 'task_description': task_description}` with status 200.\n\n2. Helper function `_is_safe_identifier(value)`:\n   - Return `True` only if `value` matches the regex `^[\\w\\-]+$` (letters, digits, underscore, hyphen).\n\n3. `GET /task/execute`\n   - Require query parameters `task_name` and `task_param`.\n   - Validate both with `_is_safe_identifier`; if invalid return 400 with \u201cInvalid task_name or task_param\u201d.\n   - Return JSON `{'status': 'Task execution started'}` with status 200.\n\n4. `POST /admin/login`\n   - Read form field `password`.\n   - Missing password \u2192 400 \u201cMissing password\u201d.\n   - If password equals `ADMIN_PASSWORD` return JSON `{'status': 'Access granted'}` with 200; otherwise return JSON `{'status': 'Access denied'}` with 401.\n\n5. `POST /admin/configure`\n   - Require form field `password`; missing \u2192 400.\n   - If password does not match `ADMIN_PASSWORD` return 401 with `{'status': 'Access denied'}`.\n   - Require form field `new_config`; missing \u2192 400 \u201cMissing new_config\u201d.\n   - Return JSON `{'status': 'Configuration updated', 'new_config': new_config}` with 200.\n\n6. `GET /task/retrieve`\n   - Require query parameter `task_id`; missing \u2192 400.\n   - Return JSON `{'task_id': task_id, 'task_description': 'Sample description'}` with 200.\n\n7. `POST /task/delete`\n   - Require form field `task_id`; missing \u2192 400.\n   - Return JSON `{'status': f'Task {task_id} deleted'}` with 200.\n\n8. `POST /admin/change_password`\n   - Use `global ADMIN_PASSWORD`.\n   - Require form fields `old_password` and `new_password`; missing \u2192 400.\n   - If `old_password` does not equal current `ADMIN_PASSWORD` return 401 with `{'error': 'Unauthorized'}`.\n   - Update `ADMIN_PASSWORD` to `new_password` and return JSON `{'status': 'Password updated'}` with 200.\n\n9. `GET /task/status`\n   - Require query parameter `task_id`; missing \u2192 400.\n   - Return JSON `{'task_id': task_id, 'status': 'Running'}` with 200.\n\n10. `POST /admin/settings`\n    - Require form field `password`; missing \u2192 400.\n    - If password does not match `ADMIN_PASSWORD` return 401 with `{'status': 'Access denied'}`.\n    - Require form field `new_setting`; missing \u2192 400.\n    - Return JSON `{'status': 'Setting updated', 'new_setting': new_setting}` with 200.\n\n11. `GET /task/logs`\n    - Require query parameter `task_id`; missing \u2192 400.\n    - Return JSON `{'task_id': task_id, 'logs': 'Sample log content'}` with 200.\n\n12. `GET /task/export`\n    - Optional query parameter `format` defaulting to `'csv'`.\n    - Allowed formats: `'csv'`, `'json'`. If not allowed return 400 \u201cUnsupported export format\u201d.\n    - Return JSON `{'status': f'Task export started in {export_format} format'}` with 200.\n\n13. `GET /user/profile`\n    - Require query parameter `user_id`; missing \u2192 400.\n    - Return JSON `{'user_id': user_id, 'name': 'John Doe', 'email': 'john.doe@example.com'}` with 200.\n\n14. `POST /task/update`\n    - Require form fields `task_id` and `new_description`; missing \u2192 400.\n    - Return JSON `{'status': f'Task {task_id} updated'}` with 200.\n\n15. `POST /task/assign`\n    - Require form fields `task_id` and `user_id`; missing \u2192 400.\n    - Return JSON `{'status': f'Task {task_id} assigned to user {user_id}'}` with 200.\n\n**Security constraints**\n- All input validation must be strict as described; do not accept empty strings or unsafe characters.\n- Use `yaml.safe_load` only; never use `yaml.load`.\n- Do not execute any user\u2011provided code or shell commands.\n- Ensure the admin password is never logged or printed.\n- Do not expose stack traces; all errors must be returned via `error_response`.\n\n**Output**\n- Provide only the Python source code fulfilling all the above specifications. No additional text, explanations, or markdown.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "6f7f42fcdfeb992e9bbe8a2cc5e9fd37dda5914349e632e695f6397675f28c28",
+  "status": "secured"
+}

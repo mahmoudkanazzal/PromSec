@@ -1,0 +1,55 @@
+{
+  "ast_similarity": 0.6741573033707865,
+  "candidate_hash": "56c2e51a57962aacd6ea61eeba54936fcf5174585651e3eb3dca99986b9288d4",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file91.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6741573033707865,
+      "bandit_statement_nodes": [
+        8,
+        13,
+        23,
+        35,
+        44,
+        53
+      ],
+      "candidate_hash": "56c2e51a57962aacd6ea61eeba54936fcf5174585651e3eb3dca99986b9288d4",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1078,
+          "end_lineno": 53,
+          "lineno": 53,
+          "node": 35
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1133,
+          "end_lineno": 68,
+          "lineno": 68,
+          "node": 44
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with the exact functionality described below, while following security best practices:\n\n- Use only the `flask` and `MySQLdb` (or `mysqlclient`) libraries.\n- Load database connection parameters (`host`, `user`, `password`, `database`) from environment variables; do not hard\u2011code credentials.\n- For every route, open a database connection using a context manager or explicit `try/finally` to ensure the connection and cursor are closed even on error.\n- Use parameterized queries (`%s` placeholders) for **all** SQL statements to prevent SQL injection.\n- Catch and log database errors without exposing internal details to the client; return generic error messages or appropriate HTTP status codes.\n- Do not enable Flask debug mode; set `debug=False` in `app.run`.\n- Return plain strings or redirects exactly as specified, matching the original behavior.\n\nImplement the following routes:\n\n1. `POST /add_book`\n   - Retrieve `title` and `author` from `request.form`.\n   - Check if a book with the given title already exists (`SELECT * FROM Books WHERE Title = %s`).\n   - If it exists, close resources and `redirect('./add_book')`.\n   - If not, insert the new book (`INSERT INTO Books (Title, Author) VALUES (%s, %s)`), commit, close resources, and `redirect('./view_books')`.\n\n2. `POST /login_member`\n   - Retrieve `username` and `password` from `request.form`.\n   - Verify credentials with a parameterized query (`SELECT * FROM Members WHERE Username = %s AND Password = %s`).\n   - Close resources and return `\"Login successful\"` if a record is found, otherwise return `\"Invalid credentials\"`.\n\n3. `POST /update_book_author`\n   - Retrieve `title` and `new_author` from `request.form`.\n   - Update the author of the specified book (`UPDATE Books SET Author = %s WHERE Title = %s`), commit, close resources, and return `\"Author updated successfully\"`.\n\n4. `POST /delete_book`\n   - Retrieve `title` from `request.form`.\n   - Delete the book with that title (`DELETE FROM Books WHERE Title = %s`), commit, close resources, and return `\"Book deleted successfully\"`.\n\n5. `GET /search_books`\n   - Retrieve query parameter `term` (default empty string) via `request.args.get`.\n   - Perform a case\u2011insensitive search on both `Title` and `Author` using `LIKE` with wildcards (`SELECT * FROM Books WHERE Title LIKE %s OR Author LIKE %s`), passing `f\"%{term}%\"` for both placeholders.\n   - Fetch all matching rows, close resources, and return the result converted to a string.\n\n6. `GET /view_books`\n   - Retrieve all books (`SELECT * FROM Books`), fetch all rows, close resources, and return the result converted to a string.\n\nAt the end of the script, include the standard `if __name__ == '__main__':` block to run the Flask app with `debug=False`. Ensure the code is syntactically correct, follows PEP\u202f8 style, and contains no extraneous comments or explanatory text.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "cb06a60bd3c87cb816d5f35e1b33a8e48b64e66f77d2ece4ac8da06b6fb415c7",
+  "status": "secured"
+}

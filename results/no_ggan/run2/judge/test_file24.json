@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "f3296baad34859dcc5ac013b311fd39dbc1d54b011775ec2ca26fcf8ba8f780d",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Malformed or non\u2011YAML request bodies to /add_book cause a server error (500).",
+      "Missing or empty required fields in /add_book result in a 400 error.",
+      "Omitting the password field in /librarian_access results in a 401 denial.",
+      "Providing an empty or missing 'section' query parameter still triggers the inventory script with an empty argument.",
+      "Requests using HTTP methods other than those defined (e.g., GET on /add_book) receive a 405 Method Not Allowed."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple web API for a library system that can add book records, trigger an inventory script, and grant librarian access based on a password.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" key.",
+      "The /add_book endpoint only succeeds when title, author, and isbn are non\u2011empty strings.",
+      "Librarian access is granted only when the supplied password exactly matches the hard\u2011coded value.",
+      "The /run_inventory endpoint always returns a 200 response with the same status message, regardless of command outcome."
+    ],
+    "io_behavior": [
+      "POST /add_book with a YAML payload returns JSON indicating success or a 400 error for missing fields.",
+      "GET /run_inventory?section=NAME returns JSON confirming the inventory check was started.",
+      "POST /librarian_access with form field 'password' returns JSON granting or denying access (401 on denial).",
+      "The Flask server listens on the default host/port when the script is executed directly."
+    ],
+    "public_api": {
+      "route:GET /run_inventory": "",
+      "route:POST /add_book": "",
+      "route:POST /librarian_access": ""
+    },
+    "side_effects": [
+      "Executes the external command `python inventory_script.py <section>` via the OS shell.",
+      "Creates a new process for the inventory script, which may read/write files or produce output.",
+      "Sends HTTP responses to clients (JSON payloads and status codes)."
+    ],
+    "source_hash": "4251288cddc13a68efb62bf4d36cdff4d2878f85e27fdeb199093c399c6e410b"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.2,
+    "io_semantics": 0.4,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file24.py",
+  "gated_score": 0.335,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.335,
+  "original_hash": "4251288cddc13a68efb62bf4d36cdff4d2878f85e27fdeb199093c399c6e410b",
+  "rationale": "The program implements the required routes and runs the inventory script, but it deviates from the contract on several key points: malformed YAML returns 400 instead of 500, error responses lack the required \"status\" key, librarian access uses a hashed password from env rather than a hard\u2011coded exact match, /run_inventory may return 400/500 instead of always 200, and an empty 'section' does not pass an empty argument. These violations reduce behavior, I/O semantics, invariants, and edge\u2011case pre",
+  "schema": 1,
+  "stability_abs_difference": 0.37125,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.8,
+    "invariants": 0.5,
+    "io_semantics": 1.0,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.70625,
+  "weighted_mean": 0.38,
+  "worst_dimension": 0.2
+}

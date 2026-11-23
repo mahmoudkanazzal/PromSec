@@ -1,0 +1,36 @@
+{
+  "ast_similarity": 0.6968641114982579,
+  "candidate_hash": "9dd88132d7670c07939d043b460a8766ae001d54d81df7e16f785c6e524aacb6",
+  "complete": true,
+  "config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file69.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6968641114982579,
+      "bandit_statement_nodes": [
+        18,
+        23
+      ],
+      "candidate_hash": "9dd88132d7670c07939d043b460a8766ae001d54d81df7e16f785c6e524aacb6",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (compatible with Python\u202f3.8+) that uses Flask to provide a `/register` POST endpoint. The script must:\n\n- Import exactly these modules: `Flask`, `request`, `redirect`, `jsonify`, `abort` from `flask`; `os`; `hashlib`; `binascii`; and `MySQLdb`.\n- Create a Flask app instance named `app`.\n- Define a function `get_db_connection()` that returns a `MySQLdb` connection using the following environment variables with defaults: `DB_HOST` (default `'localhost'`), `DB_USER` (default `'root'`), `DB_PASSWORD` (default `''`), `DB_NAME` (default `'testdb'`). Set `charset='utf8mb4'` and `use_unicode=True`.\n- Implement a route `@app.route('/register', methods=['POST'])` with a function `register()` that:\n  1. Retrieves `username` and `password` from `request.form`. If either is missing, abort with status\u202f400 and description `'Missing username or password'`.\n  2. Generates a 16\u2011byte cryptographically secure salt using `os.urandom(16)`.\n  3. Derives a password hash with `hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100_000)`.\n  4. Converts the salt and hash to hexadecimal strings using `binascii.hexlify(...).decode('ascii')`.\n  5. Opens a database connection via `get_db_connection()`, obtains a cursor, and:\n     - Executes a parameterized `SELECT 1 FROM users WHERE username = %s` to check for existing username. If a row is found, return `redirect(\"/login\", code=307)`.\n     - Executes a parameterized `INSERT INTO users (username, password, salt, account_created) VALUES (%s, %s, %s, NOW())` with the username, hashed password hex, and salt hex.\n     - Commits the transaction.\n  6. Ensures the cursor and connection are closed in a `finally` block.\n  7. Returns `jsonify(message='User registered successfully'), 201`.\n- Include the standard guard `if __name__ == '__main__':` followed by `app.run()`.\n- Follow security best practices: use only parameterized queries, never interpolate user input into SQL, use a strong hash iteration count, handle resources with try/finally, and do not expose sensitive data.\n- Output must be pure Python code only, with no additional languages, explanatory text, or comments.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "e74543c04541d3dcdf19b2647e08c7219671da9ae93285ddd645be4d5f294202",
+  "status": "secured"
+}

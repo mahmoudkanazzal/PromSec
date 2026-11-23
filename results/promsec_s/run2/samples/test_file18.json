@@ -1,0 +1,93 @@
+{
+  "ast_similarity": 0.6276041666666666,
+  "candidate_hash": "129cf791efe4414d4b004854a5e62e27c77243b9f1b3340d865f56906240312d",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    20,
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file18.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.5619047619047619,
+      "bandit_statement_nodes": [
+        4,
+        7,
+        14,
+        23
+      ],
+      "candidate_hash": "b8cdd8015a8725b0378bf06cca71ec3fff9c8abad6fb3e449f79fec3f0ffa31e",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.5841,
+          "end_lineno": 3,
+          "lineno": 3,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9164,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 4
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.9743,
+          "end_lineno": 26,
+          "lineno": 26,
+          "node": 14
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python 3 script (no other language) that implements a Flask web application with the exact functionality described below. Follow all security best\u2011practice guidelines and keep the behavior identical to the reference code.\n\n**General requirements**\n- Use only standard library modules and the third\u2011party packages `flask`, `pyyaml` (imported as `yaml`), and any other packages that are strictly necessary for security (e.g., `python-dotenv` if you choose to load environment variables). Do not use any non\u2011Python languages or external scripts except the existing binary `./invoice_generator`.\n- The script must be runnable as `python <script_name>.py` and start the Flask server with `debug=False`.\n- All responses must be JSON objects returned via `flask.jsonify`.\n- Do not include any explanatory comments, docstrings, or markdown markers in the output code.\n\n**Environment**\n- Load the environment variable `SUPER_SECRET_KEY` securely (e.g., `os.getenv`). If the variable is missing, set it to an empty string to avoid `None` values.\n\n**Endpoints**\n\n1. **POST /process_order**\n   - Accept raw request body containing a YAML document.\n   - Decode the body as UTF\u20118.\n   - Parse the YAML safely using `yaml.safe_load`.\n   - Expect the resulting dictionary to contain the keys `product_id`, `quantity`, and `shipping_address`.\n   - Return a JSON response with keys:\n     - `\"status\": \"Order processed\"`\n     - `\"product\"` set to the received `product_id`\n     - `\"quantity\"` set to the received `quantity`\n     - `\"shipping_to\"` set to the received `shipping_address`\n   - If parsing fails or required keys are missing, respond with HTTP 400 and a JSON error message.\n\n2. **GET /generate_invoice**\n   - Retrieve the query parameter `id` (default to empty string if not provided).\n   - **Security:** Validate that `id` contains only alphanumeric characters, hyphens, or underscores (reject anything else). If validation fails, respond with HTTP 400 and a JSON error.\n   - Execute the existing binary `./invoice_generator` with the validated `id` as a single argument using `subprocess.run([...], check=False, capture_output=True)`. Do **not** use `shell=True`.\n   - Return a JSON response: `{\"status\": \"Invoice generation initiated\"}`.\n   - If the subprocess returns a non\u2011zero exit code, log the error (do not expose it to the client) but still return the same success JSON to avoid information leakage.\n\n3. **POST /admin_panel**\n   - Accept form\u2011encoded data.\n   - Retrieve the field `key` (default to empty string).\n   - Compare the provided key to `SUPER_SECRET_KEY` using a constant\u2011time comparison (`hmac.compare_digest`).\n   - If they match, return `{\"status\": \"Admin access granted\"}` with HTTP 200.\n   - If they do not match, return `{\"status\": \"Access denied\"}` with HTTP 401.\n\n4. **POST /update_inventory**\n   - Accept raw request body containing a YAML document.\n   - Decode as UTF\u20118 and parse safely with `yaml.safe_load`.\n   - Return a JSON response: `{\"status\": \"Inventory updated\", \"new_inventory\": <parsed_yaml>}`.\n   - If parsing fails, respond with HTTP 400 and a JSON error.\n\n**Security hardening**\n- Use `yaml.safe_load` exclusively; never use `yaml.load` or any loader that can execute arbitrary code.\n- Validate all external inputs (YAML content, query parameters, form fields) before processing.\n- Use `hmac.compare_digest` for secret key comparison to mitigate timing attacks.\n- When invoking the external binary, pass arguments as a list, avoid `shell=True`, and restrict the allowed characters in the `order_id`.\n- Ensure the Flask app does not run in debug mode.\n- Set appropriate HTTP status codes for error conditions (400 for bad request, 401 for unauthorized).\n\n**Application entry point**\n- Include the standard `if __name__ == '__main__':` block that calls `app.run(debug=False)`.\n\nGenerate only the Python code that satisfies all the above specifications. Do not include any additional text, comments, or markdown.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6276041666666666,
+      "bandit_statement_nodes": [
+        3,
+        29
+      ],
+      "candidate_hash": "129cf791efe4414d4b004854a5e62e27c77243b9f1b3340d865f56906240312d",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 1.0,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9997,
+          "end_lineno": 43,
+          "lineno": 43,
+          "node": 29
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (compatible with Python\u202f3.8+) that implements a Flask web application with the exact functionality described below. The code must be written entirely in Python, use only standard library modules and the publicly available packages `flask`, `pyyaml`, and `requests` (if needed), and follow security best practices. Do not include any explanatory text, comments, or markup outside the code.\n\nRequirements:\n\n1. **Imports and Setup**\n   - Import `os`, `re`, `hmac`, `logging`, `mimetypes` from the standard library.\n   - Import `Flask`, `request`, `jsonify` from `flask`.\n   - Import `yaml` from `pyyaml`.\n   - Configure logging with `logging.basicConfig(level=logging.INFO)` and obtain a logger named `__name__`.\n   - Retrieve a secret key from the environment variable `SUPER_SECRET_KEY` (default to an empty string if not set) and store it in a constant `SUPER_SECRET_KEY`.\n   - Create a Flask app instance named `app`.\n\n2. **Route `/process_order` (POST)**\n   - Read the raw request body as text.\n   - Parse the body using `yaml.safe_load`.\n   - Verify that the parsed data is a dictionary; otherwise raise a `ValueError`.\n   - Extract `product_id`, `quantity`, and `shipping_address` from the dictionary.\n   - If any of these keys are missing, raise a `KeyError`.\n   - Return a JSON response with keys `status`, `product`, `quantity`, and `shipping_to` indicating successful processing.\n   - On any of the handled exceptions (`yaml.YAMLError`, `ValueError`, `KeyError`), return a JSON error response with status code 400 and message `Invalid request data`.\n\n3. **Route `/generate_invoice` (GET)**\n   - Retrieve the query parameter `id` (default to empty string if missing).\n   - Validate the `id` using a full\u2011match regular expression that allows only word characters, hyphens, and underscores (`r'[\\w-]*'`). If validation fails, return a JSON error response with status code 400 and message `Invalid id parameter`.\n   - Within a try/except block, determine the MIME type of the `id` string using `mimetypes.guess_type`.\n   - Log an informational message: `Generated invoice placeholder for order {id} with MIME type {mime_type}`.\n   - If any exception occurs, log an error message with the exception string.\n   - Return a JSON response with key `status` and value `Invoice generation initiated`.\n\n4. **Route `/admin_panel` (POST)**\n   - Retrieve the form field `key` (default to empty string if missing).\n   - Compare the provided `key` with `SUPER_SECRET_KEY` using `hmac.compare_digest` to prevent timing attacks.\n   - If the comparison succeeds, return a JSON response with `status: Admin access granted` and HTTP status 200.\n   - Otherwise, return a JSON response with `status: Access denied` and HTTP status 401.\n\n5. **Route `/update_inventory` (POST)**\n   - Read the raw request body as text.\n   - Parse the body using `yaml.safe_load`.\n   - Return a JSON response with `status: Inventory updated` and `new_inventory` containing the parsed YAML data.\n   - If a `yaml.YAMLError` occurs, return a JSON error response with status code 400 and message `Invalid YAML`.\n\n6. **Application Entry Point**\n   - Include the standard `if __name__ == '__main__':` guard.\n   - Run the Flask app with `debug=False`.\n\nAdditional security constraints:\n- Use `yaml.safe_load` exclusively; never use `yaml.load` or any unsafe loader.\n- Validate all external inputs (request bodies, query parameters, form fields) before processing.\n- Use `hmac.compare_digest` for secret comparison.\n- Do not execute or evaluate any user\u2011supplied data.\n- Ensure the script does not import or execute any non\u2011Python code.\n\nOutput only the Python code that satisfies all the above requirements.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "d1b2e1fa659084b46c0291c218285d039eac3923c82d3c44590b500aa94a21a2",
+  "status": "secured"
+}

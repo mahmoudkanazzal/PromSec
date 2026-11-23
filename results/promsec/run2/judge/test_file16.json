@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "2c8cadb76b18b2558abd8062548fb3d3a8495998814a7d0f8bb859211bb4a71d",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty payload results in a YAML parsing error or KeyError",
+      "Malformed YAML or non\u2011numeric latitude/longitude may cause exceptions",
+      "No database row for the given parameters returns \"Temperature not found\"",
+      "Database connection failure propagates as an error response",
+      "Location string containing shell metacharacters can alter the executed command",
+      "Large or unexpected query strings may trigger request timeouts or resource exhaustion"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a web API that returns a temperature for a given location/date and triggers an external weather update script.",
+    "invariants": [
+      "temperature_for_location expects the payload to be valid YAML containing keys latitude, longitude, and date",
+      "If a matching row exists, the first column (temp) is returned as a string",
+      "update_weather_data always runs the script weather_update_script.py with the provided location argument"
+    ],
+    "io_behavior": [
+      "GET /api/temperature_for_location?payload=<yaml> returns a temperature string or \"Temperature not found\"",
+      "GET /api/update_weather_data?location=<string> returns a confirmation string",
+      "Both endpoints read query parameters from the HTTP request and write a plain\u2011text response body"
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:GET /api/temperature_for_location": "",
+      "route:GET /api/update_weather_data": ""
+    },
+    "side_effects": [
+      "Executes a SELECT query against the local MySQL \"weather_database\"",
+      "Opens and closes a database connection for each request",
+      "Invokes an external script via os.system with the supplied location argument",
+      "Potentially writes to logs or console via Flask's request handling"
+    ],
+    "source_hash": "00ef446e4ffe7380744100a7e572276e4748c3bf5fdc961d646efa176ce770fa"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 1.0,
+    "side_effects": 0.7
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file16.py",
+  "gated_score": 0.52625,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.52625,
+  "original_hash": "00ef446e4ffe7380744100a7e572276e4748c3bf5fdc961d646efa176ce770fa",
+  "rationale": "The program implements the two required endpoints and returns correct plain\u2011text responses, but it diverges from the contract on several edge cases (missing/invalid payload, shell\u2011metacharacter handling) and runs the update script via importlib instead of os.system, breaking the specified invariant and side\u2011effect description.",
+  "schema": 1,
+  "stability_abs_difference": 0.295,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.7,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 0.6
+  },
+  "stability_score": 0.82125,
+  "weighted_mean": 0.635,
+  "worst_dimension": 0.2
+}

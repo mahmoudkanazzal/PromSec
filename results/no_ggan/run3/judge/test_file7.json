@@ -1,0 +1,82 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "cbc31e254cb35c78af26d90e3badcd7e6dce1f3b5d21959770363a703ec061c9",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Invalid YAML payload to /system/add_record triggers a 400 error with an 'Invalid YAML format' message.",
+      "Missing required form or query parameters (e.g., key, new_config, old_key) cause 400 or 401 errors depending on the endpoint.",
+      "Providing an incorrect admin key results in a 401 response for all protected routes.",
+      "Changing the SECRET_KEY to an empty string via /admin/change_key could lock out future admin actions.",
+      "Calling /system/start_process or /data/export with arguments containing spaces or special characters may lead to command injection vulnerabilities.",
+      "If 'type' parameter for /data/export is omitted, the default 'json' is used; unsupported types are still passed to the script without validation."
+    ],
+    "entrypoints": [
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple HTTP API for managing records, processes, and admin configuration, exposing endpoints to add, fetch, delete records, start processes, view logs, export data, retrieve user details, and perform authenticated admin actions such as authentication, config updates, key changes, and preference settings.",
+    "invariants": [
+      "All admin\u2011protected endpoints require the request key to match the current SECRET_KEY.",
+      "Endpoints that need an identifier ('id') return a 400 error if the parameter is missing or empty.",
+      "add_record validates that both 'id' and 'value' are present in the parsed YAML; otherwise it returns a 400 error.",
+      "Authentication failures always result in a 401 response.",
+      "The server always returns JSON payloads with a 'status' field describing the outcome."
+    ],
+    "io_behavior": [
+      "POST /system/add_record \u2013 accepts raw YAML in the request body, returns JSON with the parsed 'id' and 'value' or error on invalid/missing fields.",
+      "GET /system/start_process \u2013 reads 'process' and 'argument' query parameters, triggers a shell script, returns JSON status.",
+      "POST /admin/authenticate \u2013 reads form field 'key', returns JSON indicating success or 401 failure.",
+      "POST /admin/update_config \u2013 requires valid 'key' and 'new_config' form fields, returns JSON confirmation or error.",
+      "GET /records/fetch \u2013 requires 'id' query parameter, returns a sample record JSON or error.",
+      "POST /records/delete \u2013 requires 'id' form field, returns JSON deletion confirmation or error."
+    ],
+    "public_api": {
+      "route:GET /data/export": "",
+      "route:GET /logs/view": "",
+      "route:GET /process/status": "",
+      "route:GET /records/fetch": "",
+      "route:GET /system/start_process": "",
+      "route:GET /user/details": "",
+      "route:POST /admin/authenticate": "",
+      "route:POST /admin/change_key": "",
+      "route:POST /admin/set_preference": "",
+      "route:POST /admin/update_config": "",
+      "route:POST /records/delete": "",
+      "route:POST /system/add_record": ""
+    },
+    "side_effects": [
+      "Executes external shell commands via os.system for start_process.sh, export_data.py, and potentially other scripts.",
+      "Modifies the in\u2011memory SECRET_KEY when /admin/change_key is called with correct old key.",
+      "No persistent storage; all responses are generated on\u2011the\u2011fly without writing to files or databases."
+    ],
+    "source_hash": "ce4864d7f7c339a53aefaecc047fa140985c7e50c8066fcb5f9ed10108269376"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.5,
+    "invariants": 1.0,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file7.py",
+  "gated_score": 0.7925,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.7925,
+  "original_hash": "ce4864d7f7c339a53aefaecc047fa140985c7e50c8066fcb5f9ed10108269376",
+  "rationale": "All core endpoints, response formats, and admin checks match the contract, and side\u2011effects are preserved. However, the implementation adds safety checks that prevent empty key changes, command\u2011injection scenarios, and unvalidated export types, diverging from three specified edge\u2011case behaviors.",
+  "schema": 1,
+  "stability_abs_difference": 0.026,
+  "stability_dimensions": {
+    "behavior": 0.85,
+    "edge_cases": 0.67,
+    "invariants": 0.8,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.8185,
+  "weighted_mean": 0.89,
+  "worst_dimension": 0.5
+}

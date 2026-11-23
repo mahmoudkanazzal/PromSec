@@ -1,0 +1,68 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "bbe113181777a3066e0fc93bee98b9daf64d0db8e99035236cd3a59a5d0b746c",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "If the session does not contain 'username', a KeyError is raised and no redirect occurs.",
+      "If the POST data lacks the 'message' field, a KeyError is raised.",
+      "Database connection failures raise an exception and prevent the redirect.",
+      "The SQL statement is built via string interpolation, allowing SQL injection via crafted username or message values.",
+      "Messages that exceed the column size in the database cause an insertion error.",
+      "Unexpected characters in username or message may break the SQL syntax and abort the request."
+    ],
+    "entrypoints": [],
+    "intent": "Store a posted message from an authenticated user in a MySQL database and then redirect the client to the home page.",
+    "invariants": [
+      "The database connection always uses host localhost, user root, password root, and database db.",
+      "The `messages` table must exist with columns `username` and `content`.",
+      "Each successful POST results in exactly one INSERT operation.",
+      "The client is always redirected to '/' after processing."
+    ],
+    "io_behavior": [
+      "Accept an HTTP POST request to the path /post with a form field named 'message'.",
+      "Read the current session's 'username' value.",
+      "Return an HTTP 302 redirect response pointing to '/'.",
+      "No response body is sent; only the redirect location header is visible."
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "func:insert_user_message_in_db": "(username, message)",
+      "route:POST /post": ""
+    },
+    "side_effects": [
+      "Insert a new row into the MySQL table `messages` containing the username and message content.",
+      "Commit the database transaction.",
+      "Close the database connection after the insert."
+    ],
+    "source_hash": "fa8139466766f50de1cf3e82becfde48623437f0868aca195be8f4ddfd3ea9c2"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.1,
+    "invariants": 1.0,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file86.py",
+  "gated_score": 0.40375,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.40375,
+  "original_hash": "fa8139466766f50de1cf3e82becfde48623437f0868aca195be8f4ddfd3ea9c2",
+  "rationale": "The program follows the main I/O flow and side\u2011effects (insert, commit, close, redirect), and uses the required DB defaults, but it diverges on key contract points: it aborts with HTTP errors instead of raising KeyError, uses a parameterized query rather than string interpolation (preventing the specified SQL\u2011injection behavior), and catches DB errors instead of letting them propagate. Consequently, most edge\u2011case specifications are not met.",
+  "schema": 1,
+  "stability_abs_difference": 0.1675,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.2,
+    "invariants": 0.7,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.57125,
+  "weighted_mean": 0.505,
+  "worst_dimension": 0.1
+}

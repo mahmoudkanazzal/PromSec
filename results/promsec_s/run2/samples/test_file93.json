@@ -1,0 +1,37 @@
+{
+  "ast_similarity": 0.551219512195122,
+  "candidate_hash": "711be88de5c110bf588108173412670b4b124a493c932451afc4ad18a6863777",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file93.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.551219512195122,
+      "bandit_statement_nodes": [
+        10,
+        19,
+        29
+      ],
+      "candidate_hash": "711be88de5c110bf588108173412670b4b124a493c932451afc4ad18a6863777",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web API for an election system with the exact functionality described below. The script must be written **only in Python** and must follow security best practices, including but not limited to using parameterized SQL queries, proper input validation, context managers for database connections, and graceful error handling.\n\n**Requirements:**\n\n1. **Imports**: Include only the necessary imports (`flask`, `sqlite3`, and any standard library modules required for validation or error handling).\n\n2. **Database Helper**:\n   - Define a function `get_db_connection()` that returns a new SQLite connection to a file named `election.db`.\n   - Use a context manager (`with` statement) wherever a connection or cursor is opened to ensure it is closed automatically.\n\n3. **Flask Application**:\n   - Create a Flask app instance named `app`.\n\n4. **Endpoints**:\n   - **POST `/register_candidate`**  \n     - Expect a JSON body with keys `name` (non\u2011empty string) and `party` (non\u2011empty string).  \n     - Validate that both fields are present and are strings; return a JSON error with status\u202f400 if validation fails.  \n     - Insert the candidate into the `candidates` table using a parameterized query: `INSERT INTO candidates (name, party) VALUES (?, ?)`.  \n     - Return `{\"message\": \"Candidate registered successfully\"}` with status\u202f201.\n\n   - **GET `/get_candidate`**  \n     - Expect a query parameter `id`.  \n     - Validate that `id` is provided and is an integer; return a JSON error with status\u202f400 if validation fails.  \n     - Retrieve the candidate row with `SELECT * FROM candidates WHERE id = ?` using a parameterized query.  \n     - If no candidate is found, return `{\"error\": \"Candidate not found\"}` with status\u202f404.  \n     - Return the candidate data as JSON with status\u202f200.\n\n   - **POST `/update_votes`**  \n     - Expect a JSON body with keys `candidate_id` (integer) and `votes` (integer, must be non\u2011negative).  \n     - Validate both fields; return a JSON error with status\u202f400 if validation fails.  \n     - Update the candidate\u2019s vote count with `UPDATE candidates SET votes = votes + ? WHERE id = ?` using a parameterized query.  \n     - If the candidate does not exist, return `{\"error\": \"Candidate not found\"}` with status\u202f404.  \n     - Return `{\"message\": \"Votes updated successfully\"}` with status\u202f200.\n\n   - **GET `/get_results`**  \n     - Retrieve all candidates ordered by vote count descending using `SELECT name, party, votes FROM candidates ORDER BY votes DESC`.  \n     - Return the list of results as JSON with status\u202f200.\n\n5. **Response Formatting**:\n   - Use `flask.jsonify` for all responses.\n   - Ensure consistent JSON structure for success and error messages.\n\n6. **Error Handling**:\n   - Wrap database operations in try/except blocks to catch `sqlite3.Error`.  \n   - On database errors, return a generic JSON error with status\u202f500 without exposing internal details.\n\n7. **Application Execution**:\n   - Include the standard `if __name__ == '__main__':` block to run the Flask app with `debug=False`.\n\n8. **Security Considerations**:\n   - No raw string interpolation in SQL statements; always use placeholders (`?`).  \n   - Validate and sanitize all external inputs (JSON bodies and query parameters).  \n   - Do not expose stack traces or internal error messages to the client.  \n   - Ensure the SQLite connection is opened with `detect_types=sqlite3.PARSE_DECLTYPES` if needed for type safety.\n\nProduce only the Python code that satisfies all the above specifications. Do not include any explanatory text, comments, or code in any language other than Python.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "47679752c6580ec721a4e649dd63089f102ea9f5858a6f578e464ff2959c276d",
+  "status": "secured"
+}

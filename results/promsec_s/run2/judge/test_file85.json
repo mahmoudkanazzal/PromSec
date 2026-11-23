@@ -1,0 +1,67 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "69d12c1977310f118e7dd2e651b0462a265c829b7f79e77279f003fa7588dc7a",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing form fields or missing session username cause a KeyError before DB interaction.",
+      "Database connection failure results in a \"failure\" response.",
+      "SQL execution errors (e.g., duplicate keys, type mismatches) also yield \"failure\".",
+      "Non\u2011numeric stock_quantity is accepted as a string and stored as\u2011is.",
+      "SQL injection is possible because values are interpolated directly into the query."
+    ],
+    "entrypoints": [],
+    "intent": "Process a buy order request by recording the requested stock and quantity for the logged\u2011in user in a MySQL database and return a simple success or failure message.",
+    "invariants": [
+      "The request method must be POST.",
+      "Form data must contain both 'stock_name' and 'stock_quantity'.",
+      "A valid 'username' must exist in the session.",
+      "The MySQL server must be reachable and the `my_stocks` table must exist.",
+      "The response is always a short string, never a JSON object."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST requests at the path /buy_order.",
+      "Reads form fields 'stock_name' and 'stock_quantity' from the request body.",
+      "Retrieves the current username from the session data.",
+      "Returns a plain\u2011text response \"successfull\" on successful insertion.",
+      "Returns a plain\u2011text response \"failure\" if the insertion raises an exception."
+    ],
+    "public_api": {
+      "route:POST /buy_order": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection to localhost with credentials root/root.",
+      "Executes an INSERT statement that adds a row to the `my_stocks` table.",
+      "Commits the transaction on success."
+    ],
+    "source_hash": "7e999ded708c14fff95eb91a5e678da1e20c0b73b18025c94bab835c02c3767e"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.1,
+    "invariants": 0.2,
+    "io_semantics": 0.2,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file85.py",
+  "gated_score": 0.22375,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.22375,
+  "original_hash": "7e999ded708c14fff95eb91a5e678da1e20c0b73b18025c94bab835c02c3767e",
+  "rationale": "The program deviates from the contract on key edge cases (missing fields or username cause custom error responses instead of KeyError), rejects non\u2011numeric quantities, uses parameterized queries (preventing the intended SQL injection), returns 'successful' (spelling) with a 200 status rather than the exact 'successfull' string, and relies on environment variables for DB credentials instead of fixed root/root. Core side\u2011effects (DB insert) are present, but many invariants and I/O semantics are no",
+  "schema": 1,
+  "stability_abs_difference": 0.43912,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.4,
+    "invariants": 1.0,
+    "io_semantics": 0.8,
+    "side_effects": 0.67
+  },
+  "stability_score": 0.66287,
+  "weighted_mean": 0.265,
+  "worst_dimension": 0.1
+}

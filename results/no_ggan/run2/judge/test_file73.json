@@ -1,0 +1,81 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "fa566ecf7c7fe7bfd84c4dc79643aa4b00b6acc847ce52e0ef354c4c01a4ffbe",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or empty form fields may cause KeyError or result in malformed SQL statements.",
+      "Duplicate usernames or book IDs can cause database integrity errors.",
+      "SQL injection is possible because user input is concatenated directly into queries.",
+      "Invalid password format (e.g., non\u2011UTF\u20118) will raise an exception during hashing.",
+      "Database connection failures result in generic error messages and redirects.",
+      "Large input values may exceed column size limits, leading to insertion failures."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple web service for user registration, login, and basic library management (adding books, checking out, returning, and viewing books).",
+    "invariants": [
+      "Passwords are stored as SHA\u2011256 hash concatenated with the original salt.",
+      "A checkout record is created only if the username exists in the users table.",
+      "A return operation deletes a checkout record only if it exists for the given user and book.",
+      "All database connections are closed after each request.",
+      "Redirect responses always point to static routes (/home or /dashboard).",
+      "The view_books endpoint always returns a JSON\u2011serializable list of book rows."
+    ],
+    "io_behavior": [
+      "POST /register with form fields username and password redirects to /home on success or failure.",
+      "POST /login with form fields username and password redirects to /dashboard on valid credentials, otherwise returns \"Invalid credentials\" or \"Login failed\".",
+      "POST /add_book with form fields book_id, title, author returns a success or failure message.",
+      "POST /checkout with form fields username, book_id returns a message indicating success, user not found, or failure.",
+      "POST /return with form fields username, book_id returns a message indicating success, record not found, or failure.",
+      "GET /view_books returns a JSON array of all books or an error string."
+    ],
+    "public_api": {
+      "route:GET /view_books": "",
+      "route:POST /add_book": "",
+      "route:POST /checkout": "",
+      "route:POST /login": "",
+      "route:POST /register": "",
+      "route:POST /return": ""
+    },
+    "side_effects": [
+      "Inserts new user records into the users table.",
+      "Inserts new book records into the books table.",
+      "Inserts and deletes rows in the checkouts table for checkout/return operations.",
+      "Commits database transactions for each successful write operation.",
+      "Prints exception tracebacks to the server console.",
+      "Generates a random 16\u2011byte salt for each password hash."
+    ],
+    "source_hash": "a4a023812d8d87d69ca6b7c153a086fae31bb10841e6483047d43e29bb8d72c9"
+  },
+  "dimensions": {
+    "behavior": 0.3,
+    "edge_cases": 0.2,
+    "invariants": 0.2,
+    "io_semantics": 0.3,
+    "side_effects": 0.6
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file73.py",
+  "gated_score": 0.28625,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.28625,
+  "original_hash": "a4a023812d8d87d69ca6b7c153a086fae31bb10841e6483047d43e29bb8d72c9",
+  "rationale": "Core routes exist and DB connections are closed, but redirects, error messages, and password hashing do not follow the specified contract; edge\u2011case handling (missing fields, SQL injection, duplicate keys) differs; invariants about SHA\u2011256+salt are violated; side\u2011effects (inserts, commits, logging) are largely preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.30688,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.7,
+    "invariants": 0.85,
+    "io_semantics": 0.4,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.59313,
+  "weighted_mean": 0.315,
+  "worst_dimension": 0.2
+}

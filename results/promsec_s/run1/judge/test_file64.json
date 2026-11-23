@@ -1,0 +1,74 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "f8d6c65876edcd9d3f86a44e0ea2bed71bf9504224840072ffb744caec07de36",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Empty request body or missing YAML keys triggers a 400 error.",
+      "Invalid YAML syntax causes a 500 error from the YAML parser.",
+      "Missing or incorrect DB environment variables cause a 500 error on connection attempt.",
+      "Database query returns no rows, resulting in a 404 response.",
+      "Database query raises an exception (e.g., timeout), leading to a 500 response.",
+      "If the temperature value stored in the database contains shell metacharacters, the `os.system` call may execute unintended commands."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide the temperature for a given location and datetime via a POST request to /api/temperature_for_location.",
+    "invariants": [
+      "The endpoint always responds with a status code and a text body.",
+      "Database credentials must be present in DB_HOST, DB_USER, DB_PASS, and DB_NAME environment variables.",
+      "The request body is parsed with `yaml.safe_load`; malformed YAML results in a 500 error.",
+      "The SQL query uses a parameterized placeholder for datetime, preventing SQL injection.",
+      "The latitude and longitude values are read but not used in the query.",
+      "The response body on success contains only the temperature value without additional formatting."
+    ],
+    "io_behavior": [
+      "Accepts a POST request with a YAML body containing keys latitude, longitude, and datetime.",
+      "Returns HTTP 400 with an error message if the payload is empty or required keys are missing.",
+      "Returns HTTP 500 with the exception text if the database connection fails or a query error occurs.",
+      "Returns HTTP 404 with a message if no temperature record matches the supplied datetime.",
+      "On success, returns the temperature value (as a plain string) with HTTP 200.",
+      "Writes a line to the process stdout using `os.system('echo Retrieved temperature: <value>')`."
+    ],
+    "public_api": {
+      "route:POST /api/temperature_for_location": ""
+    },
+    "side_effects": [
+      "Establishes a TCP connection to a MySQL server using credentials from environment variables.",
+      "Executes a SELECT query against the `temperature` table.",
+      "Closes the database cursor and connection after the query.",
+      "Invokes the operating system shell to echo the retrieved temperature."
+    ],
+    "source_hash": "efb06c21b05fa16bbd1d20a22444fcda5569615d4c66f5bab7077d2cf01f063b"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.7,
+    "invariants": 0.85,
+    "io_semantics": 0.8,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file64.py",
+  "gated_score": 0.63312,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.63312,
+  "original_hash": "efb06c21b05fa16bbd1d20a22444fcda5569615d4c66f5bab7077d2cf01f063b",
+  "rationale": "The program mostly follows the contract (status codes, DB handling, query), but returns 400 instead of 500 for malformed YAML and omits the required os.system echo, breaking two edge cases and side\u2011effect expectations.",
+  "schema": 1,
+  "stability_abs_difference": 0.18625,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.83,
+    "invariants": 0.83,
+    "io_semantics": 0.83,
+    "side_effects": 0.75
+  },
+  "stability_score": 0.81937,
+  "weighted_mean": 0.6775,
+  "worst_dimension": 0.5
+}

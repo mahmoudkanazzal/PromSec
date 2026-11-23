@@ -1,0 +1,69 @@
+{
+  "ast_similarity": 0.8260869565217391,
+  "candidate_hash": "8f1eee0afffd169b4581d137afed7a637a9988c5bd5fb8234fee18f4f3b45d38",
+  "complete": true,
+  "config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "cwe_count_after": 0,
+  "cwe_count_before": 3,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    259,
+    327
+  ],
+  "error": "",
+  "file": "test_file55.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7633928571428571,
+      "bandit_statement_nodes": [
+        2,
+        11,
+        20
+      ],
+      "candidate_hash": "27fb9eace4e316d1fa98e3854e8538b5c03142adf39c0fcba1ddc2768c9ccaea",
+      "cwe_count": 1,
+      "cwes": [
+        327
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9993,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 2
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.7747,
+          "end_lineno": 24,
+          "lineno": 21,
+          "node": 11
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python 3 script that implements the following functionality exactly as described, using only Python code (no other languages). The script must:\n\n1. Import the modules: `Flask`, `request`, `redirect` from `flask`; `os`; `hashlib`; `MySQLdb`; and any additional standard library modules needed for security best practices.\n2. Create a Flask application instance named `app`.\n3. Define a route `'/login'` that accepts only POST requests.\n4. Inside the route handler:\n   - Retrieve `username` and `password` from `request.form` keys `'username'` and `'password'`.\n   - Establish a MySQL connection using `MySQLdb.connect` with the following parameters, each read from environment variables with the given defaults:\n     - `host` from `DB_HOST` (default `'localhost'`)\n     - `user` from `DB_USER` (default `'cwe'`)\n     - `passwd` from `DB_PASS` (default empty string)\n     - `db` from `DB_NAME` (default `'cwe'`)\n   - Use a cursor to execute a **parameterized** query that selects the `password` column from the table `registered_users` where `username` equals the supplied username. Use the placeholder syntax appropriate for MySQLdb to prevent SQL injection.\n   - Fetch all results, close the database connection, and handle any exception that occurs during this process by printing the exception (without exposing sensitive details) and returning a redirect to `'/internal_server_error'`.\n   - If the query returns zero rows, return a redirect to `'/cant_login'`.\n   - If a row is returned, compute the SHA\u20111 hash of the supplied password (`hashlib.sha1(password.encode('utf-8')).hexdigest()`).\n   - Compare the computed hash with the stored hash using a **constant\u2011time** comparison function (e.g., `hmac.compare_digest`) to mitigate timing attacks.\n   - If the hashes match, return a redirect to `'/success'`; otherwise, return a redirect to `'/cant_login'`.\n5. Ensure the script follows security best practices:\n   - Use only parameterized queries; never concatenate user input into SQL strings.\n   - Use constant\u2011time comparison for password hashes.\n   - Do not hard\u2011code any credentials; rely solely on environment variables.\n   - Do not expose stack traces or internal error details to the client.\n   - Keep the code minimal and functional, matching the described behavior exactly.\n6. The script must be runnable as a Flask application (e.g., include the typical `if __name__ == '__main__':` block to call `app.run()` if desired, but this is optional). Do not add any extra routes, functions, or output beyond what is specified. Do not include any explanatory comments or documentation strings. Do not output anything other than the requested Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.8260869565217391,
+      "bandit_statement_nodes": [
+        18
+      ],
+      "candidate_hash": "8f1eee0afffd169b4581d137afed7a637a9988c5bd5fb8234fee18f4f3b45d38",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the following exact behavior and security requirements:\n\n- Use only Python code; do not include any other language or markup.\n- Import the modules: `Flask`, `request`, `redirect` from `flask`; `os`, `hashlib`, `sys`; `MySQLdb`; and `check_password_hash` from `werkzeug.security`.\n- Create a Flask app instance named `app`.\n- Define a route `/login` that accepts only POST requests.\n- Inside the route handler:\n  - Retrieve `username` and `password` from the form data using `request.form.get`, defaulting to empty strings if missing.\n  - Establish a MySQL connection using `MySQLdb.connect` with the following parameters, each obtained from environment variables with the specified defaults:\n    - `host` from `DB_HOST` (default `'localhost'`)\n    - `user` from `DB_USER` (default `'cwe'`)\n    - `passwd` from `DB_PASS` (default empty string)\n    - `db` from `DB_NAME` (default `'cwe'`)\n  - Use a cursor to execute a **parameterized** SQL query that selects the `password` column from the `registered_users` table where `username` equals the supplied username. The query must use `%s` placeholders and pass the username as a tuple to prevent SQL injection.\n  - Fetch all rows, then close the cursor and the database connection.\n  - If any exception occurs during the database operations, print the exception to `sys.stderr` and immediately return a redirect to `/internal_server_error`.\n  - If the query returns no rows, return a redirect to `/cant_login`.\n  - Extract the stored password hash from the first row.\n  - Verify the supplied password against the stored hash using `check_password_hash`.\n  - If the verification succeeds, return a redirect to `/success`; otherwise, return a redirect to `/cant_login`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app with `app.run()`.\n- Do not include any comments, docstrings, explanatory text, or non\u2011Python code. Output only the Python code that fulfills all the above specifications.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "6c79b18bd9acc3330c239fc27e3b93f0a9191275a71e720ddf34c0a56db37061",
+  "status": "secured"
+}

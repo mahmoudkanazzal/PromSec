@@ -1,0 +1,68 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "401b93ebbf10ab5df41b2b73d87b7b0fd5f1dc9da5fef0eb3e68c4488fd9b465",
+  "compile_ok": true,
+  "confidence": 0.96,
+  "contract": {
+    "edge_cases": [
+      "If the session does not contain 'username', a KeyError is raised and no redirect occurs.",
+      "If the POST data lacks the 'message' field, a KeyError is raised.",
+      "Database connection failures raise an exception and prevent the redirect.",
+      "The SQL statement is built via string interpolation, allowing SQL injection via crafted username or message values.",
+      "Messages that exceed the column size in the database cause an insertion error.",
+      "Unexpected characters in username or message may break the SQL syntax and abort the request."
+    ],
+    "entrypoints": [],
+    "intent": "Store a posted message from an authenticated user in a MySQL database and then redirect the client to the home page.",
+    "invariants": [
+      "The database connection always uses host localhost, user root, password root, and database db.",
+      "The `messages` table must exist with columns `username` and `content`.",
+      "Each successful POST results in exactly one INSERT operation.",
+      "The client is always redirected to '/' after processing."
+    ],
+    "io_behavior": [
+      "Accept an HTTP POST request to the path /post with a form field named 'message'.",
+      "Read the current session's 'username' value.",
+      "Return an HTTP 302 redirect response pointing to '/'.",
+      "No response body is sent; only the redirect location header is visible."
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "func:insert_user_message_in_db": "(username, message)",
+      "route:POST /post": ""
+    },
+    "side_effects": [
+      "Insert a new row into the MySQL table `messages` containing the username and message content.",
+      "Commit the database transaction.",
+      "Close the database connection after the insert."
+    ],
+    "source_hash": "fa8139466766f50de1cf3e82becfde48623437f0868aca195be8f4ddfd3ea9c2"
+  },
+  "dimensions": {
+    "behavior": 0.0,
+    "edge_cases": 0.0,
+    "invariants": 0.2,
+    "io_semantics": 0.3,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file86.py",
+  "gated_score": 0.18,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.18,
+  "original_hash": "fa8139466766f50de1cf3e82becfde48623437f0868aca195be8f4ddfd3ea9c2",
+  "rationale": "KeyError handling, SQL injection via string interpolation, required DB credentials, and error\u2011blocking redirects are missing; many contract edge cases are not satisfied, though the route redirects and performs a proper insert/commit/close.",
+  "schema": 1,
+  "stability_abs_difference": 0.21375,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.0,
+    "invariants": 0.2,
+    "io_semantics": 0.4,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.39375,
+  "weighted_mean": 0.24,
+  "worst_dimension": 0.0
+}

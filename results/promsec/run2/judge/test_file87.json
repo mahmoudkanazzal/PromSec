@@ -1,0 +1,77 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "fc3f2137e50d44ac20fc7356abc19ec0b7c6a6ab3254991c9ca4ae1981200d9d",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing required form fields cause a server error (KeyError) and no graceful message.",
+      "Registering an existing username returns \"Username already exists\" without altering the database.",
+      "Login with incorrect credentials returns \"Invalid credentials\".",
+      "Search with an empty term returns all usernames (LIKE '%%').",
+      "Database errors during registration trigger a rollback and return \"Registration Failed\".",
+      "Extremely long input values may cause MySQL errors or truncation."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose simple user account management operations (register, login, update profile, search users, delete account) via HTTP endpoints.",
+    "invariants": [
+      "Each request creates a new MySQL connection with the same host, user, password, and database, and closes it before responding.",
+      "All responses are plain text strings (no JSON or HTML).",
+      "The users table is expected to contain at least columns username, password, and email.",
+      "Routes accept only the HTTP methods defined (POST for mutating actions, GET for search).",
+      "No authentication or session handling is performed; any client can call the endpoints."
+    ],
+    "io_behavior": [
+      "POST /register with form fields username and password returns a plain\u2011text message indicating success, duplicate username, or failure.",
+      "POST /login with form fields username and password returns \"Login successful\" or \"Invalid credentials\".",
+      "POST /update_profile with form fields username and email returns \"Profile updated successfully\".",
+      "GET /search_users?term=... returns the string representation of a list of matching usernames.",
+      "POST /delete_account with form field username returns \"Account deleted successfully\"."
+    ],
+    "public_api": {
+      "route:GET /search_users": "",
+      "route:POST /delete_account": "",
+      "route:POST /login": "",
+      "route:POST /register": "",
+      "route:POST /update_profile": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the users table on successful registration.",
+      "Updates the email column for a given username on profile update.",
+      "Deletes a row from the users table on account deletion.",
+      "Performs SELECT queries for login verification and user search.",
+      "Opens a TCP listening socket for the Flask web server."
+    ],
+    "source_hash": "e736b28ab6a9cb96dc6b61defd2475b82d94a9935a882c8c823b4c8adcca5700"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.33,
+    "invariants": 0.7,
+    "io_semantics": 0.5,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file87.py",
+  "gated_score": 0.54338,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.54338,
+  "original_hash": "e736b28ab6a9cb96dc6b61defd2475b82d94a9935a882c8c823b4c8adcca5700",
+  "rationale": "Core routes and DB actions are present, but missing-field errors are handled gracefully instead of raising, search returns JSON not plain text, empty search term returns empty list instead of all users, and response format invariant is violated.",
+  "schema": 1,
+  "stability_abs_difference": 0.22674,
+  "stability_dimensions": {
+    "behavior": 0.78,
+    "edge_cases": 0.67,
+    "invariants": 0.8,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.77012,
+  "weighted_mean": 0.6145,
+  "worst_dimension": 0.33
+}

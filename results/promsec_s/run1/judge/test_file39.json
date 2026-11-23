@@ -1,0 +1,79 @@
+{
+  "api_preserved": false,
+  "candidate_hash": "21e74406bf26614ae9ddff8b413fb9e54c0b757646dbcc541bd588375e8cb04b",
+  "compile_ok": true,
+  "confidence": 0.8,
+  "contract": {
+    "edge_cases": [
+      "Templates with malformed TAL expressions raise chameleon.exc.ExpressionError.",
+      "Underscore\u2011prefixed traversal paths (e.g., __class__) raise NotFound or LocationError.",
+      "Module traversal is allowed only for explicitly whitelisted functions (e.g., AccessControl/getSecurityManager); all other module accesses raise NotFound.",
+      "Unicode inserts are validated against the configured Unicode conflict resolver; switching resolvers changes rendering behavior.",
+      "Division\u2011by\u2011zero in a python expression is caught by the test but not handled, demonstrating exception propagation.",
+      "Path alternatives containing spaces are parsed correctly; missing alternatives result in empty output."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]"
+    ],
+    "intent": "Run a comprehensive unit\u2011test suite that verifies the rendering, expression handling, security checks, Unicode handling, and traversal behavior of Zope PageTemplate objects when using the Chameleon template engine.",
+    "invariants": [
+      "All template rendering is performed with the Chameleon engine; the engine choice is fixed by useChameleonEngine() in setUp.",
+      "The stub security policy always returns True for permission checks, guaranteeing that access control does not block template evaluation unless the original policy is explicitly restored.",
+      "Utility registration (DefaultUnicodeEncodingConflictResolver) is performed before any template rendering, ensuring consistent Unicode conflict handling.",
+      "Each test restores the original security policy and clears the security manager in tearDown, preserving isolation between tests.",
+      "Template source files are never modified on disk; only in\u2011memory copies are written to PageTemplate objects.",
+      "The test suite expects the expected output files to exist; missing files cause test failures."
+    ],
+    "io_behavior": [
+      "When executed as a script, the program invokes unittest.main() which discovers and runs all test methods, printing a summary of passed/failed tests to standard output.",
+      "Each test reads template source files and expected output files from the test data directory, writes the source into a PageTemplate object, renders it, and compares the result to the expected HTML.",
+      "If a test encounters an unexpected condition (e.g., a mismatched output, a raised exception), the test framework reports a failure or error on standard output.",
+      "The program may raise uncaught exceptions (e.g., AssertionError, ExpressionError, NotFound) that terminate the test run and appear on standard error.",
+      "The exit status of the process is 0 if all tests pass, non\u2011zero otherwise.",
+      "No command\u2011line arguments are required; the program reads only the bundled test fixtures."
+    ],
+    "public_api": {
+      "class:AqPageTemplate": "",
+      "class:AqZopePageTemplate": "",
+      "class:Folder": "",
+      "class:HTMLTests": "assert_expected(self, t, fname, *args, **kwargs);assert_expected_unicode(self, t, fname, *args, **kwargs);getProducts(self);setUp(self);tearDown(self);testBadExpression(self);testBatchIteration(self);testBooleanAttributes(self);testBooleanAttributesAndDefault(self);testDefaultKeywordHandling(self);testFancyLoop(self);testGlobalsShadowLocals(self);testHandleException(self);testI18nTranslate(self);testImportOldStyleClass(self);testInterpolationInContent(self);testNotExpression(self);testPathAlt(self);testPathAlternativesWithSpaces(self);testPathNothing(self);testPathTraverse(self);testRepeatVariable(self);testReplaceWithNothing(self);testSimpleLoop(self);testStringExpressions(self);testSwitch(self);testUnicodeInserts(self);testWithXMLHeader(self);test_1(self);test_2(self);test_3(self);test_module_traversal(self);test_underscore_traversal(self);test_unicode_conflict_resolution(self)",
+      "class:UnitTestSecurityPolicy": "checkPermission(self, permission, object, context);validate(self, accessed=None, container=None, name=None, value=None, context=None, roles=None, *args, **kw)"
+    },
+    "side_effects": [
+      "Registers a default traversable adapter and a Unicode\u2011encoding conflict resolver utility in the Zope component registry.",
+      "Temporarily replaces the global security policy with a permissive stub for most tests, then restores the original policy after each test.",
+      "Creates in\u2011memory Folder and PageTemplate objects that may acquire acquisition wrappers, affecting the process memory state.",
+      "Potentially modifies the global SecurityManager singleton during the module\u2011traversal test.",
+      "Writes temporary template source strings into PageTemplate instances (in\u2011memory only).",
+      "May leave the security policy in a restored state after test teardown, ensuring no lasting side\u2011effects beyond the process."
+    ],
+    "source_hash": "e4c8faf690a6d76e87ba11549e51d22556ac8952b1e6cd8e2fefab15dace2203"
+  },
+  "dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 1.0,
+    "invariants": 1.0,
+    "io_semantics": 0.0,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file39.py",
+  "gated_score": 0.0,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.57375,
+  "original_hash": "e4c8faf690a6d76e87ba11549e51d22556ac8952b1e6cd8e2fefab15dace2203",
+  "rationale": "The script runs the full test suite and preserves security, utility registration, and traversal semantics, but it calls unittest.main(exit=False), preventing the process from exiting with a non\u2011zero status on failures, violating the specified I/O behavior.",
+  "schema": 1,
+  "stability_abs_difference": 0.14,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.9,
+    "invariants": 0.9,
+    "io_semantics": 0.5,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.71375,
+  "weighted_mean": 0.765,
+  "worst_dimension": 0.0
+}

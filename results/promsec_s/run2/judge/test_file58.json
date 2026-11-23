@@ -1,0 +1,72 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "cbc666432b2877510b9fce02950ae83ab454010b918b8d721ec09f49b925c48c",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields raise a KeyError.",
+      "The username value is concatenated into the SQL query, allowing SQL injection.",
+      "If multiple rows exist for the same username, the last row's credentials are used.",
+      "Database connection failures cause the server process to exit, stopping the service.",
+      "An empty password string will never match a stored hash, resulting in a redirect to '/cwe200/'.",
+      "Storing password hashes but comparing them to raw passwords leads to authentication failures."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via POST /login and redirect based on credential verification.",
+    "invariants": [
+      "The endpoint only accepts POST requests.",
+      "Both 'username' and 'password' keys must be present in request.form.",
+      "The database connection is always closed in a finally block.",
+      "The redirect URL always begins with '/cwe200/'.",
+      "Password verification is performed with plain string equality.",
+      "Exactly one redirect response is returned per request."
+    ],
+    "io_behavior": [
+      "Accepts HTTP POST with form fields 'username' and 'password'.",
+      "Queries the MySQL 'cwe200' database for a row matching the supplied username.",
+      "Returns an HTTP 302 redirect to '/cwe200/<username>' when the supplied password equals the stored password hash.",
+      "Returns an HTTP 302 redirect to '/cwe200/' when the password does not match.",
+      "Writes database error messages to standard output if a MySQL error occurs.",
+      "Closes the database connection before completing the request."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Executes a read query against the MySQL server.",
+      "May terminate the Flask process via sys.exit on a database error.",
+      "Sends an HTTP redirect response to the client.",
+      "Outputs error information to the console.",
+      "Opens and closes a database connection for each request."
+    ],
+    "source_hash": "5ff655af97023add1622ea6ebc2d3e83554414ad4d9064096674986a62f222ce"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.0,
+    "invariants": 0.67,
+    "io_semantics": 0.5,
+    "side_effects": 0.8
+  },
+  "enforcement_config_hash": "5a9ab01ca7b2e0b5cf0a495cdd768417f67ac86f37f337afc6d8c3de908ec9ff",
+  "entrypoints_ok": true,
+  "file": "test_file58.py",
+  "gated_score": 0.29287,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.29287,
+  "original_hash": "5ff655af97023add1622ea6ebc2d3e83554414ad4d9064096674986a62f222ce",
+  "rationale": "The program deviates from key contract points such as raising KeyError on missing fields, concatenating username into SQL, using the last row for duplicate usernames, exiting on DB errors, and embedding the username in the redirect URL, though it respects POST-only handling, closes the DB connection, and logs errors.",
+  "schema": 1,
+  "stability_abs_difference": 0.28988,
+  "stability_dimensions": {
+    "behavior": 0.66,
+    "edge_cases": 0.33,
+    "invariants": 0.67,
+    "io_semantics": 0.83,
+    "side_effects": 0.8
+  },
+  "stability_score": 0.58275,
+  "weighted_mean": 0.3905,
+  "worst_dimension": 0.0
+}

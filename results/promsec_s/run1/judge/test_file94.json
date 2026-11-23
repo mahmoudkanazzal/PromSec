@@ -1,0 +1,74 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "fb78b4d5c2a6df3252f31ef0f3de3a6a86f646aad80f0ef84f2a58ab49393725",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed JSON fields cause a KeyError and a 500 response.",
+      "Non\u2011numeric or missing 'id'/'book_id' parameters result in SQL errors or empty results.",
+      "SQL injection is possible because values are interpolated into queries without escaping.",
+      "Requesting a non\u2011existent book id returns null JSON (or 200 with null).",
+      "Providing a negative 'copies' value will decrement the stored count.",
+      "Large input strings may exceed SQLite column limits or cause performance issues."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple HTTP API for managing a library catalog stored in a SQLite database, allowing clients to add books, retrieve a specific book, update copy counts, and list all books.",
+    "invariants": [
+      "All responses are JSON-encoded and include an HTTP status code.",
+      "The 'books' table must contain columns id (primary key), title, author, and copies.",
+      "Each successful write operation commits the transaction before closing the connection.",
+      "The API does not perform input validation; it forwards received values directly into SQL statements."
+    ],
+    "io_behavior": [
+      "POST /add_book with JSON {\"title\":..., \"author\":...} returns 201 and a success message.",
+      "GET /get_book?id=NUM returns 200 and the database row for that id as JSON.",
+      "POST /update_copies with JSON {\"book_id\":..., \"copies\":...} returns 200 and a success message.",
+      "GET /get_catalog returns 200 and a JSON array of all books (title, author, copies) ordered by title."
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:GET /get_book": "",
+      "route:GET /get_catalog": "",
+      "route:POST /add_book": "",
+      "route:POST /update_copies": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the 'books' table.",
+      "Updates the 'copies' column of an existing row.",
+      "Reads rows from the 'books' table.",
+      "Creates or modifies the 'library.db' SQLite file on disk."
+    ],
+    "source_hash": "e073dd9a61e0cb410dcefad0439b1bca1f2d3d6f7cbd533ee88fe43dc93f9972"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.6,
+    "io_semantics": 0.2,
+    "side_effects": 0.9
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file94.py",
+  "gated_score": 0.32375,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.32375,
+  "original_hash": "e073dd9a61e0cb410dcefad0439b1bca1f2d3d6f7cbd533ee88fe43dc93f9972",
+  "rationale": "The program implements the required routes but adds input validation and proper error handling, changing the contract's expected 500/KeyError responses to 400/404, prevents SQL injection, and returns 404 instead of null for missing books, thus deviating from the specified behavior and edge\u2011case handling while preserving core side effects and most invariants.",
+  "schema": 1,
+  "stability_abs_difference": 0.305,
+  "stability_dimensions": {
+    "behavior": 1.0,
+    "edge_cases": 0.1,
+    "invariants": 0.6,
+    "io_semantics": 1.0,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.62875,
+  "weighted_mean": 0.365,
+  "worst_dimension": 0.2
+}

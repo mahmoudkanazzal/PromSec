@@ -1,0 +1,64 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "6aaa925ace15d44109c2d39d97fa273957fc7987e458e27e9519d07af3297c00",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' in the session raises a KeyError and aborts the request.",
+      "Missing 'message' in the form data raises a KeyError and aborts the request.",
+      "Database connection failures or query errors result in an exception and no redirect.",
+      "The string\u2011format query is vulnerable to SQL injection if the message contains malicious characters.",
+      "Very long or binary message content may exceed column limits or cause encoding errors."
+    ],
+    "entrypoints": [],
+    "intent": "Accept a POST request containing a user message, store the message in a MySQL database associated with the logged\u2011in user, and redirect the client to the home page.",
+    "invariants": [
+      "The database connection always uses host localhost, user root, password root, and database db.",
+      "A redirect to '/' is always issued regardless of input content.",
+      "The inserted row contains exactly the username and message values supplied in the request."
+    ],
+    "io_behavior": [
+      "Receives an HTTP POST request at the path /post.",
+      "Extracts the 'username' from the Flask session and the 'message' field from the request form.",
+      "Returns an HTTP 302 redirect response pointing to '/' after processing."
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "func:insert_user_message_in_db": "(username, message)",
+      "route:POST /post": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the MySQL table `messages` with the provided username and message.",
+      "Commits the transaction, persisting the new record in the database."
+    ],
+    "source_hash": "fa8139466766f50de1cf3e82becfde48623437f0868aca195be8f4ddfd3ea9c2"
+  },
+  "dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.0,
+    "invariants": 0.0,
+    "io_semantics": 0.7,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "85830b8d09f1ccafc68b1eb62a7ef96b3212b250d303fce0e35ae2cf403dac02",
+  "entrypoints_ok": true,
+  "file": "test_file86.py",
+  "gated_score": 0.375,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.375,
+  "original_hash": "fa8139466766f50de1cf3e82becfde48623437f0868aca195be8f4ddfd3ea9c2",
+  "rationale": "The program implements the main flow (POST /post, extracts session username and form message, inserts into DB, redirects) but diverges on key contract points: it aborts with 401 instead of raising KeyError for missing username, silently defaults missing message, uses environment\u2011driven DB credentials instead of fixed root credentials, and employs a safe parameterized query rather than the vulnerable string\u2011format query. Consequently, invariants and edge\u2011case handling are not preserved, while sid",
+  "schema": 1,
+  "stability_abs_difference": 0.19213,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.2,
+    "invariants": 0.33,
+    "io_semantics": 0.9,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.56713,
+  "weighted_mean": 0.5,
+  "worst_dimension": 0.0
+}

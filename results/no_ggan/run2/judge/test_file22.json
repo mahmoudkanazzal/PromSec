@@ -1,0 +1,69 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "ecb6394d44a188c60f2cbd2f5c9d75b97a331ff691ebac7aa559e0ab2f755685",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed YAML in /add_book leads to a server error (e.g., 500)",
+      "Absent title/author/isbn keys cause a KeyError and error response",
+      "Empty or omitted 'section' query parameter still runs the inventory script with an empty argument",
+      "Incorrect or missing password in /librarian_access returns 401",
+      "Extremely large request bodies may cause performance degradation or request size limits"
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a simple library management HTTP API with endpoints to add a book, trigger an inventory script, and verify librarian credentials.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" key",
+      "The librarian password is a fixed constant string",
+      "The /add_book endpoint always echoes back the provided title regardless of other fields",
+      "The /run_inventory endpoint always returns a success status even if the script fails"
+    ],
+    "io_behavior": [
+      "POST /add_book with a YAML body containing title, author, and isbn returns JSON {\"status\":\"Book added\",\"title\":<title>}",
+      "GET /run_inventory?section=<name> returns JSON {\"status\":\"Inventory check initiated\"}",
+      "POST /librarian_access with form field password returns JSON {\"status\":\"Librarian access granted\"} on success or 401 with {\"status\":\"Access denied\"} on failure"
+    ],
+    "public_api": {
+      "route:GET /run_inventory": "",
+      "route:POST /add_book": "",
+      "route:POST /librarian_access": ""
+    },
+    "side_effects": [
+      "Executes the external command `python inventory_script.py <section>` via the OS shell",
+      "Consumes request payloads (YAML or form data) but does not persist them",
+      "Potentially triggers any side effects of the invoked inventory_script (e.g., file writes, network calls)"
+    ],
+    "source_hash": "628bfae4caf2338a54a5f8ef7dc7334f333bb812ca122d3afea75a2734f26efc"
+  },
+  "dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.4,
+    "invariants": 0.6,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file22.py",
+  "gated_score": 0.62875,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.62875,
+  "original_hash": "628bfae4caf2338a54a5f8ef7dc7334f333bb812ca122d3afea75a2734f26efc",
+  "rationale": "Endpoints exist and mostly follow contract, but password is read from env instead of a fixed constant and /add_book does not raise KeyError on missing fields, breaking some invariants and edge\u2011case expectations; otherwise JSON responses and side\u2011effects match.",
+  "schema": 1,
+  "stability_abs_difference": 0.0925,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.7,
+    "invariants": 0.5,
+    "io_semantics": 1.0,
+    "side_effects": 0.9
+  },
+  "stability_score": 0.72125,
+  "weighted_mean": 0.705,
+  "worst_dimension": 0.4
+}

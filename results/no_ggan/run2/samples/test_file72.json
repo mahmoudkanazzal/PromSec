@@ -1,0 +1,53 @@
+{
+  "ast_similarity": 0.47393364928909953,
+  "candidate_hash": "a2bb6a79651cab2b771268bbf7f16a206c3117f9d0bfe6ef5a2d0b00e24d2183",
+  "complete": true,
+  "config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file72.py",
+  "guidance_mode": "none",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.6537216828478964,
+      "bandit_statement_nodes": [
+        21
+      ],
+      "candidate_hash": "619d9185520039bde0dbe9bba2847b6c829b9ff72044763fa58dce210ef37335",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that uses Flask to expose a POST\u202f/register endpoint. The program must import only the following modules: os, re, hashlib, binascii, MySQLdb, and Flask (from flask import Flask, request, redirect, abort). Define a Flask app instance named\u202fapp. Implement a function get_db_connection() that returns a MySQLdb connection using host, user, passwd, and db values read from environment variables DB_HOST, DB_USER, DB_PASS, and DB_NAME, with defaults 'localhost', 'root', empty string, and 'mysite' respectively. Create a route @app.route('/register', methods=['POST']) with a function register() that:\n\n1. Retrieves 'username' and 'password' from request.form, stripping whitespace from username.\n2. Returns abort(400) if either field is missing or empty.\n3. Validates username against the regular expression ^[A-Za-z0-9_]{3,30}$ and aborts with 400 on failure.\n4. Generates a 16\u2011byte cryptographic salt using os.urandom.\n5. Derives a password hash using hashlib.pbkdf2_hmac with algorithm 'sha256', the UTF\u20118 encoded password, the generated salt, and 100,000 iterations.\n6. Constructs a stored password string formatted as hex(salt)$hex(hash) using binascii.hexlify and appropriate decoding.\n7. Opens a database connection via get_db_connection(), creates a cursor, and executes a parameterized INSERT statement: \"INSERT INTO user (username, password) VALUES (%s, %s)\" with the username and stored password as parameters.\n8. Commits the transaction and redirects the client to '/home'.\n9. Catches any MySQLdb.Error exception and also redirects to '/home' without exposing error details.\n10. Ensures that both cursor and connection are closed in a finally block, suppressing any exceptions that occur during closing.\n\nAt the end of the file, include the standard guard if __name__ == '__main__': app.run() to start the Flask development server. The code must be valid Python 3, maintain the described functionality, and follow security best practices: use parameterized queries, strong password hashing, no logging of sensitive data, and generic error handling that does not reveal internal details. Do not add any extra functionality, comments, or non\u2011Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.47393364928909953,
+      "bandit_statement_nodes": [
+        32,
+        35,
+        36,
+        39
+      ],
+      "candidate_hash": "a2bb6a79651cab2b771268bbf7f16a206c3117f9d0bfe6ef5a2d0b00e24d2183",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a secure user registration endpoint using Flask and MySQL. The script must:\n\n- Be written **only in Python** and contain no code in any other language.\n- Import exactly the following modules: `os`, `re`, `hashlib`, `binascii`, `secrets`, `logging`, `MySQLdb`, `contextlib.closing`, and the Flask objects `Flask`, `request`, `redirect`, `abort`.\n- Configure logging with `logging.basicConfig(level=logging.INFO)` and create a logger named `__name__`.\n- Create a Flask app instance named `app`.\n- Set the following Flask security\u2011related configuration values:\n  - `SECRET_KEY` should be read from the environment variable `FLASK_SECRET_KEY`; if not present, generate a 64\u2011character hex token using `secrets.token_hex(32)`.\n  - `SESSION_COOKIE_HTTPONLY` set to `True`.\n  - `SESSION_COOKIE_SECURE` set to `True`.\n  - `SESSION_COOKIE_SAMESITE` set to `'Lax'`.\n  - `MAX_CONTENT_LENGTH` set to `2 * 1024 * 1024` (2\u202fMiB).\n- Define a function `get_db_connection()` that reads database connection parameters from environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME` (defaulting to `'localhost'`, `'root'`, `''`, and `'mysite'` respectively) and returns a `MySQLdb.connect` object with:\n  - `charset='utf8mb4'`\n  - `use_unicode=True`\n  - `autocommit=False`\n- Implement a route `@app.route('/register', methods=['POST'])` with a view function `register()` that:\n  1. Retrieves `username` and `password` from `request.form`, stripping whitespace from `username`.\n  2. Validates that both fields are present; if not, abort with HTTP\u202f400 and description `'Username and password are required.'`.\n  3. Validates `username` against the regex `^[A-Za-z0-9_]{3,30}$`; if it fails, abort with HTTP\u202f400 and description `'Invalid username format.'`.\n  4. Ensures `password` length is between 8 and 128 characters inclusive; otherwise abort with HTTP\u202f400 and description `'Password must be between 8 and 128 characters.'`.\n  5. Generates a 16\u2011byte random salt using `secrets.token_bytes(16)`.\n  6. Hashes the password with PBKDF2\u2011HMAC\u2011SHA256 using `hashlib.pbkdf2_hmac`, 200,000 iterations, the generated salt, and UTF\u20118 encoded password.\n  7. Constructs a stored password string in the format `salt$hash$iterations`, where `salt` and `hash` are hex\u2011encoded using `binascii.hexlify`.\n  8. Inserts the new user into the MySQL table `user` with columns `username` and `password` using a parameterized query (`%s` placeholders) to prevent SQL injection.\n  9. Commits the transaction and redirects the client to `/home` on success.\n 10. Catches any `MySQLdb.Error`, logs the error with the logger at error level, and aborts with HTTP\u202f500 and description `'Internal server error.'`.\n 11. Uses `contextlib.closing` to manage both the database connection and cursor, ensuring proper cleanup without an explicit `finally` block.\n- Include the standard `if __name__ == '__main__':` guard to run the Flask development server with `app.run()`.\n\nThe generated code must exactly follow these specifications, maintain the described functionality, and adhere to security best practices. Do not include any explanatory text, comments, or markup outside the code itself.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "1d85cc97c3c3687ad4e1f27b1e2cf9944d891a79de7a2dc960b45beaf7549667",
+  "status": "secured"
+}

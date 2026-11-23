@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "e427f13e130b2734071fe706b9d0a525e19195c31cf66379f553ff85026f45fe",
+  "compile_ok": true,
+  "confidence": 0.9,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed YAML in /submit_feedback or /update_catalog may raise a parsing error (400 Bad Request).",
+      "Absent 'user_id' or 'feedback' keys in the submitted YAML leads to a KeyError (500 error).",
+      "Omitting the 'id' query parameter in /generate_report results in an empty argument passed to the external command.",
+      "Providing an incorrect password to /admin_login returns a 401 response.",
+      "Sending non\u2011POST methods to POST\u2011only endpoints yields a 405 Method Not Allowed."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a web API for submitting user feedback, initiating report generation, authenticating admin access, and updating a catalog via HTTP requests.",
+    "invariants": [
+      "All responses are JSON objects containing a \"status\" key.",
+      "Successful feedback and catalog updates echo back the parsed YAML content.",
+      "Admin login success returns status \"Admin login successful\"; failure returns 401 with status \"Login failed\".",
+      "The API does not modify server files or persistent storage beyond invoking the external command."
+    ],
+    "io_behavior": [
+      "POST /submit_feedback: accepts raw YAML in the request body, returns JSON with status, user_id, and feedback fields.",
+      "GET /generate_report?id=XYZ: reads query parameter, triggers external report_generator with the id, returns JSON status message.",
+      "POST /admin_login: reads form field 'password', returns JSON indicating success or a 401 error on failure.",
+      "POST /update_catalog: accepts raw YAML in the request body, returns JSON with status and the parsed catalog data."
+    ],
+    "public_api": {
+      "route:GET /generate_report": "",
+      "route:POST /admin_login": "",
+      "route:POST /submit_feedback": "",
+      "route:POST /update_catalog": ""
+    },
+    "side_effects": [
+      "Execution of the external command './report_generator <id>' when /generate_report is called.",
+      "Potential logging or console output performed by Flask's built\u2011in server (not part of the API contract)."
+    ],
+    "source_hash": "f9b0e146383078e704acfde5a6976aceb335b0d502126348c4a493855f23bb1d"
+  },
+  "dimensions": {
+    "behavior": 0.35,
+    "edge_cases": 0.3,
+    "invariants": 0.2,
+    "io_semantics": 0.45,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "entrypoints_ok": true,
+  "file": "test_file19.py",
+  "gated_score": 0.21562,
+  "judge_config_hash": "bc2e7486f4461ac98666e09fbc7ce81dde53747cb70478ae4dc5ea38fd492bd9",
+  "laaj_score": 0.21562,
+  "original_hash": "f9b0e146383078e704acfde5a6976aceb335b0d502126348c4a493855f23bb1d",
+  "rationale": "Key error handling, malformed YAML response codes, missing external command execution, and error responses lacking required status field deviate from contract; some endpoints (admin login, method restrictions) match, leading to partial preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.15563,
+  "stability_dimensions": {
+    "behavior": 0.6,
+    "edge_cases": 0.4,
+    "invariants": 0.5,
+    "io_semantics": 0.75,
+    "side_effects": 0.0
+  },
+  "stability_score": 0.37125,
+  "weighted_mean": 0.2875,
+  "worst_dimension": 0.0
+}

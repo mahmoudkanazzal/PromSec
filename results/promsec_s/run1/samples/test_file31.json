@@ -1,0 +1,71 @@
+{
+  "ast_similarity": 0.9605769230769231,
+  "candidate_hash": "9df1308c269e17a46d273355dfb537980d5643642d01641642271254b185caf5",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    703
+  ],
+  "error": "",
+  "file": "test_file31.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9605769230769231,
+      "bandit_statement_nodes": [
+        55
+      ],
+      "candidate_hash": "9df1308c269e17a46d273355dfb537980d5643642d01641642271254b185caf5",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9341,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 5
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.861,
+          "end_lineno": 83,
+          "lineno": 83,
+          "node": 31
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9914,
+          "end_lineno": 84,
+          "lineno": 84,
+          "node": 32
+        },
+        {
+          "ast_type": "Assert",
+          "change": 1.0,
+          "end_lineno": 115,
+          "lineno": 115,
+          "node": 55
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.9842,
+          "end_lineno": 247,
+          "lineno": 247,
+          "node": 117
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module (compatible with Python\u202f3.9+) that implements the following functionality exactly as described, without adding any extra features, comments, or explanatory text outside the code:\n\n1. **Imports** \u2013 Include only the necessary imports:\n   - `json`\n   - `BytesIO` from `io`\n   - `logging`\n   - `os`\n   - `Dict` from `typing`\n   - `dataclass` and `field` from `dataclasses`\n   - `text_type` from `six`\n   - `implementer` from `zope.interface`\n   - `SimpleResolverComplexifier` from `twisted.internet._resolver`\n   - `fail`, `succeed` from `twisted.internet.defer`\n   - `DNSLookupError` from `twisted.internet.error`\n   - `IHostnameResolver`, `IReactorPluggableNameResolver`, `IResolverSimple` from `twisted.internet.interfaces`\n   - `address` from `twisted.internet`\n   - `twisted.logger`\n   - `Headers` from `twisted.web.http_headers`\n   - `Request`, `Site` from `twisted.web.server`\n   - `unquote` from `twisted.web.http`\n   - `MemoryReactorClock` from `twisted.test.proto_helpers`\n   - `crypto` from `OpenSSL`\n   - `Sydent`, `parse_config_dict` from `sydent.sydent`\n\n2. **Constant** \u2013 Define a multi\u2011line string `FAKE_SERVER_CERT_PEM` containing the exact PEM certificate block shown.\n\n3. **Function `make_sydent(test_config={})`** \u2013 \n   - Accept an optional dictionary `test_config`.\n   - Ensure an in\u2011memory SQLite database is used by setting `test_config[\"db\"][\"db.file\"]` to `\":memory:\"` if not already present.\n   - Instantiate a `ResolvingMemoryReactorClock`.\n   - Return a `Sydent` object constructed with `reactor=...`, `cfg=parse_config_dict(test_config)`, and `use_tls_for_federation=False`.\n\n4. **Dataclass `FakeChannel`** \u2013 \n   - Fields: `site: Site`, `_reactor: any`, `result: dict = field(default_factory=dict)`, `_producer: any = None`.\n   - Provide read\u2011only properties `json_body`, `code`, and `headers` that raise an exception if `self.result` is empty and otherwise return parsed JSON, integer status code, and a `Headers` object built from `self.result[\"headers\"]`.\n   - Implement methods:\n     - `writeHeaders(self, version, code, reason, headers)` \u2013 store the supplied values in `self.result`.\n     - `write(self, content)` \u2013 verify `content` is `bytes`; concatenate to `self.result[\"body\"]`.\n     - `registerProducer(self, producer, streaming)` \u2013 store producer, schedule periodic `resumeProducing` calls via `self._reactor.callLater`; if not streaming, start immediately.\n     - `unregisterProducer(self)` \u2013 clear stored producer.\n     - `requestDone(self, _self)` \u2013 set `self.result[\"done\"] = True`.\n     - `getPeer(self)` \u2013 return `address.IPv4Address(\"TCP\", \"127.0.0.1\", 3423)`.\n     - `getHost(self)` \u2013 return `None`.\n   - Property `transport` returns `self`.\n   - Method `getPeerCertificate(self)` \u2013 return a certificate object loaded from `FAKE_SERVER_CERT_PEM` using `crypto.load_certificate`.\n\n5. **Class `FakeSite`** \u2013 an empty placeholder class representing a Twisted Web Site.\n\n6. **Function `make_request`** with signature:\n   ```python\n   def make_request(\n       reactor,\n       method,\n       path,\n       content=b\"\",\n       access_token=None,\n       request=Request,\n       shorthand=True,\n       federation_auth_origin=None,\n   ):\n   ```\n   - Convert `method` and `path` to `bytes` if they are not already.\n   - If `shorthand` is true and `path` does not start with `b\"/_matrix\"`, prepend `b\"/_matrix/identity/v2/\"` and collapse duplicate slashes.\n   - Ensure `path` starts with a leading slash.\n   - If `content` is a `dict`, JSON\u2011encode it; if it is a `six.text_type`, encode as UTF\u20118.\n   - Instantiate `FakeSite` and `FakeChannel(site, reactor)`.\n   - Create a request object via `request(channel)`.\n   - Set `req.process` to a lambda returning `b\"\"`.\n   - Set `req.content` to a `BytesIO` of the final `content`.\n   - Populate `req.postpath` by splitting the URL path on slashes and applying `unquote`.\n   - If `access_token` is provided, add an `Authorization: Bearer <token>` header.\n   - If `federation_auth_origin` is not `None`, add an `Authorization` header with the exact format `b\"X-Matrix origin=%s,key=,sig=\" % (federation_auth_origin,)`.\n   - If there is any content, add a `Content-Type: application/json` header.\n   - Call `req.requestReceived(method, path, b\"1.1\")`.\n   - Return the tuple `(req, channel)`.\n\n7. **Logging handler `ToTwistedHandler`** \u2013 subclass `logging.Handler`:\n   - Class attribute `tx_log = twisted.logger.Logger(namespace=\"sydent\")`.\n   - Implement `emit(self, record)` to format the record, map the level name to lowercase (replace `\"warning\"` with `\"warn\"`), and forward the message to `self.tx_log.emit` using `twisted.logger.LogLevel.levelWithName`.\n\n8. **Function `setup_logging()`** \u2013 \n   - Retrieve the root logger.\n   - Define a log format string `\"%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s\"`.\n   - Create an instance of `ToTwistedHandler`, set a `logging.Formatter` with the format, and attach the handler to the root logger.\n   - Set the root logger level based on the environment variable `SYDENT_TEST_LOG_LEVEL` (default `\"ERROR\"`).\n\n9. **Execute `setup_logging()`** at module import time.\n\n10. **Class `ResolvingMemoryReactorClock`** \u2013 \n    - Decorate with `@implementer(IReactorPluggableNameResolver)`.\n    - Subclass `MemoryReactorClock`.\n    - In `__init__`, create a dictionary `self.lookups: Dict[str, str]`.\n    - Define an inner class `FakeResolver` implementing `IResolverSimple` with method `getHostByName(self, name, timeout=None)` that returns `fail(DNSLookupError(...))` if `name` not in `lookups`, otherwise `succeed(lookups[name])`.\n    - Set `self.nameResolver = SimpleResolverComplexifier(FakeResolver())` and then call `super().__init__()`.\n    - Implement `installNameResolver(self, resolver: IHostnameResolver) -> IHostnameResolver` that raises `NotImplementedError`.\n\n**Security requirements** \u2013 The generated code must:\n- Perform explicit type checks where indicated (e.g., `write` method).\n- Avoid use of `eval`, `exec`, or any dynamic code execution.\n- Use only the imports listed; do not import additional modules.\n- Preserve the exact behavior and signatures described above.\n\nProduce only the Python code described; do not include any additional explanatory text, comments, or markup. Ensure the code is syntactically correct and ready to run.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "1a39a4177928ac3d32e74a2ff0d447c7f6ce1c7a9a28105b4f5d40c44d317349",
+  "status": "secured"
+}

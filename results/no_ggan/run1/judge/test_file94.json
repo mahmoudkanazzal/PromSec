@@ -1,0 +1,75 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "58736bfce966122328ff7b375f88d081728e8cf497afb89eb170a5d633e53acf",
+  "compile_ok": true,
+  "confidence": 0.85,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed JSON fields cause a server error (e.g., KeyError).",
+      "Non\u2011numeric or missing id in /get_book results in a SQL error or empty result.",
+      "Negative or non\u2011integer copies in /update_copies may produce unexpected DB values.",
+      "Requesting a non\u2011existent book id returns null JSON rather than an error.",
+      "Empty catalog returns an empty JSON array.",
+      "SQL injection is possible if title, author, or ids contain malicious characters."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Expose a REST\u2011like HTTP API that lets clients add, retrieve, update, and list books stored in a SQLite library database.",
+    "invariants": [
+      "Each book record must have an integer id, a non\u2011null title, a non\u2011null author, and an integer copies count.",
+      "Successful add_book returns HTTP 201 and a JSON message.",
+      "Successful update_copies returns HTTP 200 and a JSON message.",
+      "All GET endpoints return HTTP 200 with JSON payloads.",
+      "Database connections are closed after each request."
+    ],
+    "io_behavior": [
+      "POST /add_book with JSON {title, author} \u2192 201 response with confirmation message.",
+      "GET /get_book?id=<id> \u2192 200 response with JSON representation of the matching row or null.",
+      "POST /update_copies with JSON {book_id, copies} \u2192 200 response with confirmation message.",
+      "GET /get_catalog \u2192 200 response with JSON array of all books (title, author, copies) sorted by title."
+    ],
+    "public_api": {
+      "func:get_db_connection": "()",
+      "route:GET /get_book": "",
+      "route:GET /get_catalog": "",
+      "route:POST /add_book": "",
+      "route:POST /update_copies": ""
+    },
+    "side_effects": [
+      "Inserts a new row into the books table when /add_book is called.",
+      "Updates the copies column of an existing row when /update_copies is called.",
+      "Reads rows from the books table for /get_book and /get_catalog.",
+      "Commits transactions to the SQLite file 'library.db'."
+    ],
+    "source_hash": "e073dd9a61e0cb410dcefad0439b1bca1f2d3d6f7cbd533ee88fe43dc93f9972"
+  },
+  "dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.2,
+    "invariants": 0.9,
+    "io_semantics": 0.6,
+    "side_effects": 1.0
+  },
+  "enforcement_config_hash": "63dba6454be609050ca94b15a9954a965921432cfd829b321c32ee17ca675af3",
+  "entrypoints_ok": true,
+  "file": "test_file94.py",
+  "gated_score": 0.56,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.56,
+  "original_hash": "e073dd9a61e0cb410dcefad0439b1bca1f2d3d6f7cbd533ee88fe43dc93f9972",
+  "rationale": "Main API functions work, but error handling (e.g., missing fields, invalid IDs) returns 400/404 instead of the contract's server errors or null, and SQL injection is prevented contrary to the contract, leading to low edge\u2011case preservation.",
+  "schema": 1,
+  "stability_abs_difference": 0.085,
+  "stability_dimensions": {
+    "behavior": 0.9,
+    "edge_cases": 0.3,
+    "invariants": 0.6,
+    "io_semantics": 0.8,
+    "side_effects": 1.0
+  },
+  "stability_score": 0.645,
+  "weighted_mean": 0.68,
+  "worst_dimension": 0.2
+}

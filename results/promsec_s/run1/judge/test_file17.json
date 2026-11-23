@@ -1,0 +1,70 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "e47d995e277a3fdcd4f84d8cbde65c3b72d4a1d292c6da8406374a37ccf2d391",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing or malformed YAML in /create_post causes a server error (500).",
+      "Absent 'title' or 'body' keys in the parsed YAML triggers a KeyError.",
+      "An empty or unexpected 'type' parameter still results in the script being executed with an empty argument.",
+      "Providing an incorrect password to /admin_login yields a 401 response.",
+      "Extremely large or malicious input may lead to performance degradation or code execution via yaml.load."
+    ],
+    "entrypoints": [
+      "if\\s+__name__\\s*==\\s*['\\\"]__main__['\\\"]",
+      "app\\.run\\s*\\("
+    ],
+    "intent": "Provide a simple web service with three endpoints: create a blog post from YAML content, generate a report by invoking a shell script, and authenticate an admin using a hard\u2011coded password.",
+    "invariants": [
+      "Each endpoint always returns a plain\u2011text response containing the requested title, type, or login status.",
+      "admin_login succeeds only when the supplied password exactly matches the hard\u2011coded ADMIN_PASSWORD.",
+      "generate_report always calls the shell script regardless of the 'type' value.",
+      "create_post expects the YAML to contain 'title' and 'body' keys and will raise an exception if they are missing."
+    ],
+    "io_behavior": [
+      "POST /create_post with form field 'content' (YAML) \u2192 returns \"Post '<title>' created successfully\" or an error response.",
+      "GET /generate_report?type=<value> \u2192 returns \"Report of type '<value>' generated\" after executing a script.",
+      "POST /admin_login with form field 'password' \u2192 returns \"Admin login successful\" on match or HTTP 401 with \"Invalid password\" otherwise."
+    ],
+    "public_api": {
+      "route:GET /generate_report": "",
+      "route:POST /admin_login": "",
+      "route:POST /create_post": ""
+    },
+    "side_effects": [
+      "Parses the supplied YAML string using yaml.load (potentially executing arbitrary code).",
+      "Invokes the external command generate_report.sh with the provided type argument via os.system.",
+      "Presumed storage of the new post (implementation omitted) when create_post succeeds.",
+      "No persistent session state is created; each request is independent."
+    ],
+    "source_hash": "b2bd06c70a1e9957f5bda8685f64368788573f32345a6eab82c15ec5cef5484a"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.3,
+    "io_semantics": 0.5,
+    "side_effects": 0.0
+  },
+  "enforcement_config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "entrypoints_ok": true,
+  "file": "test_file17.py",
+  "gated_score": 0.18375,
+  "judge_config_hash": "dcdd828807ad0272134e1c1a24e855b43987de48f1c9c279f4c871a68a6ea5ad",
+  "laaj_score": 0.18375,
+  "original_hash": "b2bd06c70a1e9957f5bda8685f64368788573f32345a6eab82c15ec5cef5484a",
+  "rationale": "The program implements the three routes but deviates from the contract: it uses safe_load instead of yaml.load, returns 400 errors instead of the specified 500/KeyError cases, validates and rejects report types rather than always invoking the shell script, and obtains the admin password from an environment variable instead of a hard\u2011coded constant. Consequently, most side\u2011effects, edge\u2011case handling, and invariant requirements are not preserved.",
+  "schema": 1,
+  "stability_abs_difference": 0.22875,
+  "stability_dimensions": {
+    "behavior": 0.7,
+    "edge_cases": 0.2,
+    "invariants": 0.5,
+    "io_semantics": 1.0,
+    "side_effects": 0.0
+  },
+  "stability_score": 0.4125,
+  "weighted_mean": 0.245,
+  "worst_dimension": 0.0
+}

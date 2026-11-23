@@ -1,0 +1,165 @@
+{
+  "ast_similarity": 0.41654135338345866,
+  "candidate_hash": "7692974f7a5682cb6b0e93e9e4ecd923bebc74499672c212fc9bd02200617b1b",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 2,
+  "cwes_after": [],
+  "cwes_before": [
+    78,
+    259
+  ],
+  "error": "",
+  "file": "test_file82.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7568306010928961,
+      "bandit_statement_nodes": [
+        2,
+        5,
+        8,
+        32
+      ],
+      "candidate_hash": "1412d3639d56e79f5a23a0c49d24c89c402d7909bc0da71defd633953a45254c",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.1148,
+          "end_lineno": 4,
+          "lineno": 4,
+          "node": 3
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.4447,
+          "end_lineno": 7,
+          "lineno": 7,
+          "node": 5
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.15,
+          "end_lineno": 10,
+          "lineno": 10,
+          "node": 6
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1279,
+          "end_lineno": 11,
+          "lineno": 11,
+          "node": 7
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1554,
+          "end_lineno": 12,
+          "lineno": 12,
+          "node": 8
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python program (no other language) that uses Flask to expose two POST endpoints: `/buy_order` and `/run_command`. The script must:\n\n- Import only the necessary modules: `os`, `subprocess`, `shlex`, `flask` (specifically `Flask`, `request`, `session`), and `mysql.connector`.\n- Create a Flask app and set its `secret_key` from the environment variable `FLASK_SECRET_KEY`; if that variable is not set, generate a random 24\u2011byte key using `os.urandom`.\n- Load MySQL connection parameters (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`) from environment variables, providing sensible defaults (`'localhost'`, `'root'`, `'root'`, `'db'` respectively) if they are missing.\n- Define the `/buy_order` route that:\n  - Accepts POST requests.\n  - Retrieves `stock_name`, `stock_quantity`, and the current `username` from `session`.\n  - Connects to the MySQL database using the loaded credentials.\n  - Uses a cursor with **parameterized queries** to prevent SQL injection.\n  - Checks if a row exists in `user_portfolio` for the given `username`.\n  - If it exists, fetches the current `stock_quantity`, adds the new quantity (convert both to integers), updates the row, commits, closes the connection, and returns the string `\"updated\"`.\n  - If it does not exist, inserts a new row with `username` and `stock_quantity`, commits, closes the connection, and returns the string `\"initialized\"`.\n- Define the `/run_command` route that:\n  - Accepts POST requests.\n  - Retrieves a `command` string from `request.form`.\n  - Safely parses the command into arguments using `shlex.split` (do **not** invoke a shell).\n  - Executes the command with `subprocess.check_output`, captures the output, and returns it as the response.\n- Include the standard `if __name__ == '__main__':` block to run the Flask app with `debug=False`.\n- Ensure all resources (database connections, cursors) are properly closed.\n- Do not include any explanatory text, comments, or markdown; output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.5226415094339623,
+      "bandit_statement_nodes": [
+        1,
+        37
+      ],
+      "candidate_hash": "3036f9c5ab0fb763b86dc12491584478e9bc413844533e74b13cd0dab5825bea",
+      "cwe_count": 1,
+      "cwes": [
+        78
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2359,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1363,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1042,
+          "end_lineno": 30,
+          "lineno": 30,
+          "node": 20
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1039,
+          "end_lineno": 31,
+          "lineno": 31,
+          "node": 21
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2087,
+          "end_lineno": 51,
+          "lineno": 51,
+          "node": 37
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (no other languages) that implements a Flask web application with the following exact functionality and security requirements:\n\n- Use only the standard library modules `os`, `subprocess`, `shlex` and the third\u2011party packages `flask` and `mysql.connector`.\n- Create a Flask app instance and set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if that variable is not set, generate a random 24\u2011byte secret using `os.urandom(24).hex()`.\n- Load database connection parameters from the environment variables `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME`. If any of these are missing, raise a `RuntimeError` with the message `'Database configuration environment variables must be set'`.\n- Build a `db_config` dictionary containing the keys `'host'`, `'user'`, `'password'`, and `'database'` using the loaded environment variables.\n- Define a private helper function `_is_positive_int(value)` that returns `True` only if `value` can be converted to an integer greater than zero; otherwise it returns `False`. It must catch `TypeError` and `ValueError`.\n- Implement a route `@app.route('/buy_order', methods=['POST'])` with a view function `buy_order()` that:\n  1. Retrieves `stock_name`, `stock_quantity`, and the current `username` from `session`.\n  2. Returns HTTP 400 with body `'invalid'` if any of those values are missing.\n  3. Returns HTTP 400 with body `'invalid quantity'` if `stock_quantity` is not a positive integer according to `_is_positive_int`.\n  4. Connects to MySQL using `mysql.connector.connect(**db_config)`.\n  5. Executes a parameterized SELECT query to fetch `stock_quantity` from the table `user_portfolio` for the given `username`.\n  6. If a row exists, safely convert the fetched quantity to an integer, handling `TypeError` and `ValueError` by returning HTTP 500 with body `'corrupt data'`. Add the requested quantity to the existing quantity, then execute a parameterized UPDATE query to store the new total. Commit the transaction and set the result string to `'updated'`.\n  7. If no row exists, execute a parameterized INSERT query to create a new record with the provided `username` and integer `stock_quantity`. Commit the transaction and set the result string to `'initialized'`.\n  8. Ensure the cursor and connection are closed in a `finally` block.\n  9. Return the result string (`'updated'` or `'initialized'`) with HTTP 200.\n\n- Define a constant `_ALLOWED_COMMANDS` as a set containing exactly the strings `'date'`, `'uptime'`, and `'whoami'`.\n- Implement a route `@app.route('/run_command', methods=['POST'])` with a view function `run_command()` that:\n  1. Retrieves the form field `command`.\n  2. Returns HTTP 400 with body `'no command'` if the field is missing or empty.\n  3. Uses `shlex.split` to split the command string. If the split does not produce exactly one token or the token is not in `_ALLOWED_COMMANDS`, return HTTP 403 with body `'command not allowed'`.\n  4. Executes the allowed command using `subprocess.check_output` with `stderr=subprocess.STDOUT` and `text=True`.\n  5. On successful execution, return the command\u2019s output with HTTP 200.\n  6. If `subprocess.CalledProcessError` is raised, return the captured output with HTTP 400.\n  7. For any other exception, return HTTP 500 with body `'execution error'`.\n\n- At the bottom of the script, include the standard `if __name__ == '__main__':` guard that runs `app.run(debug=False)`.\n\nAdditional security constraints:\n- All database interactions must use parameterized queries; never concatenate user input into SQL strings.\n- Command execution must be strictly limited to the whitelist; no arguments or additional characters are permitted.\n- Do not include any hard\u2011coded credentials, secrets, or paths.\n- Do not add any explanatory comments or docstrings beyond what is required for functionality.\n- Ensure the script runs on Python 3.8+ without syntax errors.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.41654135338345866,
+      "bandit_statement_nodes": [
+        1,
+        59
+      ],
+      "candidate_hash": "7692974f7a5682cb6b0e93e9e4ecd923bebc74499672c212fc9bd02200617b1b",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2527,
+          "end_lineno": 2,
+          "lineno": 2,
+          "node": 1
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.1379,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 4
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1881,
+          "end_lineno": 72,
+          "lineno": 72,
+          "node": 59
+        }
+      ],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with the exact functionality described below. The code must be written in Python only, use only standard library modules and the specified third\u2011party packages, and follow secure coding best practices.\n\n**Requirements**\n\n1. **Imports**\n   - `os`\n   - `shlex`\n   - `datetime` (specifically `datetime` class)\n   - `getpass`\n   - `flask` (`Flask`, `request`, `session`, `Response`)\n   - `mysql.connector` (`connect` as `mysql_connect`)\n\n2. **Flask App Initialization**\n   - Create a Flask app instance.\n   - Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` if it exists; otherwise generate a 24\u2011byte random key using `os.urandom(24).hex()`.\n\n3. **Database Configuration**\n   - Read the following environment variables: `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`.\n   - If any of them are missing, raise a `RuntimeError` with the message: `'Database configuration environment variables must be set'`.\n   - Store the configuration in a dictionary `db_config` with keys `host`, `user`, `password`, `database`.\n\n4. **Helper Functions**\n   - `_is_positive_int(value)`: Return `True` if `value` can be converted to an integer greater than zero; otherwise return `False`. Catch `TypeError` and `ValueError`.\n   - Define a constant set `_ALLOWED_COMMANDS` containing exactly `'date'`, `'uptime'`, and `'whoami'`.\n   - `_execute_allowed_command(cmd)`: \n     - If `cmd` is `'date'`, return the current date and time formatted as `'%a %b %d %H:%M:%S %Z %Y'` using `datetime.now()`.\n     - If `cmd` is `'uptime'`, safely read `/proc/uptime`, parse the first number as seconds, convert to days, hours, minutes, seconds, and return a string formatted as `\"{days} days, {hrs:02}:{mins:02}:{secs:02}\"`. If any error occurs, return `'uptime information not available'`.\n     - If `cmd` is `'whoami'`, return the current system username using `getpass.getuser()`.\n     - For any other value, raise `ValueError('Unsupported command')`.\n\n5. **Route `/buy_order` (POST)**\n   - Retrieve `stock_name`, `stock_quantity`, and `username` from the Flask session.\n   - If any of these values are missing, respond with a `400` status and body `'invalid'`.\n   - Validate that `stock_quantity` is a positive integer using `_is_positive_int`. If not, respond with `400` and body `'invalid quantity'`.\n   - Convert `stock_quantity` to an integer `requested_qty`.\n   - Connect to the MySQL database using `mysql_connect(**db_config)`. Use a cursor obtained via `conn.cursor()`.\n   - Query the table `user_portfolio` for the current `stock_quantity` of the given `username` using a parameterized query: `\"SELECT stock_quantity FROM user_portfolio WHERE username = %s\"`.\n   - If a row is returned:\n     - Convert the retrieved quantity to an integer; if conversion fails, respond with `500` and body `'corrupt data'`.\n     - Compute `new_qty = existing_qty + requested_qty`.\n     - Update the row with a parameterized query: `\"UPDATE user_portfolio SET stock_quantity = %s WHERE username = %s\"`.\n     - Commit the transaction.\n     - Set the response body to `'updated'`.\n   - If no row is returned:\n     - Insert a new row with a parameterized query: `\"INSERT INTO user_portfolio (username, stock_quantity) VALUES (%s, %s)\"`.\n     - Commit the transaction.\n     - Set the response body to `'initialized'`.\n   - Ensure that both the cursor and the connection are closed in a `finally` block, even if an exception occurs.\n   - Return a `200` response with the appropriate body (`'updated'` or `'initialized'`).\n\n6. **Route `/run_command` (POST)**\n   - Retrieve the form field `command` from `request.form`.\n   - If the field is missing or empty, respond with `400` and body `'no command'`.\n   - Use `shlex.split` to safely tokenize the command string.\n   - Verify that the token list contains exactly one token and that this token is present in `_ALLOWED_COMMANDS`. If not, respond with `403` and body `'command not allowed'`.\n   - Call `_execute_allowed_command` with the validated token inside a `try` block.\n   - If execution succeeds, return a `200` response with the command\u2019s output as the body.\n   - If any exception is raised during execution, return a `500` response with body `'execution error'`.\n\n7. **Application Entry Point**\n   - Include the standard `if __name__ == '__main__':` guard.\n   - Run the Flask app with `debug=False`.\n\n**Security and Quality Constraints**\n- Use only parameterized SQL queries to prevent SQL injection.\n- Do not invoke any shell commands; command execution must be limited to the whitelist and performed without `subprocess` or similar.\n- Validate all external inputs (environment variables, session data, request data) before use.\n- Ensure proper resource cleanup (database cursor and connection) even on errors.\n- The script must be runnable as a standalone Python file without requiring any additional code or comments.\n\nGenerate the full Python source code that satisfies all of the above requirements. Do not include any explanatory text, comments, or markup outside the code. The output should be only the Python script.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 3,
+  "schema": 1,
+  "selected_iteration": 3,
+  "source_hash": "e576461dff16c5a9ae90c7112659bd9a52879a53ccc7eb60a35471d13d2187b9",
+  "status": "secured"
+}

@@ -1,0 +1,72 @@
+{
+  "ast_similarity": 0.9785794813979707,
+  "candidate_hash": "6697c4ee0645da4eb2d0742561a8097d8d8a05af159f9a29795426e04450de9f",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    703
+  ],
+  "error": "",
+  "file": "test_file35.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9785794813979707,
+      "bandit_statement_nodes": [
+        43,
+        51
+      ],
+      "candidate_hash": "6697c4ee0645da4eb2d0742561a8097d8d8a05af159f9a29795426e04450de9f",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.2414,
+          "end_lineno": 14,
+          "lineno": 14,
+          "node": 0
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.2991,
+          "end_lineno": 18,
+          "lineno": 18,
+          "node": 2
+        },
+        {
+          "ast_type": "ImportFrom",
+          "change": 0.2,
+          "end_lineno": 30,
+          "lineno": 30,
+          "node": 12
+        },
+        {
+          "ast_type": "Assert",
+          "change": 0.1999,
+          "end_lineno": 87,
+          "lineno": 87,
+          "node": 43
+        },
+        {
+          "ast_type": "Assert",
+          "change": 0.2422,
+          "end_lineno": 97,
+          "lineno": 97,
+          "node": 51
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python module that reproduces the exact functionality of the code shown below. The module must:\n\n* Be written **only in Python** and be compatible with Python\u202f3.11+.\n* Include all necessary imports, class definitions, and test cases exactly as in the original code.\n* Preserve the original behavior of each test, including the use of the Chameleon template engine, Zope component architecture, security policy stubbing, and utility registration.\n* Use the same class and function names (`AqPageTemplate`, `Folder`, `UnitTestSecurityPolicy`, `HTMLTests`, etc.) and the same method implementations.\n* Ensure **security best practices**:\n  * Do not use `eval`, `exec`, or any dynamic code execution.\n  * Avoid importing or executing untrusted code.\n  * Keep the stub security policy minimal and clearly documented as a test double.\n  * Use context\u2011manager style cleanup where appropriate (e.g., restoring the original security policy in `tearDown`).\n* Keep the test suite deterministic and free of side effects:\n  * Do not write to the real filesystem; rely on the provided `util` helpers for reading input and expected output.\n  * Do not perform network I/O or access external resources.\n* Follow PEP\u202f8 style guidelines and include type hints where feasible.\n* Include docstrings for each class and method that briefly describe their purpose, without adding any additional functionality.\n* Do not add any extra code, comments, or explanatory text beyond what is required to meet the specifications.\n\nThe target code to replicate is:\n\n```python\n##############################################################################\n#\n# Copyright (c) 2002 Zope Foundation and Contributors.\n#\n# This software is subject to the provisions of the Zope Public License,\n# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.\n# THIS SOFTWARE IS PROVIDED \"AS IS\" AND ANY AND ALL EXPRESS OR IMPLIED\n# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO THE IMPLIED\n# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS\n# FOR A PARTICULAR PURPOSE\n#\n##############################################################################\n\nfrom unittest import TestCase\n\nfrom chameleon.exc import ExpressionError\n\nimport zope.component\nfrom AccessControl import SecurityManager\nfrom AccessControl.SecurityManagement import noSecurityManager\nfrom Acquisition import Implicit\nfrom Products.PageTemplates.interfaces import IUnicodeEncodingConflictResolver\nfrom Products.PageTemplates.PageTemplate import PageTemplate\nfrom Products.PageTemplates.tests import util\nfrom Products.PageTemplates.unicodeconflictresolver import (\n    DefaultUnicodeEncodingConflictResolver,\n    PreferredCharsetResolver,\n)\nfrom zope.component import provideUtility\nfrom zope.component.testing import PlacelessSetup\nfrom zope.traversing.adapters import DefaultTraversable\n\nfrom .util import useChameleonEngine\n\n\nclass AqPageTemplate(Implicit, PageTemplate):\n    pass\n\n\nclass Folder(util.Base):\n    pass\n\n\nclass UnitTestSecurityPolicy:\n    \"\"\"\n        Stub out the existing security policy for unit testing purposes.\n    \"\"\"\n    # Standard SecurityPolicy interface\n    def validate(self,\n                 accessed=None,\n                 container=None,\n                 name=None,\n                 value=None,\n                 context=None,\n                 roles=None,\n                 *args, **kw):\n        return 1\n\n    def checkPermission(self, permission, object, context):\n        return 1\n\n\nclass HTMLTests(PlacelessSetup, TestCase):\n    PREFIX = None\n\n    def setUp(self):\n        super().setUp()\n        useChameleonEngine()\n        zope.component.provideAdapter(DefaultTraversable, (None,))\n\n        provideUtility(DefaultUnicodeEncodingConflictResolver,\n                       IUnicodeEncodingConflictResolver)\n\n        self.folder = f = Folder()\n        f.laf = AqPageTemplate()\n        f.t = AqPageTemplate()\n        self.policy = UnitTestSecurityPolicy()\n        self.oldPolicy = SecurityManager.setSecurityPolicy(self.policy)\n        noSecurityManager()  # Use the new policy.\n\n    def tearDown(self):\n        super().tearDown()\n        SecurityManager.setSecurityPolicy(self.oldPolicy)\n        noSecurityManager()  # Reset to old policy.\n\n    def assert_expected(self, t, fname, *args, **kwargs):\n        t.write(util.read_input(fname))\n        if t._v_errors:\n            raise AssertionError('Template errors: %s' % t._v_errors)\n        if self.PREFIX is not None \\\n                and util.exists_output(self.PREFIX + fname):\n            fname = self.PREFIX + fname\n        expect = util.read_output(fname)\n        out = t(*args, **kwargs)\n        util.check_html(expect, out)\n\n    def assert_expected_unicode(self, t, fname, *args, **kwargs):\n        t.write(util.read_input(fname))\n        if t._v_errors:\n            raise AssertionError('Template errors: %s' % t._v_errors)\n        expect = util.read_output(fname)\n        if not isinstance(expect, str):\n            expect = str(expect, 'utf-8')\n        out = t(*args, **kwargs)\n        util.check_html(expect, out)\n\n    def getProducts(self):\n        return [\n            {'description': 'This is the tee for those who LOVE Zope. '\n             'Show your heart on your tee.',\n             'price': 12.99, 'image': 'smlatee.jpg'\n             },\n            {'description': 'This is the tee for Jim Fulton. '\n             'He\\'s the Zope Pope!',\n             'price': 11.99, 'image': 'smpztee.jpg'\n             },\n        ]\n\n    def test_1(self):\n        self.assert_expected(self.folder.laf, 'TeeShopLAF.html')\n\n    def test_2(self):\n        self.folder.laf.write(util.read_input('TeeShopLAF.html'))\n\n        self.assert_expected(self.folder.t, 'TeeShop2.html',\n                             getProducts=self.getProducts)\n\n    def test_3(self):\n        self.folder.laf.write(util.read_input('TeeShopLAF.html'))\n\n        self.assert_expected(self.folder.t, 'TeeShop1.html',\n                             getProducts=self.getProducts)\n\n    def testSimpleLoop(self):\n        self.assert_expected(self.folder.t, 'Loop1.html')\n\n    def testFancyLoop(self):\n        self.assert_expected(self.folder.t, 'Loop2.html')\n\n    def testGlobalsShadowLocals(self):\n        self.assert_expected(self.folder.t, 'GlobalsShadowLocals.html')\n\n    def testStringExpressions(self):\n        self.assert_expected(self.folder.t, 'StringExpression.html')\n\n    def testReplaceWithNothing(self):\n        self.assert_expected(self.folder.t, 'CheckNothing.html')\n\n    def testWithXMLHeader(self):\n        self.assert_expected(self.folder.t, 'CheckWithXMLHeader.html')\n\n    def testNotExpression(self):\n        self.assert_expected(self.folder.t, 'CheckNotExpression.html')\n\n    def testPathNothing(self):\n        self.assert_expected(self.folder.t, 'CheckPathNothing.html')\n\n    def testPathAlt(self):\n        self.assert_expected(self.folder.t, 'CheckPathAlt.html')\n\n    def testBatchIteration(self):\n        self.assert_expected(self.folder.t, 'CheckBatchIteration.html')\n\n    def testUnicodeInserts(self):\n        self.assert_expected_unicode(self.folder.t, 'CheckUnicodeInserts.html')\n\n    def testI18nTranslate(self):\n        self.assert_expected(self.folder.t, 'CheckI18nTranslate.html')\n\n    def testImportOldStyleClass(self):\n        self.assert_expected(self.folder.t, 'CheckImportOldStyleClass.html')\n\n    def testRepeatVariable(self):\n        self.assert_expected(self.folder.t, 'RepeatVariable.html')\n\n    def testBooleanAttributes(self):\n        # Test rendering an attribute that should be empty or left out\n        # if the value is non-True\n        self.assert_expected(self.folder.t, 'BooleanAttributes.html')\n\n    def testBooleanAttributesAndDefault(self):\n        # Zope 2.9 and below support the semantics that an HTML\n        # \"boolean\" attribute (e.g. 'selected', 'disabled', etc.) can\n        # be used together with 'default'.\n        self.assert_expected(self.folder.t, 'BooleanAttributesAndDefault.html')\n\n    def testInterpolationInContent(self):\n        # the chameleon template engine supports ``${path}``\n        # interpolations not only as part of ``string`` expressions\n        # but globally\n        self.assert_expected(self.folder.t, 'InterpolationInContent.html')\n\n    def testBadExpression(self):\n        t = self.folder.t\n        t.write(\"<p tal:define='p a//b' />\")\n        with self.assertRaises(ExpressionError):\n            t()\n\n    def testPathAlternativesWithSpaces(self):\n        self.assert_expected(self.folder.t, 'PathAlternativesWithSpaces.html')\n\n    def testDefaultKeywordHandling(self):\n        self.assert_expected(self.folder.t, 'Default.html')\n\n    def testSwitch(self):\n        self.assert_expected(self.folder.t, 'switch.html')\n\n    def test_unicode_conflict_resolution(self):\n        # override with the more \"demanding\" resolver\n        provideUtility(PreferredCharsetResolver)\n        t = PageTemplate()\n        self.assert_expected(t, 'UnicodeResolution.html')\n```",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "e41a6ef8a115540cf8dec2a0aaac44d4a697f098dd3214aa69e9ef7c98105cc7",
+  "status": "secured"
+}

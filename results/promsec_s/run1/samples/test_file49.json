@@ -1,0 +1,377 @@
+{
+  "ast_similarity": 0.3682539682539683,
+  "candidate_hash": "bf8a11ed0efdbc6b6d3c82647d85e423b0602ab7df3e2e2b47c0d684baf52d41",
+  "complete": true,
+  "config_hash": "0bb67b4b0529491ed164b782507e9010d95148127ec4e21d764472d9f8bc871b",
+  "cwe_count_after": 1,
+  "cwe_count_before": 3,
+  "cwes_after": [
+    703
+  ],
+  "cwes_before": [
+    78,
+    89,
+    259
+  ],
+  "error": "",
+  "file": "test_file49.py",
+  "guidance_mode": "promsec-s",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.37662337662337664,
+      "bandit_statement_nodes": [
+        2,
+        10,
+        12
+      ],
+      "candidate_hash": "cfedd1e96594069394639d69e30017a734560e4bed2998d299fb14666e45adef",
+      "cwe_count": 2,
+      "cwes": [
+        605,
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Import",
+          "change": 0.9993,
+          "end_lineno": 5,
+          "lineno": 5,
+          "node": 2
+        },
+        {
+          "ast_type": "Import",
+          "change": 0.8035,
+          "end_lineno": 6,
+          "lineno": 6,
+          "node": 3
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.999,
+          "end_lineno": 26,
+          "lineno": 26,
+          "node": 12
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that uses Flask to implement a `/login` endpoint handling POST requests. The script must:\n\n- Use only Python code (no other languages) and import only the following packages: `flask`, `MySQLdb` (or `mysqlclient`), `python-dotenv`, and a password\u2011hashing library such as `passlib` (or `bcrypt`).\n- Load all configuration values\u2014including the Flask secret key and MySQL connection parameters (host, user, password, database)\u2014from environment variables using `python-dotenv`; do not hard\u2011code any credentials.\n- Create a Flask app with a securely generated secret key.\n- Define a `/login` route that:\n  1. Accepts only POST requests.\n  2. Retrieves `username` and `password` from `request.form`.\n  3. Connects to the MySQL database using `MySQLdb.connect` with the loaded credentials, ensuring the connection is properly closed after use.\n  4. Executes a **parameterized** SQL query to fetch the stored password hash for the supplied username (e.g., `SELECT password_hash FROM users WHERE username=%s`).\n  5. Uses a strong hashing algorithm (e.g., bcrypt via `passlib.hash.bcrypt`) to compare the submitted password with the stored hash.\n  6. If the user is not found or the password verification fails, returns `redirect('/')`.\n  7. If authentication succeeds, sets a secure session variable (e.g., `session['user'] = username`) and returns `redirect('/dashboard')`.\n- Include proper error handling for database connection failures, query errors, and missing form fields without exposing internal details.\n- Ensure the code follows best security practices: no plain\u2011text password storage, use of parameterized queries to prevent SQL injection, secure session handling, and loading secrets from environment variables only.\n- The script must be runnable as a standalone Python 3 program (e.g., `if __name__ == \"__main__\": app.run(...)`).",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3682539682539683,
+      "bandit_statement_nodes": [
+        25,
+        37
+      ],
+      "candidate_hash": "bf8a11ed0efdbc6b6d3c82647d85e423b0602ab7df3e2e2b47c0d684baf52d41",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.9999,
+          "end_lineno": 52,
+          "lineno": 52,
+          "node": 37
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Create a complete, secure Python web application using Flask that implements a login endpoint with the following exact specifications:\n\n- Use `from __future__ import annotations`.\n- Import `os`, `Flask`, `request`, `redirect`, `session` from `flask`, `connect`, `OperationalError`, `ProgrammingError` from `MySQLdb`, `bcrypt` from `passlib.hash`, and `load_dotenv` from `dotenv`.\n- Load environment variables with `load_dotenv()`.\n- Initialize a Flask app named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if not set, generate a random 24\u2011byte key with `os.urandom(24)`.\n- Configure session cookies:\n  - `SESSION_COOKIE_HTTPONLY` set to `True`.\n  - `SESSION_COOKIE_SAMESITE` set to `'Lax'`.\n  - `SESSION_COOKIE_SECURE` set based on the environment variable `SESSION_COOKIE_SECURE` (treat any case\u2011insensitive `'true'` as `True`, otherwise `False`).\n- Define a function `get_db_connection()` that returns a MySQL connection using `connect` with host, user, password, and database taken from the environment variables `MYSQL_HOST`, `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DB`.\n- Implement a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  1. Retrieves `username` and `password` from `request.form` using `.get`.\n  2. If either is missing, redirects to `'/'`.\n  3. Attempts to open a database connection via `get_db_connection()`, creates a cursor, and executes a parameterized query `SELECT password_hash FROM users WHERE username=%s` with the provided username.\n  4. Fetches one row, closes the cursor, and handles any `OperationalError` or `ProgrammingError` by redirecting to `'/'`.\n  5. Ensures the database connection is closed in a `finally` block, swallowing any exception on close.\n  6. If no row is returned, redirects to `'/'`.\n  7. Extracts the stored password hash, verifies the supplied password using `bcrypt.verify`; if verification fails, redirects to `'/'`.\n  8. On successful verification, stores the username in `session['user']` and redirects to `'/dashboard'`.\n- Include the standard `if __name__ == '__main__':` block that runs the Flask app on host `'127.0.0.1'` and port taken from the environment variable `PORT` (default `5000` if not set), using `int()` conversion.\n- Ensure the code is pure Python, contains no other language, follows security best practices (parameterized queries, proper secret handling, HTTPS\u2011aware cookie settings), and matches the described functionality exactly.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3411764705882353,
+      "bandit_statement_nodes": [
+        27
+      ],
+      "candidate_hash": "d93198230331582606bb978751da8901a82401c97240431192aa58797dbd0a03",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 3,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program that implements a Flask web application with a `/login` POST endpoint. The program must:\n\n- Import `__future__` annotations, `os`, `Flask`, `request`, `redirect`, `session`, `MySQLdb` `connect`, `OperationalError`, `ProgrammingError`, `passlib.hash` `bcrypt`, and `dotenv` `load_dotenv`.\n- Load environment variables from a `.env` file.\n- Create a Flask app, set `secret_key` from the `FLASK_SECRET_KEY` environment variable or a random 24\u2011byte value, configure `SESSION_COOKIE_HTTPONLY=True`, `SESSION_COOKIE_SAMESITE='Lax'`, and set `SESSION_COOKIE_SECURE` based on the `SESSION_COOKIE_SECURE` environment variable being `'true'` (case\u2011insensitive).\n- Define a function `get_db_connection()` that returns a MySQLdb connection using the `MYSQL_HOST`, `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DB` environment variables.\n- Implement a `/login` route that accepts POST requests, retrieves `username` and `password` from `request.form`, validates that both are present, queries the `users` table for `password_hash` using a parameterized query, handles `OperationalError` and `ProgrammingError` by redirecting to `'/'`, ensures the database cursor and connection are closed safely, verifies the password with `bcrypt.verify`, sets `session['user']` on successful authentication, and redirects to `'/dashboard'` or `'/'` as appropriate.\n- Include a `if __name__ == '__main__':` guard that runs `app.run(host='127.0.0.1', port=int(os.getenv('PORT', '5000')))`.\n\nEnsure the code follows security best practices: use parameterized queries, do not expose error details, set secure session cookie flags, handle exceptions without leaking stack traces, and avoid printing or logging sensitive information. Output only the Python code, with no explanations, comments, or additional text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.32132963988919666,
+      "bandit_statement_nodes": [
+        36,
+        40
+      ],
+      "candidate_hash": "46340172988d65bc3ec8795aa0d251b8e2f354b6d87a456382268500a58f02bf",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 4,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.8+ and using `from __future__ import annotations`) that implements a secure Flask web application with a single `/login` POST endpoint. The program must:\n\n1. Import only the following modules: `os`, `flask` (`Flask`, `request`, `redirect`, `session`), `MySQLdb`, `MySQLdb.OperationalError`, `MySQLdb.ProgrammingError`, `passlib.hash.bcrypt`, and `dotenv.load_dotenv`.\n2. Load environment variables from a `.env` file using `load_dotenv()`.\n3. Create a Flask app instance, set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` or a securely generated random 24\u2011byte key if not provided.\n4. Configure the session cookie with:\n   - `SESSION_COOKIE_HTTPONLY` set to `True`\n   - `SESSION_COOKIE_SAMESITE` set to `'Lax'`\n   - `SESSION_COOKIE_SECURE` set based on the environment variable `SESSION_COOKIE_SECURE` (treat `'true'` (case\u2011insensitive) as `True`, otherwise `False`).\n5. Define a function `get_db_connection()` that returns a MySQLdb connection using the following environment variables (with the specified defaults if missing):\n   - `MYSQL_HOST` (default `'localhost'`)\n   - `MYSQL_USER` (default empty string)\n   - `MYSQL_PASSWORD` (default empty string)\n   - `MYSQL_DB` (default empty string)\n   The connection must use `charset='utf8mb4'` and `use_unicode=True`.\n6. Implement the `/login` route that:\n   - Accepts only POST requests.\n   - Retrieves `username` and `password` from `request.form`.\n   - If either field is missing, redirects to `'/'`.\n   - Opens a database connection via `get_db_connection()`, creates a cursor, and executes a **parameterized** query to fetch `password_hash` for the given `username` (`SELECT password_hash FROM users WHERE username = %s`).\n   - If no record is found, redirects to `'/'`.\n   - Uses `bcrypt.verify` to compare the supplied password with the stored hash.\n   - On successful verification, stores the username in the session under the key `'user'` and redirects to `'/dashboard'`; otherwise redirects to `'/'`.\n   - Catches `OperationalError` and `ProgrammingError` from MySQLdb and redirects to `'/'` on any such exception.\n   - Ensures that both the cursor and the connection are closed in a `finally` block, suppressing any exceptions raised during close operations.\n7. Include the standard `if __name__ == '__main__':` block that runs the Flask app on host `127.0.0.1` and port taken from the environment variable `PORT` (default `5000`), converting the port to an integer.\n8. Do **not** include any comments, docstrings, or explanatory text in the output. Output **only** the Python code. Ensure the code is secure, uses parameterized queries, proper session cookie settings, and handles resources correctly.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.32132963988919666,
+      "bandit_statement_nodes": [
+        38,
+        42
+      ],
+      "candidate_hash": "c5adc1e9ca92b6fbcafbdabc7f7d8a28db3deb807a03bc2cb9a1112dea166589",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 5,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program (compatible with Python\u202f3.11) that implements a Flask web application with a single POST `/login` endpoint. The program must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `flask` (`Flask`, `request`, `redirect`, `session`), `MySQLdb`, `MySQLdb.OperationalError`, `MySQLdb.ProgrammingError`, `passlib.hash.bcrypt`, and `dotenv.load_dotenv`.\n- Load environment variables from a `.env` file using `load_dotenv()`.\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if that variable is not set, generate a secure random 24\u2011byte key with `os.urandom(24)`.\n- Configure the session cookie with:\n  * `app.config['SESSION_COOKIE_HTTPONLY'] = True`\n  * `app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'`\n  * `app.config['SESSION_COOKIE_SECURE']` set to `True` only when the environment variable `SESSION_COOKIE_SECURE` (case\u2011insensitive) equals `'true'`; otherwise set to `False`.\n- Define a function `get_db_connection()` that:\n  * Reads `MYSQL_HOST` (default `'localhost'`), `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DB` from the environment (default empty strings for the latter three).\n  * Returns a `MySQLdb` connection with `charset='utf8mb4'` and `use_unicode=True`.\n- Implement the `/login` route accepting only POST requests. Inside the view function:\n  * Retrieve `username` and `password` from `request.form` using `request.form.get`.\n  * If either value is missing, immediately `return redirect('/')`.\n  * Establish a database connection via `get_db_connection()`, obtain a cursor, and execute a **parameterized** query: `SELECT password_hash FROM users WHERE username = %s` with the supplied `username`.\n  * Fetch one row; if no row is returned, `return redirect('/')`.\n  * Extract the stored password hash from the row.\n  * Verify the supplied password against the stored hash using `bcrypt.verify`.\n  * If verification succeeds, set `session['user'] = username` and `return redirect('/dashboard')`; otherwise `return redirect('/')`.\n  * Catch `OperationalError` and `ProgrammingError`; on any such exception, `return redirect('/')`.\n  * In a `finally` block, close the cursor and connection if they were created, suppressing any exceptions during close.\n- Include the standard `if __name__ == '__main__':` block that:\n  * Reads the `PORT` environment variable (default `'5000'`), converts it to an integer, and runs the Flask app with `host='127.0.0.1'` and the determined port.\n- Do **not** include any comments, docstrings, or explanatory text in the generated code.\n- Ensure the code is valid Python, uses secure practices (parameterized queries, proper secret handling, appropriate session cookie flags), and matches the described functionality exactly.\n- Output **only** the Python code; do not output any additional text.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3240223463687151,
+      "bandit_statement_nodes": [
+        39,
+        43
+      ],
+      "candidate_hash": "b9472a39eeed6bddeb9b4ba374a0be78f14ac707bf2c2cf4b4258f9d78dfab75",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 6,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program that implements a Flask web application with a secure login endpoint. The program must:\n\n- Begin with `from __future__ import annotations`.\n- Import the following modules exactly as shown: `os`, `Flask`, `request`, `redirect`, `session` from `flask`, `MySQLdb`, `OperationalError`, `ProgrammingError` from `MySQLdb`, `bcrypt` from `passlib.hash`, and `load_dotenv` from `dotenv`.\n- Call `load_dotenv()` to load environment variables.\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` if it exists; otherwise generate a random 24\u2011byte key using `os.urandom(24)`.\n- Configure session cookie security:\n  - `app.config['SESSION_COOKIE_HTTPONLY'] = True`\n  - `app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'`\n  - `app.config['SESSION_COOKIE_SECURE'] = os.getenv('SESSION_COOKIE_SECURE', '').lower() == 'true'`\n- Define a function `get_db_connection()` that:\n  - Reads `MYSQL_HOST` (default `'localhost'`), `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DB` from environment variables.\n  - Returns a `MySQLdb.connect` call with parameters `host`, `user`, `password`, `db`, `charset='utf8mb4'`, and `use_unicode=True`.\n- Define a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  - Retrieves `username` and `password` from `request.form` using `get`.\n  - If either value is missing, redirects to `'/'`.\n  - Initializes `conn` and `cur` to `None`.\n  - In a `try` block:\n    - Calls `get_db_connection()` and assigns to `conn`.\n    - Creates a cursor with `conn.cursor()` and assigns to `cur`.\n    - Executes a parameterized query `SELECT password_hash FROM users WHERE username = %s` with the supplied `username`.\n    - Fetches one row; if no row is returned, redirects to `'/'`.\n    - Extracts `stored_hash` from the row.\n    - Uses `bcrypt.verify(password, stored_hash)` to check the password.\n    - If verification succeeds, sets `session['user'] = username` and redirects to `'/dashboard'`; otherwise redirects to `'/'`.\n  - Catches `OperationalError` and `ProgrammingError` and redirects to `'/'`.\n  - In a `finally` block, closes `cur` and `conn` if they were created, suppressing any exceptions during close.\n- Include a `if __name__ == '__main__':` block that:\n  - Reads the environment variable `PORT` (default `'5000'`), converts it to an integer, and stores in `port`.\n  - Calls `app.run(host='127.0.0.1', port=port)`.\n- Ensure the code uses only parameterized SQL queries, proper session cookie flags, does not expose secrets, and handles errors without leaking information.\n- Output only the Python code, with no additional explanation, markdown formatting, or comments.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3240223463687151,
+      "bandit_statement_nodes": [
+        39,
+        43
+      ],
+      "candidate_hash": "47f292158b315e1789cc4775215d51c9d84ac140818be832dbef9480858b8a38",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 7,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.9+ and using `from __future__ import annotations`) that implements a secure Flask web application with the following exact specifications:\n\n1. **Imports**\n   - Import `os`.\n   - Import `Flask`, `request`, `redirect`, and `session` from `flask`.\n   - Import `MySQLdb` and specifically `OperationalError` and `ProgrammingError` from `MySQLdb`.\n   - Import `bcrypt` from `passlib.hash`.\n   - Import `load_dotenv` from `dotenv`.\n\n2. **Environment**\n   - Call `load_dotenv()` at the top of the file to load environment variables from a `.env` file.\n\n3. **Flask App Configuration**\n   - Create a Flask app instance named `app`.\n   - Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if that variable is missing, generate a random 24\u2011byte key using `os.urandom(24)`.\n   - Configure the session cookie with:\n     - `SESSION_COOKIE_HTTPONLY` set to `True`.\n     - `SESSION_COOKIE_SAMESITE` set to `'Lax'`.\n     - `SESSION_COOKIE_SECURE` set to `True` only when the environment variable `SESSION_COOKIE_SECURE` (case\u2011insensitive) equals `'true'`; otherwise set it to `False`.\n\n4. **Database Connection Helper**\n   - Define a function `get_db_connection()` that:\n     - Reads `MYSQL_HOST` (default `'localhost'`), `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DB` from environment variables.\n     - Returns a `MySQLdb.connect` object with the parameters `host`, `user`, `password`, `db`, `charset='utf8mb4'`, and `use_unicode=True`.\n\n5. **Login Route**\n   - Register a route at `'/login'` that only accepts `POST` requests.\n   - Inside the view function:\n     - Retrieve `username` and `password` from `request.form` using `.get()`.\n     - If either value is missing or empty, immediately `return redirect('/')`.\n     - Initialize `conn` and `cur` to `None`.\n     - Use a `try` block to:\n       - Obtain a database connection via `get_db_connection()`.\n       - Create a cursor.\n       - Execute a **parameterized** query to fetch `password_hash` from the `users` table where `username = %s`, passing the `username` as a tuple.\n       - Fetch one row; if no row is returned, `return redirect('/')`.\n       - Extract the stored hash from the row.\n       - Verify the supplied password against the stored hash using `bcrypt.verify`.\n       - If verification succeeds, store the username in `session['user']` and `return redirect('/dashboard')`.\n       - If verification fails, `return redirect('/')`.\n     - Catch `OperationalError` and `ProgrammingError`; on either exception, `return redirect('/')`.\n     - In a `finally` block, close the cursor and connection if they were created, suppressing any exceptions during close.\n\n6. **Application Entry Point**\n   - Include the standard `if __name__ == '__main__':` guard.\n   - Read the `PORT` environment variable, defaulting to `'5000'`, convert it to an integer, and store it in `port`.\n   - Run the Flask app with `host='127.0.0.1'` and the determined `port`.\n\n7. **Security and Best Practices**\n   - Ensure all database interactions use parameterized queries to prevent SQL injection.\n   - Do not expose raw exception details to the client; simply redirect to `'/'` on any error.\n   - Do not include any additional routes, functions, or code beyond what is described.\n   - Do not add any comments, docstrings, or explanatory text in the generated code.\n   - Do not output any text outside the Python code; the response must consist solely of the Python program meeting the above requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.32132963988919666,
+      "bandit_statement_nodes": [
+        39,
+        43
+      ],
+      "candidate_hash": "9cbf6fb71fb0adb1b84f14ce5a5f5a5e462745ebef4acd61626007b2fba380bb",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 8,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.11+) that implements a Flask web application with a secure login endpoint. The program must:\n\n- Import `__future__` annotations, `os`, `Flask` (including `request`, `redirect`, `session`), `MySQLdb` (including `OperationalError`, `ProgrammingError`), `passlib.hash` `bcrypt`, and `dotenv` `load_dotenv`.\n- Call `load_dotenv()` to load environment variables from a `.env` file.\n- Create a Flask app instance, set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` or, if not set, to a securely generated 24\u2011byte random value using `os.urandom`.\n- Configure the Flask session cookie with `SESSION_COOKIE_HTTPONLY=True`, `SESSION_COOKIE_SAMESITE='Lax'`, and `SESSION_COOKIE_SECURE` set to `True` only when the environment variable `SESSION_COOKIE_SECURE` (case\u2011insensitive) equals `\"true\"`.\n- Define a function `get_db_connection()` that reads the following environment variables: `MYSQL_HOST` (default `\"localhost\"`), `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DB`. The function must return a `MySQLdb` connection using these values, with `charset='utf8mb4'` and `use_unicode=True`.\n- Define a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  - Retrieves `username` and `password` from `request.form`.\n  - If either field is missing, redirects to `'/'`.\n  - Establishes a database connection via `get_db_connection()`.\n  - Executes a parameterized query `SELECT password_hash FROM users WHERE username = %s` to fetch the stored password hash for the given username.\n  - If no record is found, redirects to `'/'`.\n  - Uses `bcrypt.verify` to compare the supplied password with the stored hash.\n  - On successful verification, stores the username in `session['user']` and redirects to `'/dashboard'`; otherwise redirects to `'/'`.\n  - Handles `OperationalError` and `ProgrammingError` by redirecting to `'/'`.\n  - Ensures that both the cursor and the connection are closed in a `finally` block, suppressing any exceptions that occur during closure.\n- Include a `if __name__ == '__main__':` block that reads the `PORT` environment variable (default `5000`), converts it to an integer, and runs the Flask app on host `'127.0.0.1'` and the specified port.\n- Follow security best practices: never log or expose passwords, always use parameterized queries, avoid hard\u2011coded secrets, set secure cookie attributes, and handle errors without leaking internal details.\n\nThe output must be only the Python code, with no additional explanation, comments, or markdown formatting. Ensure the code is functional, secure, and matches the described behavior exactly.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.32132963988919666,
+      "bandit_statement_nodes": [
+        38,
+        42
+      ],
+      "candidate_hash": "67c87660f0a5920b343933339b9a220b844ddb1a70e6357522c5fddbc3b8f7a0",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 9,
+      "optimized_prompt": "Write a complete, secure Python 3 program (no other language) that implements a Flask web application with the following exact specifications:\n\n- Use `from __future__ import annotations`.\n- Import `os`, `Flask`, `request`, `redirect`, `session` from `flask`, `MySQLdb`, `OperationalError` and `ProgrammingError` from `MySQLdb`, `bcrypt` from `passlib.hash`, and `load_dotenv` from `dotenv`.\n- Call `load_dotenv()` at the start.\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` to the environment variable `FLASK_SECRET_KEY` if it exists; otherwise generate a random 24\u2011byte hex string using `os.urandom(24).hex()`.\n- Configure the session cookie with:\n  - `SESSION_COOKIE_HTTPONLY` set to `True`\n  - `SESSION_COOKIE_SAMESITE` set to `'Lax'`\n  - `SESSION_COOKIE_SECURE` set to `True` only when the environment variable `SESSION_COOKIE_SECURE` (case\u2011insensitive) equals `'true'`.\n- Define a function `get_db_connection()` that:\n  - Reads `MYSQL_HOST` (default `'localhost'`), `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DB` from environment variables.\n  - Returns a `MySQLdb.connect` object with `charset='utf8mb4'` and `use_unicode=True`.\n- Add a route `'/login'` that accepts only `POST` requests and implements the following logic:\n  1. Retrieve `username` and `password` from `request.form` using `.get`.\n  2. If either is missing, immediately `redirect('/')`.\n  3. Initialize `conn` and `cur` to `None`.\n  4. In a `try` block:\n     - Obtain a database connection via `get_db_connection()`.\n     - Create a cursor.\n     - Execute a parameterized query `SELECT password_hash FROM users WHERE username = %s` with the supplied `username`.\n     - Fetch one row; if no row is returned, `redirect('/')`.\n     - Extract `stored_hash` from the row.\n     - Verify the supplied password against `stored_hash` using `bcrypt.verify`.\n     - If verification succeeds, set `session['user'] = username` and `redirect('/dashboard')`; otherwise `redirect('/')`.\n  5. Catch `OperationalError` and `ProgrammingError` and on any such exception `redirect('/')`.\n  6. In a `finally` block, safely close the cursor and connection if they were created, suppressing any exceptions during close.\n- Include the standard `if __name__ == '__main__':` block that:\n  - Reads the `PORT` environment variable (default `5000`), converts it to `int`.\n  - Runs the Flask app on host `'127.0.0.1'` and the determined port.\n- Ensure all security best practices are followed:\n  - No hard\u2011coded credentials.\n  - Use parameterized SQL queries to prevent injection.\n  - Properly configure session cookies as described.\n  - Use environment variables for all configurable values.\n  - Handle all exceptions without exposing stack traces.\n- The code must be fully functional, syntactically correct, and ready to run after installing the required packages (`flask`, `mysqlclient`, `passlib`, `python-dotenv`). Do not include any explanatory comments or additional text. Only output the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3020833333333333,
+      "bandit_statement_nodes": [
+        39,
+        43
+      ],
+      "candidate_hash": "8ee263c37087a5e3810f7764e220cebb686683c59674352d01dc415dc732faf8",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 10,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.9+ and using `from __future__ import annotations`) that implements a Flask web application with the following exact specifications and security requirements. Do not include any comments, explanatory text, or code in any language other than Python.\n\n**General requirements**\n- The program must be a single Python file.\n- All imports must be explicit and limited to the standard library and the following third\u2011party packages: `flask`, `MySQLdb`, `passlib.hash`, `python-dotenv`.\n- Use `load_dotenv()` to load environment variables from a `.env` file.\n- The Flask app must be created with `app = Flask(__name__)`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if that variable is missing, generate a random 24\u2011byte key using `os.urandom(24).hex()`.\n- Configure the session cookie with the following security flags:\n  - `SESSION_COOKIE_HTTPONLY` set to `True`\n  - `SESSION_COOKIE_SAMESITE` set to `'Lax'`\n  - `SESSION_COOKIE_SECURE` set to `True` only when the environment variable `SESSION_COOKIE_SECURE` (case\u2011insensitive) equals `'true'`; otherwise set to `False`.\n\n**Database connection**\n- Implement a function `get_db_connection()` that reads the following environment variables: `MYSQL_HOST` (default `'localhost'`), `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DB`.\n- The function must return a `MySQLdb.connect` object with the parameters `host`, `user`, `passwd`, `db`, `charset='utf8mb4'`, and `use_unicode=True`.\n- Do not hard\u2011code any credentials; all must come from environment variables.\n\n**Login route**\n- Define a route `@app.route('/login', methods=['POST'])` with a view function `login()`.\n- Retrieve `username` and `password` from `request.form` using `get`.\n- If either field is missing or empty, immediately `return redirect('/')`.\n- Establish a database connection using `get_db_connection()` inside a `try` block.\n- Use a cursor obtained via `conn.cursor()` and execute a **parameterized** query to fetch the stored password hash for the supplied username:\n  ```sql\n  SELECT password_hash FROM users WHERE username = %s\n  ```\n- If the query returns no rows, `return redirect('/')`.\n- Verify the supplied password against the stored hash using `passlib.hash.bcrypt.verify`.\n- On successful verification, set `session['user'] = username` and `return redirect('/dashboard')`.\n- On failure, `return redirect('/')`.\n- Catch only `MySQLdb.OperationalError` and `MySQLdb.ProgrammingError`; on any such exception, `return redirect('/')`.\n- In a `finally` block, close the cursor and connection if they were created, suppressing any exceptions that may occur during closing.\n\n**Application entry point**\n- Include the standard `if __name__ == '__main__':` guard.\n- Read the port from the environment variable `PORT` (default `5000`), convert it to `int`, and start the Flask development server bound to `127.0.0.1` on that port.\n\n**Security and functionality constraints**\n- Use only parameterized queries; never concatenate user input into SQL strings.\n- Do not expose stack traces or internal error details to the client; all error paths must redirect to `'/'`.\n- Ensure the session cookie is marked `HttpOnly`, `SameSite=Lax`, and conditionally `Secure` as described.\n- Do not include any additional routes, functions, or logic beyond what is specified.\n- Do not add any comments, docstrings, or explanatory text in the code.\n- The final output must be pure Python code that meets all the above requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3231197771587744,
+      "bandit_statement_nodes": [
+        41,
+        45
+      ],
+      "candidate_hash": "169e3eaa42a2f12d36c8a388d5ad4a6b442d1e2ecfc7ff78548dd40fbfb5962c",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 11,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a `/login` POST endpoint. The script must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `flask` (Flask, request, redirect, session), `MySQLdb`, `passlib.hash` (bcrypt), `dotenv` (load_dotenv).\n- Load environment variables from a .env file using `load_dotenv()`.\n- Create a Flask app, set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if not set, generate a random 24\u2011byte hex string.\n- Configure session cookies: `SESSION_COOKIE_HTTPONLY` = True, `SESSION_COOKIE_SAMESITE` = 'Lax', `SESSION_COOKIE_SECURE` based on environment variable `SESSION_COOKIE_SECURE` (true if value is case\u2011insensitive 'true').\n- Define a function `get_db_connection()` that reads `MYSQL_HOST` (default `'localhost'`), `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DB` from environment and returns a `MySQLdb.connect` with `charset='utf8mb4'` and `use_unicode=True`.\n- Implement a `/login` route accepting POST only. Retrieve `username` and `password` from `request.form`. If either is missing, redirect to `'/'`.\n- Use a try/except/finally block: obtain a connection via `get_db_connection()`, create a cursor, execute a parameterized query `SELECT password_hash FROM users WHERE username = %s` with the supplied username.\n- If no row is returned, redirect to `'/'`.\n- Verify the supplied password against the stored hash using `bcrypt.verify`. If verification succeeds, store `username` in `session['user']` and redirect to `'/dashboard'`; otherwise redirect to `'/'`.\n- Catch `MySQLdb.OperationalError` and `MySQLdb.ProgrammingError` and on exception redirect to `'/'`.\n- In the finally block, safely close the cursor and connection, ignoring any exceptions during close.\n- Include an `if __name__ == '__main__':` block that reads `PORT` from environment (default `5000`) and runs the app on host `'127.0.0.1'` with that port.\n- Ensure the code follows security best practices: use parameterized queries, never expose raw passwords, set secure session cookie flags, handle errors without leaking details, and avoid hard\u2011coded secrets.\n- Output only valid Python code, with no additional explanation, no markdown formatting, no comments, and no code in any language other than Python.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.32044198895027626,
+      "bandit_statement_nodes": [
+        38,
+        41
+      ],
+      "candidate_hash": "a28a257eb2c23a6bb3067d7886b626c37dd0d5728ae34921d64671817ac3f7ec",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 12,
+      "optimized_prompt": "Write a complete, secure Python script (Python\u202f3) that implements the following functionality exactly as described, without any additional explanatory text, comments, or non\u2011code output:\n\n- Use `from __future__ import annotations`.\n- Import the modules: `os`, `Flask`, `request`, `redirect`, `session` from `flask`, `MySQLdb`, `bcrypt` from `passlib.hash`, and `load_dotenv` from `dotenv`.\n- Call `load_dotenv()` at the start to load environment variables.\n- Create a Flask app instance named `app`.\n- Retrieve the secret key from the environment variable `FLASK_SECRET_KEY`. If it is not set, generate a random 24\u2011byte key using `os.urandom(24).hex()`. Assign this value to `app.secret_key`.\n- Configure the Flask session cookie settings:\n  - `SESSION_COOKIE_HTTPONLY` set to `True`.\n  - `SESSION_COOKIE_SAMESITE` set to `'Lax'`.\n  - `SESSION_COOKIE_SECURE` set based on the environment variable `SESSION_COOKIE_SECURE`; treat the value case\u2011insensitively and set to `True` only if it equals `'true'`.\n- Define a function `get_db_connection()` that:\n  - Reads `MYSQL_HOST` (default `'localhost'`), `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DB` from environment variables.\n  - Returns a `MySQLdb.connect` object with the parameters `host`, `user`, `passwd`, `db`, `charset='utf8mb4'`, and `use_unicode=True`.\n- Add a route `'/login'` that accepts only `POST` requests and implements the following logic:\n  - Retrieve `username` and `password` from `request.form` using `get`.\n  - If either value is missing, immediately `redirect('/')`.\n  - Open a database connection using `get_db_connection()`.\n  - Create a cursor and execute a parameterized query to select `password_hash` from the `users` table where `username = %s`, passing the `username` as a tuple.\n  - Fetch one row; if no row is returned, `redirect('/')`.\n  - Extract the stored hash from the row and verify the supplied password using `bcrypt.verify`.\n  - If verification succeeds, store the `username` in `session['user']` and `redirect('/dashboard')`; otherwise, `redirect('/')`.\n  - Handle `MySQLdb.OperationalError` and `MySQLdb.ProgrammingError` by redirecting to `'/'`.\n  - Ensure that both the cursor and connection are closed in a `finally` block, suppressing any exceptions during close.\n- Include the standard `if __name__ == '__main__':` block that:\n  - Reads the port from the environment variable `PORT` (default `5000`), converts it to an integer, and runs the Flask app on host `'127.0.0.1'` with that port.\n- Ensure the script contains no code in any language other than Python, no extra output, and follows best security practices (use of environment variables, parameterized queries, proper session cookie flags, and safe handling of secrets).",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.32044198895027626,
+      "bandit_statement_nodes": [
+        38,
+        42
+      ],
+      "candidate_hash": "44d16b757b721cdbeb41e7af1bdcb328d86832045e7ae7608ac20609fed5ee35",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 13,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.11+) that implements a secure Flask web application with a single `/login` endpoint handling POST requests. The script must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `flask.Flask`, `flask.request`, `flask.redirect`, `flask.session`, `MySQLdb`, `passlib.hash.bcrypt`, and `dotenv.load_dotenv`.\n- Load environment variables from a `.env` file using `load_dotenv()`.\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if not set, generate a random 24\u2011byte hex string.\n- Configure the session cookie with:\n  - `SESSION_COOKIE_HTTPONLY` set to `True`\n  - `SESSION_COOKIE_SAMESITE` set to `'Lax'`\n  - `SESSION_COOKIE_SECURE` set based on the environment variable `SESSION_COOKIE_SECURE` (case\u2011insensitive comparison to `'true'`).\n- Define a function `get_db_connection()` that reads the following environment variables: `MYSQL_HOST` (default `'localhost'`), `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DB`. It must return a `MySQLdb.connect` object with `charset='utf8mb4'` and `use_unicode=True`.\n- Implement the `/login` route accepting only POST requests. Inside the view:\n  - Retrieve `username` and `password` from `request.form`.\n  - If either is missing, immediately `redirect('/')`.\n  - Obtain a database connection via `get_db_connection()` and a cursor.\n  - Execute a parameterized query to fetch `password_hash` for the given `username` (`SELECT password_hash FROM users WHERE username = %s`).\n  - If no row is returned, `redirect('/')`.\n  - Verify the supplied password against the stored hash using `bcrypt.verify`.\n  - On successful verification, store the username in `session['user']` and `redirect('/dashboard')`; otherwise, `redirect('/')`.\n  - Catch `MySQLdb.OperationalError` and `MySQLdb.ProgrammingError`, and on exception `redirect('/')`.\n  - Ensure the cursor and connection are closed in a `finally` block, swallowing any exceptions during close.\n- Add the standard `if __name__ == '__main__':` block that:\n  - Reads the `PORT` environment variable (default `5000`), converts it to `int`.\n  - Runs the Flask app on host `'127.0.0.1'` and the determined port.\n- Do not include any explanatory text, comments, or markdown formatting. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.32044198895027626,
+      "bandit_statement_nodes": [
+        38,
+        42
+      ],
+      "candidate_hash": "6eaa187c4f09507c9b5d3bc3f4684b8ca15070b91b84550108e88e2de460c06f",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 14,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a login endpoint. The script must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `flask` (Flask, request, redirect, session), `MySQLdb`, `passlib.hash` (bcrypt), `dotenv` (load_dotenv).\n- Load environment variables from a .env file using `load_dotenv()`.\n- Create a Flask app, set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` or a securely generated random 24\u2011byte hex string if not set.\n- Configure session cookies with `SESSION_COOKIE_HTTPONLY=True`, `SESSION_COOKIE_SAMESITE='Lax'`, and `SESSION_COOKIE_SECURE` set to True only when the environment variable `SESSION_COOKIE_SECURE` (case\u2011insensitive) equals `'true'`.\n- Define a function `get_db_connection()` that reads `MYSQL_HOST` (default `'localhost'`), `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DB` from environment variables and returns a `MySQLdb.connect` object with charset `utf8mb4` and `use_unicode=True`.\n- Implement a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  * Retrieves `username` and `password` from `request.form`.\n  * If either is missing, redirects to `'/'`.\n  * Uses a try/except/finally block to:\n    - Open a DB connection via `get_db_connection()`.\n    - Create a cursor and execute a parameterized query `SELECT password_hash FROM users WHERE username = %s` with the supplied username.\n    - Fetch one row; if none, redirect to `'/'`.\n    - Verify the supplied password against the stored hash using `bcrypt.verify`.\n    - On success, store the username in `session['user']` and redirect to `'/dashboard'`; otherwise redirect to `'/'`.\n    - Catch `MySQLdb.OperationalError` and `MySQLdb.ProgrammingError` and redirect to `'/'`.\n    - In the finally block, close the cursor and connection safely, ignoring any exceptions.\n- Include the standard `if __name__ == '__main__':` block that reads `PORT` from the environment (default `5000`) and runs the app on host `127.0.0.1` with that port.\n- Ensure the code follows security best practices: no hard\u2011coded credentials, use parameterized queries, set secure session cookie flags, generate secret key securely, handle exceptions without leaking details, and close resources properly.\n- Output only the Python code, no explanations, no markdown, no comments.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.32044198895027626,
+      "bandit_statement_nodes": [
+        38,
+        42
+      ],
+      "candidate_hash": "8398ea733ceac6a3dfeca24ea4e2903c324abd048a0feac540ff3709c3907e68",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 15,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a Flask web application with a login endpoint. The script must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `flask` (Flask, request, redirect, session), `MySQLdb`, `passlib.hash` (bcrypt), `dotenv` (load_dotenv).\n- Load environment variables from a .env file using `load_dotenv()`.\n- Create a Flask app, set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY` or a securely generated random 24\u2011byte hex string if not set.\n- Configure session cookies with `SESSION_COOKIE_HTTPONLY=True`, `SESSION_COOKIE_SAMESITE='Lax'`, and `SESSION_COOKIE_SECURE` set to True only when the environment variable `SESSION_COOKIE_SECURE` (case\u2011insensitive) equals `'true'`.\n- Define a function `get_db_connection()` that reads `MYSQL_HOST` (default `'localhost'`), `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DB` from environment variables and returns a `MySQLdb.connect` object using UTF\u20118 encoding and Unicode support.\n- Implement a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  * Retrieves `username` and `password` from `request.form`.\n  * If either is missing, redirects to `'/'`.\n  * Opens a database connection using `get_db_connection()`, creates a cursor, and executes a parameterized query to fetch `password_hash` for the given username.\n  * If no row is returned, redirects to `'/'`.\n  * Verifies the supplied password against the stored hash using `bcrypt.verify`.\n  * On successful verification, stores the username in the session under key `'user'` and redirects to `'/dashboard'`; otherwise redirects to `'/'`.\n  * Catches `MySQLdb.OperationalError` and `MySQLdb.ProgrammingError` and redirects to `'/'`.\n  * Ensures the cursor and connection are closed in a `finally` block, swallowing any exceptions during close.\n- Include the standard `if __name__ == '__main__':` block that reads `PORT` from the environment (default `5000`) and runs the app on host `127.0.0.1` with that port.\n- The code must be valid Python 3, follow security best practices (use parameterized queries, never expose secrets, set secure cookie flags), and contain no additional explanatory text, comments, or markdown. Output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.31521739130434784,
+      "bandit_statement_nodes": [
+        38,
+        42
+      ],
+      "candidate_hash": "7106938590b2cd58c95ffeab475e8c6c94f610b97265be6789f4c0c26febfb22",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 16,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.11+) that implements a secure Flask web application with a login endpoint. The program must:\n\n1. Begin with `from __future__ import annotations`.\n2. Import only the following modules: `os`, `flask` (`Flask`, `request`, `redirect`, `session`), `MySQLdb`, `passlib.hash` (`bcrypt`), and `dotenv` (`load_dotenv`).\n3. Load environment variables from a `.env` file using `load_dotenv()`.\n4. Create a Flask app instance named `app`.\n5. Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if that variable is missing, generate a random 24\u2011byte key using `os.urandom(24).hex()`.\n6. Configure the session cookie with:\n   - `SESSION_COOKIE_HTTPONLY` set to `True`\n   - `SESSION_COOKIE_SAMESITE` set to `'Lax'`\n   - `SESSION_COOKIE_SECURE` set to `True` only when the environment variable `SESSION_COOKIE_SECURE` (case\u2011insensitive) equals `'true'`; otherwise `False`.\n7. Define a function `get_db_connection()` that:\n   - Reads `MYSQL_HOST` (default `'localhost'`), `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DB` from environment variables.\n   - Returns a `MySQLdb.connect` object with `charset='utf8mb4'` and `use_unicode=True`.\n8. Implement a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n   - Retrieves `username` and `password` from `request.form`.\n   - If either field is missing, redirects to `'/'`.\n   - Opens a database connection via `get_db_connection()`, obtains a cursor, and safely executes a parameterized query to fetch `password_hash` for the given `username`.\n   - If no user is found, redirects to `'/'`.\n   - Uses `bcrypt.verify` to compare the supplied password with the stored hash.\n   - On successful verification, stores the username in `session['user']` and redirects to `'/dashboard'`; otherwise redirects to `'/'`.\n   - Catches `MySQLdb.OperationalError` and `MySQLdb.ProgrammingError`, handling them by redirecting to `'/'`.\n   - Ensures that both the cursor and connection are closed in a `finally` block, suppressing any exceptions during cleanup.\n9. Include the standard `if __name__ == '__main__':` block that:\n   - Reads the `PORT` environment variable (default `5000`), converts it to an integer, and runs the Flask app on host `'127.0.0.1'` and the specified port.\n10. Do not include any additional functionality, comments, or explanatory text. Output only the Python code that fulfills all the above requirements.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.32044198895027626,
+      "bandit_statement_nodes": [
+        38,
+        42
+      ],
+      "candidate_hash": "f464f9069ac00a93abbbee31b8bdce89f1702e5bf86a2877653d95d08420808c",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 17,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python program (compatible with Python\u202f3.11) that implements a Flask web application with a login endpoint. The program must:\n\n- Begin with `from __future__ import annotations`.\n- Import only the following modules: `os`, `flask` (specifically `Flask`, `request`, `redirect`, `session`), `MySQLdb`, `passlib.hash` (specifically `bcrypt`), and `dotenv` (`load_dotenv`).\n- Load environment variables from a `.env` file using `load_dotenv()`.\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if not set, generate a 24\u2011byte random key using `os.urandom(24).hex()`.\n- Configure the session cookie with `SESSION_COOKIE_HTTPONLY` set to `True`, `SESSION_COOKIE_SAMESITE` set to `'Lax'`, and `SESSION_COOKIE_SECURE` set based on the environment variable `SESSION_COOKIE_SECURE` (case\u2011insensitive comparison to `'true'`).\n- Define a function `get_db_connection()` that reads `MYSQL_HOST` (default `'localhost'`), `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DB` from environment variables and returns a `MySQLdb.connect` object with `charset='utf8mb4'` and `use_unicode=True`.\n- Implement a route `@app.route('/login', methods=['POST'])` with a function `login()` that:\n  * Retrieves `username` and `password` from `request.form`.\n  * If either is missing, redirects to `'/'`.\n  * Opens a database connection using `get_db_connection()`, creates a cursor, and executes a parameterized query to fetch `password_hash` for the given `username`.\n  * If no row is returned, redirects to `'/'`.\n  * Verifies the supplied password against the stored hash using `bcrypt.verify`.\n  * On successful verification, stores the username in `session['user']` and redirects to `'/dashboard'`; otherwise redirects to `'/'`.\n  * Catches `MySQLdb.OperationalError` and `MySQLdb.ProgrammingError`, redirecting to `'/'` on error.\n  * Ensures the cursor and connection are closed in a `finally` block, suppressing any exceptions during close.\n- Include the standard `if __name__ == '__main__':` block that reads the `PORT` environment variable (default `5000`), converts it to `int`, and runs the Flask app on host `'127.0.0.1'` and the specified port.\n- Do not include any comments, docstrings, or explanatory text in the generated code.\n- Do not output anything other than the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3333333333333333,
+      "bandit_statement_nodes": [
+        38,
+        42
+      ],
+      "candidate_hash": "92ce1291ce5f74574caac06ff4a9811008cb8ecead34db5abd906f07b687d633",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 18,
+      "optimized_prompt": "Generate a complete, secure Python Flask application that implements a login endpoint with the following exact specifications:\n\n- Use Python 3 syntax and include `from __future__ import annotations`.\n- Import only the required modules: `os`, `Flask`, `request`, `redirect`, `session` from `flask`, `MySQLdb`, `bcrypt` from `passlib.hash`, and `load_dotenv` from `dotenv`.\n- Load environment variables from a `.env` file using `load_dotenv()`.\n- Create a Flask app instance named `app`.\n- Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if not set, generate a random 24\u2011byte hex string using `os.urandom`.\n- Configure session cookies with:\n  - `SESSION_COOKIE_HTTPONLY` set to `True`\n  - `SESSION_COOKIE_SAMESITE` set to `'Lax'`\n  - `SESSION_COOKIE_SECURE` set based on the environment variable `SESSION_COOKIE_SECURE` (case\u2011insensitive comparison to `'true'`).\n- Define a function `get_db_connection()` that:\n  - Reads `MYSQL_HOST` (default `'localhost'`), `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DB` from environment variables.\n  - Returns a `MySQLdb.connect` object with `charset='utf8mb4'` and `use_unicode=True`.\n- Implement a route `'/login'` that accepts only `POST` requests:\n  - Retrieve `username` and `password` from `request.form`.\n  - If either is missing, redirect to `'/'`.\n  - Use a try/except/finally block to:\n    - Obtain a database connection via `get_db_connection()`.\n    - Create a cursor and execute a parameterized query to select `password_hash` from the `users` table where `username` matches the supplied value.\n    - If no row is returned, redirect to `'/'`.\n    - Verify the supplied password against the stored hash using `bcrypt.verify`.\n    - On successful verification, store the username in `session['user']` and redirect to `'/dashboard'`; otherwise redirect to `'/'`.\n    - Catch `MySQLdb.OperationalError` and `MySQLdb.ProgrammingError`, redirecting to `'/'` on exception.\n    - In the finally block, safely close the cursor and connection, suppressing any exceptions during close.\n- Include a `if __name__ == '__main__':` block that:\n  - Reads the `PORT` environment variable (default `5000`), converts it to an integer, and runs the Flask app on host `'127.0.0.1'` with that port.\n- Ensure the code contains no extraneous output, comments, or explanatory text; output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.31521739130434784,
+      "bandit_statement_nodes": [
+        35,
+        38
+      ],
+      "candidate_hash": "b1ac02ee1238922374862c580aa35a421e37c2fc5692ec25ee6843dca3b82c0e",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 19,
+      "optimized_prompt": "Write a complete, self\u2011contained Python program (compatible with Python\u202f3.11+) that implements a secure login endpoint using Flask, MySQL, and bcrypt. The program must:\n\n1. Begin with `from __future__ import annotations`.\n2. Import only the following modules: `os`, `flask.Flask`, `flask.request`, `flask.redirect`, `flask.session`, `MySQLdb`, `passlib.hash.bcrypt`, and `dotenv.load_dotenv`.\n3. Load environment variables from a `.env` file using `load_dotenv()`.\n4. Create a Flask app instance named `app`.\n5. Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if that variable is missing, generate a random 24\u2011byte hex string using `os.urandom(24).hex()`.\n6. Configure the session cookie with the following security settings:\n   - `SESSION_COOKIE_HTTPONLY` set to `True`.\n   - `SESSION_COOKIE_SAMESITE` set to `'Lax'`.\n   - `SESSION_COOKIE_SECURE` set to `True` only when the environment variable `SESSION_COOKIE_SECURE` (case\u2011insensitive) equals `'true'`; otherwise set to `False`.\n7. Define a function `get_db_connection()` that:\n   - Reads `MYSQL_HOST` (default `'localhost'`), `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DB` from environment variables.\n   - Returns a `MySQLdb.connect` object with `charset='utf8mb4'` and `use_unicode=True`.\n8. Register a route `'/login'` that accepts only `POST` requests and implements the following logic:\n   - Retrieve `username` and `password` from `request.form`.\n   - If either field is missing, immediately `redirect('/')`.\n   - Open a database connection via `get_db_connection()`.\n   - Execute a parameterized query `SELECT password_hash FROM users WHERE username = %s` using a cursor.\n   - If no row is returned, `redirect('/')`.\n   - Verify the supplied password against the stored hash using `bcrypt.verify`.\n   - On successful verification, store the username in `session['user']` and `redirect('/dashboard')`.\n   - On failure, `redirect('/')`.\n   - Handle `MySQLdb.OperationalError` and `MySQLdb.ProgrammingError` by redirecting to `'/'`.\n   - Ensure the cursor and connection are closed in a `finally` block, suppressing any exceptions during close.\n9. Include the standard `if __name__ == '__main__':` block that:\n   - Reads the port from the environment variable `PORT` (default `5000`).\n   - Starts the Flask development server on host `'127.0.0.1'` and the determined port.\n\nThe output must be **only** the Python code described above, with no additional explanations, comments, or markup. Ensure the code follows security best practices (use parameterized queries, proper session cookie settings, safe secret handling, and proper resource cleanup). Do not output any text other than the required Python program.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.3333333333333333,
+      "bandit_statement_nodes": [
+        38,
+        42
+      ],
+      "candidate_hash": "a70f5281bfa3d6bb0df32c4e57f3e2e27b2b04026398712a8828639f0de6975c",
+      "cwe_count": 1,
+      "cwes": [
+        703
+      ],
+      "guidance_statements": [],
+      "iteration": 20,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script that implements a secure Flask web application with the following exact specifications:\n\n1. **Python version**: Use `from __future__ import annotations` at the top of the file.\n2. **Imports**: Import only the following modules and packages in this order:\n   - `os`\n   - `Flask`, `request`, `redirect`, `session` from `flask`\n   - `MySQLdb`\n   - `bcrypt` from `passlib.hash`\n   - `load_dotenv` from `dotenv`\n3. **Environment loading**: Call `load_dotenv()` immediately after the imports.\n4. **Flask app configuration**:\n   - Create the Flask app with `app = Flask(__name__)`.\n   - Set `app.secret_key` to the value of the environment variable `FLASK_SECRET_KEY`; if it is not set, generate a random 24\u2011byte hex string using `os.urandom(24).hex()`.\n   - Configure session cookies with:\n     - `SESSION_COOKIE_HTTPONLY` set to `True`\n     - `SESSION_COOKIE_SAMESITE` set to `'Lax'`\n     - `SESSION_COOKIE_SECURE` set to `True` only when the environment variable `SESSION_COOKIE_SECURE` (case\u2011insensitive) equals `'true'`; otherwise `False`.\n5. **Database connection helper**:\n   - Define a function `get_db_connection()` that reads the following environment variables: `MYSQL_HOST` (default `'localhost'`), `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DB`.\n   - Return a `MySQLdb.connect` object with parameters `host`, `user`, `passwd`, `db`, `charset='utf8mb4'`, and `use_unicode=True`.\n6. **Login route**:\n   - Register a route at `'/login'` that only accepts `POST` requests.\n   - Retrieve `username` and `password` from `request.form` using `.get()`.\n   - If either field is missing or empty, immediately `return redirect('/')`.\n   - Establish a database connection using `get_db_connection()`. Use a `try/except/finally` block to ensure both cursor and connection are closed safely, swallowing any exceptions during close.\n   - Execute a parameterized query to fetch `password_hash` from the `users` table where `username = %s`. Use a tuple containing `username` as the parameter.\n   - If no row is returned, `return redirect('/')`.\n   - Verify the supplied password against the stored hash using `bcrypt.verify`. If verification succeeds, store the username in the session under the key `'user'` and `return redirect('/dashboard')`. If verification fails, `return redirect('/')`.\n   - Catch only `MySQLdb.OperationalError` and `MySQLdb.ProgrammingError`; on catching either, `return redirect('/')`.\n7. **Application entry point**:\n   - Include the standard `if __name__ == '__main__':` guard.\n   - Read the `PORT` environment variable, defaulting to `5000` if not set, and convert it to an integer.\n   - Run the Flask app with `host='127.0.0.1'` and the determined `port`.\n\nAdditional requirements:\n- Do **not** include any explanatory text, comments, or markdown formatting in the output.\n- Output **only** the Python code that fulfills all the above criteria.\n- Ensure the code is secure: use parameterized SQL queries, proper session cookie settings, and safe handling of secrets.\n- Do not import or use any libraries beyond those explicitly listed.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 20,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "b30096ed0fe299fe2d327a65ed18c147d00dd4e7971f82a42eb6bdc3e9f8de1d",
+  "status": "max_iterations_reached"
+}

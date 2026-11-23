@@ -1,0 +1,58 @@
+{
+  "ast_similarity": 0.9345794392523364,
+  "candidate_hash": "8befac7f6a315ef22638814bb54837ed171f105d26290016c45e965d463a5cd9",
+  "complete": true,
+  "config_hash": "0d65b082ff60d9e603691a2efd0972bf1b7ac1d9db8cecda07fae758a16dad2d",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file1.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9345794392523364,
+      "bandit_statement_nodes": [
+        18,
+        23
+      ],
+      "candidate_hash": "8befac7f6a315ef22638814bb54837ed171f105d26290016c45e965d463a5cd9",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1026,
+          "end_lineno": 23,
+          "lineno": 23,
+          "node": 15
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.2379,
+          "end_lineno": 27,
+          "lineno": 27,
+          "node": 18
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1618,
+          "end_lineno": 35,
+          "lineno": 35,
+          "node": 23
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, secure Python Flask application that implements a `/register` endpoint handling only POST requests. The code must:\n\n- Import only the necessary modules: `Flask`, `request`, `redirect` from `flask`; `hashlib`; `MySQLdb`; and `os`.\n- Create a Flask app instance.\n- Define the `/register` route with `methods=['POST']`.\n- Inside the route:\n  - Retrieve `username` and `password` from `request.form`.\n  - Generate a 16\u2011byte random salt using `os.urandom`.\n  - Derive a password hash with `hashlib.pbkdf2_hmac` using the algorithm `sha256`, the UTF\u20118 encoded password, the generated salt, and **exactly** 100,000 iterations.\n  - Convert both the salt and the derived hash to hexadecimal strings.\n  - Connect to a MySQL database using `MySQLdb.connect` with the parameters: `host=\"localhost\"`, `user=\"root\"`, `passwd=\"\"`, `db=\"testdb\"`.\n  - Obtain a cursor from the connection.\n  - **Security requirement:** Use **parameterized queries** for all database interactions to prevent SQL injection.\n  - Execute a parameterized `SELECT` query to check if the provided `username` already exists in the `users` table.\n  - If a record is found, close the database connection and return a redirect to `/login` with HTTP status code 307.\n  - If the username is not taken, execute a parameterized `INSERT` query to add a new row to the `users` table with columns `username`, `password`, `salt`, and `account_created`. Insert the `username`, the hex\u2011encoded hash, the hex\u2011encoded salt, and the integer `1` for `account_created`.\n  - Commit the transaction, close the database connection, and return the plain text response `\"Registration successful\"` with HTTP status code 201.\n- Ensure the entire script is valid Python code, contains no code in any other language, and follows best security practices (proper encoding, no string interpolation in SQL, safe handling of secrets).",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 1,
+  "schema": 1,
+  "selected_iteration": 1,
+  "source_hash": "91acf2a5aef5bcd370c6a3200ba7ebb3820f83aa24caea6ae6604f49f50bfecf",
+  "status": "secured"
+}

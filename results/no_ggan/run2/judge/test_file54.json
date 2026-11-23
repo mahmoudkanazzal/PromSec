@@ -1,0 +1,73 @@
+{
+  "api_preserved": true,
+  "candidate_hash": "2e116cf93ed7b1902e2acb047766851544e5644debce42fac9c92d51ee1e8920",
+  "compile_ok": true,
+  "confidence": 0.95,
+  "contract": {
+    "edge_cases": [
+      "Missing 'username' or 'password' fields cause a KeyError and result in a 500 error.",
+      "If the username does not exist, row is None and accessing row[0] raises a TypeError.",
+      "Database connection failures raise exceptions that propagate to the client.",
+      "An empty password is still hashed and compared, potentially allowing login if the stored hash matches.",
+      "Multiple rows for the same username are ignored beyond the first fetched row.",
+      "MD5 hash collisions could theoretically allow authentication with an incorrect password."
+    ],
+    "entrypoints": [],
+    "intent": "Authenticate a user via POST /login and redirect to the home page on success or to an error page on failure.",
+    "invariants": [
+      "The database connection parameters (host, user, password, db) are fixed in the code.",
+      "Only the POST method is routed to the login function.",
+      "Redirect destinations are hard\u2011coded to '/' for success and '/error' for failure.",
+      "Password comparison is performed using MD5 of the UTF\u20118 encoded password.",
+      "The SQL query uses a parameterized placeholder to avoid injection.",
+      "A response is always a redirect; no other HTTP status codes are returned intentionally."
+    ],
+    "io_behavior": [
+      "Accepts an HTTP POST request to /login with form fields 'username' and 'password'.",
+      "Queries the MySQL 'user_info' table for the stored password hash of the given username.",
+      "Computes the MD5 hash of the supplied password.",
+      "If the hashes match, returns an HTTP 302 redirect to '/'.",
+      "If the hashes do not match, returns an HTTP 302 redirect to '/error'.",
+      "No response body is sent beyond the redirect."
+    ],
+    "public_api": {
+      "route:POST /login": ""
+    },
+    "side_effects": [
+      "Opens a MySQL connection to localhost using the root credentials.",
+      "Executes a SELECT query on the user_info table.",
+      "Relies on Flask's default logging for request handling.",
+      "Does not modify any files or external state.",
+      "Does not spawn subprocesses or external commands.",
+      "May raise an exception that results in a 500 Internal Server Error."
+    ],
+    "source_hash": "b2e18a09915013ea97ddd9cc2f500be31621fcde49a46a732060f7b6516dc55f"
+  },
+  "dimensions": {
+    "behavior": 0.2,
+    "edge_cases": 0.2,
+    "invariants": 0.3,
+    "io_semantics": 0.4,
+    "side_effects": 0.5
+  },
+  "enforcement_config_hash": "0de61b67ea13124d264447fb838c185954167c32176ae2f1598fad6309d69e37",
+  "entrypoints_ok": true,
+  "file": "test_file54.py",
+  "gated_score": 0.275,
+  "judge_config_hash": "ba494e3dfe1b59aedc25cffdea64a834176cc704e32cadcd7e37b8c60a98fcf3",
+  "laaj_score": 0.275,
+  "original_hash": "b2e18a09915013ea97ddd9cc2f500be31621fcde49a46a732060f7b6516dc55f",
+  "rationale": "The candidate deviates from the contract in key ways: uses env\u2011based DB credentials, aborts with 400 for missing fields, employs Werkzeug's password hash check instead of MD5, and adds session handling, breaking several invariants and edge\u2011case expectations while still performing a POST redirect flow.",
+  "schema": 1,
+  "stability_abs_difference": 0.13875,
+  "stability_dimensions": {
+    "behavior": 0.8,
+    "edge_cases": 0.2,
+    "invariants": 0.3,
+    "io_semantics": 0.5,
+    "side_effects": 0.2
+  },
+  "stability_score": 0.41375,
+  "weighted_mean": 0.3,
+  "worst_dimension": 0.2
+}

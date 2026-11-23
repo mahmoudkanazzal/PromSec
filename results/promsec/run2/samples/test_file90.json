@@ -1,0 +1,77 @@
+{
+  "ast_similarity": 0.6798780487804879,
+  "candidate_hash": "4ee4804d6ba9dc568ab1350de8b4bc17d5e7478877dea7a8c1b5332ec099cd88",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file90.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.7252032520325203,
+      "bandit_statement_nodes": [
+        8,
+        13,
+        23,
+        32,
+        41
+      ],
+      "candidate_hash": "be77d86b4454830db94bd9b31fda524fd5cf7989fd2cf1389e7ea1d6cf385ba8",
+      "cwe_count": 1,
+      "cwes": [
+        605
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.1078,
+          "end_lineno": 34,
+          "lineno": 34,
+          "node": 23
+        },
+        {
+          "ast_type": "Expr",
+          "change": 0.1133,
+          "end_lineno": 49,
+          "lineno": 49,
+          "node": 32
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Write a complete, self\u2011contained Python Flask application that implements the same routes and functionality as the insecure example below (add_product, update_price, delete_product, search_products, view_products). The generated code must:\n\n- Be pure Python; do not include any other programming languages.\n- Import Flask and a safe MySQL client library (e.g., mysql\u2011connector\u2011python or PyMySQL) and use it with context managers.\n- Retrieve database connection parameters (host, user, password, database) from environment variables, never hard\u2011code them.\n- Use prepared statements / parameterized queries for every SQL operation; never concatenate or format user\u2011supplied values into SQL strings.\n- Validate and sanitize incoming request data:\n  * Ensure \u201cname\u201d is a non\u2011empty string and strip leading/trailing whitespace.\n  * Ensure \u201cprice\u201d and \u201cnew_price\u201d are numeric (float or decimal) and greater than zero.\n  * Ensure \u201csearch_term\u201d is a string; use it safely with a LIKE clause via parameters.\n- Use `with` statements for database connections and cursors to guarantee proper closing, even on exceptions.\n- Return appropriate HTTP responses:\n  * For successful add, update, delete operations, return a Flask `redirect` to the appropriate endpoint.\n  * For view and search endpoints, return JSON (use `jsonify`) containing the list of products.\n  * For error conditions (e.g., duplicate product on add), return a meaningful HTTP status code and message.\n- Keep the same logical flow:\n  * In the add_product route, check for an existing product with the same name before inserting.\n  * In the update_price route, update the price of the specified product.\n  * In the delete_product route, delete the specified product.\n  * In the search_products route, perform a case\u2011insensitive LIKE search on product names.\n  * In the view_products route, return all products.\n- Disable Flask debug mode.\n- Include all necessary imports, Flask app initialization, and the `if __name__ == '__main__':` block to run the app.\n- Follow PEP\u20118 style guidelines (proper naming, spacing, etc.).\n- Do not include any explanatory text, comments, or markdown in the output; output only the Python code.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.6798780487804879,
+      "bandit_statement_nodes": [
+        71
+      ],
+      "candidate_hash": "4ee4804d6ba9dc568ab1350de8b4bc17d5e7478877dea7a8c1b5332ec099cd88",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [
+        {
+          "ast_type": "Expr",
+          "change": 0.2411,
+          "end_lineno": 94,
+          "lineno": 94,
+          "node": 71
+        }
+      ],
+      "iteration": 2,
+      "optimized_prompt": "Write a complete, self\u2011contained Python script (compatible with Python\u202f3.8+) that implements a secure Flask web application with the following exact functionality and security requirements:\n\n1. **Imports**  \n   - Import `os` for environment variables.  \n   - Import `Flask`, `request`, `redirect`, `url_for`, `jsonify`, and `abort` from `flask`.  \n   - Import `mysql.connector`.\n\n2. **Flask app initialization**  \n   - Create a Flask instance named `app`.\n\n3. **Database connection helper**  \n   - Define a function `get_db_connection()` that returns a `mysql.connector.connect` object using the environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`.  \n   - Do not hard\u2011code any credentials.\n\n4. **Input validation functions**  \n   - `validate_name(value)`:  \n     - Abort with HTTP\u202f400 if `value` is not a string.  \n     - Strip whitespace, abort with HTTP\u202f400 if the resulting string is empty.  \n     - Return the cleaned name.  \n   - `validate_price(value)`:  \n     - Attempt to convert `value` to `float`; abort with HTTP\u202f400 on `TypeError` or `ValueError`.  \n     - Abort with HTTP\u202f400 if the price is \u2264\u202f0.  \n     - Return the numeric price.  \n   - `validate_search_term(value)`:  \n     - Abort with HTTP\u202f400 if `value` is `None`.  \n     - Abort with HTTP\u202f400 if `value` is not a string.  \n     - Return the term unchanged.\n\n5. **Routes** (all routes must use only the functions above for validation and must use parameterized SQL queries to prevent injection):\n\n   - `POST /add_product` (`add_product`):  \n     - Retrieve `name` and `price` from `request.form`.  \n     - Validate them with `validate_name` and `validate_price`.  \n     - Open a DB connection using a context manager (`with get_db_connection() as conn`).  \n     - Use a cursor (`dictionary=True`) to first check if a product with the same name exists (`SELECT id FROM products WHERE name = %s`).  \n     - If it exists, abort with HTTP\u202f409.  \n     - Otherwise insert the new product (`INSERT INTO products (name, price) VALUES (%s, %s)`).  \n     - Commit the transaction and redirect to the `view_products` endpoint.\n\n   - `POST /update_price` (`update_price`):  \n     - Retrieve `name` and `new_price` from `request.form`.  \n     - Validate with `validate_name` and `validate_price`.  \n     - Execute an `UPDATE products SET price = %s WHERE name = %s`.  \n     - If `cursor.rowcount` is 0, abort with HTTP\u202f404.  \n     - Commit and redirect to `view_products`.\n\n   - `POST /delete_product` (`delete_product`):  \n     - Retrieve `name` from `request.form`.  \n     - Validate with `validate_name`.  \n     - Execute `DELETE FROM products WHERE name = %s`.  \n     - If no rows were deleted, abort with HTTP\u202f404.  \n     - Commit and redirect to `view_products`.\n\n   - `GET /search_products` (`search_products`):  \n     - Retrieve `search_term` from `request.args`.  \n     - Validate with `validate_search_term`.  \n     - Build a LIKE pattern `%{term}%` (do not concatenate user input directly into the query string; pass the pattern as a parameter).  \n     - Query `SELECT id, name, price FROM products WHERE name LIKE %s` using a dictionary cursor.  \n     - Return the fetched rows as JSON.\n\n   - `GET /view_products` (`view_products`):  \n     - Query `SELECT id, name, price FROM products` with a dictionary cursor.  \n     - Return the result as JSON.\n\n6. **Application entry point**  \n   - When the script is executed directly, read `FLASK_RUN_HOST` (default `'127.0.0.1'`) and `FLASK_RUN_PORT` (default `'5000'`) from environment variables.  \n   - Run the Flask app with `debug=False`.\n\n7. **Security and style constraints**  \n   - Use only parameterized queries (`%s` placeholders) \u2013 never concatenate raw user input into SQL strings.  \n   - Use context managers for both the DB connection and cursors to ensure proper cleanup.  \n   - Do not enable Flask debug mode.  \n   - Do not include any explanatory comments, docstrings, or non\u2011code text in the output.  \n   - Ensure the script is pure Python; do not import or reference any non\u2011standard libraries beyond those specified.  \n   - The output must be only the Python code that fulfills all the above requirements.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "27601feea594ef545b4981973fd012496ae91f0e9386b9bf28a423c58eae2c4d",
+  "status": "secured"
+}

@@ -1,0 +1,93 @@
+{
+  "ast_similarity": 0.8810457516339869,
+  "candidate_hash": "d803ccacc26e1c67204cb1c50963c8c1725ae74fb947feab817cda615a4c59d6",
+  "complete": true,
+  "config_hash": "304f6ab60d648522819ece875305b6b0374d26cb2217c3a30269729760b59adc",
+  "cwe_count_after": 0,
+  "cwe_count_before": 1,
+  "cwes_after": [],
+  "cwes_before": [
+    89
+  ],
+  "error": "",
+  "file": "test_file70.py",
+  "guidance_mode": "promsec",
+  "iterations": [
+    {
+      "ast_similarity_to_original": 0.9220246238030095,
+      "bandit_statement_nodes": [
+        14,
+        19,
+        30,
+        45,
+        49,
+        62,
+        66,
+        77
+      ],
+      "candidate_hash": "5f588aa04eac5dd846c5dfd3b5d30e1ffb3824eb136ddd1d9eb787609628686a",
+      "cwe_count": 1,
+      "cwes": [
+        259
+      ],
+      "guidance_statements": [
+        {
+          "ast_type": "Assign",
+          "change": 0.1882,
+          "end_lineno": 18,
+          "lineno": 18,
+          "node": 14
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1318,
+          "end_lineno": 37,
+          "lineno": 37,
+          "node": 30
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1318,
+          "end_lineno": 54,
+          "lineno": 54,
+          "node": 45
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1692,
+          "end_lineno": 58,
+          "lineno": 58,
+          "node": 49
+        },
+        {
+          "ast_type": "Assign",
+          "change": 0.1692,
+          "end_lineno": 77,
+          "lineno": 77,
+          "node": 66
+        }
+      ],
+      "iteration": 1,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script that implements a Flask web service with the following specifications:\n\n- Use only Python and the libraries: Flask, request, redirect, jsonify, re, hashlib, MySQLdb, os.\n- Define a Flask app instance.\n- Create a helper function `get_db_connection()` that returns a MySQLdb connection to a MySQL server on localhost with user `root`, empty password, and database `projectdb`.\n- Implement the route `/register` accepting POST requests:\n  - Retrieve `username` and `password` from `request.form`.\n  - Generate a 16\u2011byte random salt using `os.urandom`.\n  - Compute a SHA\u2011256 hash of the concatenation of the salt and the UTF\u20118 encoded password.\n  - Store the username, hashed password (hex string), salt (hex string), and an `account_created` flag set to `1` in a `users` table.\n  - Before insertion, execute a parameterized SELECT query to check if the username already exists; if it does, redirect to `/login` with HTTP status code 307.\n  - Use parameterized queries for all database interactions to prevent SQL injection.\n  - Close the cursor and connection, commit the transaction when inserting, and return the plain text response `\"Registration successful\"` on success.\n- Implement the route `/login` accepting POST requests:\n  - Retrieve `username` and `password` from `request.form`.\n  - Query the `users` table for the stored password hash and salt for the given username using a parameterized SELECT.\n  - If a record is found, convert the stored salt from hex to bytes, recompute the SHA\u2011256 hash of the salt plus the provided password, and compare it to the stored hash.\n  - On a match, close the cursor and connection and redirect to `/dashboard` with HTTP status code 307.\n  - If authentication fails, close resources and return the plain text response `\"Invalid credentials\"`.\n- Implement the route `/project/create` accepting POST requests:\n  - Retrieve `username` and `project_name` from `request.form`.\n  - Verify the username exists in the `users` table with a parameterized SELECT.\n  - If the user exists, insert a new row into a `projects` table with the username and project_name using a parameterized INSERT, commit, close resources, and return `\"Project created successfully\"`.\n  - If the user does not exist, close resources and return `\"User not found\"`.\n- Implement the route `/task/add` accepting POST requests:\n  - Retrieve `project_name`, `task_name`, and `task_description` from `request.form`.\n  - Verify the project exists in the `projects` table with a parameterized SELECT.\n  - If the project exists, insert a new row into a `tasks` table with the project_name, task_name, and task_description using a parameterized INSERT, commit, close resources, and return `\"Task added successfully\"`.\n  - If the project does not exist, close resources and return `\"Project not found\"`.\n- Implement the route `/tasks/view` accepting GET requests:\n  - Retrieve `project_name` from the query string via `request.args.get`.\n  - Execute a parameterized SELECT to fetch `task_name` and `task_description` from the `tasks` table for the given project_name.\n  - Convert the result set (list of tuples) into a list of dictionaries with keys `task_name` and `task_description`.\n  - Return the list as JSON using `jsonify`.\n  - Ensure the cursor and connection are closed after the query.\n- Ensure all database cursors and connections are properly closed in every code path, and commit transactions only when data is modified.\n- Do not enable Flask debug mode; start the application with `app.run(debug=False)` inside the standard `if __name__ == '__main__':` guard.\n- Output only the Python code, with no explanatory text, comments, or code in any language other than Python.",
+      "syntax_repair_rounds": 0
+    },
+    {
+      "ast_similarity_to_original": 0.8810457516339869,
+      "bandit_statement_nodes": [
+        4
+      ],
+      "candidate_hash": "d803ccacc26e1c67204cb1c50963c8c1725ae74fb947feab817cda615a4c59d6",
+      "cwe_count": 0,
+      "cwes": [],
+      "guidance_statements": [],
+      "iteration": 2,
+      "optimized_prompt": "Generate a complete, self\u2011contained Python script (Python 3) that implements a Flask web application with the exact functionality described below. The code must be written in Python only, use only the standard library plus the `Flask` and `MySQLdb` packages, and must follow security best practices while preserving the original behavior.\n\n**General requirements**\n- Use `Flask` to create the app and define routes.\n- Use `MySQLdb` for database connections; all queries must be parameterized to prevent SQL injection.\n- Use `os.urandom` to generate a 16\u2011byte random salt for each user registration.\n- Store the salt as a hexadecimal string and the password hash as a SHA\u2011256 hex digest of `salt + password`.\n- Use `try/finally` (or context managers) to ensure that database cursors and connections are always closed.\n- Do **not** enable Flask debug mode (`debug=False`).\n- Return appropriate HTTP status codes (e.g., 400 for missing fields) and use redirects with status code 307 where specified.\n- All responses must be plain strings or JSON as described; do not add extra text.\n- Ensure the script can be run directly (`if __name__ == '__main__': app.run(debug=False)`).\n\n**Endpoints and behavior**\n\n1. **GET `/`** (optional): can be omitted; focus on the required endpoints.\n\n2. **POST `/register`**\n   - Accept form fields `username` and `password`.\n   - If either field is missing, return `'Missing fields'` with status 400.\n   - Check if the username already exists (`SELECT 1 FROM users WHERE username=%s`). If it does, redirect to `/login` with status 307.\n   - If the username is new:\n     - Generate a 16\u2011byte salt with `os.urandom`, convert to hex.\n     - Compute `pwd_hash = hashlib.sha256(salt_bytes + password.encode('utf-8')).hexdigest()`.\n     - Insert the new user with columns `username`, `password_hash`, `salt`, `account_created` (use a placeholder value such as `1`).\n     - Commit the transaction and return `'Registration successful'`.\n\n3. **POST `/login`**\n   - Accept form fields `username` and `password`.\n   - If missing, return `'Missing fields'` with status 400.\n   - Retrieve `password_hash` and `salt` for the given username.\n   - If a record exists:\n     - Convert stored salt from hex to bytes.\n     - Compute the hash of the supplied password using the same method as registration.\n     - If the computed hash matches the stored hash, redirect to `/dashboard` with status 307.\n   - If authentication fails, return `'Invalid credentials'`.\n\n4. **POST `/project/create`**\n   - Accept form fields `username` and `project_name`.\n   - If missing, return `'Missing fields'` with status 400.\n   - Verify that the username exists in `users`. If not, return `'User not found'`.\n   - Insert a new row into `projects` with `username` and `project_name`.\n   - Commit and return `'Project created successfully'`.\n\n5. **POST `/task/add`**\n   - Accept form fields `project_name`, `task_name`, and `task_description`.\n   - If missing, return `'Missing fields'` with status 400.\n   - Verify that the project exists in `projects`. If not, return `'Project not found'`.\n   - Insert a new row into `tasks` with `project_name`, `task_name`, `task_description`.\n   - Commit and return `'Task added successfully'`.\n\n6. **GET `/tasks/view`**\n   - Accept query parameter `project_name`.\n   - If missing, return an empty JSON list (`jsonify([])`).\n   - Retrieve all tasks for the given project (`SELECT task_name, task_description FROM tasks WHERE project_name=%s`).\n   - Return a JSON array of objects with keys `task_name` and `task_description`.\n\n**Database connection helper**\n- Implement a function `get_db_connection()` that returns a `MySQLdb.connect` object with parameters: `host='localhost'`, `user='root'`, `passwd=''`, `db='projectdb'`, `charset='utf8mb4'`.\n\n**Security and robustness**\n- Use only parameterized queries (`%s` placeholders) for all database interactions.\n- Ensure salts are never reused and are stored securely.\n- Do not expose stack traces or internal errors; let Flask handle unexpected exceptions.\n- Do not import any unnecessary modules.\n- Keep the code concise but fully functional as described.",
+      "syntax_repair_rounds": 0
+    }
+  ],
+  "iterations_used": 2,
+  "schema": 1,
+  "selected_iteration": 2,
+  "source_hash": "6d4e51f8cfe78b6dadd8dc3e30ee24aee6e08732d4bad4f640760688e2a3b5cd",
+  "status": "secured"
+}
